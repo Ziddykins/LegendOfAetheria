@@ -1,9 +1,10 @@
 <?php
         session_start();
-        $sup = 1;
+        if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
 
-        if (isset($_POST['login-submit'])) {
-                
+        } else {
+            header('Location: /?failed_login');
+            exit();
         }
 ?>
 

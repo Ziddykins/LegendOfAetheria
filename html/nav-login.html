@@ -1,3 +1,13 @@
+<script>
+$(document).ready(function(){ 
+        if (location.search.match(/\?failed_login/)) {
+            const toast_failed_login = document.getElementById('error-login-toast');
+            const toast_bubble = bootstrap.Toast.getOrCreateInstance(toast_failed_login);
+            toast_bubble.show();
+            console.log('wwwwwweeeeeeeeeeeeeeeeee');
+        }
+    });
+</script>
 <ul class="nav nav-tabs" id="login-box" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-tab-pane" type="button" role="tab" aria-controls="login-tab-pane" aria-selected="true"><i class="bi bi-chevron-double-right"></i> Login</button>
@@ -13,7 +23,7 @@
                     <div class="tab-content" id="login-box-content">
                         <p></p>
                         <div class="tab-pane fade show active" id="login-tab-pane" role="tabpanel" aria-labelledby="login-tab" tabindex="0">
-                            <form id="login-form" action="/index.php" method="POST">
+                            <form id="login-form" action="/" method="POST">
                                 <div class="border">
                                     <div class="d-flex bg-body-secondary border">
                                         <div class="p-2 flex-grow-1"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
@@ -40,7 +50,7 @@
                         </div>
 
                         <div class="tab-pane fade" id="register-tab-pane" role="tabpanel" aria-labelledby="register-tab" tabindex="1">
-                            <form id="login-form" action="/index.php" method="POST">
+                            <form id="register-form" action="/" method="POST">
                                 <div class="border">
                                     <div class="d-flex bg-body-secondary border">
                                         <div class="p-2 flex-grow-1"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
@@ -181,9 +191,9 @@
                                         if (parseInt(document.querySelector("#stats-remaining-ap").innerHTML) > 0) {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            const toastLiveExample = document.getElementById('error-ap-toast')
-                                            const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
-                                            toastBootstrap.show()
+                                            const toastLiveExample = document.getElementById('error-ap-toast');
+                                            const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
+                                            toastBootstrap.show();
                                         }
                                     });
                                 </script>
@@ -207,15 +217,29 @@
 
                     </script>
                     <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                            <div id="error-ap-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                                <div class="toast-header">
-                                    <i class="bi bi-balloon rounded me-2"></i>
-                                    <strong class="me-auto">Uh oh!</strong>
-                                    
-                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                </div>
-                                <div class="toast-body">
-                                    Please assign all AP points
-                                </div>
+                        <div id="error-ap-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <span class="badge text-bg-warning me-auto">
+                                    <i class="bi bi-balloon rounded me-2"></i> Warning
+                                </span>
+                                
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                Please assign all AP points
                             </div>
                         </div>
+
+                        <div id="error-login-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <span class="badge text-bg-danger me-auto">
+                                    <i class="bi bi-dash-circle me-2"></i> Error
+                                </span>
+                                
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body bg-warning bg-gradient">
+                                Invalid login credentials!
+                            </div>
+                        </div>
+                    </div>

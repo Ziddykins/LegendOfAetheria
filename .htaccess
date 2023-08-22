@@ -1,5 +1,10 @@
 <IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME}.php -f
-RewriteRule !.*\.php$ %{REQUEST_FILENAME}.php [QSA,L]
+    RewriteEngine on
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME}.php -f
+    RewriteRule ^(.*)$ $1.php
+
+    # Return 404 if original request is *.php
+    RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.php[? ].*$"
+    RewriteRule .* - [L,R=404]
 </IfModule>

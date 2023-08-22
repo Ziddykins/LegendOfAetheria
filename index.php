@@ -1,17 +1,50 @@
 <?php
     declare(strict_types = 1);
     session_start();
-    
+
     require __DIR__ . '/vendor/autoload.php';
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
-
+    
+    include('logger.php');
     include('db.php');
     include('constants.php');
     include('functions.php');
 
-    if (isset($_POST['login-submit'])) {
-        
+    $log->info('Session started: ', [ 'Session' => session_id() ]);
+
+    /* Login submitted */
+    if (isset($_POST['login-submit']) && $_POST['login-submit'] = 1) {
+        $email    = $_POST['login-email'];
+        $password = $_POST['login-password'];
+
+        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE email = ?';
+        $prepped   = $db->prepare($sql_query);
+        $prepped->bind_param('s', $email);
+        $prepped->execute();
+
+        $result = $prepped->get_result();
+        $account = $result->fetch_assoc();
+
+        /* Password for supplied email was correct */
+        if (password_verify($password, $account['password'])) {
+            $log->info('Account login success', [
+                'Email'      => $account['email'],
+                'Privileges' => $account['privileges'],
+                'IpAddr'     => $account['ip_address']
+            ]);
+            $_SESSION['logged-in'] = 1;
+            $_SESSION['email'] = $account['email'];
+            header('Location: /game');
+            exit();
+        } else {
+            $log->error('Account login FAILED', [
+                'Email'      => $email,
+                'IpAddr'     => $_SERVER['REMOTE_ADDR']
+            ]);
+            header('Location: /?failed_login');
+            exit();
+        }
     } else if (isset($_POST['register-submit']) && $_POST['register-submit'] == 1) {
         $email            = $_POST['register-email'];
         $password         = $_POST['register-password'];
@@ -23,9 +56,9 @@
         $def              = $_POST['def-ap'];
         $int              = $_POST['int-ap'];
 
-        $time_sqlformat = get_mysql_datetime();
-        $ip_address     = $_SERVER['REMOTE_ADDR'];
-        $new_privs      = UserPrivileges::UNVERIFIED->value;
+        $time_sqlformat   = get_mysql_datetime();
+        $ip_address       = $_SERVER['REMOTE_ADDR'];
+        $new_privs        = UserPrivileges::UNVERIFIED->value;
 
         $prepped = $db->prepare('SELECT COUNT(*) FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE email = ?');
         $prepped->bind_param('s', $email);
@@ -33,7 +66,7 @@
         $result = $prepped->get_result();
 
         /* Email doesn't exist */
-        if ($prepped->num_rows() === 0) {
+        if ($prepped->num_rows() == 0) {
             /* AP Assigned properly */
             if ($str + $def + $int === MAX_ASSIGNABLE_AP) {
                 /* Passwords match */
