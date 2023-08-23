@@ -1,10 +1,14 @@
 <script>
-$(document).ready(function(){ 
+    $(document).ready(function(){ 
         if (location.search.match(/\?failed_login/)) {
             const toast_failed_login = document.getElementById('error-login-toast');
             const toast_bubble = bootstrap.Toast.getOrCreateInstance(toast_failed_login);
             toast_bubble.show();
-            console.log('wwwwwweeeeeeeeeeeeeeeeee');
+        }
+        if (location.search.match(/\?register_success/)) {
+            const toast_register_success = document.getElementById('success-register-toast');
+            const toast_bubble = bootstrap.Toast.getOrCreateInstance(toast_register_success);
+            toast_bubble.show();
         }
     });
 </script>
@@ -23,7 +27,7 @@ $(document).ready(function(){
                     <div class="tab-content" id="login-box-content">
                         <p></p>
                         <div class="tab-pane fade show active" id="login-tab-pane" role="tabpanel" aria-labelledby="login-tab" tabindex="0">
-                            <form id="login-form" action="/" method="POST">
+                            <form id="login-form" name="login-form" action="/" method="POST">
                                 <div class="border">
                                     <div class="d-flex bg-body-secondary border">
                                         <div class="p-2 flex-grow-1"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
@@ -50,7 +54,7 @@ $(document).ready(function(){
                         </div>
 
                         <div class="tab-pane fade" id="register-tab-pane" role="tabpanel" aria-labelledby="register-tab" tabindex="1">
-                            <form id="register-form" action="/" method="POST">
+                            <form id="register-form" name="register-form" action="/" method="POST">
                                 <div class="border">
                                     <div class="d-flex bg-body-secondary border">
                                         <div class="p-2 flex-grow-1"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
@@ -103,18 +107,14 @@ $(document).ready(function(){
                                         </span>
                                         <select class="form-select form-select form-control" style="font-size: 1.00rem;" aria-label=".form-select" id="race-select" name="race-select" required>
                                             <option value="Select a Race" disabled selected>Select a Race</option>
-                                            <option value="Angel">Angel</option>
-                                            <option value="Demon">Demon</option>
-                                            <option value="Dwarf">Dwarf</option>
-                                            <option value="Elf">Elf</option>
-                                            <option value="Gnome">Gnome</option>
-                                            <option value="Halfling">Halfling</option>
-                                            <option value="Human">Human</option>
-                                            <option value="Orc">Orc</option>
-                                            <option value="Troll">Troll</option>
-                                            <option value="Undead">Undead</option>
-                                            <option value="Vampire">Vampire</option>
-
+                                            <?php
+                                                foreach (Races::cases() as $race_sel) {
+                                                    if ($race_sel->name == 'Default') {
+                                                        continue;
+                                                    }
+                                                    echo "<option value=\"" . $race_sel->name . "\">" . $race_sel->name . "</option>";
+                                                }
+                                            ?>
                                         </select>
                                     </div>
 
@@ -177,11 +177,9 @@ $(document).ready(function(){
                                 
                                 <p></p>
                                 
-                                <button class="btn btn-success mb-3" id="register-submit" name="register-submit" value=1>
+                                <button class="btn btn-success mb-3" id="register-submit" name="register-submit" value="1">
                                     <i class="bi bi-clipboard-plus-fill"></i> Register
                                 </button>
-
-
 
                                 <script>
                                     $("#register-submit").on("click", function (e) {
@@ -198,12 +196,13 @@ $(document).ready(function(){
                                     });
                                 </script>
                             </form>
-                        </div></div>
-
-                        <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
-                            .3..
                         </div>
                     </div>
+
+                    <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+                        .3..
+                    </div>
+                </div>
 
                     <script type="text/javascript">
                         $("#avatar-select").on("change", function(e) {
@@ -238,8 +237,21 @@ $(document).ready(function(){
                                 
                                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                             </div>
-                            <div class="toast-body bg-warning bg-gradient">
+                            <div class="toast-body">
                                 Invalid login credentials!
+                            </div>
+                        </div>
+
+                        <div id="success-register-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <span class="badge text-bg-success me-auto">
+                                    <i class="bi bi-check me-2"></i> Success
+                                </span>
+                                
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body text-success">
+                                Account & Character successfully created!
                             </div>
                         </div>
                     </div>

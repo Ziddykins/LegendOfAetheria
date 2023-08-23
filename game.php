@@ -33,6 +33,6 @@
         </head>
         
         <body class=""> 
-                <?php include('html/nav-game.html'); ?><!-- :D -->
+                <?php include('html/nav-game.php'); ?><!-- :D -->
         </body>
 </html>
