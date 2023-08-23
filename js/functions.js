@@ -28,3 +28,9 @@ function stat_adjust(which, slider) {
         }
     }
 };
+
+function gen_toast(toast_id) {
+    let toast = document.getElementById(toast_id);
+    let toast_bubble = bootstrap.Toast.getOrCreateInstance(toast);
+    toast_bubble.show();
+}
