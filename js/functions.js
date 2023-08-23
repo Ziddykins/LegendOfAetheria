@@ -1,8 +1,8 @@
 function stat_adjust(which, slider) {
     let [stat, direction] = which.split('-');
-    let selector    = "#stats-" + stat + "-cur";
-    let stat_cur_ap = document.querySelector(selector);
-    let obj_ap      = document.querySelector('#stats-remaining-ap');
+    let selector          = "#stats-" + stat + "-cur";
+    let stat_cur_ap       = document.querySelector(selector);
+    let obj_ap            = document.querySelector('#stats-remaining-ap');
 
     if (direction == 'plus') {
         if (parseInt(obj_ap.innerHTML) == 0) {
