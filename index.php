@@ -26,6 +26,12 @@
         $result = $prepped->get_result();
         $account = $result->fetch_assoc();
 
+        if (!$account) {
+            $log->error('Attempted login with a non-existing account', [ 'Email' => $email ]);
+            header("Location: /?do_register&email=$email");
+            exit();
+        }
+
         /* Password for supplied email was correct */
         if (password_verify($password, $account['password'])) {
             $log->info('Account login success', [
@@ -107,12 +113,16 @@
                                         'choosing random enum: ', [ 'Race' => $race ] );
                     }
 
+                    $query = $db->query('SELECT MAX(id) AS account_id FROM ' . $_ENV['SQL_ACCT_TBL']);
+                    $result = $query->fetch_assoc();
+                    $account_id = $result['account_id'];
+
                     $sql_query = 'INSERT INTO ' . $_ENV['SQL_CHAR_TBL'] . 
-                                    ' (`avatar`, `name`, `race`, `str`, `def`, `int`)' .
-                                    ' VALUES (?, ?, ?, ?, ?, ?)';
+                                    ' (`account_id`, `avatar`, `name`, `race`, `str`, `def`, `int`)' .
+                                    ' VALUES (?, ?, ?, ?, ?, ?, ?)';
 
                     $prepped = $db->prepare($sql_query);
-                    $prepped->bind_param('sssiii', $avatar, $char_name, $race, $str, $def, $intl);
+                    $prepped->bind_param('isssiii', $account_id, $avatar, $char_name, $race, $str, $def, $intl);
                     
                     if (!$prepped->execute()) {
                         $log->critical('Couldn\'t insert user information into character table');
