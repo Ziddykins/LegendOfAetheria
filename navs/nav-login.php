@@ -1,14 +1,15 @@
 <script>
     $(document).ready(function(){ 
         if (location.search.match(/\?failed_login/)) {
-            const toast_failed_login = document.getElementById('error-login-toast');
-            const toast_bubble = bootstrap.Toast.getOrCreateInstance(toast_failed_login);
-            toast_bubble.show();
-        }
-        if (location.search.match(/\?register_success/)) {
-            const toast_register_success = document.getElementById('success-register-toast');
-            const toast_bubble = bootstrap.Toast.getOrCreateInstance(toast_register_success);
-            toast_bubble.show();
+            gen_toast('error-login-toast');
+        } else if (location.search.match(/\?register_success/)) {
+            gen_toast('success-register-toast');
+        } else if (location.search.match(/\?do_register/)) {
+            document.getElementById('register-tab').click();
+            document.getElementById('register-email').value = location.search.split('&')[1].replace('email=', '');
+            gen_toast('account-not-exist-toast');
+        } else if (location.search.match(/\?logged_out/)) {
+            gen_toast('logged-out');
         }
     });
 </script>
@@ -252,6 +253,32 @@
                             </div>
                             <div class="toast-body text-success">
                                 Account & Character successfully created!
+                            </div>
+                        </div>
+
+                        <div id="account-not-exist-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <span class="badge text-bg-secondary me-auto">
+                                    <i class="bi bi-info-circle-fill"></i> Info
+                                </span>
+                                
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                No account associated with this email, register?
+                            </div>
+                        </div>
+
+                        <div id="logged-out" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <span class="badge text-bg-success me-auto">
+                                    <i class="bi bi-check me-2"></i> Success
+                                </span>
+                                
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                Successfully logged out!
                             </div>
                         </div>
                     </div>
