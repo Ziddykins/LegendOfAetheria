@@ -41,7 +41,7 @@ CREATE TABLE `tbl_characters` (
 	`race` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`avatar` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`str` BIGINT(20) NOT NULL,
-	`intl` BIGINT(20) NOT NULL,
+	`int` BIGINT(20) NOT NULL,
 	`def` BIGINT(20) NOT NULL,
 	`x` INT(9) NOT NULL DEFAULT '0',
 	`y` INT(9) NOT NULL DEFAULT '0',
@@ -53,6 +53,15 @@ CREATE TABLE `tbl_characters` (
 	`alignment` INT(9) NOT NULL DEFAULT '0',
 	PRIMARY KEY (`id`) USING BTREE,
 	UNIQUE INDEX `account_id` (`account_id`) USING BTREE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB;
+
+CREATE TABLE `tbl_globals` (
+	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`weather` ENUM('Raining','Sunny','Cloudy','Snowing','Hailing','Acid Rain') NULL DEFAULT 'Sunny' COLLATE 'utf8mb4_general_ci',
+	`exp_multiplier` TINYINT(4) NULL DEFAULT '1',
+	PRIMARY KEY (`id`) USING BTREE
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;

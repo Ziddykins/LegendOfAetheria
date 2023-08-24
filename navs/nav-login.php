@@ -1,30 +1,36 @@
 <script>
-    $(document).ready(function(){ 
-        if (location.search.match(/\?failed_login/)) {
-            gen_toast('error-login-toast');
-        } else if (location.search.match(/\?register_success/)) {
-            gen_toast('success-register-toast');
-        } else if (location.search.match(/\?do_register/)) {
-            document.getElementById('register-tab').click();
-            document.getElementById('register-email').value = location.search.split('&')[1].replace('email=', '');
-            gen_toast('account-not-exist-toast');
-        } else if (location.search.match(/\?logged_out/)) {
-            gen_toast('logged-out');
-        }
-    });
-</script>
-<ul class="nav nav-tabs" id="login-box" role="tablist">
+                        $(document).ready(function(){ 
+                            if (location.search.match(/\?failed_login/)) {
+                                gen_toast('error-login-toast', 'danger', 'bi-dash-circle', 'Error', 'Invalid login credentials!');
+                            } else if (location.search.match(/\?register_success/)) {
+                                gen_toast('success-register-toast', 'success', 'bi-check', 'Success', 'Account and Character successfully created, you can now log in');
+                            } else if (location.search.match(/\?do_register/)) {
+                                document.getElementById('register-tab').click();
+                                document.getElementById('register-email').value = location.search.split('&')[1].replace('email=', '');
+                                gen_toast('account-not-exist', 'success', 'bi-check', 'Success', 'No account associated with this email, register?');
+                            } else if (location.search.match(/\?logged_out/)) {
+                                gen_toast('logged-out', 'success', 'bi-check', 'Logged Out', 'Successfully logged out!');
+                            } else if (location.search.match(/\?gooft/)) {
+                                gen_toast('test-popup', 'warning', 'bi-balloon " style="font-size: 72px;"','Warning', '<marquee>Aw snap ya mighta gooft</marquee>');
+                            } else if (location.search.match(/\?account_exists/)) {
+                                gen_toast('account-exists', 'danger', 'bi-dash-circle', 'Account Exists', 'An account already exists with that email');
+                            }
+                            
+                            document.getElementById('login-email').focus();
+                        });
+                    </script>
+                    <ul class="nav nav-tabs" id="login-box" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-tab-pane" type="button" role="tab" aria-controls="login-tab-pane" aria-selected="true" onclick=tgl_active(this)>
-                            <i class="fa-sm bi bi-diamond-fill"></i> Login</button>
+                            <i class="fa-sm bi bi-diamond-fill" style="font-size: 10px;"></i> Login</button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register-tab-pane" type="button" role="tab" aria-controls="register-tab-pane" aria-selected="false" onclick=tgl_active(this)>
-                                <i class="fa-sm bi bi-diamond"></i> Register</button>
+                                <i class="fa-sm bi bi-diamond"  style="font-size: 10px;"></i> Register</button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false" onclick=tgl_active(this)>
-                                <i class="bi bi-xs bi-diamond"></i> Contact</button>
+                                <i class="bi bi-xs bi-diamond" style="font-size: 10px;"></i> Contact</button>
                         </li>
                     </ul>
 
@@ -190,10 +196,18 @@
                                         document.querySelector("#str-ap").value = document.querySelector("#stats-str-cur").innerHTML;
                                         document.querySelector("#def-ap").value = document.querySelector("#stats-def-cur").innerHTML;
                                         document.querySelector("#int-ap").value = document.querySelector("#stats-int-cur").innerHTML;
+
                                         if (parseInt(document.querySelector("#stats-remaining-ap").innerHTML) > 0) {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            gen_toast('error-ap-toast');
+                                            gen_toast('error-ap-toast', 'warning', 'bi-balloon', 'Unassigned Attribute Points', 'Ensure all remaining attribute points are applied');
+                                        }
+
+                                        if (document.querySelector("#race-select").selectedIndex === 0 
+                                            || document.querySelector("#avatar-select").selectedIndex === 0 ) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            
                                         }
                                     });
                                 </script>
@@ -206,79 +220,19 @@
                     </div>
                 </div>
 
-                    <script type="text/javascript">
-                        $("#avatar-select").on("change", function(e) {
-                            let chosen_pic  = document.querySelector('#avatar-select').value;
-                            let target_div  = document.querySelector('#avatar-image-cont');
-                            let pic_path    = "img/avatars/avatar-" + chosen_pic;
-                            let html_string = "<img src=\"" + pic_path + ".png\" style=\"width: 256px; height: auto;\" alt=\"" + chosen_pic + "\">";
+                <script type="text/javascript">
+                    $("#avatar-select").on("change", function(e) {
+                        let chosen_pic  = document.querySelector('#avatar-select').value;
+                        let target_div  = document.querySelector('#avatar-image-cont');
+                        let pic_path    = "img/avatars/avatar-" + chosen_pic;
+                        let html_string = "<img src=\"" + pic_path + ".png\" style=\"width: 256px; height: auto;\" alt=\"" + chosen_pic + "\">";
 
-                            target_div.innerHTML = html_string;
-                        });
-                    </script>
-                    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                        <div id="error-ap-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                            <div class="toast-header">
-                                <span class="badge text-bg-warning me-auto">
-                                    <i class="bi bi-balloon rounded me-2"></i> Warning
-                                </span>
-                                
-                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                            </div>
-                            <div class="toast-body">
-                                Please assign all AP points
-                            </div>
-                        </div>
+                        target_div.innerHTML = html_string;
+                    });
+                </script>
 
-                        <div id="error-login-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                            <div class="toast-header">
-                                <span class="badge text-bg-danger me-auto">
-                                    <i class="bi bi-dash-circle me-2"></i> Error
-                                </span>
-                                
-                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                            </div>
-                            <div class="toast-body">
-                                Invalid login credentials!
-                            </div>
-                        </div>
+                <div aria-live="polite" aria-atomic="true" class="position-relative">
+                    <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
 
-                        <div id="success-register-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                            <div class="toast-header">
-                                <span class="badge text-bg-success me-auto">
-                                    <i class="bi bi-check me-2"></i> Success
-                                </span>
-                                
-                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                            </div>
-                            <div class="toast-body text-success">
-                                Account & Character successfully created!
-                            </div>
-                        </div>
-
-                        <div id="account-not-exist-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                            <div class="toast-header">
-                                <span class="badge text-bg-secondary me-auto">
-                                    <i class="bi bi-info-circle-fill"></i> Info
-                                </span>
-                                
-                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                            </div>
-                            <div class="toast-body">
-                                No account associated with this email, register?
-                            </div>
-                        </div>
-
-                        <div id="logged-out" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-                            <div class="toast-header">
-                                <span class="badge text-bg-success me-auto">
-                                    <i class="bi bi-check me-2"></i> Success
-                                </span>
-                                
-                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                            </div>
-                            <div class="toast-body">
-                                Successfully logged out!
-                            </div>
-                        </div>
                     </div>
+                </div>
