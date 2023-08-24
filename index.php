@@ -14,7 +14,7 @@
     $log->info('Session started: ', [ 'Session' => session_id() ]);
 
     /* Login submitted */
-    if (isset($_POST['login-submit']) && $_POST['login-submit'] = 1) {
+    if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
         $email    = $_POST['login-email'];
         $password = $_POST['login-password'];
 
@@ -70,6 +70,7 @@
         $prepped->bind_param('s', $email);
         $prepped->execute();
         $result = $prepped->get_result();
+        $account = $result->fetch_assoc();
 
         /* Email doesn't exist */
         if ($prepped->num_rows() == 0) {
@@ -170,9 +171,6 @@
     storage
     <i class="bi bi-box2-heart-fill"></i>
 
-    dunugeon
-    <i class="bi bi-bricks"></i>
-
     char sheet
     <i class="bi bi-card-heading"></i>
 
@@ -183,7 +181,7 @@
     <i class="bi bi-clipboard-fill"></i>
 
     weather - rain
-    <i class="bi bi-cloud-drizzle-fill"></i>
+    
 
     weather - snow
     <i class="bi bi-cloud-snow-fill"></i>
