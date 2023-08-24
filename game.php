@@ -57,7 +57,7 @@
                 <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark border border-top-0 border-bottom-0 border-dark-subtle">
                     <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
                         <a href="/game" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                            <span class="fs-5 d-none d-sm-inline mt-3">
+                            <span class="fs-6 d-none d-sm-inline mt-3">
                                 <img src="img/logos/logo-banner-no-bg.png" style="width: 100%;">
                             </span>
                         </a>
@@ -67,7 +67,7 @@
                         <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start" id="menu-character">
                             <a href="#sub-character-menu" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
                                 <i class="fs-4 bi-house-fill"></i>
-                                <span class="ms-1 d-none d-sm-inline fs-5">Character</span>
+                                <span class="ms-1 d-none d-sm-inline fs-6">Character</span>
                             </a>
                             <ul class="nav collapse flex-column ms-1" id="sub-character-menu" data-bs-parent="#menu-character" aria-expanded="false">
                                 <li>
@@ -101,7 +101,7 @@
                         <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start" id="menu-travel">
                             <a href="#sub-travel-menu" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
                                 <i class="fs-4 bi bi-signpost-split-fill"></i>
-                                <span class="ms-1 d-none d-sm-inline fs-5">Travel</span>
+                                <span class="ms-1 d-none d-sm-inline fs-6">Travel</span>
                             </a>
                             <ul class="collapse nav flex-column ms-1" id="sub-travel-menu" data-bs-parent="#menu-travel" aria-expanded="false">
                                 <li>
@@ -125,7 +125,7 @@
                         <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start" id="menu-dungeon">
                             <a href="#sub-menu-dungeon" data-bs-toggle="collapse" class="nav-link px-0 align-middle ">
                                 <i class="fs-4 bi bi-bricks"></i>
-                                <span class="ms-1 d-none d-sm-inline fs-5">Dungeon</span>
+                                <span class="ms-1 d-none d-sm-inline fs-6">Dungeon</span>
                             </a>
                             <ul class="collapse nav flex-column ms-1" id="sub-menu-dungeon" data-bs-parent="#menu-dungeon" aria-expanded="false">
                                 <li>
@@ -145,7 +145,7 @@
                         <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start" id="menu-quests">
                             <a href="#sub-menu-quests" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
                                 <i class="fs-4 bi bi-clipboard-fill"></i>
-                                <span class="ms-1 d-none d-sm-inline fs-5">Quests</span>
+                                <span class="ms-1 d-none d-sm-inline fs-6">Quests</span>
                             </a>
                             <ul class="collapse nav flex-column ms-1" id="sub-menu-quests" data-bs-parent="#menu-quests">
                                 <li>
@@ -177,7 +177,7 @@
 
                         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="img/avatars/<?php echo $character['avatar']; ?>" alt="avatar" width="50" height="50" class="rounded-circle" />
-                            <span class="d-none d-sm-inline mx-1 ms-3 fs-5">
+                            <span class="d-none d-sm-inline mx-1 ms-3 fs-6">
                                 Account
                             </span>
                         </a>

@@ -72,9 +72,12 @@
         $result = $prepped->get_result();
         $account = $result->fetch_assoc();
 
+
+
+
         /* Email doesn't exist */
-        if ($prepped->num_rows() == 0) {
-            /* AP Assigned properly */
+        if ($result->num_rows == 0) {
+            /* AP assigned properly */            
             if ($str + $def + $intl === MAX_ASSIGNABLE_AP) {
                 /* Passwords match */
                 if ($password === $password_confirm) {
@@ -155,7 +158,7 @@
             <div class="row">
                 <div class="col">
                         <?php include('navs/nav-login.php'); ?>
-                </div>
+
             </div>
         </div>
     </body>
