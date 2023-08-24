@@ -7,10 +7,11 @@
     function get_user($email, $type) {
         global $db;
         $table = $type == 'account' ? 'SQL_ACCT_TBL' : 'SQL_CHAR_TBL';
+        $column = $type == 'account' ? 'email' : 'account_id';
 
-        $sql_query = 'SELECT * FROM ' . $_ENV[$table] . ' WHERE email = ?';
+        $sql_query = 'SELECT * FROM ' . $_ENV[$table] . " WHERE $column = ?";
     
-        $prepped   = $db->prepare($sql_query);
+        $prepped = $db->prepare($sql_query);
         $prepped->bind_param('s', $email);
         $prepped->execute();
 

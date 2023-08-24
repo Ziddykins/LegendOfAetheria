@@ -33,6 +33,7 @@
                 'Privileges' => $account['privileges'],
                 'IpAddr'     => $account['ip_address']
             ]);
+
             $_SESSION['logged-in'] = 1;
             $_SESSION['email'] = $account['email'];
             header('Location: /game');
@@ -65,9 +66,6 @@
         $prepped->execute();
         $result = $prepped->get_result();
         $account = $result->fetch_assoc();
-
-
-
 
         /* Email doesn't exist */
         if ($result->num_rows == 0) {

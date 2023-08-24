@@ -216,7 +216,42 @@
                     </div>
 
                     <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
-                        .3..
+                        <div class="container">
+                            <div class="row">
+                                <div class="col">
+                                    <form id="contact-form" name="contact-form" action="/contact" method="POST">
+                                        <div class="border">
+                                            <div class="d-flex bg-body-secondary border">
+                                                <div class="p-2 flex-grow-1"><h6><i class="bi bi-envelope-heart"></i> Contact Me</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3 input-group">
+                                            <span class="input-group-text" id="icon-name"><i class="bi bi-envelope-plus"></i></span>
+                                            <div class="form-floating flex-grow-1">
+                                                <input type="email" class="form-control" aria-label="Email" aria-describedby="icon-email" id="contact-email" name="contact-email" placeholder="Email" required>
+                                                <label for="contact-email">E-mail</label>
+                                            </div>
+                                            <div class="form-text text-danger">*</div>
+                                        </div>
+
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text" id="icon-message"><i class="bi bi-chat-dots-fill"></i></span>
+                                            <div class="form-floating flex-grow-1">
+                                                <textarea class="form-control" id="contact-message" name="contact-message" placeholder="Message" aria-label="Message" aria-describedby="contact-message" style="height: 200px;" required></textarea>
+                                                <label for="contact-message">Message</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-text text-danger">* Required</div>
+
+                                        <button class="btn btn-primary mb-3" id="contact-submit" name="contact-submit" value="1">
+                                            🤍 Submit 
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -233,6 +268,6 @@
 
                 <div aria-live="polite" aria-atomic="true" class="position-relative">
                     <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
-
+                        <!-- Here the hardy toasts will be created - place ant traps :o -->
                     </div>
                 </div>

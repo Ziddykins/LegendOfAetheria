@@ -11,6 +11,9 @@
     include('constants.php');
     include('functions.php');
 
+    $account   = get_user($_SESSION['email'], 'account');
+    $character = get_user($account['id'], 'character');
+
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         $sql_query = 'SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE email = ?';
         $prepped   = $db->prepare($sql_query);
@@ -172,12 +175,12 @@
                         </ul>
                     </div>
 
+                    <img src="img/assets/lmfaowhy.png" />
+                    
                     <div class="dropdown pb-4 fixed-bottom ms-4">
-                        <hr style="width: 100%; border-style: dashed; opacity: .25">
-
                         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="img/avatars/<?php echo $character['avatar']; ?>" alt="avatar" width="50" height="50" class="rounded-circle" />
-                            <span class="d-none d-sm-inline mx-1 ms-3 fs-6">
+                            <span class="d-none d-sm-inline mx-1 ms-5 fs-5">
                                 Account
                             </span>
                         </a>
