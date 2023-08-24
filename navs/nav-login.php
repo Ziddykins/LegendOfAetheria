@@ -15,13 +15,16 @@
 </script>
 <ul class="nav nav-tabs" id="login-box" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-tab-pane" type="button" role="tab" aria-controls="login-tab-pane" aria-selected="true"><i class="bi bi-chevron-double-right"></i> Login</button>
+                            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-tab-pane" type="button" role="tab" aria-controls="login-tab-pane" aria-selected="true" onclick=tgl_active(this)>
+                            <i class="fa-sm bi bi-diamond-fill"></i> Login</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register-tab-pane" type="button" role="tab" aria-controls="register-tab-pane" aria-selected="false"> Register</button>
+                            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register-tab-pane" type="button" role="tab" aria-controls="register-tab-pane" aria-selected="false" onclick=tgl_active(this)>
+                                <i class="fa-sm bi bi-diamond"></i> Register</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false"> Contact <i class="bi bi-chevron-double-left"></i></button>
+                            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false" onclick=tgl_active(this)>
+                                <i class="bi bi-xs bi-diamond"></i> Contact</button>
                         </li>
                     </ul>
 
@@ -79,7 +82,7 @@
                                         </div>
 
                                         <div class="input-group mb-1">
-                                            <span class="input-group-text" id="register-icon-password"><i class="bi bi-key"></i><i class="bi bi-key"></i></span>
+                                            <span class="input-group-text" id="register-icon-password"><i class="bi bi-key"></i><sup style="margin-left: -12px; margin-top: -8px;">x2</sup></span>
                                             <div class="form-floating flex-grow-1">
                                                 <input type="password" class="form-control" id="register-password-confirm" name="register-password-confirm" placeholder="Password (Confirm)" aria-label="Password" aria-describedby="register-icon-password-confirm" required>
                                                 <label for="login-password">Password (Confirm)</label>
@@ -190,9 +193,7 @@
                                         if (parseInt(document.querySelector("#stats-remaining-ap").innerHTML) > 0) {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            const toastLiveExample = document.getElementById('error-ap-toast');
-                                            const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
-                                            toastBootstrap.show();
+                                            gen_toast('error-ap-toast');
                                         }
                                     });
                                 </script>
@@ -214,7 +215,6 @@
 
                             target_div.innerHTML = html_string;
                         });
-
                     </script>
                     <div class="toast-container position-fixed bottom-0 end-0 p-3">
                         <div id="error-ap-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
