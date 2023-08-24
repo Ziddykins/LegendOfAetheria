@@ -18,13 +18,7 @@
         $email    = $_POST['login-email'];
         $password = $_POST['login-password'];
 
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE email = ?';
-        $prepped   = $db->prepare($sql_query);
-        $prepped->bind_param('s', $email);
-        $prepped->execute();
-
-        $result = $prepped->get_result();
-        $account = $result->fetch_assoc();
+        $account = get_user($email, 'account');
 
         if (!$account) {
             $log->error('Attempted login with a non-existing account', [ 'Email' => $email ]);
