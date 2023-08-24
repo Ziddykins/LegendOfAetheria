@@ -23,7 +23,7 @@
         $sql_query = 'SELECT * FROM ' . $_ENV['SQL_CHAR_TBL'] . ' WHERE account_id = ' . $account['id'];
         $result  = $db->query($sql_query);
 
-        $character = $result->fetch_assoc();        
+        $character = $result->fetch_assoc();
     } else {
         header('Location: /?failed_login');
         exit();
