@@ -11,8 +11,6 @@
     include('constants.php');
     include('functions.php');
 
-        
-
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         $sql_query = 'SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE email = ?';
         $prepped   = $db->prepare($sql_query);
