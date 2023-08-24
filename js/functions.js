@@ -33,4 +33,13 @@ function gen_toast(toast_id) {
     let toast = document.getElementById(toast_id);
     let toast_bubble = bootstrap.Toast.getOrCreateInstance(toast);
     toast_bubble.show();
-}
+};
+
+function tgl_active (e) {
+    document.querySelectorAll('i[class$="diamond-fill"]').forEach(function(e) {
+        e.classList.remove('bi-diamond-fill');
+        e.classList.add('bi-diamond');
+    });
+    e.childNodes[1].classList.add('bi-diamond-fill');
+    e.childNodes[1].classList.remove('bi-diamond');
+};
