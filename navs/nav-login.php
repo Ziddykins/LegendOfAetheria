@@ -242,11 +242,10 @@
                                                 <label for="contact-message">Message</label>
                                             </div>
                                         </div>
-                                        
                                         <div class="form-text text-danger">* Required</div>
 
                                         <button class="btn btn-primary mb-3" id="contact-submit" name="contact-submit" value="1">
-                                            🤍 Submit 
+                                            🤍 Submit
                                         </button>
                                     </form>
                                 </div>
