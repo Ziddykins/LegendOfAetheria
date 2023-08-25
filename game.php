@@ -36,46 +36,31 @@
 <?php include('html/opener.html'); ?>
     <head>
         <?php include('html/headers.html'); ?><!-- :D -->
-        <style>
-            body {
-                min-height: 100vh;
-                min-height: -webkit-fill-available;
-            }
-            html {
-                height: -webkit-fill-available;
-            }
-            main {
-                height: 100vh;
-                height: -webkit-fill-available;
-                max-height: 100vh;
-                overflow-x: auto;
-                overflow-y: hidden;
-            }
-        </style>
+
     </head>
         
     <body class="bg-dark"> 
-        <div class="container-fluid">
-            <div class="row flex-nowrap">
-                <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark border border-top-0 border-bottom-0 border-dark-subtle">
-                    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+        <div class="container-fluid border border-white sticky-bottom" style="margin-top: 25px;">
+            <div class="row flex-nowrap" style="min-height: 96.5vh!important;">
+                <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark border border-white">
+                    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white">
                         <a href="/game" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                            <span class="fs-6 d-none d-sm-inline mt-3">
-                                <img src="img/logos/logo-banner-no-bg.png" style="width: 100%;">
-                            </span>
+                            <img src="img/logos/logo-banner-no-bg.png" class="p-3 w-100">
                         </a>
 
                         <hr style="width: 35%; opacity: .25; align-self: center;">
-                        
-                        <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start" id="menu-character">
+
+                        <!-- broke? mb-sm-auto  -->
+                        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
                             <a href="#sub-character-menu" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
                                 <i class="fs-4 bi-house-fill"></i>
                                 <span class="ms-1 d-none d-sm-inline fs-6">Character</span>
                             </a>
-                            <ul class="nav collapse flex-column ms-1" id="sub-character-menu" data-bs-parent="#menu-character" aria-expanded="false">
+                            <ul class="nav collapse flex-column ms-1" id="sub-character-menu" data-bs-parent="#menu" aria-expanded="false">
                                 <li>
                                     <a href="#" class="nav-link px-0">
                                         <span class="d-none d-sm-inline ms-4">Character Sheet</span>
+                                        <span class="badge bg-primary rounded-pill"> 7177135</span>
                                     </a>
                                 </li>
                                 <li>
@@ -99,14 +84,19 @@
                                     </a>
                                 </li>
                             </ul>
-                        </ul>
-
-                        <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start" id="menu-travel">
+                        </li>
+                        
+                        <li>
                             <a href="#sub-travel-menu" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
                                 <i class="fs-4 bi bi-signpost-split-fill"></i>
-                                <span class="ms-1 d-none d-sm-inline fs-6">Travel</span>
+                                <span class="ms-1 d-none d-sm-inline fs-6">Location</span>
                             </a>
-                            <ul class="collapse nav flex-column ms-1" id="sub-travel-menu" data-bs-parent="#menu-travel" aria-expanded="false">
+                            <ul class="collapse nav flex-column ms-1" id="sub-travel-menu" data-bs-parent="#menu" aria-expanded="false">
+                                <li>
+                                    <a href="?page=hunt" class="nav-link px-0">
+                                        <span class="d-none d-sm-inline ms-4">Hunt</span>
+                                    </a>
+                                </li>
                                 <li>
                                     <a href="#" class="nav-link px-0">
                                         <span class="d-none d-sm-inline ms-4">Map</span>
@@ -123,14 +113,14 @@
                                     </a>
                                 </li>
                             </ul>
-                        </ul>
+                        </li>
 
-                        <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start" id="menu-dungeon">
+                        <li>
                             <a href="#sub-menu-dungeon" data-bs-toggle="collapse" class="nav-link px-0 align-middle ">
                                 <i class="fs-4 bi bi-bricks"></i>
                                 <span class="ms-1 d-none d-sm-inline fs-6">Dungeon</span>
                             </a>
-                            <ul class="collapse nav flex-column ms-1" id="sub-menu-dungeon" data-bs-parent="#menu-dungeon" aria-expanded="false">
+                            <ul class="collapse nav flex-column ms-1" id="sub-menu-dungeon" data-bs-parent="#menu" aria-expanded="false">
                                 <li>
                                     <a href="#" class="nav-link px-0">
                                         <!-- TODO: Replace number with tbl_character.dungeon_level -->
@@ -143,14 +133,14 @@
                                     </a>
                                 </li>
                             </ul>
-                        </ul>
+                        </li>
 
-                        <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start" id="menu-quests">
+                        <li>
                             <a href="#sub-menu-quests" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
                                 <i class="fs-4 bi bi-clipboard-fill"></i>
                                 <span class="ms-1 d-none d-sm-inline fs-6">Quests</span>
                             </a>
-                            <ul class="collapse nav flex-column ms-1" id="sub-menu-quests" data-bs-parent="#menu-quests">
+                            <ul class="collapse nav flex-column ms-1" id="sub-menu-quests" data-bs-parent="#menu">
                                 <li>
                                     <a href="#" class="nav-link px-0">
                                         <span class="d-none d-sm-inline ms-4">Active</span>
@@ -172,12 +162,12 @@
                                     </a>
                                 </li>
                             </ul>
-                        </ul>
+                        </li>
                     </div>
 
-                    <img src="img/assets/lmfaowhy.png" />
-                    
-                    <div class="dropdown pb-4 fixed-bottom ms-4">
+                    <hr style="width: 35%; opacity: .25; align-self: center;">
+
+                    <div class="dropdown pb-4 ms-4 fixed-bottom">
                         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="img/avatars/<?php echo $character['avatar']; ?>" alt="avatar" width="50" height="50" class="rounded-circle" />
                             <span class="d-none d-sm-inline mx-1 ms-5 fs-5">
@@ -186,60 +176,51 @@
                         </a>
 
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                            <li>
-                                <a class="dropdown-item" href="?page=profile">Profile</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="?page=settings">Settings</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/logout">Sign out</a>
-                            </li>
+                            <li><a class="dropdown-item" href="?page=profile">Profile</a></li>
+                            <li><a class="dropdown-item" href="?page=settings">Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout">Sign out</a></li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="col text-dark-emphasis">
-                    <div class="row bg-black justify-content-center row-cols-auto">
-                        <div class="col"><i class="bi bi-currency-exchange text-warning"></i> 9,894</div> |
-                        <div class="col text-danger"><i class="bi bi-emoji-dizzy-fill"></i> Dead</div> |
-                        <div class="col text-primary"><i class="bi bi-cloud-drizzle-fill"></i> Raining</div> |
-                        <div class="col"><i class="bi bi-ladder"></i> 42</div> |
-                        <div class="col"><i class="bi bi-envelope-fill"></i> 0</div> |
-                        <div class="col"><i class="bi bi-clipboard-fill"></i> 5</div> |
-                        <div class="col"><i class="bi bi-box2-heart-fill"></i><span class="text-warning"> 42/50</span></div> |
-                        <div class="col"><i class="bi bi-bookmark-fill"></i> 7</div> |
-                        <div class="col text-white"><i class="bi bi-hourglass-split"></i><span id="tick-left"></span></div> |
-                        <div class="col" id="ep-status" name="ep-status">
-                            <span id="ep-icon"></span>
-                            <span id="ep-value">20</span>/<span id="ep-max" class="text-success">100</span>
-                        </div>
+                <div id="content" name="content" class="container text-center border border-danger" style="flex-shrink: 1;">
+                    <?php
+                        if (isset($_GET['page'])) {
+                            $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
+                            $page_uri = 'pages/game-' .  $requested_page . '.php';
+                            include($page_uri);
+                        }
+                    ?>
 
-                    </div>
-                    <div id="content" name="content" class="container text-center">
-                        <?php
-                            if (isset($_GET['page'])) {
-                                $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
-                                $page_uri = 'pages/game-' .  $requested_page . '.php';
-                                include($page_uri);
-                            }
-                        ?>
-                    </div>
+                    <?php
+                        include('navs/nav-status.php');
+                    ?>
                 </div>
             </div>
         </div>
+
         <script>
             let tick_counter = setInterval(function() {
-                let tick = new Date().getTime();
-                let out_string = new String();
-                let cur_energy = parseInt(document.getElementById('ep-value').innerHTML);
-                let max_energy = parseInt(document.getElementById('ep-max').innerHTML);
-                let percent_full = Math.ceil(cur_energy / max_energy * 100);
-                let icon = 'bi bi-battery-full';
-                let txt_color = 'text-success';
+                let obj_tick_left = document.getElementById('tick-left');
+                let obj_ep_status = document.getElementById('ep-status');
+                
+                    $character = get_user($_SESSION['account_id'], 'character');
+                    echo 'let obj_ep_value  = ' . $character['ep'] . ';';
+                    echo 'let obj_ep_max    = ' . $character['ep_max'] . ';';
+                ?>
+                let obj_ep_icon   = document.getElementById('ep-icon');
+                
+                let tick          = new Date().getTime();
+                let out_string    = new String();
+                
+                let cur_energy    = parseInt(obj_ep_value.innerHTML);
+                let max_energy    = parseInt(obj_ep_max.innerHTML);
+                let percent_full  = Math.ceil(cur_energy / max_energy * 100);
+
+                let icon          = 'bi bi-battery-full';
+                let txt_color     = 'text-success';
+                
 
                 tick = (60 - Math.ceil(tick/1000) % 60) - 1;
                 
@@ -251,10 +232,10 @@
                     out_string = '0:' + tick.toString();
                 }
 
-                document.getElementById('tick-left').innerHTML = out_string;
+                obj_tick_left.innerHTML = out_string;
 
                 if (cur_energy >= max_energy) {
-                    document.getElementById('ep-value').innerHTML = Math.random(max_energy - 1);
+                    obj_ep_value.innerHTML = Math.random(max_energy - 1);
                 }
 
                 if (percent_full > 0 && percent_full < 49) {
@@ -263,18 +244,22 @@
                 } else if (percent_full > 49 && percent_full < 75) {
                     icon = 'bi bi-battery-half';
                     txt_color = 'text-warning';
+                } else if (percent_full > 75) {
+                    icon = 'bi bi-battery-full';
+                    txt_color = 'text-success';
                 }
                 
-                document.getElementById('ep-icon').innerHTML = '<i class="' + icon + '"></i>';
-                document.getElementById('ep-status').classList.add(txt_color);
+                if (!obj_ep_status.classList.contains(/text-/)) {
+                    obj_ep_icon.innerHTML = '<i class="' + icon + '"></i>';
+                    obj_ep_status.classList.add(txt_color);
+                }
 
                 if (tick < 1) {
-                    document.getElementById('ep-icon').innerHTML = '<i class="' + icon + '"></i>';
-                    document.getElementById('ep-value').innerHTML = cur_energy + 1;
-                    document.getElementById('ep-status').classList.add(txt_color);
-                    console.log('updaterated');
+                    obj_ep_icon.innerHTML = '<i class="' + icon + '"></i>';
+                    obj_ep_value.innerHTML = cur_energy + 1;
+                    obj_ep_value.classList = txt_color;
+                    obj_ep_icon.classList = txt_color;
                 }
-                console.log(`tick ${tick} - cur_energy ${cur_energy} - max_energy ${max_energy} - %_full ${percent_full} - icon ${icon} - txt_color ${txt_color}`);
             }, 1000);
         </script>
     </body>

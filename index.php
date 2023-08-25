@@ -34,8 +34,11 @@
                 'IpAddr'     => $account['ip_address']
             ]);
 
+            $character = get_user($account['email'], 'character');
+
             $_SESSION['logged-in'] = 1;
             $_SESSION['email'] = $account['email'];
+            $_SESSION['account_id'] = $character['account_id'];
             header('Location: /game');
             exit();
         } else {
