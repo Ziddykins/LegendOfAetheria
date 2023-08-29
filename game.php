@@ -14,6 +14,8 @@
     $account   = get_user($_SESSION['email'], 'account');
     $character = get_user($account['id'], 'character');
 
+    $_SESSION['name'] = $character['name'];
+
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         $sql_query = 'SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE email = ?';
         $prepped   = $db->prepare($sql_query);
@@ -177,14 +179,23 @@
 
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                             <li><a class="dropdown-item" href="?page=profile">Profile</a></li>
+                            <li><a class="dropdown-item" href="?page=mail">Mail
+                                    <span class="badge bg-danger rounded-pill"> 5</span>
+                            </a></li>
                             <li><a class="dropdown-item" href="?page=settings">Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
+                            <?php
+                                $privileges = UserPrivileges::from_name($account['privileges']);
+                                if ($privileges > UserPrivileges::MODERATOR->value) {
+                                    echo '<li><a class="dropdown-item" href="?page=administrator">Administrator</a></li>';
+                                }
+                            ?>
                             <li><a class="dropdown-item" href="/logout">Sign out</a></li>
                         </ul>
                     </div>
                 </div>
 
-                <div id="content" name="content" class="container text-center border border-danger" style="flex-shrink: 1;">
+                <div id="content" name="content" class="container border border-danger" style="flex-shrink: 1;">
                     <?php
                         if (isset($_GET['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
@@ -204,11 +215,9 @@
             let tick_counter = setInterval(function() {
                 let obj_tick_left = document.getElementById('tick-left');
                 let obj_ep_status = document.getElementById('ep-status');
+                let obj_ep_value  = <?php echo $character['ep']; ?>;
+                let obj_ep_max    = <?php echo $character['max_ep']; ?>;
                 
-                    $character = get_user($_SESSION['account_id'], 'character');
-                    echo 'let obj_ep_value  = ' . $character['ep'] . ';';
-                    echo 'let obj_ep_max    = ' . $character['ep_max'] . ';';
-                ?>
                 let obj_ep_icon   = document.getElementById('ep-icon');
                 
                 let tick          = new Date().getTime();
