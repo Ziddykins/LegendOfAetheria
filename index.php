@@ -10,6 +10,7 @@
     include('db.php');
     include('constants.php');
     include('functions.php');
+    include('mailer.php');
 
     $log->info('Session started: ', [ 'Session' => session_id() ]);
 
@@ -80,9 +81,6 @@
                     $verification_code = strrev(sha1(session_id())) . substr(md5(strval(rand(0,100))), 0, 15);
                     $password = password_hash($password, PASSWORD_BCRYPT);
 
-                    /* TODO: Actually implement */
-                    // gen_verification_email(); // :D
-
                     $sql_query =' INSERT INTO ' . $_ENV['SQL_ACCT_TBL'] . 
                                 ' (email, password, date_registered, verification_code, privileges, ip_address) ' .
                                 ' VALUES (?, ?, ?, ?, ?, ?)';
@@ -127,6 +125,11 @@
                     if (!$prepped->execute()) {
                         $log->critical('Couldn\'t insert user information into character table');
                     }
+
+                    
+                    // Verification email
+                    send_mail($email);
+
                     header('Location: /?register_success');
                     exit();
                 }
@@ -141,7 +144,7 @@
 <?php include('html/opener.html'); ?>
 
     <head>
-        <?php include('html/headers.html'); ?><!-- :D -->
+        <?php include('html/headers.html'); ?>
     </head>
     
     <body class="">    
