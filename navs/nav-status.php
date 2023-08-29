@@ -1,6 +1,20 @@
+<?php
+    $hp = $character['hp'];
+    $max_hp = $character['max_hp'];
+    $icon = 'bi bi-emoji-smile-fill';
+    $color = 'text-success';
+    
+    if ($hp == 0) {
+        $icon = 'bi bi-emoji-dizzy-fill';
+        $color = 'text-danger';
+    }
+
+    $status_string = "<div class=\"col $color\"><i class=\"bi $icon\"></i>$hp/$max_hp</div> |";
+    
+?>
                     <div class="row bg-black justify-content-center text-dark-emphasis fixed-top">
-                        <div class="col"><i class="bi bi-currency-exchange text-warning"></i> 9,894</div> |
-                        <div class="col text-danger"><i class="bi bi-emoji-dizzy-fill"></i> Dead</div> |
+                        <div class="col"><i class="bi bi-currency-exchange text-warning"></i> <?php echo $character['gold']; ?></div> |
+                        <?php echo $status_string; ?>
                         <div class="col text-primary"><i class="bi bi-cloud-drizzle-fill"></i> Raining</div> |
                         <div class="col"><i class="bi bi-ladder"></i> 42</div> |
                         <div class="col"><i class="bi bi-envelope-fill"></i> 0</div> |
