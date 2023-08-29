@@ -20,3 +20,19 @@
 
         return $user;
     }
+
+    function get_globals($which) {
+        global $db;
+        $ret_val = '';
+        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_GLBL_TBL'];
+        $result = $db->query($sql_query);
+
+        while ($row = $result->fetch_assoc()) {
+            if ($row['name'] == $which) {
+                $ret_val = $row['value'];
+                break;
+            }
+        }
+
+        return $ret_val;
+    }

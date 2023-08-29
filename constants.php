@@ -44,10 +44,18 @@
         case ROOTED = 1024;
     };
 
-    enum Weather {
+    enum Weather: int {
         public static function random(): self {
             $count = count(self::cases()) - 1;
             return self::cases()[rand(0, $count)];
+        }
+        public static function name_to_value(string $name): string {
+            foreach (self::cases() as $weather) {
+                if ($name === $weather->name){
+                    return $weather->value;
+                }
+            }
+            throw new \ValueError("$name is not a valid backing value for enum " . self::class);
         }
         public function icon(): string {
             return match($this) {
@@ -59,11 +67,11 @@
             };
         }
 
-        case SUNNY;
-        case RAINING;
-        case HAILING;
-        case CLOUDY;
-        case SNOWING;
+        case SUNNY = 1;
+        case RAINING = 2;
+        case HAILING = 4;
+        case CLOUDY = 8;
+        case SNOWING = 16;
     }
 ?>
 

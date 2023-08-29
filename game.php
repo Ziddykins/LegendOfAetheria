@@ -44,8 +44,8 @@
     <body class="bg-dark"> 
         <div class="container-fluid border border-white sticky-bottom" style="margin-top: 25px;">
             <div class="row flex-nowrap" style="min-height: 96.5vh!important;">
-                <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark border border-white">
-                    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white">
+                <div class="col-auto col-xl-2 px-sm-2 px-0 bg-dark border border-white">
+                    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 text-white">
                         <a href="/game" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                             <img src="img/logos/logo-banner-no-bg.png" class="p-3 w-100">
                         </a>
@@ -126,7 +126,7 @@
                                 <li>
                                     <a href="#" class="nav-link px-0">
                                         <!-- TODO: Replace number with tbl_character.dungeon_level -->
-                                        <span class="d-none d-sm-inline ms-4">Floor 1</span>
+                                        <span class="d-none d-sm-inline ms-4">Floor <?php echo $character['floor']; ?></span>
                                     </a>
                                 </li>
                                 <li>
@@ -185,7 +185,7 @@
                             <li><a class="dropdown-item" href="?page=settings">Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <?php
-                                $privileges = UserPrivileges::from_name($account['privileges']);
+                                $privileges = UserPrivileges::name_to_value($account['privileges']);
                                 if ($privileges > UserPrivileges::MODERATOR->value) {
                                     echo '<li><a class="dropdown-item" href="?page=administrator">Administrator</a></li>';
                                 }
