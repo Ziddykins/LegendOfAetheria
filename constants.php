@@ -23,6 +23,14 @@
     }
 
     enum UserPrivileges: int {
+        public static function name_to_value(string $name): string {
+            foreach (self::cases() as $privilege) {
+                if ($name === $privilege->name){
+                    return $privilege->value;
+                }
+            }
+            throw new \ValueError("$name is not a valid backing value for enum " . self::class);
+        }
         case BANNED = 1;
         case MUTED = 2;
         case UNREGISTERED = 4;
@@ -35,4 +43,28 @@
         case OWNER = 512;
         case ROOTED = 1024;
     };
+
+    enum Weather {
+        public static function random(): self {
+            $count = count(self::cases()) - 1;
+            return self::cases()[rand(0, $count)];
+        }
+        public function icon(): string {
+            return match($this) {
+                Weather::CLOUDY =>  '<i class="bi bi-cloud-fill"></i>',
+                Weather::SUNNY  =>  '<i class="bi bi-brightness-high-fill"></i>',
+                Weather::HAILING => '<i class="bi bi-cloud-hail-fill"></i>',
+                Weather::SNOWING => '<i class="bi bi-cloud-snow-fill"></i>',
+                Weather::RAINING => '<i class="bi bi-cloud-lightning-rain-fill"></i>'
+            };
+        }
+
+        case SUNNY;
+        case RAINING;
+        case HAILING;
+        case CLOUDY;
+        case SNOWING;
+    }
 ?>
+
+

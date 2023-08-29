@@ -65,3 +65,33 @@ CREATE TABLE `tbl_globals` (
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;
+
+CREATE TABLE `tbl_globals` (
+	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(50) NOT NULL DEFAULT '0' COLLATE 'utf8mb4_general_ci',
+	`value` VARCHAR(50) NOT NULL DEFAULT '0' COLLATE 'utf8mb4_general_ci',
+	PRIMARY KEY (`id`) USING BTREE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB;
+
+INSERT INTO tbl_globals (id, name, value) VALUES (1, 'weather',   'Raining');
+INSERT INTO tbl_globals (id, name, value) VALUES (2, 'epoch',     '1692894200');
+INSERT INTO tbl_globals (id, name, value) VALUES (3, 'next_tick', '1692894972');
+
+CREATE TABLE `tbl_mail` (
+	`id` INT(9) UNSIGNED NOT NULL,
+	`account_id` INT(9) UNSIGNED NOT NULL,
+	`folder` ENUM('Inbox', 'Outbox', 'Deleted') NOT NULL,
+	`to` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`from` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`subject` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`message` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
+	`date` DATETIME NOT NULL,
+	`read` ENUM('True','False') NOT NULL DEFAULT 'False' COLLATE 'utf8mb4_general_ci',
+	PRIMARY KEY (`id`) USING BTREE,
+	UNIQUE INDEX `account_id` (`account_id`) USING BTREE
+)
+COLLATE='utf8mb4_general_ci'
+ENGINE=InnoDB;
+
