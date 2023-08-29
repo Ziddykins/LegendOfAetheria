@@ -20,10 +20,11 @@ CREATE TABLE `tbl_accounts` (
 		'UNVERIFIED',
         'USER',        
 		'MODERATOR',
-		'SUPER MODERATOR',
-        'GLOBAL ADMINISTRATOR',
+		'SUPER_MODERATOR',
+        'GLOBAL_ADMINISTRATOR',
 		'ADMINISTRATOR',
-		'OWNER'
+		'OWNER',
+		'ROOTED'
 	) NOT NULL DEFAULT 'UNREGISTERED',
 	`last_login` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
 	`logged_in` ENUM('True', 'False') NOT NULL DEFAULT 'False',
@@ -62,16 +63,7 @@ CREATE TABLE `tbl_characters` (
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;
 
-
-CREATE TABLE `tbl_globals` (
-	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`weather` ENUM('Raining','Sunny','Cloudy','Snowing','Hailing','Acid Rain') NULL DEFAULT 'Sunny' COLLATE 'utf8mb4_general_ci',
-	`exp_multiplier` TINYINT(4) NULL DEFAULT '1',
-	PRIMARY KEY (`id`) USING BTREE
-)
-COLLATE='utf8mb4_general_ci'
-ENGINE=InnoDB;
-
+-- Don't like this
 CREATE TABLE `tbl_globals` (
 	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(50) NOT NULL DEFAULT '0' COLLATE 'utf8mb4_general_ci',
@@ -84,20 +76,24 @@ ENGINE=InnoDB;
 INSERT INTO tbl_globals (id, name, value) VALUES (1, 'weather',   'Raining');
 INSERT INTO tbl_globals (id, name, value) VALUES (2, 'epoch',     '1692894200');
 INSERT INTO tbl_globals (id, name, value) VALUES (3, 'next_tick', '1692894972');
+INSERT INTO tbl_globals (id, name, value) VALUES (4, 'exp_multiplier', '1');
+INSERT INTO tbl_globals (id, name, value) VALUES (5, 'gold_multiplier', '1');
 
 CREATE TABLE `tbl_mail` (
 	`id` INT(9) UNSIGNED NOT NULL,
 	`account_id` INT(9) UNSIGNED NOT NULL,
-	`folder` ENUM('Inbox', 'Outbox', 'Deleted') NOT NULL,
+	`folder` ENUM('Inbox','Outbox','Deleted') NOT NULL COLLATE 'utf8mb4_general_ci',
 	`to` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`from` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`subject` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`message` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
 	`date` DATETIME NOT NULL,
 	`read` ENUM('True','False') NOT NULL DEFAULT 'False' COLLATE 'utf8mb4_general_ci',
+	`important` ENUM('True','False') NULL DEFAULT 'False' COLLATE 'utf8mb4_general_ci',
 	PRIMARY KEY (`id`) USING BTREE,
 	UNIQUE INDEX `account_id` (`account_id`) USING BTREE
 )
 COLLATE='utf8mb4_general_ci'
-ENGINE=InnoDB;
+ENGINE=InnoDB
+;
 

@@ -19,7 +19,7 @@
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         $sql_query = 'SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE email = ?';
         $prepped   = $db->prepare($sql_query);
-        $prepped->bind_param('s', $_SESSION['email']);
+        $prepped->bind_param('s', $account['email']);
         $prepped->execute();
         $result = $prepped->get_result();
 

@@ -4,3 +4,4 @@ composer.lock
 *.swp
 .env
 /.vscode/
+gamelog.txt
