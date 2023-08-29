@@ -196,19 +196,32 @@
                                         document.querySelector("#str-ap").value = document.querySelector("#stats-str-cur").innerHTML;
                                         document.querySelector("#def-ap").value = document.querySelector("#stats-def-cur").innerHTML;
                                         document.querySelector("#int-ap").value = document.querySelector("#stats-int-cur").innerHTML;
+                                        let password_field = document.getElementById('register-password').value;
+                                        let password_confirm = document.getElementById('register-password-confirm').value;
+
+                                        if (password_field !== password_confirm) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            gen_toast('error-pw-mismatch', 'warning', 'bi-key', 'Password Mis-match', 'Ensure passwords match');
+                                        };
 
                                         if (parseInt(document.querySelector("#stats-remaining-ap").innerHTML) > 0) {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            gen_toast('error-ap-toast', 'warning', 'bi-balloon', 'Unassigned Attribute Points', 'Ensure all remaining attribute points are applied');
-                                        }
+                                            gen_toast('error-ap-toast', 'warning', 'bi-dice-5-fill', 'Unassigned Attribute Points', 'Ensure all remaining attribute points are applied');
+                                        };
 
-                                        if (document.querySelector("#race-select").selectedIndex === 0 
-                                            || document.querySelector("#avatar-select").selectedIndex === 0 ) {
+                                        if (document.querySelector("#race-select").selectedIndex == 0) {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            
-                                        }
+                                            gen_toast('error-race-toast', 'warning', 'bi-droplet', 'Select Race', 'You must choose a race first');
+                                        };
+
+                                        if (document.querySelector("#avatar-select").selectedIndex == 0 ) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            gen_toast('error-avatar-toast', 'warning', 'bi-person-bounding-box', 'Select Avatar', 'You must choose an avatar first');
+                                        };
                                     });
                                 </script>
                             </form>
