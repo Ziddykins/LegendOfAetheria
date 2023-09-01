@@ -17,27 +17,38 @@
     $_SESSION['name'] = $character['name'];
 
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE email = ?';
-        $prepped   = $db->prepare($sql_query);
-        $prepped->bind_param('s', $account['email']);
-        $prepped->execute();
-        $result = $prepped->get_result();
-
-        $account = $result->fetch_assoc();
-
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_CHAR_TBL'] . ' WHERE account_id = ' . $account['id'];
-        $result  = $db->query($sql_query);
-
-        $character = $result->fetch_assoc();
+        if (isset($_POST['profile-apply']) && $_POST['profile-apply'] == 1) {
+            $old_password     = $_POST['profile-old-password'];
+            $new_password     = $_POST['profile-new-password'];
+            $confirm_password = $_POST['profile-confirm-password'];
+            $account_email    = $_SESSION['email'];
+    
+            /* Old password matches current */
+            if (password_verify($old_password, $account['password'])) {
+                if ($new_password === $confirm_password) {
+                    $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
+                    $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' SET `password` = ? WHERE `email` = ?';
+                    $prepped   = $db->prepare($sql_query);
+                    $prepped->bind_param('ss', $hashed_password, $account_email);
+                    $prepped->execute();
+                    header('Location: /game?page=profile&action=pw_reset&result=pass');
+                    exit();
+                } else {
+                    
+                }
+            } else {
+                echo 'no';
+            }
+        }
     } else {
-        header('Location: /?failed_login');
+        header('Location: /?no_login');
         exit();
     }
 ?>
 
 <?php include('html/opener.html'); ?>
     <head>
-        <?php include('html/headers.html'); ?><!-- :D -->
+        <?php include('html/headers.html'); ?>
 
     </head>
         
@@ -125,7 +136,6 @@
                             <ul class="collapse nav flex-column ms-1" id="sub-menu-dungeon" data-bs-parent="#menu" aria-expanded="false">
                                 <li>
                                     <a href="#" class="nav-link px-0">
-                                        <!-- TODO: Replace number with tbl_character.dungeon_level -->
                                         <span class="d-none d-sm-inline ms-4">Floor <?php echo $character['floor']; ?></span>
                                     </a>
                                 </li>
@@ -271,5 +281,10 @@
                 }
             }, 1000);
         </script>
+            <div aria-live="polite" aria-atomic="true" class="position-relative">
+                <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
+                <!-- Here the hardy toasts will be created - place ant traps :o -->
+            </div>
+        </div>
     </body>
 </html>

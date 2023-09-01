@@ -94,6 +94,4 @@ CREATE TABLE `tbl_mail` (
 	UNIQUE INDEX `account_id` (`account_id`) USING BTREE
 )
 COLLATE='utf8mb4_general_ci'
-ENGINE=InnoDB
-;
-
+ENGINE=InnoDB;

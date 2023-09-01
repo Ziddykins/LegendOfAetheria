@@ -145,9 +145,10 @@
 
     <head>
         <?php include('html/headers.html'); ?>
+        
     </head>
     
-    <body class="">    
+    <body>    
         <div class="container-sm my-5 shadow" style="width: 50%;">
             <div class="row">
                 <div class="col p-4">
@@ -156,8 +157,13 @@
             </div>
             <div class="row">
                 <div class="col">
-                        <?php include('navs/nav-login.php'); ?>
+                    <?php include('navs/nav-login.php'); ?>
 
+                <div aria-live="polite" aria-atomic="true" class="position-relative">
+                    <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
+                        <!-- Here the hardy toasts will be created - place ant traps :o -->
+                    </div>
+                </div>
             </div>
         </div>
     </body>
