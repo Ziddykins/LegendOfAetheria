@@ -1,7 +1,5 @@
 <?php
-    
-    $account   = get_user($_SESSION['email'], 'account');
-    $character = get_user($account['id'], 'character');
+
 
 
 ?>
@@ -33,53 +31,71 @@
             </div>
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
-                    <form id="settings-account" name="settings-account" action="/set_settings.php" method="POST">
+                    <div class="mb-3 row">
+                        <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
+                        <div class="col-sm-10">
+                            <span><?php echo $account['email']; ?></span>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="staticEmail" class="col-sm-2 col-form-label">Date Registered</label>
+                        <div class="col-sm-10">
+                            <span><?php echo $account['date_registered']; ?></span>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="staticEmail" class="col-sm-2 col-form-label">Privileges</label>
+                        <div class="col-sm-10">
+                            <span><?php print $account['privileges'] ?></span>
+                        </div>
+                    </div>
+                    
+                    <form id="profile-password-change" name="profile-password-change" action="/game?page=profile" method="POST">
                         <div class="mb-3 row">
-                            <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
+                            <label for="profile-old-password" class="col-sm-2 col-form-label">Old Password</label>
                             <div class="col-sm-10">
-                                <span><?php echo $account['email']; ?></span>
+                                <input type="password" class="form-control" id="profile-old-password" name="profile-old-password">
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label for="staticEmail" class="col-sm-2 col-form-label">Date Registered</label>
+                            <label for="profile-new-password" class="col-sm-2 col-form-label">New Password</label>
                             <div class="col-sm-10">
-                                <span><?php echo $account['date_registered']; ?></span>
+                                <input type="password" class="form-control" id="profile-new-password" name="profile-new-password">
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label for="staticEmail" class="col-sm-2 col-form-label">Privileges</label>
+                            <label for="profile-confirm-password" class="col-sm-2 col-form-label">Confirm Password</label>
                             <div class="col-sm-10">
-                                <span><?php print $account['privileges'] ?></span>
+                                <input type="password" class="form-control" id="profile-confirm-password" name="profile-confirm-password">
                             </div>
                         </div>
-                        <div class="mb-3 row">
-                            <label for="inputPassword" class="col-sm-2 col-form-label">Old Password</label>
-                            <div class="col-sm-10">
-                                <input type="password" class="form-control" id="inputPassword">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="inputPassword" class="col-sm-2 col-form-label">New Password</label>
-                            <div class="col-sm-10">
-                                <input type="password" class="form-control" id="inputPassword">
-                            </div>
-                        </div>
-                        <div class="mb-3 row">
-                            <label for="inputPassword" class="col-sm-2 col-form-label">Confirm Password</label>
-                            <div class="col-sm-10">
-                                <input type="password" class="form-control" id="inputPassword">
-                            </div>
-                        </div>
-                        <button id="profile-apply" name="profile-apply" class="btn btn-primary">Apply</button>
+
+                        
+
+                        <button id="profile-apply" name="profile-apply" class="btn btn-primary" value="1">Apply</button>
                         <button id="profile-discard" name="profile-discard" class="btn btn-danger">Discard</button>
+                        <script type="text/javascript">
+                            $("#profile-apply").on("click", function(e) {
+                                let new_pass = document.querySelector("#profile-new-password").value;
+                                let pass_confirm = document.querySelector("#profile-confirm-password").value;
+                                if (new_pass !== pass_confirm) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    gen_toast('error-nologin-toast', 'danger', 'bi-key', 'Password Mis-match', 'Please ensure passwords match');
+                                }
+                            });
+                        </script>
                     </form>
                 </div>
+
                 <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
                     o look some more settings
                 </div>
+
                 <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
                 o look some message things
                 </div>
+
                 <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
                 get out
                 </div>

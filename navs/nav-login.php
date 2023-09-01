@@ -14,6 +14,8 @@
                                 gen_toast('test-popup', 'warning', 'bi-balloon " style="font-size: 72px;"','Warning', '<marquee>Aw snap ya mighta gooft</marquee>');
                             } else if (location.search.match(/\?account_exists/)) {
                                 gen_toast('account-exists', 'danger', 'bi-dash-circle', 'Account Exists', 'An account already exists with that email');
+                            } else if (location.search.match(/\?no_login/)) {
+                                gen_toast('error-nologin-toast', 'danger', 'bi-dash-circle', 'Not Logged In', 'Please login first');
                             }
                             
                             document.getElementById('login-email').focus();
@@ -277,9 +279,4 @@
                         target_div.innerHTML = html_string;
                     });
                 </script>
-
-                <div aria-live="polite" aria-atomic="true" class="position-relative">
-                    <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
-                        <!-- Here the hardy toasts will be created - place ant traps :o -->
-                    </div>
-                </div>
+                
