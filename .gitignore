@@ -1,0 +1,10 @@
+composer.phar
+composer.lock
+/vendor/
+*.swp
+.env
+/.vscode/
+gamelog.txt
+/esp32/
+esp.php
+esp32.html
