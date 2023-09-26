@@ -1,16 +1,10 @@
 <?php
-    function get_user_folder($account_id, $folder = MailFolderType::INBOX) {
-        $user_mailbox = new MailBox($account_id);
-        $user_folder  = $user_mailbox->get_folder($folder);
-        
-    }
-    
     class MailBox {
-        private $account_id;
+        private $accountID;
         private $focused_folder;
 
-        public function __construct ($account_id) {
-            $this->account_id = $account_id;
+        public function __construct ($accountID) {
+            $this->accountID = $accountID;
         }
 
         public function set_focused_folder(MailFolderType $folder) {
@@ -18,25 +12,32 @@
         }
 
         public function populate_focused_folder() {
-            $this->focused_folder->get_messages();
+            if (isset($this->focused_folder)) {
+                $this->focused_folder->get_messages();
+            } else {
+                // handle the situation when focused_folder is not set
+            }
         }
 
     }
-    
 
     class MailFolder {
-        private $populated_folder;
+        private $populatedFolder = Array();
+        private $accountID;
 
-        public function __construct ($account_id) {
-        
-        }
-        
-        private function get_message_count($folder) {
-            
+        public function __construct($account_id) {
+            $this->accountID = $account_id;
         }
 
-        private function get_messages($folder) {
-             // ye
+        private function get_message_count() {
+            return count($this->populatedFolder);
+        }
+
+        private function get_messages(MailFolderType $folder_type = MailFolderType::INBOX) {
+             $sql_query = 'SELECT * FROM ' . $_ENV['TBL_MAIL_SQL'] . 
+                        '  WHERE accountID = '. $this->accountID . 
+                        '  AND folder = "'. $folder_type->name . '"';
+                    
         }
 
     }
@@ -46,19 +47,20 @@
         private $sender;
         private $recipient;
         private $subject;
-        private $body;
+        private $message;
         private $folder;
         private $date;
         private $read;
         private $favorite;
+        private $important;
 
-        public function __construct ($sender, $recipient) {
+        public function __construct ($sender, $recipient, $folder) {
             $this->sender = $sender;
             $this->recipient = $recipient;
         }
 
-        public function set_body ($body) {
-            $this->body = $body;
+        public function set_message ($message) {
+            $this->message = $message;
         }
 
         public function set_folder (MailFolderType $folder) {
@@ -70,6 +72,6 @@
         case INBOX;
         case DRAFTS;
         case OUTBOX;
-        case FAVORITES;
+        case FAVORITE;
         case DELETED;
     }
