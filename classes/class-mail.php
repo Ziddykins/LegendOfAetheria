@@ -4,6 +4,7 @@
         $user_folder  = $user_mailbox->get_folder($folder);
         
     }
+    
     class MailBox {
         private $account_id;
         private $focused_folder;
