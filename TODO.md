@@ -13,7 +13,7 @@
 * [ ] **Mail system (in-game)**
 
   * [X] Must be on friends list
-  * [ ] Implement class for users' mailboxes
+  * [X] Implement class for users' mailboxes
 * [ ] **Friends list**
 
   * [ ] Have the cancel request link remove the sql entry
@@ -21,7 +21,7 @@
   * [ ] also make decline, block, and message buttons work
 * [ ] **Status bar**
 
-  * [ ] no sticky top, so it fits inside game content area
+  * [X] no sticky top, so it fits inside game content area
   * [ ] redo the bar so it pulls real values
 
 # Icons

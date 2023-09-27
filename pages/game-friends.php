@@ -13,7 +13,7 @@
         $status_in  = friend_status($row['email_1']);
         $status_out = friend_status($row['email_2']);
 
-        $log->warning("Checking friend status for ". $row['email_1']. " and ". $row['email_2'] . " - ". $status->name);
+        $log->warning("Checking friend status for ". $row['email_1']." and ". $row['email_2'] ." - ". $status->name);
 
         if ($status_in == FriendStatus::REQUEST) {
             array_push($requests, $row);
@@ -83,23 +83,23 @@
     }
 ?>
 
-<div class="container text-white">
+<div class="container ">
     <div class="row pt-5">
         <div class="col">
             <div class="list-group" id="list-tab" role="tablist">
-                <a class="list-group-item list-group-item-action active bg-dark text-white" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">
+                <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">
                     Friends
                 </a>
-                <a class="list-group-item list-group-item-action bg-dark text-white" id="list-friendreqs-header" data-bs-toggle="list" href="#friends-request" role="tab" aria-controls="friends-request">
+                <a class="list-group-item list-group-item-action" id="list-friendreqs-header" data-bs-toggle="list" href="#friends-request" role="tab" aria-controls="friends-request">
                     Requests
                     <?php if (count($requests) > 0) {?>
                         <span class="badge rounded-pill bg-<?php echo count($requests) ? 'danger' : 'primary'; ?>"><?php echo count($requests); ?></span>
                     <?php } ?>
                 </a>
-                <a class="list-group-item list-group-item-action bg-dark text-white" id="list-friendreqd-header" data-bs-toggle="list" href="#friends-requested" role="tab" aria-controls="friends-requested">
+                <a class="list-group-item list-group-item-action" id="list-friendreqd-header" data-bs-toggle="list" href="#friends-requested" role="tab" aria-controls="friends-requested">
                     Requested
                 </a>
-                <a class="list-group-item list-group-item-action bg-dark text-white" id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">
+                <a class="list-group-item list-group-item-action" id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">
                     Blocked
                 </a>
             </div>
@@ -116,8 +116,7 @@
                         for ($i=0; $i<count($friends); $i++) {
                             $temp_account = get_user($friends[$i]['email_1'], 'account');
                             $sender_account = get_user($temp_account['id'], 'character');
-                            $sql_query = 'SELECT account_id, FLOOR((UNIX_TIMESTAMP() - UNIX_TIMESTAMP(last_action)) / 60) AS timedelta FROM tbl_characters HAVING timedelta < 60 AND account_id = ' . $temp_account["id"];
-                            $check_user = $db->query($sql_query)->num_rows;
+                            $check_user = file_exists(escapeshellcmd('/var/lib/php/sessions/sess_' . $temp_account['session_id']));
                             
                             $log->info('Account online status: ', [ 'email' => $temp_account['email'], 'check_user' => $check_user ]);
                             $online_indicator = '<p class="badge bg-secondary"><i class="bi bi-lightbulb"></i> Offline</p>';
@@ -127,7 +126,6 @@
                                 $online_indicator = '<p class="badge bg-success"><i class="bi bi-lightbulb-fill"></i> Online</p>';
                                 $msg_color = 'btn-success'; // -_-
                             }
-                            
 
                             echo '<div class="row mb-3">
                             <div class="card" style="max-width: 400px;">
