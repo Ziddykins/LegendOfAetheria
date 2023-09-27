@@ -75,3 +75,22 @@ function tgl_active (e) {
     e.childNodes[1].classList.add('bi-diamond-fill');
     e.childNodes[1].classList.remove('bi-diamond');
 };
+
+function gen_envelope(subject, sender, message_fragment, date) {
+    let envelope_html = '<div class="list-group">';
+    envelope_html    += '    <a href="#" class="list-group-item list-group-item-action active" aria-current="true">';
+    envelope_html    += '        <div class="d-flex w-100 justify-content-between">';
+    envelope_html    += '            <h5 class="mb-1">' + sender + ' - ' + subject + '</h5>';
+    envelope_html    += '            <small>' + date + '</small>';
+    envelope_html    += '        </div>';
+    envelope_html    += '        <small>' + message_fragment + '</small>';
+    envelope_html    += '   </a>';
+    envelope_html    += '</div>';
+    return envelope_html;
+}
+
+$(document).ready(function(){ 
+    if (document.body.contains(document.getElementById('login-email'))) {
+        document.getElementById('login-email').focus();
+    };
+});
