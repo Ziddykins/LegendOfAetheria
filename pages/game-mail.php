@@ -1,9 +1,13 @@
 <?php
+    require 'classes/class-mail.php';
+    
     $account   = get_user($_SESSION['email'], 'account');
     $character = get_user($account['id'], 'character');
+    
     $user_mailbox = new MailBox($account['id']);
-    $user_inbox = $user_mailbox->get_folder(MailFolderType::INBOX);
-    $new_emails = $user_inbox->get_mail_count();
+    $user_mailbox->set_focused_folder(MailFolderType::INBOX);
+    $user_mailbox->populate_focused_folder();
+    $inbox_count = $user_mailbox->get_focused_folder_count();
 ?>
 
 <div class="container text-white">

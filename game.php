@@ -16,6 +16,8 @@
     $account   = get_user($_SESSION['email'], 'account');
     $character = get_user($account['id'], 'character');
 
+    $char_menu_icon = $character['hp'] > 0 ? 'bi-emoji-laughing-fill' : 'bi-emoji-dizzy-fill';
+
     $_SESSION['name'] = $character['name'];
 
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
@@ -55,32 +57,31 @@
 
     </head>
         
-    <body class="bg-dark"> 
+    <body> 
         <div class="container-fluid border border-white sticky-bottom" style="margin-top: 25px;">
             <div class="row flex-nowrap" style="min-height: 96.5vh!important;">
-                <div class="col-2 px-sm-2 px-0 bg-dark border border-white">
-                    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 text-white">
+                <div class="col-2 px-sm-2 px-0 border border-grey">
+                    <div class="d-flex flex-column align-items-center align-items-sm-start px-3">
                         <a href="/game" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                             <img src="img/logos/logo-banner-no-bg.png" class="p-3 w-100">
                         </a>
 
                         <hr style="width: 35%; opacity: .25; align-self: center;">
 
-                        <!-- broke? mb-sm-auto  -->
-                        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
-                            <a href="#sub-character-menu" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
-                                <i class="fs-4 bi-house-fill"></i>
+                        <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start mb-sm-auto" id="menu">
+                            <a href="#sub-menu-character" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                                <i class="fs-4 bi <?php echo $char_menu_icon; ?>"></i>
                                 <span class="ms-1 d-none d-sm-inline fs-6">Character</span>
                             </a>
-                            <ul class="nav collapse flex-column ms-1" id="sub-character-menu" data-bs-parent="#menu" aria-expanded="false">
+                            <ul class="nav collapse flex-column" id="sub-menu-character" data-bs-parent="#menu" aria-expanded="false">
                                 <li>
                                     <a href="#" class="nav-link px-0">
-                                        <span class="d-none ms-4 d-sm-inline ">Sheet</span>
+                                        <i class="bi bi-card-text ms-4"></i><span class="d-none d-sm-inline"> Sheet</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#" class="nav-link px-0">
-                                        <span class="d-none d-sm-inline ms-4">Inventory</span>
+                                    <i class="bi bi-box ms-4"></i><span class="d-none d-sm-inline"> Inventory</span>
                                     </a>
                                 </li>
                                 <li>
@@ -102,11 +103,11 @@
                         </li>
                         
                         <li>
-                            <a href="#sub-travel-menu" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
+                            <a href="#sub-menu-travel" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
                                 <i class="fs-4 bi bi-signpost-split-fill"></i>
                                 <span class="ms-1 d-none d-sm-inline fs-6">Location</span>
                             </a>
-                            <ul class="collapse nav flex-column ms-1" id="sub-travel-menu" data-bs-parent="#menu" aria-expanded="false">
+                            <ul class="collapse nav flex-column ms-1" id="sub-menu-travel" data-bs-parent="#menu" aria-expanded="false">
                                 <li>
                                     <a href="?page=hunt" class="nav-link px-0">
                                         <span class="d-none d-sm-inline ms-4">Hunt</span>
@@ -189,7 +190,7 @@
                             </span>
                         </a>
 
-                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                        <ul class="dropdown-menu dropdown-menu text-small shadow">
                             <li><a class="dropdown-item" href="?page=profile">Profile</a></li>
                             <li><a class="dropdown-item" href="?page=mail">Mail
                                     <span class="badge bg-danger rounded-pill"> 5</span>
