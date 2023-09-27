@@ -3,7 +3,7 @@
         public $accountID;
         public $focusedFolder;
 
-        public function __construct ($accountID) {
+        public function __construct($accountID) {
             $this->accountID = $accountID;
         }
 

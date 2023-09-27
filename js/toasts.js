@@ -18,6 +18,4 @@ $(document).ready(function(){
     } else if (location.search.match(/\?contact_form_submitted=1/)) {
         gen_toast('success-contactform-sent', 'success', 'bi-chat-heart-fill', 'Contact Form Sent', 'Thank you for contacting us, we will get back to you as soon as possible');
     }
-    
-    document.getElementById('login-email').focus();
 });
