@@ -20,10 +20,6 @@
                     [ 'File' => __FILE__, 'Line' => __LINE__ - 2 ]); // lol?
             }
         }
-
-        public function get_focused_folder_count() {
-            return $this->focusedFolder->get_message_count();
-        }
     }
 
     class MailFolder {
@@ -83,6 +79,5 @@
         case INBOX;
         case DRAFTS;
         case OUTBOX;
-        case FAVORITE;
         case DELETED;
     }
