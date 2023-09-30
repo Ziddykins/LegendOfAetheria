@@ -1,4 +1,4 @@
-$(document).ready(function() {
+(document).ready(function() {
     let rgx_failed_login        = /\?failed_login/;
     let rgx_successful_register = /\?register_success/;
     let rgx_start_new_register  = /\?do_register/;
@@ -8,30 +8,32 @@ $(document).ready(function() {
     let rgx_not_logged_in       = /\?no_login/;
     let rgx_contactform_submit  = /\?contact_form_submitted=1/;
     let rgx_changepw_fail       = /game\?page=profile&action=pw_reset&result=fail
-  
+    
     let query = location.search;
     
     
     
-    if (location.search.match($rgx_failed_login)) {
+    if (query.match(rgx_failed_login)) {
         gen_toast('error-login-toast', 'danger', 'bi-dash-circle', 'Error', 'Invalid login credentials!');
-    } else if (location.search.match($rgx_successful_register)) {
+    } else if (query.match(rgx_successful_register)) {
         gen_toast('success-register-toast', 'success', 'bi-check', 'Success', 'Account and Character successfully created, you can now log in');
-    } else if (location.search.match($rgx_start_new_register)) {
+    } else if (query.match(rgx_start_new_register)) {
         document.getElementById('register-tab').click();
-        document.getElementById('register-email').value = location.search.split('&')[1].replace('email=', '');
+        document.getElementById('register-email').value = query.split('&')[1].replace('email=', '');
         gen_toast('account-not-exist', 'success', 'bi-check', 'Success', 'No account associated with this email, register?');
-    } else if (location.search.match($rgx_logged_out)) {
+    } else if (query.match(rgx_logged_out)) {
         gen_toast('logged-out', 'success', 'bi-check', 'Logged Out', 'Successfully logged out!');
-    } else if (location.search.match($rgx_dun_gooft_up)) {
+    } else if (query.match(rgx_dun_gooft_up)) {
         gen_toast('test-popup', 'warning', 'bi-balloon " style="font-size: 72px;"','Warning', '<marquee>Aw snap ya mighta gooft</marquee>');
-    } else if (location.search.match($rgx_account_exists)) {
+    } else if (query.match(rgx_account_exists)) {
         gen_toast('account-exists', 'danger', 'bi-dash-circle', 'Account Exists', 'An account already exists with that email');
-    } else if (location.search.match($rgx_not_logged_in)) {
+    } else if (query.match(rgx_not_logged_in)) {
         gen_toast('error-nologin-toast', 'danger', 'bi-dash-circle', 'Not Logged In', 'Please login first');
-    } else if (location.search.match($rgx_contactform_submit) {
+    } else if (query.match(rgx_contactform_submit)) {
         gen_toast('success-contactform-sent', 'success', 'bi-chat-heart-fill', 'Contact Form Sent', 'Thank you for contacting us, we will get back to you as soon as possible');
-    } else if (loca)
+    } else if (query.match(rgx_changepw_fail)) {
+        gen_toast('success-changepw-fail', 'danger', 'bi-key', 'Password Mis-match', 'The two passwords do not match; password unchanged');
+    }
     
     
 });
