@@ -28,27 +28,13 @@
         $header_charname = $character['name'] . "'";
     }
 
-    if (isset($_POST['friends-send-request']) && $_POST['friends-send-request'] == "1") {
-        if (isset($_POST['friends-request-send'])) {
-            $requested_email = filter_var($_POST['friends-request-send'], FILTER_SANITIZE_EMAIL);
-           
-            if (friend_status($requested_email) == FriendStatus::NONE) {
-                $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
-                $prepped = $db->prepare($sql_query);
-                $prepped->bind_param("ss", $account['email'], $requested_email);
-                $prepped->execute();
-                $log->warning('Friend request sent', [ 'email_1' => $account['email'], 'email_2' => $requested_email ]);
-            }
-        }
-    }
-
     if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
         accept_friend_req($_POST['focused-request']);
         $log->info('Friend request accepted', 
             [ 'email_1' => $account['email'], 'email_2' => $_POST['focused-request'] ]);
     }
     
-    if ($_REQUEST['page'] == 'friends')
+    if ($_REQUEST['page'] == 'friends') {
         if ($_REQUEST['action'] == 'cancel_request') {
             $sql_query = "DELETE FROM `" . $_ENV['SQL_FRND_TBL'] . "` " .
                          "WHERE email_1 = ? AND email_2 = ?";
@@ -57,6 +43,20 @@
                 $prepped = $db->prepare($sql_query);
                 $prepped->bind_param("ss", $account['email'], $_REQUEST['email']);
                 $prepped->execute();
+            }
+        } else if ($_REQUEST['action'] == 'accept_request') {
+            if (isset($_POST['friends-send-request']) && $_POST['friends-send-request'] == "1") {
+                if (isset($_POST['friends-request-send'])) {
+                    $requested_email = filter_var($_POST['friends-request-send'], FILTER_SANITIZE_EMAIL);
+           
+                    if (friend_status($requested_email) == FriendStatus::NONE) {
+                        $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
+                        $prepped = $db->prepare($sql_query);
+                        $prepped->bind_param("ss", $account['email'], $requested_email);
+                        $prepped->execute();
+                        $log->warning('Friend request sent', [ 'email_1' => $account['email'], 'email_2' => $requested_email ]);
+                    }
+                }
             }
         }
     }
@@ -180,7 +180,7 @@
                         for ($i=0; $i<count($requests); $i++) {
                             $temp_account = get_user($requests[$i]['email_1'], 'account');
                             $sender_account = get_user($temp_account['id'], 'character');
-                            echo '<form id="accept-request-' . $sender_account['account_id'] . '" name="accept-request-'. $sender_account['account_id']. '" action="/game?page=friends" method="POST">';
+                            echo '<form id="accept-request-' . $sender_account['account_id'] . '" name="accept-request-'. $sender_account['account_id']. '" action="/game?page=friends&action=accept_request" method="POST">';
                             echo '<div class="row mb-3">
                                     <div class="card" style="max-width: 540px;">
                                         <div class="row g-0">
@@ -199,7 +199,6 @@
                                                             <button id="btn-decline" name="btn-decline" class="btn btn-warning btn-block" value="1">Decline</button>
                                                             <button id="btn-block" name="btn-block" class="btn btn-danger btn-block" value="1">Block</button>                                                            
                                                             <input type="hidden" id="focused-request" name="focused-request" value="' . $temp_account['email'] . '">
-                                                            <input type
                                                         </div>
                                                     </div>
                                                     <p class="card-text"><small class="text-body-secondary">Sent at ' . $requests[$i]['created'] . '</small></p>
