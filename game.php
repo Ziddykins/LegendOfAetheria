@@ -7,10 +7,11 @@
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 
-    include('logger.php');
-    include('db.php');
-    include('constants.php');
-    include('functions.php');
+    include 'logger.php';
+    include 'db.php';
+    include 'constants.php';
+    include 'functions.php';
+    
     global $log;
     
     $account   = get_user($_SESSION['email'], 'account');
@@ -38,9 +39,8 @@
                     session_regenerate_id();
                     header('Location: /logout?action=pw_reset&result=pass');
                     exit();
-                } else {
-                    
                 }
+                
             } else {
                 header('Location: /game?page=profile&action=pw_reset&result=fail');
                 exit();
