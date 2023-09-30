@@ -33,19 +33,7 @@
     }
 
     function do_minute() {
-        global $db, $log;
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_CHAR_TBL'] . ' WHERE ep <> max_ep';
-        $results = $db->query($sql_query);
-    
-        while ($row = $results->fetch_assoc()) {
-            $new_ep = $row['ep'] + 3;
-    
-            $new_ep = min($new_ep, $row['max_ep']);
-    
-            $sql_query = 'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . " SET ep = $new_ep WHERE id = " . $row['id'];
-            $log->info("Updating ep to $new_ep", ['SQL_QUERY' => $sql_query]);
-            $db->query($sql_query);
-        }
+        add_energy();
     }
     
     function do_hourly() {
@@ -80,5 +68,21 @@
         }
         
         $log->info("$count players revived during daily cronrun");
+    }
+    
+    function add_energy() {
+        global $db, $log;
+        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_CHAR_TBL'] . ' WHERE ep <> max_ep';
+        $results = $db->query($sql_query);
+    
+        while ($player = $results->fetch_assoc()) {
+            $new_ep = $player['ep'] + 3;
+            $new_ep = min($new_ep, $player['max_ep']);
+    
+            $sql_query = 'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . " SET ep = $new_ep WHERE id = " . $player['id'];
+          
+            $log->info("Updating ep to $new_ep", ['SQL_QUERY' => $sql_query]);
+            $db->query($sql_query);
+        }
     }
 ?>
