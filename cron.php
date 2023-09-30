@@ -57,5 +57,7 @@
         // we just dont know - <° ?
     }
     
-    
+    function cycle_weather() {
+        $new_weather = 
+    }
 ?>
