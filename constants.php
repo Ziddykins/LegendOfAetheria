@@ -45,7 +45,7 @@
         case ROOTED = 1024;
     };
 
-    enum Weather: int {
+    enum Weather {
         public static function random(): self {
             $count = count(self::cases()) - 1;
             return self::cases()[rand(0, $count)];
@@ -68,7 +68,7 @@
             };
         }
 
-        case SUNNY = 1;
+        case SUNNY;
         case RAINING;
         case HAILING;
         case CLOUDY;
