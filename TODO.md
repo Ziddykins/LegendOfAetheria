@@ -55,11 +55,6 @@
   in prog quests
 `<i class="bi bi-clipboard-fill"></i>`
 
-  weather - rain
-
-  weather - snow
-`<i class="bi bi-cloud-snow-fill"></i>`
-
   account
 `<i class="bi bi-credit-card-2-front-fill"></i>`
 
@@ -76,21 +71,6 @@
 
   discord
 `<i class="bi bi-discord"></i>`
-
-  status - ded
-`<i class="bi bi-emoji-dizzy-fill"></i>`
-
-  status - alive
-`<i class="bi bi-emoji-laughing-fill"></i>`
-
-  mail - impertern
-`<i class="bi bi-envelope-exclamation-fill"></i>`
-
-  mail - read
-`<i class="bi bi-envelope-open-fill"></i>`
-
-  mail - unread
-`<i class="bi bi-envelope-fill"></i>`
 
   dungeon - ladder
 `<i class="bi bi-ladder"></i>`
