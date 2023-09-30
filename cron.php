@@ -54,7 +54,7 @@
     }
     
     function do_daily() {
-        // we just dont know - <° ?
+        revive_all_players();
     }
     
     function cycle_weather() {
@@ -62,7 +62,23 @@
         
         while ($new_weather === $cur_weather) {
             $new_weather = Weather::random();
-            
         }
+        
+        set_globals('weather', $weather);
+    }
+    
+    function revive_all_players() {
+        global $db, $log;
+        $count = 0;
+        
+        $sql_query = "SELECT * FROM `" . $ENV['SQL_CHAR_TBL'] . "` WHERE hp = 0;";
+        $results   = $db->query($sql_query);
+        
+        while ($player = $results->fetch_assoc()) {
+            $player['hp'] = $player['max_hp'];
+            $count++;
+        }
+        
+        $log->info("$count players revived during daily cronrun");
     }
 ?>
