@@ -37,3 +37,11 @@
 
         return $ret_val;
     }
+    
+    function set_globals($name, $value) {
+        global db;
+        
+        $$sql_query = "UPDATE `tbl_globals` SET `value` = '$value'" .
+                        "WHERE `name` = '$name'";
+        $db->query($sql_query);
+    }
