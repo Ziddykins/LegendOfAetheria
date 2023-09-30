@@ -25,15 +25,17 @@
   * [ ] redo the bar so it pulls real values
 * [ ] **Cronjobs**
 
-  * [ ] Cycle weather hourly
+  * [X] Cycle weather hourly
 * [ ] **Spinels**
 
   * [ ] implement
   * [ ] tooltips
-* [ ] Eastereggs
 
-  * [ ] Egg icon randomly selects a div and blends in hourly
-    Grants random amount of xp/gold, maybe once per day a golden egg grants boosts or equip
+* [ ] Eastereggs
+  * [ ] Egg icon randomly selects a div, on a random page which all registered
+        playerspi⁸ have acces to, and blends in, hourly - grants random amount of
+        xp/gold
+  * [ ] maybe once per day a golden egg grants boosts or equip
 
 # Icons
 
