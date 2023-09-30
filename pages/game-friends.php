@@ -4,7 +4,7 @@
     $header_charname = $character['name'] . "'s";
     
     /* :3 */
-    $requests = $requested = $friends  = $blocked = Array();
+    $requests = $requested = $friends = $blocked = Array();
     
     /* Populate global $requests array with incoming requests */
     $recvreqs = $db->query("SELECT * FROM tbl_friends WHERE email_2 = '" . $account['email'] . "' OR email_1 = '" . $account['email'] . "'");
@@ -31,6 +31,7 @@
     if (isset($_POST['friends-send-request']) && $_POST['friends-send-request'] == "1") {
         if (isset($_POST['friends-request-send'])) {
             $requested_email = filter_var($_POST['friends-request-send'], FILTER_SANITIZE_EMAIL);
+           
             if (friend_status($requested_email) == FriendStatus::NONE) {
                 $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
                 $prepped = $db->prepare($sql_query);
@@ -43,7 +44,8 @@
 
     if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
         accept_friend_req($_POST['focused-request']);
-        $log->info('Friend request accepted', [ 'email_1' => $account['email'], 'email_2' => $_POST['focused-request'] ]);
+        $log->info('Friend request accepted', 
+            [ 'email_1' => $account['email'], 'email_2' => $_POST['focused-request'] ]);
     }
     
     if ($_REQUEST['page'] == 'friends')
@@ -51,7 +53,7 @@
             $sql_query = "DELETE FROM `" . $_ENV['SQL_FRND_TBL'] . "` " .
                          "WHERE email_1 = ? AND email_2 = ?";
                          
-            if (friend_status($_REQUEST['email']) !== FriendStatus::REQUESTED) {
+            if (friend_status($_REQUEST['email']) === FriendStatus::REQUESTED) {
                 $prepped = $db->prepare($sql_query);
                 $prepped->bind_param("ss", $account['email'], $_REQUEST['email']);
                 $prepped->execute();
@@ -87,7 +89,7 @@
 
     function accept_friend_req($email) {
         global $db, $log, $account;
-        if (friend_status($email) == FriendStatus::REQUEST) {
+        if (friend_status($email) === FriendStatus::REQUEST) {
             $sql_query = 'INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)';
             $prepped = $db->prepare($sql_query);
             $prepped->bind_param("ss", $account['email'], $email);
@@ -129,7 +131,7 @@
                         </div>
                     </div>
                     <?php
-                        for ($i=0; $i<count($friends); $i++) {
+                        for ($i=0; $i<count($friends)-1; $i++) {
                             $temp_account = get_user($friends[$i]['email_1'], 'account');
                             $sender_account = get_user($temp_account['id'], 'character');
                             $check_user = file_exists(escapeshellcmd('/var/lib/php/sessions/sess_' . $temp_account['session_id']));
@@ -143,28 +145,29 @@
                                 $msg_color = 'btn-success'; // -_-
                             }
 
-                            echo '<div class="row mb-3">
-                            <div class="card" style="max-width: 400px;">
-                                <div class="row g-0">
-                                    <div class="col-2 pt-2 pb-2">
-                                        <img src="/img/avatars/' . $sender_account['avatar'] . '" class="img-fluid rounded" alt="friend-' . $i . '-avatar">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">' . $online_indicator . ' - ' . $temp_account['email'] . '
-                                        <div class="btn-group">
-                                            <button class="btn ' . $msg_color . ' btn-block btn-sm">Message</button>
-                                            <button class="btn btn-warning btn-block btn-sm">Remove</button>
-                                            <button class="btn btn-danger btn-block btn-sm">Block</button>
+                            echo   '<div class="row mb-3">
+                                        <div class="card" style="max-width: 400px;">
+                                            <div class="row g-0">
+                                                <div class="col-2 pt-2 pb-2">
+                                                    <img src="/img/avatars/' . $sender_account['avatar'] . '" class="img-fluid rounded" alt="friend-' . $i . '-avatar">
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="card-body">' . $online_indicator . ' - ' . $temp_account['email'] . '
+                                                    <div class="btn-group">
+                                                        <button class="btn ' . $msg_color . ' btn-block btn-sm">Message</button>
+                                                        <button class="btn btn-warning btn-block btn-sm">Remove</button>
+                                                        <button class="btn btn-danger btn-block btn-sm">Block</button>
+                                                    </div>
+                                                        
+                                                    <p class="card-text"><small class="text-body-secondary">Friends since ' . $friends[$i]["created"] . '</small></p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                            
-                                        <p class="card-text"><small class="text-body-secondary">Friends since ' . $friends[$i]["created"] . '</small></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>';
-                        }?>
-                        
+                                    </div>';
+                        }
+                    ?>
+
                 </div>
                 <div class="tab-pane fade" id="friends-request" role="tabpanel" aria-labelledby="list-friendreqs-header">
                     <div class="row mb-3">
@@ -196,6 +199,7 @@
                                                             <button id="btn-decline" name="btn-decline" class="btn btn-warning btn-block" value="1">Decline</button>
                                                             <button id="btn-block" name="btn-block" class="btn btn-danger btn-block" value="1">Block</button>                                                            
                                                             <input type="hidden" id="focused-request" name="focused-request" value="' . $temp_account['email'] . '">
+                                                            <input type
                                                         </div>
                                                     </div>
                                                     <p class="card-text"><small class="text-body-secondary">Sent at ' . $requests[$i]['created'] . '</small></p>
