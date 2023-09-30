@@ -89,6 +89,7 @@
 
     function accept_friend_req($email) {
         global $db, $log, $account;
+        
         if (friend_status($email) === FriendStatus::REQUEST) {
             $sql_query = 'INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)';
             $prepped = $db->prepare($sql_query);
@@ -132,9 +133,9 @@
                     </div>
                     <?php
                         for ($i=0; $i<count($friends)-1; $i++) {
-                            $temp_account = get_user($friends[$i]['email_1'], 'account');
+                            $temp_account   = get_user($friends[$i]['email_1'], 'account');
                             $sender_account = get_user($temp_account['id'], 'character');
-                            $check_user = file_exists(escapeshellcmd('/var/lib/php/sessions/sess_' . $temp_account['session_id']));
+                            $check_user     = file_exists(escapeshellcmd('/var/lib/php/sessions/sess_' . $temp_account['session_id']));
                             
                             $log->info('Account online status: ', [ 'email' => $temp_account['email'], 'check_user' => $check_user ]);
                             $online_indicator = '<p class="badge bg-secondary"><i class="bi bi-lightbulb"></i> Offline</p>';
@@ -178,7 +179,7 @@
                     
                     <?php
                         for ($i=0; $i<count($requests); $i++) {
-                            $temp_account = get_user($requests[$i]['email_1'], 'account');
+                            $temp_account   = get_user($requests[$i]['email_1'], 'account');
                             $sender_account = get_user($temp_account['id'], 'character');
                             echo '<form id="accept-request-' . $sender_account['account_id'] . '" name="accept-request-'. $sender_account['account_id']. '" action="/game?page=friends&action=accept_request" method="POST">';
                             echo '<div class="row mb-3">
