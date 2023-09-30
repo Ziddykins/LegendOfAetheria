@@ -1,5 +1,4 @@
 <?php
-    
      __DIR__ . '/vendor/autoload.php';
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
@@ -38,7 +37,6 @@
     
     function do_hourly() {
         cycle_weather();
-        
     }
     
     function do_daily() {
