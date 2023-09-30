@@ -9,17 +9,15 @@
     let rgx_contactform_submit  = /\?contact_form_submitted=1/;
     let rgx_changepw_fail       = /game\?page=profile&action=pw_reset&result=fail
     
-    let query = location.search;
-    
-    
-    
+    URLSearchParams(location.search);
+
     if (query.match(rgx_failed_login)) {
         gen_toast('error-login-toast', 'danger', 'bi-dash-circle', 'Error', 'Invalid login credentials!');
     } else if (query.match(rgx_successful_register)) {
         gen_toast('success-register-toast', 'success', 'bi-check', 'Success', 'Account and Character successfully created, you can now log in');
     } else if (query.match(rgx_start_new_register)) {
         document.getElementById('register-tab').click();
-        document.getElementById('register-email').value = query.split('&')[1].replace('email=', '');
+        document.getElementById('register-email').value = params.get('email');
         gen_toast('account-not-exist', 'success', 'bi-check', 'Success', 'No account associated with this email, register?');
     } else if (query.match(rgx_logged_out)) {
         gen_toast('logged-out', 'success', 'bi-check', 'Logged Out', 'Successfully logged out!');
@@ -34,6 +32,4 @@
     } else if (query.match(rgx_changepw_fail)) {
         gen_toast('success-changepw-fail', 'danger', 'bi-key', 'Password Mis-match', 'The two passwords do not match; password unchanged');
     }
-    
-    
 });
