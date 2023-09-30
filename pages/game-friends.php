@@ -45,9 +45,23 @@
         accept_friend_req($_POST['focused-request']);
         $log->info('Friend request accepted', [ 'email_1' => $account['email'], 'email_2' => $_POST['focused-request'] ]);
     }
+    
+    if ($_REQUEST['page'] == 'friends')
+        if ($_REQUEST['action'] == 'cancel_request') {
+            $sql_query = "DELETE FROM `" . $_ENV['SQL_FRND_TBL'] . "` " .
+                         "WHERE email_1 = ? AND email_2 = ?";
+                         
+            if (friend_status($_REQUEST['email']) !== FriendStatus::REQUESTED) {
+                $prepped = $db->prepare($sql_query);
+                $prepped->bind_param("ss", $account['email'], $_REQUEST['email']);
+                $prepped->execute();
+            }
+        }
+    }
 
     function friend_status($email) {
         global $db, $account;
+        $email = filter_var($_REQUEST['email'], FILTER_SANITIZE_EMAIL);
         
         /* ours */
         $sql_query = "SELECT * FROM tbl_friends WHERE email_1 = '" . $account['email'] . "' AND email_2 = '$email'";
@@ -78,7 +92,9 @@
             $prepped = $db->prepare($sql_query);
             $prepped->bind_param("ss", $account['email'], $email);
             $prepped->execute();
-            $log->warning('Friend request accepted', [ 'email_1' => $account['email'], 'email_2' => $email ]);
+            
+            $log->warning('Friend request accepted', 
+                [ 'email_1' => $account['email'], 'email_2' => $email ]);
         }
     }
 ?>
@@ -229,11 +245,11 @@
                                     <?php
                                         for ($i=0; $i<=count($requested)-1; $i++) {
                                             echo '<tr>
-                                                    <th scope="row">' . $i . '</th>
-                                                    <td>' . $requested[$i]['email_2'] . '</td>
-                                                    <td>' . $requested[$i]['created'] . '</td>
-                                                    <td><a href="/game?page=friends&action=cancel-request&id=' . $requested[$i]['email_2'] . '">X</a>
-                                                </tr>';
+                                                      <th scope="row">' . $i . '</th>
+                                                      <td>' . $requested[$i]['email_2'] . '</td>
+                                                      <td>' . $requested[$i]['created'] . '</td>
+                                                      <td><a href="/game?page=friends&action=cancel_request&email=' . $requested[$i]['email_2'] . '">X</a>
+                                                  </tr>';
                                         }
                                     ?>
                                 </tbody>
@@ -248,7 +264,6 @@
                             <div class="col">
                                 <h3><?php echo $header_charname; ?> Blocked</h3>
                             </div>
-                            
                         </div>
                     </form>
                 </div>
