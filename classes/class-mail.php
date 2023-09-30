@@ -16,7 +16,8 @@
             if (isset($this->focusedFolder)) {
                 $this->focusedFolder->get_messages();
             } else {
-                $log->warning('Focused folder not yet populated in ', [ 'File' => __FILE__, 'Line' => __LINE__ - 2 ]); // lol?
+                $log->warning('Focused folder not yet populated in ', 
+                    [ 'File' => __FILE__, 'Line' => __LINE__ - 2 ]); // lol?
             }
         }
 
