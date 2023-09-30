@@ -1,11 +1,10 @@
 /**
  * This PHP script runs different cron jobs based on the command line argument passed to it.
- *
+ * It cannot be 
  * @example
  * php cron.php minute
  * This will run the `do_minute()` function, which adds energy to a database table.
  *
- * @package Cron
  */
 
 require __DIR__ . '/vendor/autoload.php';
