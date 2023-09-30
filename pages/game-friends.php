@@ -213,7 +213,7 @@
                     ?>
                 </div>
                 <div class="tab-pane fade" id="friends-requested" role="tabpanel" aria-labelledby="list-friendreqd-header">
-                    <form id='form-send-friends-request' name='form-send-friends-request' action='/game?page=friends' method='POST'>
+                    <form id='form-send-friends-request' name='form-send-friends-request' action='/game?page=friends&actions=send_request' method='POST'>
                         <div class="row">
                             <div class="col">
                                 <h3><?php echo $header_charname; ?> Requested</h3>
