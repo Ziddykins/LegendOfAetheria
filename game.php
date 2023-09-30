@@ -42,7 +42,8 @@
                     
                 }
             } else {
-                echo 'no';
+                header('Location: /game?page=profile&action=pw_reset&result=fail');
+                exit();
             }
         }
     } else {
@@ -54,7 +55,7 @@
 <?php include('html/opener.html'); ?>
     <head>
         <?php include('html/headers.html'); ?>
-
+        
     </head>
         
     <body> 
