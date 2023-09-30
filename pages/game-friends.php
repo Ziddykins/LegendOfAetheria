@@ -228,6 +228,7 @@
 
                         <div class="row mb-3">
                             <div class="col-8">
+                                l
                                 <input id="friends-request-send" name="friends-request-send" class="form-control">
                             </div>
                             <div class="col-2">
