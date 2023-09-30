@@ -58,6 +58,11 @@
     }
     
     function cycle_weather() {
-        $new_weather = Weather
+        $cur_weather = get_globals('weather');
+        
+        while ($new_weather === $cur_weather) {
+            $new_weather = Weather::random();
+            
+        }
     }
 ?>
