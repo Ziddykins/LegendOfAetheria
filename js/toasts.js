@@ -7,7 +7,7 @@
     let rgx_account_exists      = /\?account_exists/;
     let rgx_not_logged_in       = /\?no_login/;
     let rgx_contactform_submit  = /\?contact_form_submitted=1/;
-    let rgx_changepw_fail       = /game\?page=profile&action=pw_reset&result=fail
+    let rgx_changepw_fail       = /game\?page=profile&action=pw_reset&result=fail/;
     
     URLSearchParams(location.search);
 
