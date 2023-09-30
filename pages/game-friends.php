@@ -27,12 +27,6 @@
     if (substr($character['name'], -1, 1) == "s") {
         $header_charname = $character['name'] . "'";
     }
-
-    if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
-        accept_friend_req($_POST['focused-request']);
-        $log->info('Friend request accepted', 
-            [ 'email_1' => $account['email'], 'email_2' => $_POST['focused-request'] ]);
-    }
     
     if ($_REQUEST['page'] == 'friends') {
         if ($_REQUEST['action'] == 'cancel_request') {
@@ -45,6 +39,12 @@
                 $prepped->execute();
             }
         } else if ($_REQUEST['action'] == 'accept_request') {
+            if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
+                accept_friend_req($_POST['focused-request']);
+                $log->info('Friend request accepted', 
+                    [ 'email_1' => $account['email'], 'email_2' => $_POST['focused-request'] ]);
+            }
+        } else if ($_REQUEST['action'] == 'send_request') {
             if (isset($_POST['friends-send-request']) && $_POST['friends-send-request'] == "1") {
                 if (isset($_POST['friends-request-send'])) {
                     $requested_email = filter_var($_POST['friends-request-send'], FILTER_SANITIZE_EMAIL);
