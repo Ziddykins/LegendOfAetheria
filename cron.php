@@ -58,6 +58,6 @@
     }
     
     function cycle_weather() {
-        $new_weather = Weather::
+        $new_weather = Weather
     }
 ?>
