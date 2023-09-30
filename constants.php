@@ -69,10 +69,10 @@
         }
 
         case SUNNY = 1;
-        case RAINING = 2;
-        case HAILING = 4;
-        case CLOUDY = 8;
-        case SNOWING = 16;
+        case RAINING;
+        case HAILING;
+        case CLOUDY;
+        case SNOWING;
     };
 
     enum FriendStatus {
