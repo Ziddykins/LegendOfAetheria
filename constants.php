@@ -50,6 +50,10 @@
             return self::cases()[rand(0, $count)];
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+   
+>>>>>>> ef4665f (wewp)
 =======
    
 >>>>>>> ef4665f (wewp)
@@ -62,6 +66,10 @@
             throw new \ValueError("$name is not a valid backing value for enum " . self::class);
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+  
+>>>>>>> ef4665f (wewp)
 =======
   
 >>>>>>> ef4665f (wewp)

@@ -9,6 +9,9 @@ $character = get_user($account['id'], 'character');
     $user_mailbox->set_focused_folder(MailFolderType::INBOX);
     $user_mailbox->populate_focused_folder();
     $inbox_count = $user_mailbox->focusedFolder->get_message_count();
+<<<<<<< HEAD
+>>>>>>> ef4665f (wewp)
+=======
 >>>>>>> ef4665f (wewp)
 ?>
 
