@@ -1,4 +1,30 @@
+<<<<<<< HEAD
 
+=======
+<script>
+                        $(document).ready(function(){ 
+                            if (location.search.match(/\?failed_login/)) {
+                                gen_toast('error-login-toast', 'danger', 'bi-dash-circle', 'Error', 'Invalid login credentials!');
+                            } else if (location.search.match(/\?register_success/)) {
+                                gen_toast('success-register-toast', 'success', 'bi-check', 'Success', 'Account and Character successfully created, you can now log in');
+                            } else if (location.search.match(/\?do_register/)) {
+                                document.getElementById('register-tab').click();
+                                document.getElementById('register-email').value = location.search.split('&')[1].replace('email=', '');
+                                gen_toast('account-not-exist', 'success', 'bi-check', 'Success', 'No account associated with this email, register?');
+                            } else if (location.search.match(/\?logged_out/)) {
+                                gen_toast('logged-out', 'success', 'bi-check', 'Logged Out', 'Successfully logged out!');
+                            } else if (location.search.match(/\?gooft/)) {
+                                gen_toast('test-popup', 'warning', 'bi-balloon " style="font-size: 72px;"','Warning', '<marquee>Aw snap ya mighta gooft</marquee>');
+                            } else if (location.search.match(/\?account_exists/)) {
+                                gen_toast('account-exists', 'danger', 'bi-dash-circle', 'Account Exists', 'An account already exists with that email');
+                            } else if (location.search.match(/\?no_login/)) {
+                                gen_toast('error-nologin-toast', 'danger', 'bi-dash-circle', 'Not Logged In', 'Please login first');
+                            }
+                            
+                            document.getElementById('login-email').focus();
+                        });
+                    </script>
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                     <ul class="nav nav-tabs" id="login-box" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-tab-pane" type="button" role="tab" aria-controls="login-tab-pane" aria-selected="true" onclick=tgl_active(this)>
@@ -212,7 +238,11 @@
                         <div class="container">
                             <div class="row">
                                 <div class="col">
+<<<<<<< HEAD
                                     <form id="contact-form" name="contact-form" action="/?contact_form_submitted=1" method="POST">
+=======
+                                    <form id="contact-form" name="contact-form" action="/contact" method="POST">
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                                         <div class="border">
                                             <div class="d-flex bg-body-secondary border">
                                                 <div class="p-2 flex-grow-1"><h6><i class="bi bi-envelope-heart"></i> Contact Me</div>

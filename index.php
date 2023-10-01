@@ -62,8 +62,11 @@
         $str              = $_POST['str-ap'];
         $def              = $_POST['def-ap'];
         $intl             = $_POST['int-ap'];
+<<<<<<< HEAD
         
         $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $char_name);
+=======
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
 
         $time_sqlformat   = get_mysql_datetime();
         $ip_address       = $_SERVER['REMOTE_ADDR'];
@@ -72,7 +75,11 @@
         $prepped = $db->prepare('SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE email = ?');
         $prepped->bind_param('s', $email);
         $prepped->execute();
+<<<<<<< HEAD
         $result  = $prepped->get_result();
+=======
+        $result = $prepped->get_result();
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
         $account = $result->fetch_assoc();
 
         /* Email doesn't exist */
@@ -101,7 +108,10 @@
                         $avatar = $avatar_now;
                     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                     $valid_race = 0;
                     foreach(Races::cases() as $enum_race) {
                         if ($race === $enum_race->name) {
@@ -115,8 +125,13 @@
                                         'choosing random enum: ', [ 'Race' => $race ] );
                     }
 
+<<<<<<< HEAD
                     $query      = $db->query('SELECT MAX(id) AS account_id FROM ' . $_ENV['SQL_ACCT_TBL']);
                     $result     = $query->fetch_assoc();
+=======
+                    $query = $db->query('SELECT MAX(id) AS account_id FROM ' . $_ENV['SQL_ACCT_TBL']);
+                    $result = $query->fetch_assoc();
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                     $account_id = $result['account_id'];
 
                     $sql_query = 'INSERT INTO ' . $_ENV['SQL_CHAR_TBL'] . 
@@ -125,14 +140,22 @@
 
                     $prepped = $db->prepare($sql_query);
                     $prepped->bind_param('isssiii', $account_id, $avatar, $char_name, $race, $str, $def, $intl);
+<<<<<<< HEAD
 
+=======
+                    
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                     if (!$prepped->execute()) {
                         $log->critical('Couldn\'t insert user information into character table');
                     }
 
                     
                     // Verification email
+<<<<<<< HEAD
                     // send_mail($email);
+=======
+                    send_mail($email);
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
 
                     header('Location: /?register_success');
                     exit();
@@ -173,3 +196,77 @@
     </body>
 </html>
                 
+<<<<<<< HEAD
+=======
+<!--
+    vitality or hp - change color
+    <i class="bi bi-activity"></i>
+
+    badge / alert
+    <i class="bi bi-bookmark-fill"></i>
+
+    storage
+    <i class="bi bi-box2-heart-fill"></i>
+
+    char sheet
+    <i class="bi bi-card-heading"></i>
+
+    compl quests
+    <i class="bi bi-clipboard-check-fill"></i>
+
+    in prog quests
+    <i class="bi bi-clipboard-fill"></i>
+
+    weather - rain
+    
+
+    weather - snow
+    <i class="bi bi-cloud-snow-fill"></i>
+
+    account 
+    <i class="bi bi-credit-card-2-front-fill"></i>
+
+    map
+    <i class="bi bi-cursor-fill"></i>
+    <i class="bi bi-map-fill"></i>
+
+    community - wide
+    <i class="bi bi-diagram-3-fill"></i>
+
+    community - near
+    <i class="bi bi-diagram-2-fill"></i>
+
+    discord
+    <i class="bi bi-discord"></i>
+
+    status - ded
+    <i class="bi bi-emoji-dizzy-fill"></i>
+
+    status - alive
+    <i class="bi bi-emoji-laughing-fill"></i>
+
+    mail - impertern
+    <i class="bi bi-envelope-exclamation-fill"></i>
+
+    mail - read
+    <i class="bi bi-envelope-open-fill"></i>
+
+    mail - unread
+    <i class="bi bi-envelope-fill"></i>
+
+    dungeon - ladder
+    <i class="bi bi-ladder"></i>
+
+    dungeon? - key
+    <i class="bi bi-key-fill"></i>
+
+    academy
+    <i class="bi bi-mortarboard-fill"></i>
+
+    profile icon
+    <i class="bi bi-person-circle"></i>
+
+    monies
+    <i class="bi bi-currency-exchange"></i>
+-->
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
