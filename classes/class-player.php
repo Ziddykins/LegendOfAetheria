@@ -7,12 +7,8 @@
         }
     }
     
-    class Character {
-        
-    }
-    
     class Inventory {
-        private $accountID;
+        protected $accountID;
         
         public function __construct($playerID) {
             $this->accountID = $accountID;
@@ -31,7 +27,7 @@
             $this->name = $name;
         }
         
-        protected function get_name {
+        protected function get_name() {
             return $this->name;
         }
     }
