@@ -4,6 +4,7 @@
 
 ?>
 
+<<<<<<< HEAD
 <div class="container ">
     <div class="row pt-5">
         <div class="col">
@@ -19,6 +20,23 @@
                 </a>
                 <a class="list-group-item list-group-item-action" id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">
                     SPOTIFY PREEMIIUUUUM
+=======
+<div class="container text-white">
+    <div class="row pt-5">
+        <div class="col">
+            <div class="list-group" id="list-tab" role="tablist">
+                <a class="list-group-item list-group-item-action active bg-dark text-white" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">
+                    Account
+                </a>
+                <a class="list-group-item list-group-item-action bg-dark text-white" id="list-profile-list" data-bs-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">
+                    Character
+                </a>
+                <a class="list-group-item list-group-item-action bg-dark text-white" id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">
+                    Messages
+                </a>
+                <a class="list-group-item list-group-item-action bg-dark text-white" id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">
+                    SPOTIFY PREMIUMMMMMM
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                 </a>
             </div>
         </div>

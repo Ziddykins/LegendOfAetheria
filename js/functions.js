@@ -75,6 +75,7 @@ function tgl_active (e) {
     e.childNodes[1].classList.add('bi-diamond-fill');
     e.childNodes[1].classList.remove('bi-diamond');
 };
+<<<<<<< HEAD
 
 function gen_envelope(subject, sender, message_fragment, date) {
     let envelope_html = '<div class="list-group">';
@@ -94,3 +95,5 @@ $(document).ready(function(){
         document.getElementById('login-email').focus();
     };
 });
+=======
+>>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
