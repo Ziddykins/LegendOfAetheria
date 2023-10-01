@@ -41,6 +41,7 @@
             $_SESSION['email'] = $account['email'];
             $_SESSION['account_id'] = $character['account_id'];
             $_SESSION['name'] = $character['name'];
+            
             header('Location: /game');
             exit();
         } else {

@@ -3,6 +3,13 @@ $account   = get_user($_SESSION['email'], 'account');
 $character = get_user($account['id'], 'character');
 
 
+<<<<<<< HEAD
+=======
+    $user_mailbox = new MailBox($account['id']);
+    $user_mailbox->set_focused_folder(MailFolderType::INBOX);
+    $user_mailbox->populate_focused_folder();
+    $inbox_count = $user_mailbox->focusedFolder->get_message_count();
+>>>>>>> ef4665f (wewp)
 ?>
 
 <div class="container text-white">

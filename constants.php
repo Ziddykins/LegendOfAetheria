@@ -49,6 +49,10 @@
             $count = count(self::cases()) - 1;
             return self::cases()[rand(0, $count)];
         }
+<<<<<<< HEAD
+=======
+   
+>>>>>>> ef4665f (wewp)
         public static function name_to_value(string $name): string {
             foreach (self::cases() as $weather) {
                 if ($name === $weather->name){
@@ -57,6 +61,10 @@
             }
             throw new \ValueError("$name is not a valid backing value for enum " . self::class);
         }
+<<<<<<< HEAD
+=======
+  
+>>>>>>> ef4665f (wewp)
         public function icon(): string {
             return match($this) {
                 Weather::CLOUDY =>  '<i class="bi bi-cloud-fill"></i>',

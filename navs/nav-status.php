@@ -8,12 +8,10 @@
         $icon = 'bi bi-emoji-dizzy-fill';
         $color = 'text-danger';
     }
-
-    $weather = get_globals('weather');
-    $weather_eval = Weather::name_to_value($weather);
+    $test = Weather::SNOWING; 
     $weather_string = '<div class="col">';
-    $weather_string .= Weather::from($weather_eval)->icon();
-    $weather_string .= ' ' . Weather::from($weather_eval)->name;
+   // $weather_string .= Weather::from($test)->icon();
+    $weather_string .= $test->name;
     $weather_string .= '</div> |';
 
     $status_string = "<div class=\"col $color\"><i class=\"bi $icon\"></i>$hp/$max_hp</div> |";
