@@ -7,7 +7,7 @@
     $user_mailbox = new MailBox($account['id']);
     $user_mailbox->set_focused_folder(MailFolderType::INBOX);
     $user_mailbox->populate_focused_folder();
-    $inbox_count = $user_mailbox->get_focused_folder_count();
+    $inbox_count = $user_mailbox->focusedFolder->get_message_count();
 ?>
 
 <div class="container text-white">
