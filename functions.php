@@ -24,15 +24,20 @@
     function get_globals($which) {
         global $db;
         $ret_val = '';
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_GLBL_TBL'];
+        $sql_query = 'SELECT `value` FROM ' . $_ENV['SQL_GLBL_TBL'] . " WHERE `name` = '$which'";
         $result = $db->query($sql_query);
-
-        while ($row = $result->fetch_assoc()) {
-            if ($row['name'] == $which) {
-                $ret_val = $row['value'];
-                break;
-            }
-        }
-
-        return $ret_val;
+        $row = $result->fetch_assoc();
+        
+        return $row['value'];
     }
+<<<<<<< HEAD
+=======
+    
+    function set_globals($name, $value) {
+        global $db;
+        
+        $sql_query = "UPDATE `tbl_globals` SET `value` = '$value'" .
+                        " WHERE `name` = '$name'";
+        $db->query($sql_query);
+    }
+>>>>>>> ef4665f (wewp)
