@@ -40,4 +40,7 @@
                         " WHERE `name` = '$name'";
         $db->query($sql_query);
     }
+<<<<<<< HEAD
+>>>>>>> ef4665f (wewp)
+=======
 >>>>>>> ef4665f (wewp)
