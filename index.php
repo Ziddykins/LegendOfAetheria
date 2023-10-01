@@ -37,13 +37,11 @@
 
             $character = get_user($account['email'], 'character');
 
-            $db->query("UPDATE tbl_accounts SET session_id = '" . session_id() . "' WHERE email = '". $account['email']. "'");
-            //$db->query("UPDATE tbl_accounts SET session_id = '{session_id()}' WHERE email = '{$account["email"]}'");
-
             $_SESSION['logged-in'] = 1;
             $_SESSION['email'] = $account['email'];
             $_SESSION['account_id'] = $character['account_id'];
             $_SESSION['name'] = $character['name'];
+            
             header('Location: /game');
             exit();
         } else {

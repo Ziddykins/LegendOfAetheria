@@ -1,6 +1,6 @@
 <?php
-    $account   = get_user($_SESSION['email'], 'account');
-    $character = get_user($account['id'], 'character');
+    $account         = get_user($_SESSION['email'], 'account');
+    $character       = get_user($account['id'], 'character');
     $header_charname = $character['name'] . "'s";
     
     /* :3 */
@@ -8,19 +8,21 @@
     
     /* Populate global $requests array with incoming requests */
     $recvreqs = $db->query("SELECT * FROM tbl_friends WHERE email_2 = '" . $account['email'] . "' OR email_1 = '" . $account['email'] . "'");
+    
+    if ($recvreqs->num_rows) {
+       while ($row = $recvreqs->fetch_assoc()) {
+            $status_in  = friend_status($row['email_1']);
+            $status_out = friend_status($row['email_2']);
 
-    while ($row = $recvreqs->fetch_assoc()) {
-        $status_in  = friend_status($row['email_1']);
-        $status_out = friend_status($row['email_2']);
+//            $log->warning("Checking friend status for ". $row['email_1']." and ". $row['email_2'] ." - ". $status->name);
 
-        $log->warning("Checking friend status for ". $row['email_1']." and ". $row['email_2'] ." - ". $status->name);
-
-        if ($status_in == FriendStatus::REQUEST) {
-            array_push($requests, $row);
-        } else if ($status_in == FriendStatus::MUTUAL) {
-            array_push($friends, $row);
-        } else if ($status_out == FriendStatus::REQUESTED) {
-            array_push($requested, $row);
+            if ($status_in == FriendStatus::REQUEST) {
+                array_push($requests, $row);
+            } else if ($status_in == FriendStatus::MUTUAL) {
+                array_push($friends, $row);
+            } else if ($status_out == FriendStatus::REQUESTED) {
+                array_push($requested, $row);
+            }
         }
     }
 
@@ -29,32 +31,34 @@
     }
     
     if ($_REQUEST['page'] == 'friends') {
-        if ($_REQUEST['action'] == 'cancel_request') {
-            $sql_query = "DELETE FROM `" . $_ENV['SQL_FRND_TBL'] . "` " .
-                         "WHERE email_1 = ? AND email_2 = ?";
-                         
-            if (friend_status($_REQUEST['email']) === FriendStatus::REQUESTED) {
-                $prepped = $db->prepare($sql_query);
-                $prepped->bind_param("ss", $account['email'], $_REQUEST['email']);
-                $prepped->execute();
-            }
-        } else if ($_REQUEST['action'] == 'accept_request') {
-            if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
-                accept_friend_req($_POST['focused-request']);
-                $log->info('Friend request accepted', 
-                    [ 'email_1' => $account['email'], 'email_2' => $_POST['focused-request'] ]);
-            }
-        } else if ($_REQUEST['action'] == 'send_request') {
-            if (isset($_POST['friends-send-request']) && $_POST['friends-send-request'] == "1") {
-                if (isset($_POST['friends-request-send'])) {
-                    $requested_email = filter_var($_POST['friends-request-send'], FILTER_SANITIZE_EMAIL);
-           
-                    if (friend_status($requested_email) == FriendStatus::NONE) {
-                        $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
-                        $prepped = $db->prepare($sql_query);
-                        $prepped->bind_param("ss", $account['email'], $requested_email);
-                        $prepped->execute();
-                        $log->warning('Friend request sent', [ 'email_1' => $account['email'], 'email_2' => $requested_email ]);
+        if (isset($_REQUEST['action'])) {
+            if ($_REQUEST['action'] == 'cancel_request') {
+                $sql_query = "DELETE FROM `" . $_ENV['SQL_FRND_TBL'] . "` " .
+                             "WHERE email_1 = ? AND email_2 = ?";
+                             
+                if (friend_status($_REQUEST['email']) === FriendStatus::REQUESTED) {
+                    $prepped = $db->prepare($sql_query);
+                    $prepped->bind_param("ss", $account['email'], $_REQUEST['email']);
+                    $prepped->execute();
+                }
+            } else if ($_REQUEST['action'] == 'accept_request') {
+                if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
+                    accept_friend_req($_POST['focused-request']);
+                    $log->info('Friend request accepted', 
+                        [ 'email_1' => $account['email'], 'email_2' => $_POST['focused-request'] ]);
+                }
+            } else if ($_REQUEST['action'] == 'send_request') {
+                if (isset($_POST['friends-send-request']) && $_POST['friends-send-request'] == "1") {
+                    if (isset($_POST['friends-request-send'])) {
+                        $requested_email = filter_var($_POST['friends-request-send'], FILTER_SANITIZE_EMAIL);
+               
+                        if (friend_status($requested_email) == FriendStatus::NONE) {
+                            $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
+                            $prepped = $db->prepare($sql_query);
+                            $prepped->bind_param("ss", $account['email'], $requested_email);
+                            $prepped->execute();
+                            $log->warning('Friend request sent', [ 'email_1' => $account['email'], 'email_2' => $requested_email ]);
+                        }
                     }
                 }
             }
@@ -63,7 +67,7 @@
 
     function friend_status($email) {
         global $db, $account;
-        $email = filter_var($_REQUEST['email'], FILTER_SANITIZE_EMAIL);
+        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
         
         /* ours */
         $sql_query = "SELECT * FROM tbl_friends WHERE email_1 = '" . $account['email'] . "' AND email_2 = '$email'";
