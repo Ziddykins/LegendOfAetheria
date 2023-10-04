@@ -54,7 +54,6 @@
 <?php include('html/opener.html'); ?>
     <head>
         <?php include('html/headers.html'); ?>
-<<<<<<< HEAD
         
     </head>
         
@@ -63,23 +62,11 @@
             <div class="row flex-nowrap" style="min-height: 99.5vh!important;">
                 <div class="col-2 px-sm-2 px-0 border border-grey">
                     <div class="d-flex flex-column align-items-center align-items-sm-start px-3">
-=======
-
-    </head>
-        
-    <body class="bg-dark"> 
-        <div class="container-fluid border border-white sticky-bottom" style="margin-top: 25px;">
-            <div class="row flex-nowrap" style="min-height: 96.5vh!important;">
-                <div class="col-auto col-xl-2 px-sm-2 px-0 bg-dark border border-white">
-                    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 text-white">
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                         <a href="/game" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                             <img src="img/logos/logo-banner-no-bg.png" class="p-3 w-100">
                         </a>
 
                         <hr style="width: 35%; opacity: .25; align-self: center;">
-
-<<<<<<< HEAD
                         <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start mb-sm-auto" id="menu">
                             <li>
                                 <a href="#sub-menu-character" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
@@ -312,38 +299,18 @@
                                 </li>
                             </ul>
                         </li>
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
-                    </div>
-
-                    <hr style="width: 35%; opacity: .25; align-self: center;">
-
-                    <div class="dropdown pb-4 ms-4 fixed-bottom">
-<<<<<<< HEAD
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-=======
-                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
+
                             <img src="img/avatars/<?php echo $character['avatar']; ?>" alt="avatar" width="50" height="50" class="rounded-circle" />
                             <span class="d-none d-sm-inline mx-1 ms-5 fs-5">
                                 Account
                             </span>
                         </a>
-
-<<<<<<< HEAD
                         <ul class="dropdown-menu dropdown-menu text-small shadow">
-=======
-                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                             <li><a class="dropdown-item" href="?page=profile">Profile</a></li>
                             <li><a class="dropdown-item" href="?page=mail">Mail
                                     <span class="badge bg-danger rounded-pill"> 5</span>
                             </a></li>
-<<<<<<< HEAD
-                            <li><a class="dropdown-item" href="?page=friends">Friends
-                                    <span class="badge bg-danger rounded-pill"> 3</span>
-                            </a></li>
-=======
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                             <li><a class="dropdown-item" href="?page=settings">Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <?php
@@ -359,25 +326,15 @@
 
                 <div id="content" name="content" class="container border border-danger" style="flex-shrink: 1;">
                     <?php
-<<<<<<< HEAD
                         include('navs/nav-status.php');
                     ?>
                     <?php
-=======
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                         if (isset($_GET['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
                             $page_uri = 'pages/game-' .  $requested_page . '.php';
                             include($page_uri);
                         }
                     ?>
-<<<<<<< HEAD
-=======
-
-                    <?php
-                        include('navs/nav-status.php');
-                    ?>
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                 </div>
             </div>
         </div>
@@ -444,10 +401,6 @@
         </script>
             <div aria-live="polite" aria-atomic="true" class="position-relative">
                 <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
-<<<<<<< HEAD
-=======
-                <!-- Here the hardy toasts will be created - place ant traps :o -->
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
             </div>
         </div>
     </body>
