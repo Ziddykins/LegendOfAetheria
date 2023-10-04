@@ -1,7 +1,5 @@
 <?php
     declare(strict_types = 1);
-<<<<<<< HEAD
-    
     session_start();
     require __DIR__ . '/vendor/autoload.php';
 
@@ -20,22 +18,6 @@
 
     $char_menu_icon = $character['hp'] > 0 ? 'bi-emoji-laughing-fill' : 'bi-emoji-dizzy-fill';
 
-=======
-    session_start();
-
-    require __DIR__ . '/vendor/autoload.php';
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-    $dotenv->safeLoad();
-
-    include('logger.php');
-    include('db.php');
-    include('constants.php');
-    include('functions.php');
-
-    $account   = get_user($_SESSION['email'], 'account');
-    $character = get_user($account['id'], 'character');
-
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
     $_SESSION['name'] = $character['name'];
 
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
