@@ -17,11 +17,7 @@
     $status_string = "<div class=\"col $color\"><i class=\"bi $icon\"></i>$hp/$max_hp</div> |";
 
 ?>
-<<<<<<< HEAD
                     <div class="row bg-black justify-content-center text-dark-emphasis">
-=======
-                    <div class="row bg-black justify-content-center text-dark-emphasis fixed-top">
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                         <div class="col"><i class="bi bi-currency-exchange text-warning"></i> <?php echo $character['gold']; ?></div> |
                         <?php echo $status_string; ?>
                         <?php echo $weather_string; ?>
