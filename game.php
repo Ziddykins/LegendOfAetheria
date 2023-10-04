@@ -35,7 +35,6 @@
                     $prepped   = $db->prepare($sql_query);
                     $prepped->bind_param('ss', $hashed_password, $account_email);
                     $prepped->execute();
-<<<<<<< HEAD
                     session_regenerate_id();
                     header('Location: /logout?action=pw_reset&result=pass');
                     exit();
@@ -44,15 +43,6 @@
             } else {
                 header('Location: /game?page=profile&action=pw_reset&result=fail');
                 exit();
-=======
-                    header('Location: /game?page=profile&action=pw_reset&result=pass');
-                    exit();
-                } else {
-                    
-                }
-            } else {
-                echo 'no';
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
             }
         }
     } else {
