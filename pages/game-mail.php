@@ -48,25 +48,11 @@ $character = get_user($account['id'], 'character');
                 </a>
                 <a class="list-group-item list-group-item-action" id="list-mail-drafts" data-bs-toggle="list" href="#list-drafts" role="tab" aria-controls="list-drafts">
                     <i class="bi bi-envelope-paper"></i> Drafts
-=======
-                <a class="list-group-item list-group-item-action active bg-dark text-white" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">
-                    Inbox
-                </a>
-                <a class="list-group-item list-group-item-action bg-dark text-white" id="list-profile-list" data-bs-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">
-                    Outbox
-                </a>
-                <a class="list-group-item list-group-item-action bg-dark text-white" id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">
-                    Deleted
-                </a>
-                <a class="list-group-item list-group-item-action bg-dark text-white" id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">
-                    SPOTIFY PREMIUMMMMMM
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                 </a>
             </div>
         </div>
         <div class="col-8">
             <div class="tab-content" id="nav-tabContent">
-<<<<<<< HEAD
                 <div class="tab-pane fade show active" id="list-inbox" role="tabpanel" aria-labelledby="list-mail-inbox">
                     <div class="row">
                         <div class="col">
@@ -99,60 +85,8 @@ $character = get_user($account['id'], 'character');
                     </div>
                 </div>
                 <div class="tab-pane fade" id="list-outbox" role="tabpanel" aria-labelledby="list-mail-outbox">
-=======
-                <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
-                    <form id="settings-account" name="settings-account" action="/set_settings.php" method="POST">
-                        <div class="row">
-                            <div class="col">
-                                <h3><?php echo $_SESSION['name']; ?>'s Messages</h3>
-                            </div>
-                            <div class="list-group">
-                                <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">List group item heading</h5>
-                                        <small>3 days ago</small>
-                                    </div>
-                                    <p class="mb-1">Some placeholder content in a paragraph.</p>
-                                    <small>And some small print.</small>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action" aria-current="true">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">List group item heading</h5>
-                                        <small>3 days ago</small>
-                                    </div>
-                                    <p class="mb-1">Some placeholder content in a paragraph.</p>
-                                    <small>And some small print.</small>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action" aria-current="true">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">List group item heading</h5>
-                                        <small>3 days ago</small>
-                                    </div>
-                                    <p class="mb-1">Some placeholder content in a paragraph.</p>
-                                    <small>And some small print.</small>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action" aria-current="true">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">List group item heading</h5>
-                                        <small>3 days ago</small>
-                                    </div>
-                                    <p class="mb-1">Some placeholder content in a paragraph.</p>
-                                    <small>And some small print.</small>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action" aria-current="true">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">List group item heading</h5>
-                                        <small>3 days ago</small>
-                                    </div>
-                                    <p class="mb-1">Some placeholder content in a paragraph.</p>
-                                    <small>And some small print.</small>
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+                    
                 </div>
-                <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                     <div class="list-group">
                         <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
                             <div class="d-flex w-100 justify-content-between">
@@ -172,17 +106,10 @@ $character = get_user($account['id'], 'character');
                         </a>
                     </div>
                 </div>
-<<<<<<< HEAD
                 <div class="tab-pane fade" id="list-deleted" role="tabpanel" aria-labelledby="list-mail-deleted">
                 o look some message things
                 </div>
                 <div class="tab-pane fade" id="list-drafts" role="tabpanel" aria-labelledby="list-mail-drafts">
-=======
-                <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
-                o look some message things
-                </div>
-                <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                 get out
                 </div>
             </div>
