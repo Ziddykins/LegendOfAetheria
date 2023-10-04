@@ -98,8 +98,4 @@
             <p></p>
         </div>
     </div>
-<<<<<<< HEAD
-
-=======
-</div>
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
+<!--merge-fuggup, if broken add closing div-->
