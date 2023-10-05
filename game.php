@@ -308,6 +308,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu text-small shadow">
                             <li><a class="dropdown-item" href="?page=profile">Profile</a></li>
+                            <li><a class="dropdown-item" href="?page=friends">Friends</a></li>
                             <li><a class="dropdown-item" href="?page=mail">Mail
                                     <span class="badge bg-danger rounded-pill"> 5</span>
                             </a></li>
