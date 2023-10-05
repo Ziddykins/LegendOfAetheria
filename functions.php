@@ -1,10 +1,7 @@
 <?php
 <<<<<<< HEAD
     include 'db.php';
-    
-=======
-    include('db.php');
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
+   
     function get_mysql_datetime() {
         return date("Y-m-d H:i:s", strtotime("now"));
     }
@@ -35,11 +32,6 @@
         
         return $row['value'];
     }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
     
     function set_globals($name, $value) {
         global $db;
@@ -48,10 +40,3 @@
                         " WHERE `name` = '$name'";
         $db->query($sql_query);
     }
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> ef4665f (wewp)
-=======
->>>>>>> ef4665f (wewp)
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
