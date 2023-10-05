@@ -212,11 +212,7 @@
                         <div class="container">
                             <div class="row">
                                 <div class="col">
-<<<<<<< HEAD
                                     <form id="contact-form" name="contact-form" action="/?contact_form_submitted=1" method="POST">
-=======
-                                    <form id="contact-form" name="contact-form" action="/contact" method="POST">
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
                                         <div class="border">
                                             <div class="d-flex bg-body-secondary border">
                                                 <div class="p-2 flex-grow-1"><h6><i class="bi bi-envelope-heart"></i> Contact Me</div>
