@@ -93,11 +93,11 @@
                 </div>
 
                 <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
-                o look some message things
+                    o look some message things
                 </div>
 
                 <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
-                get out
+                    get out
                 </div>
             </div>
         </div>
