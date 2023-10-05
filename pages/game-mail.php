@@ -1,36 +1,19 @@
 <?php
-<<<<<<< HEAD
     require 'classes/class-mail.php';
     
     $account   = get_user($_SESSION['email'], 'account');
     $character = get_user($account['id'], 'character');
-
-=======
-$account   = get_user($_SESSION['email'], 'account');
-$character = get_user($account['id'], 'character');
-
-
-<<<<<<< HEAD
-=======
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
+    
     $user_mailbox = new MailBox($account['id']);
     $user_mailbox->set_focused_folder(MailFolderType::INBOX);
     $user_mailbox->populate_focused_folder();
     $inbox_count = $user_mailbox->focusedFolder->get_message_count();
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> ef4665f (wewp)
-=======
->>>>>>> ef4665f (wewp)
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
 ?>
 
 <div class="container text-white">
     <div class="row pt-5">
         <div class="col">
             <div class="list-group" id="list-tab" role="tablist">
-<<<<<<< HEAD
                 <a class="list-group-item list-group-item-action active" id="list-mail-inbox" data-bs-toggle="list" href="#list-inbox" role="tab" aria-controls="list-inbox">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope-arrow-up" viewBox="0 0 16 16">
                     <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4.5a.5.5 0 0 1-1 0V5.383l-7 4.2-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h5.5a.5.5 0 0 1 0 1H2a2 2 0 0 1-2-1.99V4Zm1 7.105 4.708-2.897L1 5.383v5.722ZM1 4v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1Z"/>
