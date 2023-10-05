@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 CREATE DATABASE db_loa;
 USE db_loa;
 
 GRANT ALL PRIVILEGES ON db_loa.* TO user_loa IDENTIFIED BY 'G4m3th1n6!';
-=======
-CREATE DATABASE db_gamething;
-USE db_gamething;
-
-GRANT ALL PRIVILEGES ON db_gamething.* TO user_gamething IDENTIFIED BY 'G4m3th1n6!';
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
 FLUSH PRIVILEGES;
 
 CREATE TABLE `tbl_accounts` (
@@ -101,8 +94,4 @@ CREATE TABLE `tbl_mail` (
 	UNIQUE INDEX `account_id` (`account_id`) USING BTREE
 )
 COLLATE='utf8mb4_general_ci'
-<<<<<<< HEAD
 ENGINE=InnoDB;
-=======
-ENGINE=InnoDB;
->>>>>>> 9806c21609a4f9958274f1980a2e43cead173763
