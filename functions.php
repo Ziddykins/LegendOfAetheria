@@ -1,5 +1,4 @@
 <?php
-<<<<<<< HEAD
     include 'db.php';
    
     function get_mysql_datetime() {
