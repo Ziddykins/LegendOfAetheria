@@ -11,12 +11,12 @@
 
     if ($db->connect_errno) {
         $log->critical('Unable to make a connection to the SQL database D:');
-        die(Error::SQLDB_NOCONNECTIONT);
+        die(LOAError::SQLDB_NOCONNECTIONT);
     }
     
     $log->info("Connection to $sql_host:$sql_port successful", ['Username' => $sql_user]);
     
-    function do_sql($action, $targets, $table, $values = null, $conditions = null) {
+    function do_sql_call($action, $targets, $table, $values = null, $conditions = null) {
         $query = '';
         [$targets, $target_count] = explode(':', $targets);
         $targets = explode(',', $targets);
@@ -31,10 +31,9 @@
             case 'UPDATE':
                 $query = "UPDATE $table SET ";
                 for ($i=0; $i<$target_count - 1; $i++) {
-                    $query .= $targets[$i] . " = ?,";
-                    
+                    $query .= $targets[$i] . ' = ?,';    
                 }
-                rtrim(',' $query);
+                rtrim($query, ',');
                 
                 if ($conditions) {
                     $query .= " WHERE $conditions";
@@ -56,8 +55,7 @@
                 
                 break;
             default:
-                return Error::FUNCT_DOSQL_INVALIDACTION;
-                
+                return LOAError::FUNCT_DOSQL_INVALIDACTION;
         }
         
         $bind_str = str_repeat('s', $target_count);
@@ -74,7 +72,7 @@
                     ]
             );
             
-            return Error::SQLDB_PREPPED_EXECUTE;
+            return LOAError::SQLDB_PREPPED_EXECUTE;
         }
         
         

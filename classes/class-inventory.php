@@ -1,9 +1,9 @@
 <?php
     class Inventory {
         protected $accountID;
-        protected current_weight;
-        protected maximum_weight;
-        protected slots;
+        protected $current_weight;
+        protected $maximum_weight;
+        protected $slots;
         
         public function __construct($playerID) {
             $this->accountID = $accountID;
