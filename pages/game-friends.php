@@ -69,26 +69,33 @@
         global $db, $account;
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
         
-        /* ours */
-        $sql_query = "SELECT * FROM tbl_friends WHERE email_1 = '" . $account['email'] . "' AND email_2 = '$email'";
-        $count_one = $db->query($sql_query)->num_rows;
-
-        /* theirs */
-        $sql_query = "SELECT * FROM tbl_friends WHERE email_2 = '". $account['email']. "' AND email_1 = '$email'";
-        $count_two = $db->query($sql_query)->num_rows;
+        $sql_query    = "SELECT * FROM tbl_friends WHERE email_1 = '" . $account['email'] . "' AND email_2 LIKE '%$email%'";
+        $results_us   = $db->query($sql_query);
+        $count_one    = $results_us->num_rows;
+     
+        $sql_query    = "SELECT * FROM tbl_friends WHERE email_2 = '". $account['email'] . "' AND email_1 LIKE '%$email%'";
+        $results_them = $db->query($sql_query);
+        $count_two    = $results_them->num_rows;
+        
 
         switch (true) {
             case ($count_one && $count_two):
                 return FriendStatus::MUTUAL;
             case ($count_one && !$count_two):
+                if (substr($results_us->fetch_assoc()['email_2'], 0, 3) == '¿b¿') {
+                    return FriendStatus::BLOCKED;
+                }
                 return FriendStatus::REQUESTED;
             case ($count_two && !$count_one):
+                if (substr($results_them->fetch_assoc()['email_2'], 0, 3) == '¿b¿') {
+                    return FriendStatus::BLOCKED_BY;
+                }
                 return FriendStatus::REQUEST;
             default:
                 return FriendStatus::NONE;
         }
 
-        return -1;
+        return FRIEND_STATUS_ERROR;
     }
 
     function accept_friend_req($email) {
@@ -100,9 +107,17 @@
             $prepped->bind_param("ss", $account['email'], $email);
             $prepped->execute();
             
-            $log->warning('Friend request accepted', 
-                [ 'email_1' => $account['email'], 'email_2' => $email ]);
+            $log->info('Friend request accepted', 
+                [
+                    'email_1' => $account['email'], 
+                    'email_2' => $email
+                ]
+            );
         }
+    }
+    
+    function block_user($email) {
+        
     }
 ?>
 
@@ -147,26 +162,28 @@
                             
                             if ($check_user) {
                                 $online_indicator = '<p class="badge bg-success"><i class="bi bi-lightbulb-fill"></i> Online</p>';
-                                $msg_color = 'btn-success'; // -_-
+                                $msg_color = 'btn-success';
                             }
 
                             echo   '<div class="row mb-3">
                                         <div class="card" style="max-width: 400px;">
                                             <div class="row g-0">
-                                                <div class="col-2 pt-2 pb-2">
-                                                    <img src="/img/avatars/' . $sender_account['avatar'] . '" class="img-fluid rounded" alt="friend-' . $i . '-avatar">
-                                                </div>
-                                                <div class="col-md-8">
-                                                    <div class="card-body">' . $online_indicator . ' - ' . $temp_account['email'] . '
-                                                    <div class="btn-group">
-                                                        <button class="btn ' . $msg_color . ' btn-block btn-sm">Message</button>
-                                                        <button class="btn btn-warning btn-block btn-sm">Remove</button>
-                                                        <button class="btn btn-danger btn-block btn-sm">Block</button>
+                                                <form id="friend-' . $friends[$i]['id'] . '" name="friend-' . $friends[$i]['id'] . '" action="/game?page=friends&action=block_user" method="POST">
+                                                    <div class="col-2 pt-2 pb-2">
+                                                        <img src="/img/avatars/' . $sender_account['avatar'] . '" class="img-fluid rounded" alt="friend-' . $i . '-avatar">
                                                     </div>
-                                                        
-                                                    <p class="card-text"><small class="text-body-secondary">Friends since ' . $friends[$i]["created"] . '</small></p>
+                                                    <div class="col-md-8">
+                                                        <div class="card-body">' . $online_indicator . ' - ' . $temp_account['email'] . '
+                                                        <div class="btn-group">
+                                                            <button class="btn ' . $msg_color . ' btn-block btn-sm">Message</button>
+                                                            <button class="btn btn-warning btn-block btn-sm">Remove</button>
+                                                            <button class="btn btn-danger btn-block btn-sm">Block</button>
+                                                        </div>
+                                                            
+                                                        <p class="card-text"><small class="text-body-secondary">Friends since ' . $friends[$i]["created"] . '</small></p>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>';
