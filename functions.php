@@ -7,7 +7,7 @@
 
     function get_user($email, $type) {
         global $db;
-        $table = $type == 'account' ? 'SQL_ACCT_TBL' : 'SQL_CHAR_TBL';
+        $table  = $type == 'account' ? 'SQL_ACCT_TBL' : 'SQL_CHAR_TBL';
         $column = $type == 'account' ? 'email' : 'account_id';
 
         $sql_query = 'SELECT * FROM ' . $_ENV[$table] . " WHERE $column = ?";
@@ -17,7 +17,7 @@
         $prepped->execute();
 
         $result = $prepped->get_result();
-        $user = $result->fetch_assoc();
+        $user   = $result->fetch_assoc();
 
         return $user;
     }
@@ -39,3 +39,8 @@
                         " WHERE `name` = '$name'";
         $db->query($sql_query);
     }
+    
+    function random_float ($min,$max) {
+       return ($min + lcg_value() * (abs($max - $min)));
+    }
+?>
