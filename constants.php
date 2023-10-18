@@ -23,7 +23,7 @@
         case Default;
     }
 
-    enum UserPrivileges {
+    enum UserPrivileges: int {
         public static function name_to_value(string $name): string {
             foreach (self::cases() as $privilege) {
                 if ($name === $privilege->name){
@@ -31,7 +31,7 @@
                 }
             }
             throw new \ValueError("$name is not a valid backing value for enum " . self::class);
-        }
+       }
         
         case BANNED = 1;
         case MUTED = 2;
@@ -88,7 +88,7 @@
         case BLOCKED_BY;
     }
     
-    enum Error {
+    enum LOAError: int {
         case FUNCT_DOSQL_INVALIDACTION = -1000;
         
         case SQLDB_NOCONNECTION        = -2000;
@@ -112,7 +112,7 @@
         case LEADER;      /* 5-10x all stats */
     }
     
-    enum ItemRarity {
+    enum ItemRarity: int {
        public static function getItemRarity($roll) {
            foreach (self::cases() as $rarity) {
                $log->info("checking $rarity rarity against $roll");

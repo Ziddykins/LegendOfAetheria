@@ -35,5 +35,10 @@
             $this->accountID = $account_id;
             $this->scope     = $scope;
         }
+
+        public function load_monster_sheet() {
+            $monsters = Array();
+            $monsters = file_get_contents(__DIR__ . "monsters.raw");
+        }
     }
-}
+?>

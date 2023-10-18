@@ -9,6 +9,7 @@
     let rgx_verification_failed = /\?verification_failed/;
     let rgx_contactform_submit  = /\?contact_form_submitted=1/;
     let rgx_changepw_fail       = /game\?page=profile&action=pw_reset&result=fail/;
+    let rgx_changepw_pass       = /logout\?action=pw_reset&result=pass/;
     
     URLSearchParams(location.search);
 
@@ -34,5 +35,7 @@
         gen_toast('success-changepw-fail', 'danger', 'bi-key', 'Password Mis-match', 'The two passwords do not match; password unchanged');
     } else if (query.match(rgx_verification_failed)) {
         gen_toast('failed-verification', 'danger', 'bi-envelope-slash', 'Verification Failed', 'Account verification failed - check email/code combination');
+    } else if (query.match(rgx_changepw_pass)) {
+        gen_toast('password-changed', 'success', 'bi-key', 'Password Changed', 'Your password has been successfully updated - Please re-login');
     }
 });
