@@ -10,13 +10,13 @@
     $db = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db, $sql_port);
 
     if ($db->connect_errno) {
-        $log->critical('Unable to make a connection to the SQL database D:');
-        die(LOAError::SQLDB_NOCONNECTIONT);
+        $log->critical('Unable to make a connection to the SQL database: ' . $db->connect_error);
+        die(LOAError::SQLDB_NOCONNECTION);
     }
     
     $log->info("Connection to $sql_host:$sql_port successful", ['Username' => $sql_user]);
     
-    function do_sql_call($action, $targets, $table, $values = null, $conditions = null) {
+/*    function do_sql_call($action, $targets, $table, $values = null, $conditions = null) {
         $query = '';
         [$targets, $target_count] = explode(':', $targets);
         $targets = explode(',', $targets);
@@ -81,5 +81,6 @@
         }
         
         return 0;
-    }
+}
+ */
 ?>
