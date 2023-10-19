@@ -11,8 +11,6 @@
     include 'constants.php';
     include 'functions.php';
     
-    global $log;
-    
     $account   = get_user($_SESSION['email'], 'account');
     $character = get_user($account['id'], 'character');
 
@@ -41,7 +39,6 @@
                     header('Location: /logout?action=pw_reset&result=pass');
                     exit();
                 }
-                
             } else {
                 header('Location: /game?page=profile&action=pw_reset&result=fail');
                 exit();
@@ -193,7 +190,7 @@
     
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="img/avatars/<?php echo $character['avatar']; ?>" alt="avatar" width="50" height="50" class="rounded-circle" />
-                            <span class="d-none d-sm-inline mx-1 ms-5 fs-5">Account</span>
+                            <span class="d-none d-xl-inline mx-1 ms-5 fs-3">Account</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu text-small shadow">
                             <li><a class="dropdown-item" href="?page=profile">Profile</a></li>
