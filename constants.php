@@ -87,14 +87,27 @@
         case BLOCKED;
         case BLOCKED_BY;
     }
-    
+
+    # Categories:
+    #   - FUNCT - Relating to the usage of a function
+    #   - SQLDB - Directly relating to the database, i.e. invalid
+    #             prepare statements or connection issues
+    #   - FRNDS - Well, friend related issues
     enum LOAError: int {
         case FUNCT_DOSQL_INVALIDACTION = -1000;
         
         case SQLDB_NOCONNECTION        = -2000;
         case SQLDB_PREPPED_EXECUTE     = -2001;
+
+        case FRIEND_STATUS_ERROR       = -3000;
     }
-    
+
+    # Global:
+    #   - Global monsters are available for everyone to attack and will pop up occasionally
+    #     Expeience and gold, as well as items will be based on damage contribution
+    #   - Zone monsters are a bit less powerful, but are restricted to zones (maps); any
+    #     players in this area will be able to contribute. Leaving the area forefits contribution
+    #   - Personal monsters are only visible and attackable by you
     enum MonsterScope {
         case GLOBAL;
         case ZONE;
@@ -122,7 +135,7 @@
                }
            }
        }
-       
+
        case WORTHLESS = 50.0;  /* 50.00% chance */
        case TARNISHED = 30.0;  /* 20.00% chance */
        case COMMON    = 20.0;  /* 10.00% chance */

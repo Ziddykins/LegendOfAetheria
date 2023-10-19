@@ -95,7 +95,7 @@
                 return FriendStatus::NONE;
         }
 
-        return FRIEND_STATUS_ERROR;
+        return LOAError::FRIEND_STATUS_ERROR;
     }
 
     function accept_friend_req($email) {
@@ -249,7 +249,6 @@
 
                         <div class="row mb-3">
                             <div class="col-8">
-                                l
                                 <input id="friends-request-send" name="friends-request-send" class="form-control">
                             </div>
                             <div class="col-2">
@@ -260,7 +259,7 @@
 
                     <div class="row mb-3">
                         <div class="col">
-                            <table class="table table-hover">
+                            <table class="table table-hover text-center">
                                 <thead>
                                     <th scope="col">Id</th>
                                     <th scope="col">Email</th>

@@ -6,11 +6,11 @@
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
     
-    include('logger.php');
-    include('db.php');
-    include('constants.php');
-    include('functions.php');
-    include('mailer.php');
+    include 'logger.php';
+    include 'db.php';
+    include 'constants.php';
+    include 'functions.php';
+    include 'mailer.php';
 
     $log->info('Session started: ', [ 'Session' => session_id() ]);
 
@@ -145,10 +145,10 @@
     }
 ?>
 
-<?php include('html/opener.html'); ?>
+<?php include 'html/opener.html'; ?>
 
     <head>
-        <?php include('html/headers.html'); ?>
+        <?php include 'html/headers.html'; ?>
         
     </head>
     
@@ -161,7 +161,7 @@
             </div>
             <div class="row">
                 <div class="col">
-                    <?php include('navs/nav-login.php'); ?>
+                    <?php include 'navs/nav-login.php'; ?>
 
                 <div aria-live="polite" aria-atomic="true" class="position-relative">
                     <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>

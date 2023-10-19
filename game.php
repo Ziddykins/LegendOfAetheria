@@ -7,7 +7,7 @@
     $dotenv->safeLoad();
 
     include 'logger.php';
-    include 'db.php';
+    require_once 'db.php';
     include 'constants.php';
     include 'functions.php';
     

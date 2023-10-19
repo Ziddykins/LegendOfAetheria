@@ -1,8 +1,8 @@
           let tick_counter = setInterval(function() {
                 let obj_tick_left = document.getElementById('tick-left');
                 let obj_ep_status = document.getElementById('ep-status');
-                let obj_ep_value  = <?php echo $character['ep']; ?>;
-                let obj_ep_max    = <?php echo $character['max_ep']; ?>;
+                let obj_ep_value  = <?php echo $character.ep; ?>;
+                let obj_ep_max    = <?php echo $character.max_ep; ?>;
                 
                 let obj_ep_icon   = document.getElementById('ep-icon');
                 
