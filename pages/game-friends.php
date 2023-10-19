@@ -1,20 +1,20 @@
 <?php
+    global $log;
     $account         = get_user($_SESSION['email'], 'account');
     $character       = get_user($account['id'], 'character');
     $header_charname = $character['name'] . "'s";
-    
-    /* :3 */
+        
     $requests = $requested = $friends = $blocked = Array();
     
     /* Populate global $requests array with incoming requests */
     $recvreqs = $db->query("SELECT * FROM tbl_friends WHERE email_2 = '" . $account['email'] . "' OR email_1 = '" . $account['email'] . "'");
     
     if ($recvreqs->num_rows) {
-       while ($row = $recvreqs->fetch_assoc()) {
+        while ($row = $recvreqs->fetch_assoc()) {
             $status_in  = friend_status($row['email_1']);
             $status_out = friend_status($row['email_2']);
 
-//            $log->warning("Checking friend status for ". $row['email_1']." and ". $row['email_2'] ." - ". $status->name);
+            $log->warning("Checking friend status for ". $row['email_1']." and ". $row['email_2'] ." - ". $status->name);
 
             if ($status_in == FriendStatus::REQUEST) {
                 array_push($requests, $row);
