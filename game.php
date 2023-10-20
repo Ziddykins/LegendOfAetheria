@@ -188,8 +188,18 @@
                             </li>
                         </ul>
     
-                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="img/avatars/<?php echo $character['avatar']; ?>" alt="avatar" width="50" height="50" class="rounded-circle" />
+                        <a href="#" 
+                            class="d-flex align-items-center text-decoration-none dropdown-toggle" 
+                            id="dropdownUser1"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            
+                            <img src="img/avatars/<?php echo $character['avatar']; ?>"
+                                 alt="avatar"
+                                 width="50"
+                                 height="50"
+                                 class="rounded-circle"
+                            />
                             <span class="d-none d-xl-inline mx-1 ms-5 fs-3">Account</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu text-small shadow">
