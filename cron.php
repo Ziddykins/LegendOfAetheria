@@ -3,10 +3,10 @@
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
     
-    include 'logger.php';
-    include 'db.php';
-    include 'constants.php';
-    include 'functions.php';
+    require_once 'logger.php';
+    require_once 'db.php';
+    require_once 'constants.php';
+    require_once 'functions.php';
     
     if (!isset($argv)) {
         $log->critical('Access to cron.php directly is not allowed!', ['REQUEST' => print_r($_REQUEST, 1)]);
