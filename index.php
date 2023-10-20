@@ -166,7 +166,7 @@
             </div>
             <div class="row">
                 <div class="col">
-                    <?php include 'navs/nav-login.php'; ?>
+                    <?php require_once 'navs/nav-login.php'; ?>
 
                 <div aria-live="polite" aria-atomic="true" class="position-relative">
                     <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
