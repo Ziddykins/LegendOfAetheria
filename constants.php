@@ -48,7 +48,7 @@
 
 
     enum Weather {
-        public static function random(): self {
+        public function random(): self {
             $count = count(self::cases()) - 1;
             return self::cases()[rand(0, $count)];
         }
