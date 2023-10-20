@@ -6,11 +6,11 @@
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
     
-    include 'logger.php';
-    include 'db.php';
-    include 'constants.php';
-    include 'functions.php';
-    include 'mailer.php';
+    require_once 'logger.php';
+    require_once 'db.php';
+    require_once 'constants.php';
+    require_once 'functions.php';
+    require_once 'mailer.php';
 
     $log->info('Session started: ',
         [ 
