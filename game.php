@@ -18,9 +18,9 @@
 
     $_SESSION['name'] = $character['name'];
 
-    # First make sure the user is logged in before doing anything
+    /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
-        # Check if the user has clicked the apply button on the profile tab
+        /* Check if the user has clicked the apply button on the profile tab */
         if (isset($_POST['profile-apply']) && $_POST['profile-apply'] == 1) {
             $old_password     = $_POST['profile-old-password'];
             $new_password     = $_POST['profile-new-password'];
@@ -229,7 +229,7 @@
                         if (isset($_GET['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
                             $page_uri = 'pages/game-' .  $requested_page . '.php';
-                            include($page_uri);
+                            include "$page_uri";
                         }
                     ?>
                 </div>
