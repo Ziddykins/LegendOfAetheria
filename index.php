@@ -148,9 +148,9 @@
             exit();
         }
     }
-?>
 
-<?php include 'html/opener.html'; ?>
+    include 'html/opener.html';
+?>
 
     <head>
         <?php include 'html/headers.html'; ?>
@@ -170,7 +170,7 @@
 
                 <div aria-live="polite" aria-atomic="true" class="position-relative">
                     <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
-                        <!-- Here the hardy toasts will be created - place ant traps :o -->
+
                     </div>
                 </div>
             </div>
