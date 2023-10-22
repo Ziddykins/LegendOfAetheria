@@ -10,40 +10,25 @@ my $FQDN             = 'loa.dankaf.ca';
 my $IP_ADDRESS       = '127.0.2.1';
 my $LOG_TO_FILE      = '';
 
-# Verbosity level:
-#   - 0: Script errors/system call errors
-#   - 1: Script output (default)
-#   - 2: Script and system call output
-#   - 3: All + errors to output file
-#   - 4: All + all to output file
-my $VERBOSITY = 1;
-
 # NO TOUCH #
 my $WIN32_HOSTS_FILE = 'c:\windows\system32\drivers\etc\hosts';
 my $LINUX_HOSTS_FILE = '/etc/hosts';
-my $GREEN = "\e[32m";
-my $RED   = "\e[31m";
-my $RESET = "\e[0m";
-my $REDIR;
 
-# lmao
-#$REDIR = $VERBOSITY == 1
-#            ? ''
-#            : $VERBOSITY == 2
-#                ? ''
-#                : $VERBOSITY == 3
-#                    ? ''
-#                    : $VERBOSITY == 4
-#                = ">/dev/null 2>&1";
+my $BLUE   = "\e[34m";
+my $YELLOW = "\e[33m";
+my $GREEN  = "\e[32m";
+my $RED    = "\e[31m";
+my $RESET  =  "\e[0m";
 
+my @steps = qw/hosts software hostname apache php sql/;
 
 check_platform();
 
-if (get_answer("Update hosts file?")) {
+if (ask_user("Update hosts file?")) {
     update_hosts();
 }
 
-if (get_answer("Install required software?")) {
+if (ask_user("Install required software?")) {
     install_software();
 }
 
@@ -63,11 +48,11 @@ sub check_platform {
     return "linux";
 }
 
-sub get_answer {
+sub ask_user {
     my $question = $_[0];
     
     print $question;
-    print "Choice[y/n]: ";
+    print "Choice[${GREEN}y${RESET}/${RED}n${RESET}]: ";
     
     chomp(my $answer = <STDIN>);
     print "\n";
@@ -77,6 +62,40 @@ sub get_answer {
     }
     
     return 0;
+}
+
+sub tell_user {
+    my ($severity, $message, $result) = @_;
+    my ($sec, $min, $hour, $day, $mon, $year) = localtime();
+    my $date  = "$year-$mon-$day $hour:$min:$sec";
+    my prefix = "$date [";
+    
+    if ($severity eq 'INFO') {
+        $prefix .= $BLUE . "=";
+    } elsif ($severity eq 'WARN') {
+        $prefix .= $YELLOW . "÷";
+    } elsif ($severity eq 'ERROR') {
+        $prefix .= $RED . "-";
+    } elsif ($severity eq 'SUCCESS') {
+        $prefix .= $GREEN . "+";
+    } else {
+        print "$message\n";
+    }
+    
+    $prefix .= "$RESET] ";
+    
+    print "$prefix -> $message\n";
+    
+    if ($result) {
+        $result =~ s/[\r\n]/\n\t=> /g;
+        print $result;
+    }
+    
+    if ($LOG_TO_FILE && -e $LOG_TO_FILE) {
+        open my $fh, '>>', $LOG_TO_FILE
+            or die "Couldn't open specified log file '$LOG_TO_FILE': $!";
+        print $fh $result;
+    }
 }
 
 sub update_hosts {
@@ -92,27 +111,18 @@ sub update_hosts {
     }
     
     my $contents = <$fh>;
-    print $fh "$IP_ADDRESS\t$FQDN $sub.$domain";
+    
+    print $fh "\n$IP_ADDRESS\t$FQDN $sub.$domain";
     
     close $fh
         or die "Unable to open file for rw: $!\n";
 }
 
 sub install_software {
-    if (get_answer("Update too?")) {
-        print "Updating system packages\n";
+    if (ask_user("Update too?")) {
+        tell_user('INFO', 'Updating system packages';
         do_system('apt update');
     }
     my $packages = 'php8.2 php8.2-fpm php8.2-mysql libapache2-mod-php8.2 ';
     
-}
-
-sub do_system {
-    my $command = $_[0];
-    
-    my $output = `$command`;
-    
-    if ($LOG_TO_FILE) {
-        
-    }
 }
