@@ -66,128 +66,130 @@
                         </a>
 
                         <hr style="width: 35%; opacity: .25; align-self: center;">
-                        
-                        <ul class="nav nav-pills flex-column mb-0 align-items-center align-items-sm-start mb-sm-auto" id="menu">
-                            <li>
-                                <a href="#sub-menu-character" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
-                                    <i class="fs-4 bi <?php echo $char_menu_icon; ?>"></i>
-                                    <span class="ms-1 d-none d-sm-inline fs-6">Character</span>
-                                </a>
+
+                        <div class="w-100 pb-3 text-center">
+                            <ul class="nav flex-column mb-0 align-items-center align-items-sm-start mb-sm-auto" id="menu">
+                                <li class="border rounded w-100">
+                                    <a href="#sub-menu-character" id="menu-header-character" name="menu-header-character" class="nav-link px-0 align-middle bg-primary text-white" data-bs-toggle="collapse">
+                                        <i class="fs-4 bi <?php echo $char_menu_icon; ?>"></i>
+                                        <span class="ms-1 d-none d-md-inline fs-6 text-start">Character</span>
+                                    </a>
+                                    
+                                    <ul class="nav collapse flex-column text-start" id="sub-menu-character" data-bs-parent="#menu" aria-expanded="false">
+                                        <li>
+                                            <a href="?page=sheet" id="menu-character-sheet" name="menu-character-sheet" class="nav-link px-0">
+                                                <i class="bi bi-card-text ms-4"></i><span class="d-none d-sm-inline"> Sheet</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                            <i class="bi bi-box ms-4"></i><span class="d-none d-sm-inline"> Inventory</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Skills</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Spells</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Train</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <li class="border w-100">
+                                    <a href="#sub-menu-travel"  class="nav-link px-0 align-middle" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
+                                        <i class="d-none d-sm-inline fs-4 bi bi-signpost-split-fill"></i>
+                                        <span class="ms-1 d-none d-md-inline fs-6">Location</span>
+                                    </a>
                                 
-                                <ul class="nav collapse flex-column" id="sub-menu-character" data-bs-parent="#menu" aria-expanded="false">
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <i class="bi bi-card-text ms-4"></i><span class="d-none d-sm-inline"> Sheet</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                        <i class="bi bi-box ms-4"></i><span class="d-none d-sm-inline"> Inventory</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Skills</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Spells</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Train</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                                    <ul class="collapse nav flex-column ms-1 text-start" id="sub-menu-travel" data-bs-parent="#menu" aria-expanded="false">
+                                        <li>
+                                            <a href="?page=hunt" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Hunt</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Map</span>
+                                            </a>
+                                        </li>
+                                        <li class="w-100">
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Explore</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Zone</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <i class="bi bi-brightness-alt-high ms-4"></i><span class="d-none d-sm-inline"> Rest</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
 
-                            <li>
-                                <a href="#sub-menu-travel" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
-                                    <i class="fs-4 bi bi-signpost-split-fill"></i>
-                                    <span class="ms-1 d-none d-sm-inline fs-6">Location</span>
-                                </a>
-                            
-                                <ul class="collapse nav flex-column ms-1" id="sub-menu-travel" data-bs-parent="#menu" aria-expanded="false">
-                                    <li>
-                                        <a href="?page=hunt" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Hunt</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Map</span>
-                                        </a>
-                                    </li>
-                                    <li class="w-100">
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Explore</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Change Location</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <i class="bi bi-brightness-alt-high ms-4"></i><span class="d-none d-sm-inline"> Rest</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                                <li class="border w-100">
+                                    <a href="#sub-menu-dungeon" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
+                                        <i class="fs-4 bi bi-bricks"></i>
+                                        <span class="ms-1 d-none d-md-inline fs-6">Dungeon</span>
+                                    </a>
 
-                            <li>
-                                <a href="#sub-menu-dungeon" data-bs-toggle="collapse" class="nav-link px-0 align-middle ">
-                                    <i class="fs-4 bi bi-bricks"></i>
-                                    <span class="ms-1 d-none d-sm-inline fs-6">Dungeon</span>
-                                </a>
+                                    <ul class="collapse nav flex-column ms-1 text-start" id="sub-menu-dungeon" data-bs-parent="#menu" aria-expanded="false">
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Floor <?php echo $character['floor']; ?></span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline text-danger ms-4">Reset</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
 
-                                <ul class="collapse nav flex-column ms-1" id="sub-menu-dungeon" data-bs-parent="#menu" aria-expanded="false">
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Floor <?php echo $character['floor']; ?></span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline text-danger ms-4">Reset</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
+                                <li class="border w-100">
+                                    <a href="#sub-menu-quests" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
+                                        <i class="fs-4 bi bi-clipboard-fill"></i>
+                                        <span class="ms-1 d-none d-md-inline fs-6">Quests</span>
+                                    </a>
+                                    <ul id="sub-menu-quests" class="collapse nav flex-column ms-1 text-start" data-bs-parent="#menu">
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Active</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Completed</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Achievements</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="?page=" class="nav-link px-0">
+                                                <span class="d-none d-sm-inline ms-4">Awards</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>    
 
-                            <li>
-                                <a href="#sub-menu-quests" data-bs-toggle="collapse" class="nav-link px-0 align-middle">
-                                    <i class="fs-4 bi bi-clipboard-fill"></i>
-                                    <span class="ms-1 d-none d-sm-inline fs-6">Quests</span>
-                                </a>
-                                <ul class="collapse nav flex-column ms-1" id="sub-menu-quests" data-bs-parent="#menu">
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Active</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Completed</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Achievements</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" class="nav-link px-0">
-                                            <span class="d-none d-sm-inline ms-4">Awards</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-    
                         <a href="#" 
                             class="d-flex align-items-center text-decoration-none dropdown-toggle" 
                             id="dropdownUser1"
@@ -200,7 +202,7 @@
                                  height="50"
                                  class="rounded-circle"
                             />
-                            <span class="d-none d-xl-inline mx-1 ms-5 fs-3">Account</span>
+                            <span class="d-none d-xl-inline mx-1 ms-3 fs-6">Account</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu text-small shadow">
                             <li><a class="dropdown-item" href="?page=profile">Profile</a></li>
@@ -235,7 +237,7 @@
                 </div>
             </div>
             
-            <script type="text/javascript" src="js/footer.js"></script>
+            <?php include 'html/footer.html'; ?>
             
             <div aria-live="polite" aria-atomic="true" class="position-relative">
                 <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>

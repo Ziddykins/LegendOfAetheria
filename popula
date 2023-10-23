@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Carp;
+
+if (!scalar @ARGV) {
+    carp "Usage: perl $0 <table> <# lines>\n";
+}
+
+my $which = shift;
+my $lines = shift;
+
+for (1 .. $lines) {
+    if ($which eq "tbl_accounts") {
+        my $line = "INSERT INTO $table (account_id, name, race, avatar, 
