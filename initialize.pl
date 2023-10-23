@@ -14,6 +14,10 @@ my $LOG_TO_FILE      = '';
 my $WIN32_HOSTS_FILE = 'c:\windows\system32\drivers\etc\hosts';
 my $LINUX_HOSTS_FILE = '/etc/hosts';
 
+my $XAMPP_INSTALLER_BIN  = 'https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.2.4/xampp-windows-x64-8.2.4-0-VS16-installer.exe';
+my $XAMPP_INSTALLER_ARGS = '--mode unattended --enabled-components xampp_server,xampp_apache,xampp_mysql,xampp_program_languages,xampp_php,xampp_perl,xampp_tools
+my $XAMPP_MARIADB_CHPW   = 'mysqladmin.exe -u root password
+'
 my $BLUE   = "\e[34m";
 my $YELLOW = "\e[33m";
 my $GREEN  = "\e[32m";
