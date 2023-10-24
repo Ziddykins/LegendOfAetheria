@@ -70,119 +70,132 @@
                         <div class="w-100 pb-3 text-center">
                             <ul class="nav flex-column mb-0 align-items-center align-items-sm-start mb-sm-auto" id="menu">
                                 <li class="border rounded w-100">
-                                    <a href="#sub-menu-character" id="menu-header-character" name="menu-header-character" class="nav-link px-0 align-middle bg-primary text-white" data-bs-toggle="collapse">
+                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link px-0 align-middle bg-primary text-white" data-bs-toggle="collapse">
                                         <i class="fs-4 bi <?php echo $char_menu_icon; ?>"></i>
                                         <span class="ms-1 d-none d-md-inline fs-6 text-start">Character</span>
                                     </a>
                                     
-                                    <ul class="nav collapse flex-column text-start" id="sub-menu-character" data-bs-parent="#menu" aria-expanded="false">
+                                    <ul id="menu-header-character" class="nav collapse flex-column text-start" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
-                                            <a href="?page=sheet" id="menu-character-sheet" name="menu-character-sheet" class="nav-link px-0">
-                                                <i class="bi bi-card-text ms-4"></i><span class="d-none d-sm-inline"> Sheet</span>
+                                            <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link px-0">
+                                                <i class="bi bi-card-text ms-4"></i>
+                                                <span class="d-none d-lg-inline"> Sheet</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                            <i class="bi bi-box ms-4"></i><span class="d-none d-sm-inline"> Inventory</span>
+                                            <a href="?page=" id="menu-sub-inventory" name="menu-sub-inventory" class="nav-link px-0">
+                                                <i class="bi bi-box ms-4"></i>
+                                                <span class="d-none d-lg-inline"> Inventory</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Skills</span>
+                                            <a href="?page=" id="menu-sub-skills" name="menu-sub-skills" class="nav-link px-0">
+                                                <span class="material-symbols-sharp ms-4">trophy</span>
+                                                <span class="d-none d-lg-inline">Skills</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Spells</span>
+                                            <a href="?page=" id="menu-sub-spells" name="menu-sub-spells" class="nav-link px-0">
+                                                <span class="d-none d-lg-inline ms-4">Spells</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Train</span>
+                                            <a href="?page=" id="menu-sub-train" name="menu-sub-trail" class="nav-link px-0">
+                                                <span class="d-none d-lg-inline ms-4">Train</span>
                                             </a>
                                         </li>
                                     </ul>
                                 </li>
 
                                 <li class="border w-100">
-                                    <a href="#sub-menu-travel"  class="nav-link px-0 align-middle" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
-                                        <i class="d-none d-sm-inline fs-4 bi bi-signpost-split-fill"></i>
+                                    <a href="#menu-header-travel" id="menu-anchor-location" name="menu-anchor-location" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
+                                        <i class="fs-4 bi bi-signpost-split-fill"></i>
                                         <span class="ms-1 d-none d-md-inline fs-6">Location</span>
                                     </a>
                                 
-                                    <ul class="collapse nav flex-column ms-1 text-start" id="sub-menu-travel" data-bs-parent="#menu" aria-expanded="false">
+                                    <ul class="collapse nav flex-column ms-1 text-start" id="menu-header-travel" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
-                                            <a href="?page=hunt" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Hunt</span>
+                                            <a href="?page=hunt" id="menu-sub-hunt" name="menu-sub-hunt" class="nav-link px-0">
+                                                <span class="d-none d-lg-inline ms-4">Hunt</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Map</span>
+                                            <a href="?page=" id="menu-sub-map" name="menu-sub-map" class="nav-link px-0">
+                                                <span class="d-none d-lg-inline ms-4">Map</span>
                                             </a>
                                         </li>
                                         <li class="w-100">
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Explore</span>
+                                            <a href="?page=" id="menu-sub-explore" name="menu-sub-explore" class="nav-link px-0">
+                                                <span class="d-none d-lg-inline ms-4">Explore</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Zone</span>
+                                            <a href="?page=" id="menu-sub-zone" name="menu-sub-zone" class="nav-link px-0">
+                                                <span class="d-none d-lg-inline ms-4">Zone</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <i class="bi bi-brightness-alt-high ms-4"></i><span class="d-none d-sm-inline"> Rest</span>
+                                            <?php
+                                                $rest_disabled = '';
+                                                if ($character['hp'] === $character['max_hp']) {
+                                                    $rest_disabled = 'disabled';
+                                                }
+                                            ?>
+                                            <a href="?page=" id="menu-sub-rest" name="menu-sub-rest" class="nav-link d-flex align-items-center px-0 <?php echo $rest_disabled; ?>">
+                                                <span class="material-symbols-sharp ms-4 pe-2">nights_stay</span>
+                                                <span class="d-none d-lg-inline"> Rest</span>
                                             </a>
                                         </li>
                                     </ul>
                                 </li>
 
                                 <li class="border w-100">
-                                    <a href="#sub-menu-dungeon" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
+                                    <a href="#menu-header-dungeon" id="menu-anchor-dungeon" name="menu-anchor-dungeon" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
                                         <i class="fs-4 bi bi-bricks"></i>
                                         <span class="ms-1 d-none d-md-inline fs-6">Dungeon</span>
                                     </a>
 
-                                    <ul class="collapse nav flex-column ms-1 text-start" id="sub-menu-dungeon" data-bs-parent="#menu" aria-expanded="false">
+                                    <ul id="menu-header-dungeon" class="collapse nav flex-column ms-1 text-start" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Floor <?php echo $character['floor']; ?></span>
+                                            <a href="?page=" id="menu-sub-floor" name="menu-sub-floor" class="nav-link px-0 text-center">
+                                                <span class="material-symbols-sharp">floor</span>
+                                                <span class="d-none d-lg-inline">Floor <?php echo $character['floor']; ?></span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline text-danger ms-4">Reset</span>
+                                            <a href="?page=" id="menu-sub-reset" name="menu-sub-reset" class="nav-link px-0 text-center">
+                                                <span class="d-none d-lg-inline text-danger ms-4">Reset</span>
                                             </a>
                                         </li>
                                     </ul>
                                 </li>
 
                                 <li class="border w-100">
-                                    <a href="#sub-menu-quests" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
+                                    <a href="#menu-header-quests" id="menu-anchor-quests" name="menu-anchor-quests" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
                                         <i class="fs-4 bi bi-clipboard-fill"></i>
                                         <span class="ms-1 d-none d-md-inline fs-6">Quests</span>
                                     </a>
-                                    <ul id="sub-menu-quests" class="collapse nav flex-column ms-1 text-start" data-bs-parent="#menu">
+
+                                    <ul id="menu-header-quests" name="menu-header-quests" class="collapse nav flex-column ms-1 text-start" data-bs-parent="#menu">
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Active</span>
+                                            <a href="?page=" id="menu-sub-active" name="menu-sub-active" class="nav-link px-0 text-center">
+                                                <span class="d-none d-lg-inline ms-4">Active</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Completed</span>
+                                            <a href="?page=" id="menu-sub-completed" name="menu-sub-completed" class="nav-link px-0 text-center">
+                                                <span class="d-none d-lg-inline ms-4">Completed</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Achievements</span>
+                                            <a href="?page=" id="menu-sub-achievements" name="menu-sub-achievements" class="nav-link px-0">
+                                                <span class="material-symbols-sharp ms-4">military_tech</span>
+                                                <span class="d-none d-lg-inline">Achievements</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" class="nav-link px-0">
-                                                <span class="d-none d-sm-inline ms-4">Awards</span>
+                                            <a href="?page=" id="menu-sub-awards" name="menu-sub-awards" class="nav-link px-0">
+                                                <span class="d-none d-lg-inline ms-4">Awards</span>
                                             </a>
                                         </li>
                                     </ul>
@@ -209,28 +222,43 @@
                             </a>
                         
                             <ul class="dropdown-menu dropdown-menu text-small shadow">
-                                <li><a class="dropdown-item" href="?page=profile">Profile</a></li>
-                                <li><a class="dropdown-item" href="?page=friends">Friends</a></li>
-                                <li><a class="dropdown-item" href="?page=mail">Mail
-                                <?php
-                                $unread_mail = check_mail('unread', $account['id']);
-
-                                    $pill_bg = 'bg-danger';
-                                    if ($unread_mail == 0) {
-                                            $pill_bg = 'bg-primary';
-                                    }
-                                ?>
-                                    <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $unread_mail; ?></span>
-                                </a></li>
-                                <li><a class="dropdown-item" href="?page=settings">Settings</a></li>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=profile">Profile</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=friends">Friends</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=mail">Mail
+                                    <?php
+                                        $unread_mail = check_mail('unread', $account['id']);
+                                        $pill_bg = 'bg-danger';
+    
+                                        if ($unread_mail == 0) {
+                                                $pill_bg = 'bg-primary';
+                                        }
+                                    ?>
+                                        <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $unread_mail; ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=settings">Settings</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <?php
                                     $privileges = UserPrivileges::name_to_value($account['privileges']);
+                                    
                                     if ($privileges > UserPrivileges::MODERATOR->value) {
-                                        echo '<li><a class="dropdown-item" href="?page=administrator">Administrator</a></li>';
+                                        echo "<li>\n\t\t\t\t\t\t\t\t\t";
+                                        echo '<a class="dropdown-item" href="?page=administrator">Administrator</a>';
+                                        echo "\n\t\t\t\t\t\t\t\t</li>\n";
                                     }
                                 ?>
-                                <li><a class="dropdown-item" href="/logout">Sign out</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="/logout">Sign out</a>
+                                </li>
                             </ul>
                         </div>
                     </div>

@@ -27,7 +27,6 @@
             $mail->isHTML(true);
             $mail->Subject = 'Verify Your LoA Account';
             $mail->Body    = 'Click: <a href="/verification.php?code=' . $account['verification_code'] . '">Verify</a>';
-            $mail->AltBody = 'fuk u skrubs get real email';
         
             $mail->send();
             echo $mail->SMTPDebug;
