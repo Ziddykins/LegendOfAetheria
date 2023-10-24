@@ -1,6 +1,4 @@
 <?php
-    include 'db.php';
-   
     function get_mysql_datetime() {
         return date("Y-m-d H:i:s", strtotime("now"));
     }
@@ -42,5 +40,20 @@
     
     function random_float ($min,$max) {
        return ($min + lcg_value() * (abs($max - $min)));
+    }
+
+    function check_mail($what, $id) {
+        global $db, $log;
+        $log->info("Checking mail for '$what' for id '$id'");
+        switch ($what) {
+            case 'unread':
+                $result = $db->query(
+                    "SELECT * FROM tbl_mail WHERE `read` = 'False' AND id = $id"
+                )->num_rows;
+                $log->info(print_r($result, 1));
+                return $result;
+            default:
+                return LOAError::MAIL_UNKNOWN_DIRECTIVE;
+        }
     }
 ?>
