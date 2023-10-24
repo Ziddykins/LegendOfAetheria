@@ -90,13 +90,14 @@
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-skills" name="menu-sub-skills" class="nav-link px-0">
-                                                <span class="material-symbols-sharp ms-4">trophy</span>
+                                                <span class="material-symbols-sharp ms-2">book_2</span>
                                                 <span class="d-none d-lg-inline">Skills</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-spells" name="menu-sub-spells" class="nav-link px-0">
-                                                <span class="d-none d-lg-inline ms-4">Spells</span>
+                                                <span class="material-symbols-sharp ms-2">book</span>
+                                                <span class="d-none d-lg-inline">Spells</span>
                                             </a>
                                         </li>
                                         <li>
@@ -121,17 +122,20 @@
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-map" name="menu-sub-map" class="nav-link px-0">
-                                                <span class="d-none d-lg-inline ms-4">Map</span>
+                                                <span class="material-symbols-sharp ms-2">map</span>
+                                                <span class="d-none d-lg-inline">Map</span>
                                             </a>
                                         </li>
                                         <li class="w-100">
                                             <a href="?page=" id="menu-sub-explore" name="menu-sub-explore" class="nav-link px-0">
-                                                <span class="d-none d-lg-inline ms-4">Explore</span>
+                                                <span class="material-symbols-sharp ms-2">travel_explore</span>
+                                                <span class="d-none d-lg-inline">Explore</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-zone" name="menu-sub-zone" class="nav-link px-0">
-                                                <span class="d-none d-lg-inline ms-4">Zone</span>
+                                                <span class="material-symbols-sharp ms-2">move_location</span>
+                                                <span class="d-none d-lg-inline">Zone</span>
                                             </a>
                                         </li>
                                         <li>
@@ -142,7 +146,7 @@
                                                 }
                                             ?>
                                             <a href="?page=" id="menu-sub-rest" name="menu-sub-rest" class="nav-link d-flex align-items-center px-0 <?php echo $rest_disabled; ?>">
-                                                <span class="material-symbols-sharp ms-4 pe-2">nights_stay</span>
+                                                <span class="material-symbols-sharp ms-2 me-2">nights_stay</span>
                                                 <span class="d-none d-lg-inline"> Rest</span>
                                             </a>
                                         </li>
@@ -157,45 +161,49 @@
 
                                     <ul id="menu-header-dungeon" class="collapse nav flex-column ms-1 text-start" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
-                                            <a href="?page=" id="menu-sub-floor" name="menu-sub-floor" class="nav-link px-0 text-center">
-                                                <span class="material-symbols-sharp">floor</span>
+                                            <a href="?page=" id="menu-sub-floor" name="menu-sub-floor" class="nav-link px-0">
+                                                <span class="material-symbols-sharp ms-2">floor</span>
                                                 <span class="d-none d-lg-inline">Floor <?php echo $character['floor']; ?></span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" id="menu-sub-reset" name="menu-sub-reset" class="nav-link px-0 text-center">
-                                                <span class="d-none d-lg-inline text-danger ms-4">Reset</span>
+                                            <a href="?page=" id="menu-sub-reset" name="menu-sub-reset" class="nav-link px-0">
+                                                <span class="material-symbols-sharp ms-2">restart_alt</span>
+                                                <span class="d-none d-lg-inline text-danger">Reset</span>
                                             </a>
                                         </li>
                                     </ul>
                                 </li>
 
                                 <li class="border w-100">
-                                    <a href="#menu-header-quests" id="menu-anchor-quests" name="menu-anchor-quests" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
+                                    <a href="#menu-header-quests" id="menu-anchor-quests" name="menu-anchor-quests" class="nav-link px-0" data-bs-toggle="collapse">
                                         <i class="fs-4 bi bi-clipboard-fill"></i>
                                         <span class="ms-1 d-none d-md-inline fs-6">Quests</span>
                                     </a>
 
                                     <ul id="menu-header-quests" name="menu-header-quests" class="collapse nav flex-column ms-1 text-start" data-bs-parent="#menu">
                                         <li>
-                                            <a href="?page=" id="menu-sub-active" name="menu-sub-active" class="nav-link px-0 text-center">
-                                                <span class="d-none d-lg-inline ms-4">Active</span>
+                                            <a href="?page=" id="menu-sub-active" name="menu-sub-active" class="nav-link px-0">
+                                                <span class="material-symbols-sharp ms-2">pending_actions</span>
+                                                <span class="d-none d-lg-inline">Active</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" id="menu-sub-completed" name="menu-sub-completed" class="nav-link px-0 text-center">
-                                                <span class="d-none d-lg-inline ms-4">Completed</span>
+                                            <a href="?page=" id="menu-sub-completed" name="menu-sub-completed" class="nav-link px-0">
+                                                <span class="material-symbols-sharp ms-2">inventory</span>
+                                                <span class="d-none d-lg-inline">Completed</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-achievements" name="menu-sub-achievements" class="nav-link px-0">
-                                                <span class="material-symbols-sharp ms-4">military_tech</span>
+                                                <span class="material-symbols-sharp ms-2">military_tech</span>
                                                 <span class="d-none d-lg-inline">Achievements</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-awards" name="menu-sub-awards" class="nav-link px-0">
-                                                <span class="d-none d-lg-inline ms-4">Awards</span>
+                                                <span class="material-symbols-sharp ms-2">trophy</span>
+                                                <span class="d-none d-lg-inline">Awards</span>
                                             </a>
                                         </li>
                                     </ul>
