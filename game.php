@@ -62,7 +62,7 @@
                 <div class="col-2 px-sm-2 px-0 border border-grey">
                     <div class="d-flex flex-column align-items-center align-items-sm-start px-3">
                         <a href="/game" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                            <img src="img/logos/logo-banner-no-bg.png" class="p-3 w-100">
+                            <img src="img/logos/logo-banner-no-bg.png" class="mt-4 w-100">
                         </a>
 
                         <hr style="width: 35%; opacity: .25; align-self: center;">
@@ -189,37 +189,50 @@
                                 </li>
                             </ul>
                         </div>    
+                        
+                        <hr style="width: 35%; opacity: .25; align-self: center;">
 
-                        <a href="#" 
-                            class="d-flex align-items-center text-decoration-none dropdown-toggle" 
-                            id="dropdownUser1"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            
-                            <img src="img/avatars/<?php echo $character['avatar']; ?>"
-                                 alt="avatar"
-                                 width="50"
-                                 height="50"
-                                 class="rounded-circle"
-                            />
-                            <span class="d-none d-xl-inline mx-1 ms-3 fs-6">Account</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu text-small shadow">
-                            <li><a class="dropdown-item" href="?page=profile">Profile</a></li>
-                            <li><a class="dropdown-item" href="?page=friends">Friends</a></li>
-                            <li><a class="dropdown-item" href="?page=mail">Mail
-                                    <span class="badge bg-danger rounded-pill"> 5</span>
-                            </a></li>
-                            <li><a class="dropdown-item" href="?page=settings">Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <?php
-                                $privileges = UserPrivileges::name_to_value($account['privileges']);
-                                if ($privileges > UserPrivileges::MODERATOR->value) {
-                                    echo '<li><a class="dropdown-item" href="?page=administrator">Administrator</a></li>';
-                                }
-                            ?>
-                            <li><a class="dropdown-item" href="/logout">Sign out</a></li>
-                        </ul>
+                        <div id="bottom-menu" name="bottom-menu" class="ms-3">
+                            <a href="#" 
+                                class="d-flex align-items-center text-decoration-none dropdown-toggle" 
+                                id="dropdownUser1"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                
+                                <img src="img/avatars/<?php echo $character['avatar']; ?>"
+                                     alt="avatar"
+                                     width="50"
+                                     height="50"
+                                     class="rounded-circle"
+                                />
+                                <span class="d-none d-xl-inline mx-1 ms-3 fs-6">Account</span>
+                            </a>
+                        
+                            <ul class="dropdown-menu dropdown-menu text-small shadow">
+                                <li><a class="dropdown-item" href="?page=profile">Profile</a></li>
+                                <li><a class="dropdown-item" href="?page=friends">Friends</a></li>
+                                <li><a class="dropdown-item" href="?page=mail">Mail
+                                <?php
+                                $unread_mail = check_mail('unread', $account['id']);
+
+                                    $pill_bg = 'bg-danger';
+                                    if ($unread_mail == 0) {
+                                            $pill_bg = 'bg-primary';
+                                    }
+                                ?>
+                                    <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $unread_mail; ?></span>
+                                </a></li>
+                                <li><a class="dropdown-item" href="?page=settings">Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <?php
+                                    $privileges = UserPrivileges::name_to_value($account['privileges']);
+                                    if ($privileges > UserPrivileges::MODERATOR->value) {
+                                        echo '<li><a class="dropdown-item" href="?page=administrator">Administrator</a></li>';
+                                    }
+                                ?>
+                                <li><a class="dropdown-item" href="/logout">Sign out</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 

@@ -100,6 +100,8 @@
         case SQLDB_PREPPED_EXECUTE     = -2001;
 
         case FRIEND_STATUS_ERROR       = -3000;
+
+        case MAIL_UNKNOWN_DIRECTIVE    = -4000;
     }
 
     # Global:
