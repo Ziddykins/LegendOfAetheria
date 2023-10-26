@@ -9,7 +9,7 @@
     require_once 'functions.php';
     
     if (!isset($argv)) {
-        $log->critical('Access to cron.php directly is not allowed!', ['REQUEST' => print_r($_REQUEST, 1)]);
+        $log->warning('Access to cron.php directly is not allowed!', ['REQUEST' => print_r($_REQUEST, 1)]);
         echo 'Access to cron.php directly is not allowed!';
         exit(1);
     }

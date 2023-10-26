@@ -10,7 +10,7 @@
     require_once 'db.php';
     include 'constants.php';
     include 'functions.php';
-    
+
     $account   = get_user($_SESSION['email'], 'account');
     $character = get_user($account['id'], 'character');
 
@@ -258,7 +258,16 @@
                                     <a class="dropdown-item" href="?page=profile">Profile</a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="?page=friends">Friends</a>
+                                    <a class="dropdown-item" href="?page=friends">Friends
+                                    <?php
+                                        $requests = get_friend_counts('requests');
+                                        $pill_bg  = 'bg-danger';
+
+                                        if (!$requests) {
+                                            $pill_bg = 'bg-primary';
+                                        }
+                                    ?>
+                                    <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $requests; ?></span>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" href="?page=mail">Mail
