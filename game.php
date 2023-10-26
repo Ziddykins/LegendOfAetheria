@@ -78,13 +78,13 @@
                                     <ul id="menu-header-character" class="nav collapse flex-column text-start" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
                                             <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link px-0">
-                                                <i class="bi bi-card-text ms-4"></i>
+                                                <i class="bi bi-card-text ms-2"></i>
                                                 <span class="d-none d-lg-inline"> Sheet</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-inventory" name="menu-sub-inventory" class="nav-link px-0">
-                                                <i class="bi bi-box ms-4"></i>
+                                                <i class="bi bi-box ms-2"></i>
                                                 <span class="d-none d-lg-inline"> Inventory</span>
                                             </a>
                                         </li>
@@ -102,7 +102,8 @@
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-train" name="menu-sub-trail" class="nav-link px-0">
-                                                <span class="d-none d-lg-inline ms-4">Train</span>
+                                                <span class="material-symbols-sharp ms-2">fitness_center</span>
+                                                <span class="d-none d-lg-inline">Train</span>
                                             </a>
                                         </li>
                                     </ul>
@@ -117,7 +118,8 @@
                                     <ul class="collapse nav flex-column ms-1 text-start" id="menu-header-travel" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
                                             <a href="?page=hunt" id="menu-sub-hunt" name="menu-sub-hunt" class="nav-link px-0">
-                                                <span class="d-none d-lg-inline ms-4">Hunt</span>
+                                                <span class="material-symbols-sharp ms-2">cruelty_free</span>
+                                                <span class="d-none d-lg-inline">Hunt</span>
                                             </a>
                                         </li>
                                         <li>
@@ -167,10 +169,32 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" id="menu-sub-reset" name="menu-sub-reset" class="nav-link px-0">
-                                                <span class="material-symbols-sharp ms-2">restart_alt</span>
+                                            <a href="#" id="menu-sub-reset" name="menu-sub-reset" class="nav-link px-0" data-bs-toggle="modal" data-bs-target="#reset-modal" >
+                                                <span class="material-symbols-sharp ms-2 text-danger">restart_alt</span>
                                                 <span class="d-none d-lg-inline text-danger">Reset</span>
                                             </a>
+                                            <div class="modal fade" id="reset-modal" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header bg-danger text-bg-danger">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Reset Dungeon Progress</h1>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            This will reset your dungeon progress from floor <?php echo $character['floor']; ?> to floor 1 and return your dungeon multiplier back to 1x<br /><br />
+                                                            <strong>Are you sure? This cannot be reversed!</strong>
+                                                        </div>
+                                                        <form id="modal-dungeon-reset" name="modal-dungeon-reset" action="?page=dungeon&action=reset" method="POST">
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                <input type="submit" class="btn btn-danger" value="Reset">
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
                                         </li>
                                     </ul>
                                 </li>
