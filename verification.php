@@ -36,8 +36,8 @@
             
             $log->info("User verification successful",
                         [
-                            'User'    => $player['email'],
-                            'Request' => print_r($_REQUEST, 1)
+                            'User' => $player['email'],
+                            'Code' => $player['verification_code']
                         ]
             );
         } else {
