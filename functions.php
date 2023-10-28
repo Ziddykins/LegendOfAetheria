@@ -126,6 +126,7 @@
         }
     }
 
+    /* TODO: test */
     function block_user($email) {
         $sql_query = 'SELECT * FROM ' . $_ENV['SQL_FRND_TBL'] . 
                      "WHERE `email_2` = '$email' " .
@@ -133,7 +134,25 @@
         $result = $db->query($result)->fetch_assoc();
         print_r($result);
         die();
-
     }
 
+    function save_character($serialized_data) {
+        $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
+                     "SET `serialized_character` = '$serialized_data' ";
+                     "WHERE `id` = $account_id";
+        $db->query($sql_query);
+    }
+
+    function load_character($account_id) {
+        $sql_query = 'SELECT `serialized_character` ' .
+                     'FROM ' . $_ENV['SQL_ACCT_TBL'] . 
+                     " WHERE `id` = $account_id";
+        $db->query($sql_query);
+        $serialized_data = $db->fetch_assoc();
+    
+        $character = new Character($account_id);
+        $character = unserialize($serialized_data);
+        
+        return $character;
+    }
 ?>

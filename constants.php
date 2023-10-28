@@ -1,8 +1,10 @@
 <?php
 
-    define('MAX_ASSIGNABLE_AP', 40);
-    define('ENERGY_PER_TICK',    3);
-    
+    define('MAX_STARTING_INVWEIGHT', 500);
+    define('MAX_STARTING_INVSLOTS',   30);
+    define('MAX_ASSIGNABLE_AP',       40);
+    define('ENERGY_PER_TICK',          3);
+
     enum Races {
         public static function random(): self {
             $count = count(self::cases()) - 1;

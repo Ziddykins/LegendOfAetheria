@@ -70,6 +70,7 @@
         
         $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $char_name);
 
+
         $time_sqlformat   = get_mysql_datetime();
         $ip_address       = $_SERVER['REMOTE_ADDR'];
         $new_privs        = UserPrivileges::UNVERIFIED->value;
@@ -136,6 +137,21 @@
                     }
 
                     
+                    $character = new Character($account_id);
+
+                    $character->setStats('strength',     $str);
+                    $character->setStats('intelligence', $int);
+                    $character->setStats('defense',      $def);
+                     
+                    $character->setStats('hp',     100);
+                    $character->setStats('maxHp',  100);
+                    $character->setStats('mp',     100);
+                    $character->setStats('maxMp',  100);
+
+                    $character->setStats('status', 'healthy');
+                    
+                    $serialized_data = serialize($character);
+
                     // Verification email
                     // send_mail($email);
 
