@@ -267,18 +267,19 @@
                                             $pill_bg = 'bg-primary';
                                         }
                                     ?>
-                                    <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $requests; ?></span>
+                                        <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $requests; ?></span>
+                                    </a>
                                 </li>
                                 <li>
                                     <a class="dropdown-item" href="?page=mail">Mail
-                                    <?php
-                                        $unread_mail = check_mail('unread', $account['id']);
-                                        $pill_bg = 'bg-danger';
-    
-                                        if ($unread_mail == 0) {
-                                                $pill_bg = 'bg-primary';
-                                        }
-                                    ?>
+                                        <?php
+                                            $unread_mail = check_mail('unread', $account['id']);
+                                            $pill_bg = 'bg-danger';
+        
+                                            if ($unread_mail == 0) {
+                                                    $pill_bg = 'bg-primary';
+                                            }
+                                        ?>
                                         <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $unread_mail; ?></span>
                                     </a>
                                 </li>
