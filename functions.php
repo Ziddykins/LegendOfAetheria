@@ -135,24 +135,26 @@
         print_r($result);
         die();
     }
+        function save_character($id, $character) {
+            global $db;
+            $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
+                         "SET `serialized_character` = '$serialized_data' ";
+                         "WHERE `id` = $id";
+            $db->query($sql_query); 
+        }
 
-    function save_character($serialized_data) {
-        $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
-                     "SET `serialized_character` = '$serialized_data' ";
-                     "WHERE `id` = $account_id";
-        $db->query($sql_query);
-    }
-
-    function load_character($account_id) {
-        $sql_query = 'SELECT `serialized_character` ' .
-                     'FROM ' . $_ENV['SQL_ACCT_TBL'] . 
-                     " WHERE `id` = $account_id";
-        $db->query($sql_query);
-        $serialized_data = $db->fetch_assoc();
-    
-        $character = new Character($account_id);
-        $character = unserialize($serialized_data);
+        function load_character($id) {
+            $sql_query = 'SELECT `serialized_character` ' .
+                         'FROM ' . $_ENV['SQL_ACCT_TBL'] . 
+                         " WHERE `id` = $account_id";
+            
+            $db->query($sql_query);
+            
+            $serialized_data = $db->fetch_assoc();
         
-        return $character;
-    }
+            $character = new Character($account_id);
+            $character = unserialize($serialized_data);
+            
+            return $character;
+        }
 ?>

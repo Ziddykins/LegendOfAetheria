@@ -22,7 +22,7 @@
         public function getStat($stat) {
             return $this->stats->$stat;
         }
-		
+
 		function __call($method, $params) {
 			$var = lcfirst(substr($method, 3));
 
@@ -37,19 +37,16 @@
     }
 
 	class Stats {
-		private $hp;
-		private $maxHp;
-		private $mp;
-        private $maxMp;
+		protected $hp;
+		protected $maxHp;
+		protected $mp;
+        protected $maxMp;
         
-        public $strength;
-        private $intelligence;
-        private $defense;
+        protected $strength;
+        protected $intelligence;
+        protected $defense;
 
-        private $status;
-
-        public function __construct() {
-        }
+        protected $status;
     }
 
     class Inventory {
@@ -61,7 +58,7 @@
 
         protected $nextAvailableSlot;
 
-        public __construct($slotCount, $maxWeight) {
+        public function __construct($slotCount, $maxWeight) {
             for ($i=0; $i<$slotCount; $i++) {
                 $this->slots[$i] = new Slot();
             }
