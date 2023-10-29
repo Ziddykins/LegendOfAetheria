@@ -11,7 +11,7 @@
     require_once 'constants.php';
     require_once 'functions.php';
     require_once 'mailer.php';
-
+    require_once 'classes/class-character.php';
     $log->info('Session started: ',
         [ 
             'Session' => session_id(),
@@ -44,8 +44,6 @@
 
             $_SESSION['logged-in'] = 1;
             $_SESSION['email'] = $account['email'];
-            $_SESSION['account_id'] = $character['account_id'];
-            $_SESSION['name'] = $character['name'];
             
             header('Location: /game');
             exit();
@@ -136,11 +134,10 @@
                         $log->critical('Couldn\'t insert user information into character table');
                     }
 
-                    
-                    $character = new Character($account_id);
+                    $character = new Character($account_id, $email);
 
                     $character->setStats('strength',     $str);
-                    $character->setStats('intelligence', $int);
+                    $character->setStats('intelligence', $intl);
                     $character->setStats('defense',      $def);
                      
                     $character->setStats('hp',     100);
@@ -150,8 +147,9 @@
 
                     $character->setStats('status', 'healthy');
                     
-                    $serialized_data = serialize($character);
-
+                    $serialized_data = serialize($character); 
+                    $log->info("serdata: $serialized_data");
+                    save_character($account_id, $serialized_data);
                     // Verification email
                     // send_mail($email);
 

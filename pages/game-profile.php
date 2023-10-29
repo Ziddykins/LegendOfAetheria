@@ -32,19 +32,19 @@
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
                     <div class="mb-3 row">
-                        <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
+                        <label for="staticEmail" class="col-sm-2 col-form-label fw-bold">Email:</label>
                         <div class="col-sm-10">
                             <span><?php echo $account['email']; ?></span>
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label for="staticEmail" class="col-sm-2 col-form-label">Date Registered</label>
+                        <label for="staticEmail" class="col-sm-2 col-form-label fw-bold">Date Registered:</label>
                         <div class="col-sm-10">
                             <span><?php echo $account['date_registered']; ?></span>
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label for="staticEmail" class="col-sm-2 col-form-label">Privileges</label>
+                        <label for="staticEmail" class="col-sm-2 col-form-label fw-bold">Privileges:</label>
                         <div class="col-sm-10">
                             <span><?php print $account['privileges'] ?></span>
                         </div>
@@ -52,19 +52,19 @@
                     
                     <form id="profile-password-change" name="profile-password-change" action="/game?page=profile" method="POST">
                         <div class="mb-3 row">
-                            <label for="profile-old-password" class="col-sm-2 col-form-label">Old Password</label>
+                            <label for="profile-old-password" class="col-sm-2 col-form-label fw-bold">Old Password:</label>
                             <div class="col-sm-10">
                                 <input type="password" class="form-control" id="profile-old-password" name="profile-old-password">
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label for="profile-new-password" class="col-sm-2 col-form-label">New Password</label>
+                            <label for="profile-new-password" class="col-sm-2 col-form-label fw-bold">New Password:</label>
                             <div class="col-sm-10">
                                 <input type="password" class="form-control" id="profile-new-password" name="profile-new-password">
                             </div>
                         </div>
                         <div class="mb-3 row">
-                            <label for="profile-confirm-password" class="col-sm-2 col-form-label">Confirm Password</label>
+                            <label for="profile-confirm-password" class="col-sm-2 col-form-label fw-bold">Confirm Password:</label>
                             <div class="col-sm-10">
                                 <input type="password" class="form-control" id="profile-confirm-password" name="profile-confirm-password">
                             </div>
