@@ -172,7 +172,7 @@
     </head>
     
     <body>    
-        <div class="container-sm my-5 shadow" style="width: 50%;">
+        <div class="container-sm my-5 shadow" style="width: 70%;">
             <div class="row">
                 <div class="col p-4">
                     <img src="img/logos/logo-banner-no-bg.png" style="width: 100%;"></img>
