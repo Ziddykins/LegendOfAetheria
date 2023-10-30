@@ -79,10 +79,10 @@
                                     </a>
                                     
                                     <ul id="menu-header-character" class="nav collapse flex-column text-start" data-bs-parent="#menu" aria-expanded="false">
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link px-0">
-                                                <i class="bi bi-card-text"></i>
-                                                <span class="d-none d-lg-inline ms-2"> Sheet</span>
+                                                <i class="bi bi-card-text ms-3 me-3 text-start"></i>
+                                                <span class="d-none d-lg-inline"> Sheet</span>
                                             </a>
                                         </li>
                                         <li class="text-center">
@@ -126,7 +126,7 @@
 
 
 
-                                        <li>
+                                        <li class="text-center">
                                             <a href="#" id="menu-sub-save" name="menu-sub-save" class="nav-link px-0" onclick=saveChar()>
                                                 <span class="material-symbols-sharp ms-2">save</span>
                                                 <span class="d-none d-lg-inline">Save</span>
@@ -188,22 +188,22 @@
                                     </a>
 
                                     <ul id="menu-header-dungeon" class="collapse nav flex-column ms-1 text-start" data-bs-parent="#menu" aria-expanded="false">
-                                        <li class="text-center">
+                                        <li class="text-center d-lg-inline">
                                             <a href="?page=" id="menu-sub-floor" name="menu-sub-floor" class="nav-link px-0">
                                                 <span class="material-symbols-sharp">floor</span>
-                                                <span class="d-none d-lg-inline ms-2">Floor <?php echo $character['floor']; ?></span>
+                                                <span class="d-none d-lg-inline">Floor <?php echo $character['floor']; ?></span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li class="text-center d-lg-inline">
                                             <a href="#" id="menu-sub-reset" name="menu-sub-reset" class="nav-link px-0" data-bs-toggle="modal" data-bs-target="#reset-modal" >
                                                 <span class="material-symbols-sharp text-danger">restart_alt</span>
-                                                <span class="d-none d-lg-inline text-danger ms-2">Reset</span>
+                                                <span class="d-none d-lg-inline text-danger">Reset</span>
                                             </a>
                                             <div class="modal fade" id="reset-modal" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
                                                         <div class="modal-header bg-danger text-bg-danger">
-                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Reset Dungeon Progress</h1>
+                                                            <h1 class="modal-title fs-5" id="dungeon-progres-reset">Reset Dungeon Progress</h1>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
