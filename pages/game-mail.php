@@ -1,8 +1,8 @@
 <?php
     require 'classes/class-mail.php';
     
-    $account   = get_user($_SESSION['email'], 'account');
-    $character = get_user($account['id'], 'character');
+    $account   = table_to_obj($_SESSION['email'], 'account');
+    $character = table_to_obj($account['id'], 'character');
     
     $user_mailbox = new MailBox($account['id']);
     $user_mailbox->set_focused_folder(MailFolderType::INBOX);

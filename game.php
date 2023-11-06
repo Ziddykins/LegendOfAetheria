@@ -11,8 +11,28 @@
     require_once 'constants.php';
     require_once 'functions.php';
 
-    $account   = get_user($_SESSION['email'], 'account');
-    $character = get_user($account['id'], 'character');
+    $classes = scandir('classes/');
+
+    for ($i=2; $i<count($classes); $i++) {
+        [$file_name, $file_ext] = explode('.', $classes[$i]);
+        
+        if ($file_ext === 'php') {
+            $class = "classes/$file_name.php";
+            $log->info("Dynamically loading class " . __DIR__ . "/$class");
+            require_once "$class";
+        } else {
+            $log->warning("Skipping non-php file in classes folder: $file_name");
+        }
+    }
+
+    $account   = table_to_obj($_SESSION['email'], 'account');
+    $character = table_to_obj($account['id'], 'character');
+
+    echo '<pre>';
+    print_r($character);
+
+    $familiar = new Familiar($character['id']);
+    $familiar->loadFamiliar($character['id']);
 
     $char_menu_icon = $character['hp'] > 0 
         ? 'bi-emoji-laughing-fill' 
@@ -63,49 +83,49 @@
         <div class="container-fluid border">
             <div class="row flex-nowrap" style="min-height: 99.5vh!important;">
                 <div class="col-2 px-0 border border-grey">
-                    <div class="d-flex flex-column align-items-center align-items-sm-start px-2">
-                        <a href="/game" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                    <div class="d-flex flex-column flex-shrink-0 bg-body-tertiary">
+                        <a href="/game" class="pb-3 text-white text-decoration-none">
                             <img src="img/logos/logo-banner-no-bg.png" class="mt-2 w-100">
                         </a>
 
                         <hr style="width: 35%; opacity: .25; align-self: center;">
 
-                        <div class="w-100 pb-3 text-center">
-                            <ul class="nav flex-column mb-0 align-items-center align-items-sm-start mb-sm-auto" id="menu">
+                        <div class="d-flex flex-column">
+                            <ul class="nav nav-flush flex-column mb-auto ms-2 me-2" id="menu">
                                 <li class="border rounded w-100">
-                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link px-0 align-middle bg-primary text-white" data-bs-toggle="collapse">
-                                        <i class="fs-4 bi <?php echo $char_menu_icon; ?>"></i>
-                                        <span class="ms-1 d-none d-md-inline fs-6 text-start">Character</span>
+                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link px-0 bg-primary text-white" data-bs-toggle="collapse">
+                                        <i class="fs-4 p-3 bi <?php echo $char_menu_icon; ?>"></i>
+                                        <span class="ms-1 d-none d-sm-inline">Character</span>
                                     </a>
                                     
-                                    <ul id="menu-header-character" class="nav collapse flex-column text-start" data-bs-parent="#menu" aria-expanded="false">
+                                    <ul id="menu-header-character" class="nav nav-pills nav-flush flex-column mb-auto" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
                                             <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link px-0">
-                                                <i class="bi bi-card-text ms-3 me-3 text-start"></i>
-                                                <span class="d-none d-lg-inline"> Sheet</span>
+                                                <i class="bi bi-card-text ms-3"></i>
+                                                <span class="ms-1 d-none d-md-inline ms-2"> Sheet</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-inventory" name="menu-sub-inventory" class="nav-link px-0">
-                                                <i class="bi bi-box"></i>
+                                                <i class="bi bi-box ms-3"></i>
                                                 <span class="d-none d-lg-inline ms-2"> Inventory</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-skills" name="menu-sub-skills" class="nav-link px-0">
-                                                <span class="material-symbols-sharp">book_2</span>
+                                                <span class="material-symbols-sharp ms-3">book_2</span>
                                                 <span class="d-none d-lg-inline ms-2">Skills</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-spells" name="menu-sub-spells" class="nav-link px-0">
-                                                <span class="material-symbols-sharp">book</span>
+                                                <span class="material-symbols-sharp ms-3">book</span>
                                                 <span class="d-none d-lg-inline ms-2">Spells</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-train" name="menu-sub-trail" class="nav-link px-0">
-                                                <span class="material-symbols-sharp">fitness_center</span>
+                                                <span class="material-symbols-sharp ms-3">fitness_center</span>
                                                 <span class="d-none d-lg-inline ms-2">Train</span>
                                             </a>
                                         </li>
@@ -126,11 +146,27 @@
 
 
 
-                                        <li class="text-center">
+                                        <li>
                                             <a href="#" id="menu-sub-save" name="menu-sub-save" class="nav-link px-0" onclick=saveChar()>
-                                                <span class="material-symbols-sharp ms-2">save</span>
-                                                <span class="d-none d-lg-inline">Save</span>
+                                                <span class="material-symbols-sharp ms-3">save</span>
+                                                <span class="d-none d-lg-inline ms-2">Save</span>
                                             </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                 <li class="border w-100">
+                                    <a href="#menu-header-familiar" id="menu-anchor-familiar" name="menu-anchor-familiar" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
+                                        <span class="material-symbols-sharp">pets</span>
+                                        <span class="ms-1 d-none d-md-inline fs-6">Familiar</span>
+                                    </a>
+                                
+                                    <ul class="collapse nav flex-column ms-1 text-start" id="menu-header-familiar" data-bs-parent="#menu" aria-expanded="false">
+                                        <li>
+                                            <a href="?page=eggs" id="menu-sub-eggs" name="menu-sub-eggs" class="nav-link px-0">
+                                                <span class="material-symbols-sharp ms-3">egg</span>
+                                                <span class="d-none d-lg-inline ms-2">Eggs</span>
+                                            </a>
+
                                         </li>
                                     </ul>
                                 </li>
@@ -142,31 +178,31 @@
                                     </a>
                                 
                                     <ul class="collapse nav flex-column ms-1 text-start" id="menu-header-travel" data-bs-parent="#menu" aria-expanded="false">
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=hunt" id="menu-sub-hunt" name="menu-sub-hunt" class="nav-link px-0">
                                                 <span class="material-symbols-sharp">cruelty_free</span>
                                                 <span class="d-none d-lg-inline ms-2">Hunt</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-map" name="menu-sub-map" class="nav-link px-0">
                                                 <span class="material-symbols-sharp">map</span>
                                                 <span class="d-none d-lg-inline ms-2">Map</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-explore" name="menu-sub-explore" class="nav-link px-0">
                                                 <span class="material-symbols-sharp">travel_explore</span>
                                                 <span class="d-none d-lg-inline ms-2">Explore</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-zone" name="menu-sub-zone" class="nav-link px-0">
                                                 <span class="material-symbols-sharp">move_location</span>
                                                 <span class="d-none d-lg-inline ms-2">Zone</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <?php
                                                 $rest_disabled = '';
                                                 if ($character['hp'] === $character['max_hp']) {
@@ -230,25 +266,25 @@
                                     </a>
 
                                     <ul id="menu-header-quests" name="menu-header-quests" class="collapse nav flex-column ms-1 text-start" data-bs-parent="#menu">
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-active" name="menu-sub-active" class="nav-link px-0">
                                                 <span class="material-symbols-sharp">pending_actions</span>
                                                 <span class="d-none d-lg-inline ms-2">Active</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-completed" name="menu-sub-completed" class="nav-link px-0">
                                                 <span class="material-symbols-sharp">inventory</span>
                                                 <span class="d-none d-lg-inline ms-2">Completed</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-achievements" name="menu-sub-achievements" class="nav-link px-0">
                                                 <span class="material-symbols-sharp">military_tech</span>
                                                 <span class="d-none d-lg-inline ms-2">Achievements</span>
                                             </a>
                                         </li>
-                                        <li class="text-center">
+                                        <li>
                                             <a href="?page=" id="menu-sub-awards" name="menu-sub-awards" class="nav-link px-0">
                                                 <span class="material-symbols-sharp">trophy</span>
                                                 <span class="d-none d-lg-inline ms-2">Awards</span>
@@ -261,7 +297,7 @@
                         
                         <hr style="width: 35%; opacity: .25; align-self: center;">
 
-                        <div id="bottom-menu" name="bottom-menu" class="ms-3">
+                        <div id="bottom-menu" name="bottom-menu" class="ms-3 pb-3 fixed-bottom" style="width: 15%;">
                             <a href="#" 
                                 class="d-flex align-items-center text-decoration-none dropdown-toggle" 
                                 id="dropdownUser1"
@@ -274,7 +310,7 @@
                                      height="50"
                                      class="rounded-circle"
                                 />
-                                <span class="d-none d-xl-inline mx-1 ms-3 fs-6">Account</span>
+                                <span class="d-none d-md-inline mx-1 ms-3 fs-6">Account</span>
                             </a>
                         
                             <ul class="dropdown-menu dropdown-menu text-small shadow">

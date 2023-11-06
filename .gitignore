@@ -9,3 +9,5 @@ gamelog.txt
 esp.php
 esp32.html
 .htaccess
+/sheets/
+*ctags*

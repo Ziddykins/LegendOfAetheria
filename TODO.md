@@ -1,15 +1,5 @@
 # **Ideas**
 
-- > no stealing cars
-  >
-
-  - > fr tho
-    >
-
-* [X] RELEASE ME FROM THIS INDENTATION-HELL
-
-# To-Do
-
 * [ ] **Mail system (in-game)**
 
   * [X] Must be on friends list

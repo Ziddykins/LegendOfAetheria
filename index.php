@@ -11,7 +11,7 @@
     require_once 'constants.php';
     require_once 'functions.php';
     require_once 'mailer.php';
-    require_once 'classes/class-character.php';
+
     $log->info('Session started: ',
         [ 
             'Session' => session_id(),
@@ -24,7 +24,7 @@
         $email    = $_POST['login-email'];
         $password = $_POST['login-password'];
 
-        $account = get_user($email, 'account');
+        $account = table_to_obj($email, 'account');
 
         if (!$account) {
             $log->error('Attempted login with a non-existing account', [ 'Email' => $email ]);
@@ -40,7 +40,7 @@
                 'IpAddr'     => $account['ip_address']
             ]);
 
-            $character = get_user($account['email'], 'character');
+            $character = table_to_obj($account['email'], 'character');
 
             $_SESSION['logged-in'] = 1;
             $_SESSION['email'] = $account['email'];

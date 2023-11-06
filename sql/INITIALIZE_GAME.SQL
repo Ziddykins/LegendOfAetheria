@@ -4,7 +4,7 @@ USE db_loa;
 GRANT ALL PRIVILEGES ON db_loa.* TO user_loa IDENTIFIED BY 'G4m3th1n6!';
 FLUSH PRIVILEGES;
 
-CREATE TABLE `tbl_accounts` (
+CREATE TABLE IF NOT EXISTS `tbl_accounts` (
 	`id` INT(9) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`email` VARCHAR(256) NULL DEFAULT NULL,
 	`password` VARCHAR(64) NULL DEFAULT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE `tbl_accounts` (
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;
 
-CREATE TABLE `tbl_characters` (
+CREATE TABLE IF NOT EXISTS `tbl_characters` (
 	`id` INT(9) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`account_id` INT(9) NOT NULL,
 	`name` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_general_ci',
@@ -64,7 +64,7 @@ COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;
 
 -- Don't like this
-CREATE TABLE `tbl_globals` (
+CREATE TABLE IF NOT EXISTS `tbl_globals` (
 	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` VARCHAR(50) NOT NULL DEFAULT '0' COLLATE 'utf8mb4_general_ci',
 	`value` VARCHAR(50) NOT NULL DEFAULT '0' COLLATE 'utf8mb4_general_ci',
@@ -79,7 +79,7 @@ INSERT INTO tbl_globals (id, name, value) VALUES (3, 'next_tick', '1692894972');
 INSERT INTO tbl_globals (id, name, value) VALUES (4, 'exp_multiplier', '1');
 INSERT INTO tbl_globals (id, name, value) VALUES (5, 'gold_multiplier', '1');
 
-CREATE TABLE `tbl_mail` (
+CREATE TABLE IF NOT EXISTS `tbl_mail` (
 	`id` INT(9) UNSIGNED NOT NULL,
 	`account_id` INT(9) UNSIGNED NOT NULL,
 	`folder` ENUM('Inbox','Outbox','Deleted') NOT NULL COLLATE 'utf8mb4_general_ci',
@@ -95,3 +95,16 @@ CREATE TABLE `tbl_mail` (
 )
 COLLATE='utf8mb4_general_ci'
 ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS tbl_familiars (
+    `id` INT(9) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `account_id` INT(9) UNSIGNED NOT NULL,
+    `name` VARCHAR(64) NOT NULL,
+    `hatched` ENUM('True', 'False') NOT NULL DEFAULT 'False',
+    `rarity` INT(3) UNSIGNED NOT NULL,
+    `date_aquired` DATETIME(6) DEFAULT CURRENT_TIMESTAMP,
+    `hatch_time` DATETIME(6),
+    PRIMARY KEY(`id`)
+)
+ENGINE='InnoDB'
+COLLATE='utf8mb4_general_ci';

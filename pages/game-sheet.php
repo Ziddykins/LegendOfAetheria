@@ -35,19 +35,19 @@
     );
 </script>
 <p></p>
-<div class="container text-center d-flex justify-content-center">
+<div class="container text-center d-flex justify-content-center align-items-center">
     <div class="row">
-        <div class="col align-self-center">
+        <div class="col">
             <div class="card mb-3" style="max-width: 700px;">
                 <div class="row g-0">
                     <div class="col-4">
                         <img src="img/avatars/<?php echo $character['avatar']; ?>" class="img-fluid rounded m-3" alt="character-avatar">
                     </div>
-                    <div class="col-8">
+                    <div class="col-6">
                         <div class="card-body">
-                            <h5 class="card-title text-center"><?php echo $character['name']; ?></h5>
-                            <div class="container text-center">
-                                <div class="row">
+                            <h5 class="card-title"><?php echo $character['name']; ?></h5>
+                            <div class="container">
+                                <div class="row mb-3">
                                     <div class="col-4 truncate">
                                         Health
                                     </div>
@@ -90,7 +90,9 @@
                                         >
                                     </div>
                                 </div>
-                                <p></p>
+
+                                <hr style="opacity: .25; align-self: center;">
+                                
                                 <div class="row mb-3">
                                     <div class="col-4 text-truncate">
                                         Strength
