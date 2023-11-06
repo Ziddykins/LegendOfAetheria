@@ -4,7 +4,7 @@
 
 ?>
 
-<div class="container ">
+<div class="container">
     <div class="row pt-5">
         <div class="col">
             <div class="list-group" id="list-tab" role="tablist">

@@ -1,23 +1,45 @@
 <?php
+    require_once __DIR__ . '/vendor/autoload.php';
+    require_once 'logger.php';
+    require_once 'constants.php';
+
     function get_mysql_datetime() {
         return date("Y-m-d H:i:s", strtotime("now"));
     }
 
-    function get_user($email, $type) {
-        global $db;
-        $table  = $type == 'account' ? 'SQL_ACCT_TBL' : 'SQL_CHAR_TBL';
-        $column = $type == 'account' ? 'email' : 'account_id';
+    function table_to_obj($identifier, $type) {
+        global $db, $log;
+        $table = '';
+        $column = '';
 
-        $sql_query = "SELECT * FROM " . ($_ENV[$table]) . " WHERE $column = ?";
-    
+        switch ($type) {
+            case 'account':
+                $column = 'email';
+                $table  = $_ENV['SQL_ACCT_TBL'];
+                break;
+            case 'character':
+                $column = 'account_id';
+                $table  = $_ENV['SQL_CHAR_TBL'];
+                break;
+            case 'familiar':
+                $column = 'account_id';
+                $table  = $_ENV['SQL_FMLR_TBL'];
+                break;
+            default:
+                $log->critical("Invalid 'type' provided to " . __FUNCTION__ . ": $type"); 
+                break;
+        }
+
+        $sql_query = "SELECT * FROM $table WHERE `$column` = ?";
+        
         $prepped = $db->prepare($sql_query);
-        $prepped->bind_param('s', $email);
+        $prepped->bind_param('s', $identifier);
         $prepped->execute();
 
         $result = $prepped->get_result();
-        $user   = $result->fetch_assoc();
+        $row    = $result->fetch_assoc();
 
-        return $user;
+        return $row;
     }
 
     function get_globals($which) {
@@ -135,26 +157,76 @@
         print_r($result);
         die();
     }
-        function save_character($id, $character) {
-            global $db;
-            $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
-                         "SET `serialized_character` = '$serialized_data' ";
-                         "WHERE `id` = $id";
-            $db->query($sql_query); 
-        }
 
-        function load_character($id) {
-            $sql_query = 'SELECT `serialized_character` ' .
-                         'FROM ' . $_ENV['SQL_ACCT_TBL'] . 
-                         " WHERE `id` = $account_id";
-            
-            $db->query($sql_query);
-            
-            $serialized_data = $db->fetch_assoc();
+    function save_character($id, $character) {
+        global $db;
+        $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
+                     "SET `serialized_character` = '$serialized_data' ";
+                     "WHERE `id` = $id";
+        $db->query($sql_query); 
+    }
+
+    function load_character($id) {
+        $sql_query = 'SELECT `serialized_character` ' .
+                     'FROM ' . $_ENV['SQL_ACCT_TBL'] . 
+                     " WHERE `id` = $account_id";
         
-            $character = new Character($account_id);
-            $character = unserialize($serialized_data);
-            
-            return $character;
+        $db->query($sql_query);
+        
+        $serialized_data = $db->fetch_assoc();
+    
+        $character = new Character($account_id);
+        $character = unserialize($serialized_data);
+        
+        return $character;
+    }
+
+    function generate_egg($familiar) {
+        global $log;
+        $rarity_roll  = random_float(0, 100);
+        $rarity       = ObjectRarity::getObjectRarity($rarity_roll);
+        $rarity_color = get_rarity_color($rarity);
+
+        $familiar->set_rarity($rarity);
+        $familiar->set_rarityColor($rarity_color);
+        $familiar->saveFamiliar();
+    }
+
+    function get_rarity_color($rarity) {
+        switch($rarity->name) {
+            case "WORTHLESS":
+                return "#FACEF0";
+                break;
+            case "TARNISHED":
+                return "#779988";
+                break;
+            case "COMMON":
+                return "#ADD8D7";
+                break;
+            case "ENCHANTED":
+                return "#08E71C";
+                break;
+            case "MAGICAL":
+                return "#A6D9F8";
+                break;
+            case "LEGENDARY":
+                return "#F8C81C";
+                break;
+            case "EPIC":
+                return "#CAB51F";
+                break;
+            case "MYSTIC":
+                return "#01CBF6";
+                break;
+            case "HEROIC":
+                return "#1C4F2C";
+                break;
+            case "INFAMOUS":
+                return "#CB20EE";
+                break;
+            case "GODLY":
+                return "#FF2501";
+                break;
         }
+    }
 ?>

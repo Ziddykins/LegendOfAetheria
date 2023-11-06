@@ -1,7 +1,7 @@
 <?php
     global $log;
-    $account         = get_user($_SESSION['email'], 'account');
-    $character       = get_user($account['id'], 'character');
+    $account         = table_to_obj($_SESSION['email'], 'account');
+    $character       = table_to_obj($account['id'], 'character');
     $header_charname = $character['name'] . "'s";
         
     $requests = $requested = $friends = $blocked = Array();
@@ -97,8 +97,8 @@
                     </div>
                     <?php
                         for ($i=0; $i<count($friends)-1; $i++) {
-                            $temp_account   = get_user($friends[$i]['email_1'], 'account');
-                            $sender_account = get_user($temp_account['id'], 'character');
+                            $temp_account   = table_to_obj($friends[$i]['email_1'], 'account');
+                            $sender_account = table_to_obj($temp_account['id'], 'character');
                             $check_user     = file_exists(escapeshellcmd('/var/lib/php/sessions/sess_' . $temp_account['session_id']));
                             
                             $log->info('Account online status: ', [ 'email' => $temp_account['email'], 'check_user' => $check_user ]);
@@ -145,8 +145,8 @@
                     
                     <?php
                         for ($i=0; $i<count($requests); $i++) {
-                            $temp_account   = get_user($requests[$i]['email_1'], 'account');
-                            $sender_account = get_user($temp_account['id'], 'character');
+                            $temp_account   = table_to_obj($requests[$i]['email_1'], 'account');
+                            $sender_account = table_to_obj($temp_account['id'], 'character');
                             echo '<form id="accept-request-' . $sender_account['account_id'] . '" name="accept-request-'. $sender_account['account_id']. '" action="/game?page=friends&action=accept_request" method="POST">';
                             echo '<div class="row mb-3">
                                     <div class="card" style="max-width: 540px;">
