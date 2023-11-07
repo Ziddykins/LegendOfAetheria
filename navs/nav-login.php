@@ -113,7 +113,7 @@
                                             <i class="bi bi-person-bounding-box"></i>
                                         </span>
                                         <select class="form-select form-select form-control" aria-label=".form-select" id="avatar-select" name="avatar-select" style="font-size: 1.00rem" required>
-                                            <option value="Select Avatar" disabled selected>Select Avatar</option>
+                                            <option value="select avatar" disabled selected>select avatar</option>
                                             <?php
                                                 $images = scandir('img/avatars');
                                                 for ($i=2; $i<count($images); $i++) {
