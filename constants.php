@@ -97,6 +97,7 @@
     #   - FRNDS - Well, friend related issues
     enum LOAError: int {
         case FUNCT_DOSQL_INVALIDACTION = -1000;
+        case FUNCT_GENCOMP_UNKNOWN     = -1001;
         
         case SQLDB_NOCONNECTION        = -2000;
         case SQLDB_PREPPED_EXECUTE     = -2001;
@@ -134,7 +135,6 @@
             foreach (self::cases() as $rarity) {
                 if ($roll >= $rarity->value) {
                     return $rarity;
-
                 }
             }
         }
@@ -150,5 +150,10 @@
         case HEROIC    = 0.75;  /*  0.75% chance */
         case INFAMOUS  = 0.24;  /*  0.51% chance */
         case GODLY     = 0.01;  /*  0.23% chance */
+        case NOT_SET   = -1;    /* Used to determine if player has egg yet */
+    }
+
+    enum Components {
+        case FLOATING_LABEL_TEXTBOX;
     }
 ?>

@@ -28,9 +28,6 @@
     $account   = table_to_obj($_SESSION['email'], 'account');
     $character = table_to_obj($account['id'], 'character');
 
-    echo '<pre>';
-    print_r($character);
-
     $familiar = new Familiar($character['id']);
     $familiar->loadFamiliar($character['id']);
 

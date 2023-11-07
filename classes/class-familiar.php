@@ -16,37 +16,54 @@
 
         public function registerFamiliar() {
             global $db, $log;
-        
-            $sql_query = 'INSERT INTO ' . $_ENV['SQL_FMLR_TBL'] . ' ' .
-                         '(character_id, date_acquired, hatch_time, level) ' .
-                         "VALUES ($this->characterID, NOW(), (NOW() + INTERVAL 8 HOUR), 1)";
 
+            $sql_time   = get_mysql_datetime();
+            $hatch_time = get_mysql_datetime('+8 hours');
+
+            $log->critical('New SQL time function ah damn!',
+                [
+                    'SQLTime' => $sql_time,
+                    'SQLNewTime' => $hatch_time,
+                ]
+            );
+
+            $sql_query = 'INSERT INTO ' . $_ENV['SQL_FMLR_TBL'] .
+                        '   (`character_id`) ' .
+                         "VALUES ($this->characterID)";
             $db->query($sql_query);
-
-            
 
             $sql_query    = 'SELECT `id` FROM ' . $_ENV['SQL_FMLR_TBL'] . " WHERE `character_id` = $this->characterID";
             $result       = $db->query($sql_query);
 
             $familiar_id  = $result->fetch_assoc();
-            $this->id     = $familiar_id['id'];
+
+            $this->dateAcquired = NULL;
+            $this->rarityColor  = '#000';
+            $this->hatchTime    = NULL;
+            $this->hatched      = NULL;
+            $this->rarity       = 'NONE';
+            $this->name         = '!Unset!';
+            $this->id           = $familiar_id['id'];
 
             $log->info("New familiar $this->id registered for character $this->characterID");
-            $this->saveFamiliar();
         }
 
         public function saveFamiliar() {
             global $log, $db;
 
+            echo '<pre>';
+            print_r($this);
+            echo '</pre>';
+
             $sql_query = 'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' ' .
                          'SET ' .
-                             "`name` = '$this->name', " .
-                             "`level` = '$this->level', " .
-                             "`rarity` = '" . $this->rarity->name . "', " .
-                             "`rarity_color` = '$this->rarityColor', " .
-                             "`hatch_time` = '$this->hatchTime', " .
+                             "`name`          = '$this->name', " .
+                             "`rarity`        = '" . $this->rarity->name . "', " .
+                             "`rarity_color`  = '$this->rarityColor', " .
+                             "`hatch_time`    = '$this->hatchTime', " .
                              "`date_acquired` = '$this->dateAcquired', " .
-                             "`hatched` = '$this->hatched' " .
+                             "`hatched`       = '$this->hatched', " .
+                             "`level`         =  $this->level " .
                          'WHERE ' .
                              "`id` = $this->id";
 
@@ -57,29 +74,43 @@
         public function getCard($which = 'current') {
             $html = null;
 
-            if ($which === 'current') {
-                if ($this->rarity === '') {
-                    $html = '<div class="container text-center d-flex justify-content-center align-items-center">
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="card mb-3" style="max-width: 700px;">
-                                            <div class="row g-0">
-                                                <div class="col-4">
-                                                    <img src="img/avatars/unknown.png" class="img-fluid rounded m-3" alt="character-avatar">
-                                                </div>
-                                                <div class="col-6">
-                                                    <div class="card-body">
-                                                        <h3 class="card-title">No Egg!</h3>
-                                                        <div class="container">
-                                                            <div class="row mb-3">
-                                                                <div class="col-4">
-                                                                    <h5>Every new player is gifted one egg</h5>
-                                                                </div>
+            if ($which === 'empty') {
+                $html = '<div class="container text-center d-flex justify-content-center align-items-center">
+                            <div class="row">
+                                 <div class="col">
+                                    <div class="card mb-3" style="max-width: 600px;">
+                                        <div class="row g-0">
+                                            <div class="col-2">
+                                                <img src="img/avatars/avatar-unknown.jpg" class="img-fluid rounded-circle m-3" alt="character-avatar">
+                                            </div>
+                                            <div class="col ms-4">
+                                                <div class="card-body">
+                                                    <h3 class="card-title bg-warning border g-0">No Egg!</h3>
+                                                    <div class="container text-center border">
+                                                        <div class="row">  
+                                                            <div class="col">
+                                                                <strong>Claim your Tier 4 Starter Egg below!</strong><br />
+                                                                Its rarity will be chosen at random, but you will be guaranteed at least<br />
+                                                                tier 4. < More text explaining the hatch process and familiar >
                                                             </div>
-                                                            <div class="row mb-3">
-                                                                <div class="col-4">
-                                                                    <button class="btn btn-primary" id="generate-egg" name="generate-egg" value="1">Generate</button>
-                                                                </div>
+                                                        </div>
+                                                        <div class="row mb-3">
+                                                            <div class="col">
+                                                                <form id="generate-egg" name="generate-egg" action="?page=eggs" method="POST">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text" id="name-icon" name="name-icon">
+                                                                            <span class="material-symbols-sharp">cognition</span>
+                                                                        </span>
+                                                                        <div class="form-floating">
+                                                                            <input type="text" class="form-control" id="egg-name" name="egg-name">
+                                                                            <label for="egg-name">Egg Name (optional)</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <small>You can wait to name your familiar until when it hatches if you\'d prefer</small>
+                                                                    
+                                                                    <button class="btn btn-primary" id="generate-egg" name="generate-egg" value="1">Collect Egg</button>
+                                                                    <input type="hidden" id="action" name="action" value="generate">
+                                                                </form>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -88,8 +119,8 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>';
-                    }
+                            </div>
+                        </div>';
                 }
                 return $html;
             }
@@ -121,14 +152,32 @@
             }
 
             function __call($method, $params) {
+                global $log, $db;
+
                 $var = lcfirst(substr($method, 4));
+                $params[0] = clsprop_to_tblcol($params[0]);
 
                 if (strncasecmp($method, "get_", 4) === 0) {
+                    $log->info("'get_' triggered for var '$var'; returning '" . $params[0] . "'");
                     return $this->$var;
                 }
-            
+                
                 if (strncasecmp($method, "set_", 4) === 0) {
+                    $sql_query =  'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' ';
+
+                    if (is_int($params[0])) {
+                        $sql_query .= "SET `$var` = " . $params[0] . " ";
+                    } else {
+                        $sql_query .= "SET `$var` = '" . $params[0] . "' ";
+                    }
+
+                    $sql_query .= 'WHERE `id` = ' . $this->id;
+                    
+                    $db->query($sql_query);
                     $this->$var = $params[0];
+
+                    $log->info("'set_' triggered for var '\$this->$var'; assigning '" . $params[0] . "' to it", [ 'SQLQuery' => $sql_query ]);
+
                 }
             }
         }

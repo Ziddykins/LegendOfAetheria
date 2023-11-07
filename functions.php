@@ -3,8 +3,14 @@
     require_once 'logger.php';
     require_once 'constants.php';
 
-    function get_mysql_datetime() {
-        return date("Y-m-d H:i:s", strtotime("now"));
+    function get_mysql_datetime($modifier = 'now') {
+        global $log;
+
+        $operand  = substr($modifier, 0, 1);
+        $amount   = substr($modifier, 1);
+        $modifier = $operand . $amount;
+
+        return date("Y-m-d h:i:s", strtotime("$modifier"));
     }
 
     function table_to_obj($identifier, $type) {
@@ -64,15 +70,13 @@
        return ($min + lcg_value() * (abs($max - $min)));
     }
 
-    function check_mail($what, $id) {
+    function check_mail($what, $account_id) {
         global $db, $log;
-        $log->info("Checking mail for '$what' for id '$id'");
+
         switch ($what) {
             case 'unread':
-                $result = $db->query(
-                    "SELECT * FROM tbl_mail WHERE `read` = 'False' AND id = $id"
-                )->num_rows;
-                $log->info(print_r($result, 1));
+                $result = $db->query('SELECT * FROM ' . $_ENV['SQL_MAIL_TBL'] . ' ' .
+                                     "WHERE `read` = 'False' AND `account_id` = $account_id")->num_rows;
                 return $result;
             default:
                 return LOAError::MAIL_UNKNOWN_DIRECTIVE;
@@ -96,7 +100,6 @@
             case ($count_one && $count_two):
                 return FriendStatus::MUTUAL;
             case ($count_one && !$count_two):
-//                $result = $results_us->fetch_assoc[
                 if (substr($results_us->fetch_assoc()['email_2'], 0, 3) == '¿b¿') {
                     return FriendStatus::BLOCKED;
                 }
@@ -183,12 +186,19 @@
 
     function generate_egg($familiar) {
         global $log;
+ 
         $rarity_roll  = random_float(0, 100);
         $rarity       = ObjectRarity::getObjectRarity($rarity_roll);
         $rarity_color = get_rarity_color($rarity);
 
-        $familiar->set_rarity($rarity);
+        $familiar->set_level(1);
+        
         $familiar->set_rarityColor($rarity_color);
+        $familiar->set_rarity($rarity);
+        
+        $familiar->set_dateAcquired(get_mysql_datetime());
+        $familiar->set_hatchTime(get_mysql_datetime('+8 hours'));
+        
         $familiar->saveFamiliar();
     }
 
@@ -229,4 +239,19 @@
                 break;
         }
     }
+
+    /* This ridiculousness is directly related to camelCase being standard */
+    /*         for PHP class properties - via PHPCS's tool on GitHub       */
+    /*             Pass it: ourProperty - Get back: our_property           */
+    function clsprop_to_tblcol($property) {
+        $splits = preg_split('/(?=[A-Z])/', $property);
+
+        if (count($splits) !== 2) {
+            return $property;
+        }
+
+        $table_column = $splits[0] . '_' . strtolower($splits[1]);
+        return $tablec_column;
+    }
+            
 ?>

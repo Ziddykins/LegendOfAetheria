@@ -100,7 +100,7 @@
                     $arr_images = scandir('img/avatars');
                     
                     if (!array_search($avatar, $arr_images)) {
-                        $avatar_now = 'avatar-tetra-dechahedron.png';
+                        $avatar_now = 'avatar-unknown.jpg';
                         $log->error('Avatar wasn\'t found in our accepted list of avatar choices!',
                                         [ 'Avatar' => $avatar, 'Avatar_now' => $avatar_now ] );
                         $avatar = $avatar_now;
