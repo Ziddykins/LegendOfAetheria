@@ -18,7 +18,6 @@
         
         if ($file_ext === 'php') {
             $class = "classes/$file_name.php";
-            $log->info("Dynamically loading class " . __DIR__ . "/$class");
             require_once "$class";
         } else {
             $log->warning("Skipping non-php file in classes folder: $file_name");
