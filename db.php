@@ -14,8 +14,6 @@
         die(LOAError::SQLDB_NOCONNECTION);
     }
     
-    $log->info("Connection to $sql_host:$sql_port successful", ['Username' => $sql_user]);
-    
 /*    function do_sql_call($action, $targets, $table, $values = null, $conditions = null) {
         $query = '';
         [$targets, $target_count] = explode(':', $targets);

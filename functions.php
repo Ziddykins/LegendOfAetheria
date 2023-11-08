@@ -244,14 +244,18 @@
     /*         for PHP class properties - via PHPCS's tool on GitHub       */
     /*             Pass it: ourProperty - Get back: our_property           */
     function clsprop_to_tblcol($property) {
+        global $log;
+
         $splits = preg_split('/(?=[A-Z])/', $property);
 
-        if (count($splits) !== 2) {
+        if (count($splits) != 2) {
             return $property;
         }
-
+ 
         $table_column = $splits[0] . '_' . strtolower($splits[1]);
-        return $tablec_column;
+        $log->critical("prop: $property - splits: " . print_r($splits, 1) . " - return: $table_clumn"); 
+            
+        return $table_column;
     }
             
 ?>

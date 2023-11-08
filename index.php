@@ -12,13 +12,6 @@
     require_once 'functions.php';
     require_once 'mailer.php';
 
-    $log->info('Session started: ',
-        [ 
-            'Session' => session_id(),
-            'Address' => $_SERVER['REMOTE_ADDR']
-        ]
-    );
-
     /* Login submitted */
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
         $email    = $_POST['login-email'];
