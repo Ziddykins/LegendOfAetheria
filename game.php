@@ -365,8 +365,7 @@
                 <div id="content" name="content" class="container border border-danger" style="flex-shrink: 1;">
                     <?php
                         include('navs/nav-status.php');
-                    ?>
-                    <?php
+
                         if (isset($_GET['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
                             $page_uri = 'pages/game-' .  $requested_page . '.php';
@@ -375,9 +374,11 @@
                     ?>
                 </div>
             </div>
-            
-            <?php include 'html/footer.html'; ?>
-            
+
+            <div id="footer"> 
+                <?php include 'html/footer.html'; ?>
+            </div>
+
             <div aria-live="polite" aria-atomic="true" class="position-relative">
                 <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
             </div>

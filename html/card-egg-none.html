@@ -1,0 +1,51 @@
+<div class="container text-center d-flex justify-content-center align-items-center">
+                        <div class="row">
+                            <div class="col">
+                                <div class="card border shadow" style="max-width: 600px;">
+                                    <div class="row">
+                                        <div class="col-2">
+                                            <img src="<?php echo $this->avatar; ?>"  class="img-fluid rounded-circle m-3 border" alt="eggvatar">
+                                        </div>
+                                        
+                                        <div class="col ms-4">
+                                            <div class="card-body">';
+                                                <h3 class="card-title bg-warning border g-0 ps-2 pt-2 pe-2 shadow">No Egg/Familiar!</h3>
+                                                <div class="container text-center border">
+                                                    <div class="row">  
+                                                        <div class="col">
+                                                            <div class="fs-5 border">Claim your <strong>Tier 4</strong> Starter Egg below!</div><br />
+                                                                Its rarity will be chosen at random, but you will be guaranteed at least<br />
+                                                                tier 4. < More text explaining the hatch process and familiar >
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="row mb-3">
+                                                            <div class="col">
+                                                                <form id="generate-egg" name="generate-egg" action="?page=eggs" method="POST">
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text" id="name-icon" name="name-icon">
+                                                                            <span class="material-symbols-sharp">pets</span>
+                                                                        </span>
+                                                                    
+                                                                        <div class="form-floating">
+                                                                            <input type="text" class="form-control" id="egg-name" name="egg-name" placeholder="woo" aria-describedby="name-helper">
+                                                                            <label for="egg-name">Egg Name</label>
+                                                                        </div>
+                                                                        <div id="name-helper" name="name-helper" class="form-text"><small>You can wait to name your familiar until when it hatches if you\'d prefer</small></div>
+                                                                        
+                                                                        <div class="row">
+                                                                            <button class="btn btn-primary" id="generate-egg" name="generate-egg" value="1">Collect Egg</button>
+                                                                        </div>
+                                                                        <input type="hidden" id="action" name="action" value="generate">
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>                                     
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>

@@ -127,7 +127,7 @@
                         $log->critical('Couldn\'t insert user information into character table');
                     }
 
-                    $character = new Character($account_id, $email);
+/*                    $character = new Character($account_id, $email);
 
                     $character->setStats('strength',     $str);
                     $character->setStats('intelligence', $intl);
@@ -145,7 +145,7 @@
                     save_character($account_id, $serialized_data);
                     // Verification email
                     // send_mail($email);
-
+ */
                     header('Location: /?register_success');
                     exit();
                 }
