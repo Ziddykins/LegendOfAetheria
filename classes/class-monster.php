@@ -1,36 +1,59 @@
 <?php
    class Monster {
-        private $scope;
-        private $seed;
+        protected $name;
         
-        private $accountID;
+        protected $scope;
+        protected $seed;
         
-        private $strength;
-        private $intelligence;
-        private $defense;
+        protected $summondBy;
         
-        private $monsterClass;
+        protected $hp, $maxHP;
+        protected $mp, $maxMP;
+        protected $strength;
+        protected $intelligence;
+        protected $defense;
         
-        /* 
-            Cleaned up getter/setter handler from:
-            https://stackoverflow.com/a/32191
-        */
-        function __call($function , $args) {
-            global $log;
-            list ($name , $var) = split ('_' , $function);
-            
-            if ($name == 'get' && isset($this->$var)) {
+        protected $dropLevel;
+        protected $expAwarded, $goldAwarded
+        
+        protected $monsterClass;
+
+        
+        function __call($method, $params) {
+            global $log, $db;
+            $caller = debug_backtrace()[1]['function'];
+
+            $var = lcfirst(substr($method, 4));
+
+            if (strncasecmp($method, "get_", 4) === 0) {
+                $log->info("'get_' triggered for var '$var'; returning '" . $this->$var . "'");
                 return $this->$var;
             }
-            
-            if ($name == 'set' && isset($this->$var)) {
-                $this->$var= $args[0];
-                return;
-            }
 
-            $log->critical("Fatal error: Call to undefined method " . __CLASS__ . "::$function()");
+            if (strncasecmp($method, "set_", 4) === 0) {
+                $sql_query =  'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' ';
+                $table_col = clsprop_to_tblcol($var);
+
+                if (is_int($params[0])) {
+                    $sql_query .= "SET `$table_col` = " . $params[0] . " ";
+                } else {
+                    $sql_query .= "SET `$table_col` = '" . $params[0] . "' ";
+                }
+
+                $sql_query .= 'WHERE `id` = ' . $this->id;
+
+                $db->query($sql_query);
+                $this->$var = $params[0];
+
+                $log->info("'set_' triggered for var '\$this->$var'; assigning '" . $params[0] . "' to it",
+                    [ 
+                        'SQLQuery' => $sql_query,
+                        'CallingFunc' => $caller,
+                        'PropToCol' => $table_col
+                    ]
+                );
+            }
         }
-        
         public function __construct(MonsterScope $scope, $account_id = null) {
             $this->accountID = $account_id;
             $this->scope     = $scope;
