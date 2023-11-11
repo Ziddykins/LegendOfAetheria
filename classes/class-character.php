@@ -1,14 +1,16 @@
 <?php
     class Character {
+        protected $id;
         protected $accountID;
-        protected $accountEmail;
-        protected $charName;
+        protected $email;
+        protected $name;
+        protected $password;
 
         protected $stats;
         protected $inventory;
 
-        public function __construct($accountID, $accountEmail) {
-            $this->accountEmail = $accountEmail;
+        public function __construct($accountID, $email) {
+            $this->email = $email;
             $this->accountID    = $accountID;
 
             $this->inventory = new Inventory(MAX_STARTING_INVSLOTS, MAX_STARTING_INVWEIGHT);
@@ -23,15 +25,39 @@
             return $this->stats->$stat;
         }
 
-		function __call($method, $params) {
-			$var = lcfirst(substr($method, 3));
+        function __call($method, $params) {
+            global $log, $db;
+            $caller = debug_backtrace()[1]['function'];
 
-			if (strncasecmp($method, "get", 3) === 0) {
-				return $this->$var;
-			}
-		
-            if (strncasecmp($method, "set", 3) === 0) {
-				$this->$var = $params[0];
+            $var = lcfirst(substr($method, 4));
+
+            if (strncasecmp($method, "get_", 4) === 0) {
+                $log->info("'get_' triggered for var '$var'; returning '" . $this->$var . "'");
+                return $this->$var;
+            }
+
+            if (strncasecmp($method, "set_", 4) === 0) {
+                $sql_query =  'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . ' ';
+                $table_col = clsprop_to_tblcol($var);
+
+                if (is_int($params[0])) {
+                    $sql_query .= "SET `$table_col` = " . $params[0] . " ";
+                } else {
+                    $sql_query .= "SET `$table_col` = '" . $params[0] . "' ";
+                }
+
+                $sql_query .= 'WHERE `id` = ' . $this->accountID;
+
+                $db->query($sql_query);
+                $this->$var = $params[0];
+
+                $log->info("'set_' triggered for var '\$this->$var'; assigning '" . $params[0] . "' to it",
+                    [ 
+                        'SQLQuery' => $sql_query,
+                        'CallingFunc' => $caller,
+                        'PropToCol' => $table_col
+                    ]
+                );
             }
         }
     }
@@ -41,6 +67,8 @@
 		protected $maxHp;
 		protected $mp;
         protected $maxMp;
+        protected $ep;
+        protected $maxEp;
         
         protected $strength;
         protected $intelligence;
