@@ -10,7 +10,7 @@
         $amount   = substr($modifier, 1);
         $modifier = $operand . $amount;
 
-        return date("Y-m-d h:i:s", strtotime("$modifier"));
+        return date("Y-m-d H:i:s", strtotime("$modifier"));
     }
 
     function table_to_obj($identifier, $type) {
@@ -66,7 +66,7 @@
         $db->query($sql_query);
     }
     
-    function random_float ($min,$max) {
+    function random_float($min, $max) {
        return ($min + lcg_value() * (abs($max - $min)));
     }
 
@@ -184,20 +184,23 @@
         return $character;
     }
 
-    function generate_egg($familiar) {
+    function generate_egg($familiar, $rarity_roll) {
         global $log;
  
-        $rarity_roll  = random_float(0, 100);
         $rarity       = ObjectRarity::getObjectRarity($rarity_roll);
         $rarity_color = get_rarity_color($rarity);
 
         $familiar->set_level(1);
         
         $familiar->set_rarityColor($rarity_color);
-        $familiar->set_rarity($rarity);
+        $familiar->set_rarity($rarity->name);
+        $familiar->set_lastRoll = $rarity_roll;
         
         $familiar->set_dateAcquired(get_mysql_datetime());
         $familiar->set_hatchTime(get_mysql_datetime('+8 hours'));
+
+        $familiar->set_eggsOwned(0);
+        $familiar->set_eggsSeen(0);
         
         $familiar->saveFamiliar();
     }
@@ -240,22 +243,26 @@
         }
     }
 
-    /* This ridiculousness is directly related to camelCase being standard */
-    /*         for PHP class properties - via PHPCS's tool on GitHub       */
-    /*             Pass it: ourProperty - Get back: our_property           */
     function clsprop_to_tblcol($property) {
         global $log;
 
-        $splits = preg_split('/(?=[A-Z])/', $property);
+        /* $splits = preg_split('/(?=[A-Z])/', $property);*/
+        $splits = preg_split('/(?=[A-Z]{1,2})/', $property); 
 
-        if (count($splits) != 2) {
+       $log->warning(print_r($splits, 1)); 
+        if (count($splits) === 1) {
             return $property;
         }
- 
+
+
         $table_column = $splits[0] . '_' . strtolower($splits[1]);
-        $log->critical("prop: $property - splits: " . print_r($splits, 1) . " - return: $table_clumn"); 
+
+        if (isset($splits[2])) {
+            $table_column .= strtolower($splits[2]);
+        }
+
+        $log->critical("prop: $property - splits: " . print_r($splits, 1) . " - return: $table_column"); 
             
         return $table_column;
     }
-            
 ?>

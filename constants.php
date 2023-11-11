@@ -4,7 +4,7 @@
     define('MAX_STARTING_INVSLOTS',   30);
     define('MAX_ASSIGNABLE_AP',       40);
     define('ENERGY_PER_TICK',          3);
-
+    define('ROOT_WEB_DIRECTORY', '/var/www/html/dankaf.ca/loa/');
     enum Races {
         public static function random(): self {
             $count = count(self::cases()) - 1;
@@ -131,6 +131,15 @@
     }
     
     enum ObjectRarity: int {
+        public static function name_to_object(string $name): string {
+            foreach (self::cases() as $rarity) {
+                if ($name === $rarity->name){
+                    return $rarity;
+                }
+            }
+            throw new \ValueError("$value is not a valid backing value for enum " . self::class);
+        }
+
         public static function getObjectRarity($roll) {
             foreach (self::cases() as $rarity) {
                 if ($roll >= $rarity->value) {
@@ -150,7 +159,7 @@
         case HEROIC    = 0.75;  /*  0.75% chance */
         case INFAMOUS  = 0.24;  /*  0.51% chance */
         case GODLY     = 0.01;  /*  0.23% chance */
-        case NOT_SET   = -1;    /* Used to determine if player has egg yet */
+        case NONE      = 0.00;    /* Used to determine if player has egg yet */
     }
 
     enum Components {
