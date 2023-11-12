@@ -78,4 +78,8 @@
 
   monies
 `<i class="bi bi-currency-exchange"></i>`
+
+- Dime baggies scattered in the laundry room where I was staying; they popped up out of the blue one day. Some in hard to reach spots; I cleaned them all up.
+- 3 syringes found in the basement in a baggie labeled "dark earth". i threw them in the garbage. Inquired about them, apparently something to do with snake injections.
+
   -->
