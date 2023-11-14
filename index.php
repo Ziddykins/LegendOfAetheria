@@ -13,9 +13,9 @@
     require_once 'mailer.php';
 
     /* Login submitted */
-    if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
-        $email    = $_POST['login-email'];
-        $password = $_POST['login-password'];
+    if (isset($_REQUEST['login-submit']) && $_REQUEST['login-submit'] == 1) {
+        $email    = $_REQUEST['login-email'];
+        $password = $_REQUEST['login-password'];
 
         $account = table_to_obj($email, 'account');
 
@@ -48,16 +48,16 @@
             header('Location: /?failed_login');
             exit();
         }
-    } else if (isset($_POST['register-submit']) && $_POST['register-submit'] == 1) {
-        $avatar           = 'avatar-' . $_POST['avatar-select'] . '.png';
-        $email            = $_POST['register-email'];
-        $password         = $_POST['register-password'];
-        $password_confirm = $_POST['register-password-confirm'];
-        $char_name        = $_POST['register-character-name'];
-        $race             = $_POST['race-select'];
-        $str              = $_POST['str-ap'];
-        $def              = $_POST['def-ap'];
-        $intl             = $_POST['int-ap'];
+    } else if (isset($_REQUEST['register-submit']) && $_REQUEST['register-submit'] == 1) {
+        $avatar           = 'avatar-' . $_REQUEST['avatar-select'] . '.png';
+        $email            = $_REQUEST['register-email'];
+        $password         = $_REQUEST['register-password'];
+        $password_confirm = $_REQUEST['register-password-confirm'];
+        $char_name        = $_REQUEST['register-character-name'];
+        $race             = $_REQUEST['race-select'];
+        $str              = $_REQUEST['str-ap'];
+        $def              = $_REQUEST['def-ap'];
+        $intl             = $_REQUEST['int-ap'];
         
         $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $char_name);
 

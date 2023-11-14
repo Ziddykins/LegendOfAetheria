@@ -42,15 +42,15 @@
                     $prepped->execute();
                 }
             } else if ($_REQUEST['action'] == 'accept_request') {
-                if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
-                    accept_friend_req($_POST['focused-request']);
+                if (isset($_REQUEST['btn-accept']) && $_REQUEST['btn-accept'] == "1") {
+                    accept_friend_req($_REQUEST['focused-request']);
                     $log->info('Friend request accepted', 
-                        [ 'email_1' => $account['email'], 'email_2' => $_POST['focused-request'] ]);
+                        [ 'email_1' => $account['email'], 'email_2' => $_REQUEST['focused-request'] ]);
                 }
             } else if ($_REQUEST['action'] == 'send_request') {
-                if (isset($_POST['friends-send-request']) && $_POST['friends-send-request'] == "1") {
-                    if (isset($_POST['friends-request-send'])) {
-                        $requested_email = filter_var($_POST['friends-request-send'], FILTER_SANITIZE_EMAIL);
+                if (isset($_REQUEST['friends-send-request']) && $_REQUEST['friends-send-request'] == "1") {
+                    if (isset($_REQUEST['friends-request-send'])) {
+                        $requested_email = filter_var($_REQUEST['friends-request-send'], FILTER_SANITIZE_EMAIL);
                
                         if (friend_status($requested_email) == FriendStatus::NONE) {
                             $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
