@@ -49,7 +49,8 @@
             if (password_verify($old_password, $account['password'])) {
                 if ($new_password === $confirm_password) {
                     $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-                    $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' SET `password` = ? WHERE `email` = ?';
+                    $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
+                                 'SET `password` = ? WHERE `email` = ?';
                     $prepped   = $db->prepare($sql_query);
                     $prepped->bind_param('ss', $hashed_password, $account_email);
                     $prepped->execute();
