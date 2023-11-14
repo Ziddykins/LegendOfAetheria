@@ -39,10 +39,10 @@
     /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         /* Check if the user has clicked the apply button on the profile tab */
-        if (isset($_POST['profile-apply']) && $_POST['profile-apply'] == 1) {
-            $old_password     = $_POST['profile-old-password'];
-            $new_password     = $_POST['profile-new-password'];
-            $confirm_password = $_POST['profile-confirm-password'];
+        if (isset($_REQUEST['profile-apply']) && $_REQUEST['profile-apply'] == 1) {
+            $old_password     = $_REQUEST['profile-old-password'];
+            $new_password     = $_REQUEST['profile-new-password'];
+            $confirm_password = $_REQUEST['profile-confirm-password'];
             $account_email    = $_SESSION['email'];
 
             /* Old password matches current */
@@ -367,8 +367,8 @@
                     <?php
                         include('navs/nav-status.php');
 
-                        if (isset($_GET['page'])) {
-                            $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
+                        if (isset($_REQUEST['page'])) {
+                            $requested_page = preg_replace('/[^a-z-]+/', '', $_REQUEST['page']);
                             $page_uri = 'pages/game-' .  $requested_page . '.php';
                             include "$page_uri";
                         }
