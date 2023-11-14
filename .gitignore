@@ -11,3 +11,4 @@ esp32.html
 .htaccess
 /sheets/
 *ctags*
+.*_tmp_egg
