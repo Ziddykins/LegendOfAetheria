@@ -27,7 +27,7 @@ perl initialize.pl
 
 | Step             | Wiki              |
 | ---------------- | ----------------- |
-| Hosts            | [#Hosts]          |
+| Hosts            | [Hosts][#Hosts]          |
 | Software         | [#Software]       |
 | Hostname         | [#Hostname]       |
 | Apache           | [#Apache]         |

@@ -1,7 +1,4 @@
 <?php
-
-
-
 ?>
 
 <div class="container">
@@ -22,7 +19,7 @@
                 </a>
             </div>
         </div>
-        
+
         <div class="col-8 pt-2">
             <div class="row text-center">
                 <div class="col">
@@ -49,7 +46,7 @@
                             <span><?php print $account['privileges'] ?></span>
                         </div>
                     </div>
-                    
+
                     <form id="profile-password-change" name="profile-password-change" action="/game?page=profile" method="POST">
                         <div class="mb-3 row">
                             <label for="profile-old-password" class="col-sm-2 col-form-label fw-bold">Old Password:</label>
@@ -70,21 +67,21 @@
                             </div>
                         </div>
 
-                        
+
 
                         <button id="profile-apply" name="profile-apply" class="btn btn-primary" value="1">Apply</button>
                         <button id="profile-discard" name="profile-discard" class="btn btn-danger">Discard</button>
-                        <script type="text/javascript">
-                            $("#profile-apply").on("click", function(e) {
-                                let new_pass = document.querySelector("#profile-new-password").value;
-                                let pass_confirm = document.querySelector("#profile-confirm-password").value;
-                                if (new_pass !== pass_confirm) {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    gen_toast('error-nologin-toast', 'danger', 'bi-key', 'Password Mis-match', 'Please ensure passwords match');
-                                }
-                            });
-                        </script>
+<script type="text/javascript">
+$("#profile-apply").on("click", function(e) {
+    let new_pass = document.querySelector("#profile-new-password").value;
+    let pass_confirm = document.querySelector("#profile-confirm-password").value;
+    if (new_pass !== pass_confirm) {
+        e.preventDefault();
+        e.stopPropagation();
+        gen_toast('error-nologin-toast', 'danger', 'bi-key', 'Password Mis-match', 'Please ensure passwords match');
+    }
+});
+</script>
                     </form>
                 </div>
 

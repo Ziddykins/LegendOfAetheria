@@ -194,7 +194,7 @@
         
         $familiar->set_rarityColor($rarity_color);
         $familiar->set_rarity($rarity->name);
-        $familiar->set_lastRoll = $rarity_roll;
+        $familiar->set_lastRoll($rarity_roll);
         
         $familiar->set_dateAcquired(get_mysql_datetime());
         $familiar->set_hatchTime(get_mysql_datetime('+8 hours'));
