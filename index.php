@@ -128,7 +128,7 @@
                             'choosing random enum: ',
                             [ 'Race' => $race ]
                         );
-                    }
+                    } 
 
                     $query = $db->query(
                         'SELECT MAX(id) AS account_id FROM ' . $_ENV['SQL_ACCT_TBL']
