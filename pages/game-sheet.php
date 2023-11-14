@@ -64,9 +64,8 @@
                                             class="ldBar label-center <?php echo $hp_textcolor; ?>"
                                             data-value="<?php echo $character['hp']; ?>"
                                             data-max="<?php echo $character['max_hp']; ?>"
-                                            data-preset="bubble"
+                                            data-preset="energy"
                                             data-pattern-size="120"
-                                           data-fill="data:ldbar/res,bubble(#e05f55,#fff,50,10)"
                                         >
                                     </div>
                                     <div class="col-4">
@@ -74,19 +73,17 @@
                                             class="ldBar label-center <?php echo $mp_textcolor; ?>"
                                             data-value="<?php echo $character['mp']; ?>"
                                             data-max="<?php echo $character['max_mp']; ?>"
-                                            data-preset="bubble"
+                                            data-preset="energy"
                                             data-pattern-size="120"
-                                            data-fill="data:ldbar/res,bubble(#7782e6, #fff, 50, 10)"
                                         >
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-6">
                                         <span id="ep" name="ep"   
                                             class="ldBar label-center <?php echo $ep_textcolor; ?>"
                                             data-value="<?php echo $character['ep']; ?>"
                                             data-max="<?php echo $character['max_ep']; ?>"
-                                            data-preset="bubble"
+                                            data-preset="energy"
                                             data-pattern-size="120"
-                                            data-fill="data:ldbar/res,bubble(#76f597,#fff,50,10)"
                                         >
                                     </div>
                                 </div>

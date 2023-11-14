@@ -14,6 +14,13 @@
         protected $avatar;
         protected $lastRoll;
 
+        protected $health, $maxHealth;
+        protected $mana, $maxMana;
+        protected $energy, $maxEnergy;
+
+        protected $intelligence, $strength, $defense;
+        protected $experience, $nextLevel;
+
         public function __construct($characterID) {
             $this->characterID = $characterID;
         }
@@ -40,11 +47,12 @@
             $this->rarity       = 'NONE';
             $this->name         = '!Unset!';
             $this->id           = $familiar_id['id'];
-            $this->eggsOwned    = 0;
-            $this->eggsSeen     = 0;
+            $this->eggsOwned    = 1;
+            $this->eggsSeen     = 1;
             $this->avatar       = 'img/generated/eggs/egg-unhatched.jpeg';
             $this->level        = 1;
             $this->lastRoll     = 0.00;
+        
             $this->saveFamiliar(); 
         }
 
@@ -91,7 +99,7 @@
             } else if ($which === 'current') {
                 $build_timer = '<script>init_egg_timer("' . $this->hatchTime . '", "egg-timer");</script>';
                 $html = "$build_timer\n";
-                $html .= file_get_contents(ROOT_WEB_DIRECTORY . 'html/card-egg-current.php');
+                $html .= file_get_contents(ROOT_WEB_DIRECTORY . 'html/card-egg-current.html');
                 $html .= "\n";
 
                 return $html;

@@ -14,7 +14,7 @@
         protected $defense;
         
         protected $dropLevel;
-        protected $expAwarded, $goldAwarded
+        protected $expAwarded, $goldAwarded;
         
         protected $monsterClass;
 
@@ -62,6 +62,18 @@
         public function load_monster_sheet() {
             $monsters = Array();
             $monsters = file_get_contents(__DIR__ . "monsters.raw");
+            print_r($monsters);
+            exit();
         }
+
+        public function random_monster($dropLevel = 0) {
+            
+        }
+    }
+
+    class MonsterPool {
+        protected $monsters;
+        protected $total_monsters;
+
     }
 ?>

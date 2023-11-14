@@ -38,14 +38,13 @@
 
     /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
-
         /* Check if the user has clicked the apply button on the profile tab */
         if (isset($_POST['profile-apply']) && $_POST['profile-apply'] == 1) {
             $old_password     = $_POST['profile-old-password'];
             $new_password     = $_POST['profile-new-password'];
             $confirm_password = $_POST['profile-confirm-password'];
             $account_email    = $_SESSION['email'];
-    
+
             /* Old password matches current */
             if (password_verify($old_password, $account['password'])) {
                 if ($new_password === $confirm_password) {
@@ -54,6 +53,7 @@
                     $prepped   = $db->prepare($sql_query);
                     $prepped->bind_param('ss', $hashed_password, $account_email);
                     $prepped->execute();
+         
                     session_regenerate_id();
                     header('Location: /logout?action=pw_reset&result=pass');
                     exit();
@@ -97,32 +97,32 @@
                                     <ul id="menu-header-character" class="nav nav-pills nav-flush flex-column mb-auto" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
                                             <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link px-0">
-                                                <i class="bi bi-card-text ms-3"></i>
-                                                <span class="ms-1 d-none d-md-inline ms-2"> Sheet</span>
+                                                <span class="material-symbols-sharp ms-3">account_circle</span>
+                                                <span class="d-none d-md-inline ms-2"> Sheet</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-inventory" name="menu-sub-inventory" class="nav-link px-0">
-                                                <i class="bi bi-box ms-3"></i>
-                                                <span class="d-none d-lg-inline ms-2"> Inventory</span>
+                                                <span class="material-symbols-sharp ms-3">deployed_code</span>
+                                                <span class="d-none d-md-inline ms-2"> Inventory</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-skills" name="menu-sub-skills" class="nav-link px-0">
                                                 <span class="material-symbols-sharp ms-3">book_2</span>
-                                                <span class="d-none d-lg-inline ms-2">Skills</span>
+                                                <span class="d-none d-md-inline ms-2">Skills</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-spells" name="menu-sub-spells" class="nav-link px-0">
                                                 <span class="material-symbols-sharp ms-3">book</span>
-                                                <span class="d-none d-lg-inline ms-2">Spells</span>
+                                                <span class="d-none d-md-inline ms-2">Spells</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-train" name="menu-sub-trail" class="nav-link px-0">
                                                 <span class="material-symbols-sharp ms-3">fitness_center</span>
-                                                <span class="d-none d-lg-inline ms-2">Train</span>
+                                                <span class="d-none d-md-inline ms-2">Train</span>
                                             </a>
                                         </li>
                                         <script>
@@ -145,12 +145,13 @@
                                         <li>
                                             <a href="#" id="menu-sub-save" name="menu-sub-save" class="nav-link px-0" onclick=saveChar()>
                                                 <span class="material-symbols-sharp ms-3">save</span>
-                                                <span class="d-none d-lg-inline ms-2">Save</span>
+                                                <span class="d-none d-md-inline ms-2">Save</span>
                                             </a>
                                         </li>
                                     </ul>
                                 </li>
-                                 <li class="border w-100">
+
+                                 <li class="border rounded w-100">
                                     <a href="#menu-header-familiar" id="menu-anchor-familiar" name="menu-anchor-familiar" class="nav-link px-0 align-middle" data-bs-toggle="collapse">
                                         <span class="material-symbols-sharp">pets</span>
                                         <span class="ms-1 d-none d-md-inline fs-6">Familiar</span>

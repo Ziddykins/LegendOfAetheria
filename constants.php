@@ -33,7 +33,16 @@
                 }
             }
             throw new \ValueError("$name is not a valid backing value for enum " . self::class);
+        }
+        public static function name_to_enum(string $name) {
+            foreach (self::cases() as $privilege) {
+                if ($name === $privilege->name){
+                    return $privilege;
+                }
+            }
+            throw new \ValueError("$name is not a valid backing value for enum " . self::class);
        }
+
         
         case BANNED = 1;
         case MUTED = 2;
@@ -131,15 +140,6 @@
     }
     
     enum ObjectRarity: int {
-        public static function name_to_object(string $name): string {
-            foreach (self::cases() as $rarity) {
-                if ($name === $rarity->name){
-                    return $rarity;
-                }
-            }
-            throw new \ValueError("$value is not a valid backing value for enum " . self::class);
-        }
-
         public static function getObjectRarity($roll) {
             foreach (self::cases() as $rarity) {
                 if ($roll >= $rarity->value) {
@@ -159,7 +159,7 @@
         case HEROIC    = 0.75;  /*  0.75% chance */
         case INFAMOUS  = 0.24;  /*  0.51% chance */
         case GODLY     = 0.01;  /*  0.23% chance */
-        case NONE      = 0.00;    /* Used to determine if player has egg yet */
+        case NONE      = 0.00;  /* Used to determine if player has egg yet */
     }
 
     enum Components {

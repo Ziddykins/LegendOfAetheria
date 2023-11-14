@@ -7,7 +7,7 @@
         if ($action === 'generate') {
             $rarity_name = $familiar->get_rarity();
 
-            $roll = random_float(ObjectRarity::NONE, ObjectRarity::ENCHANTED);
+            $roll = random_float(0, 12);
             generate_egg($familiar, $roll);
             $egg_name = null;
 
@@ -35,13 +35,19 @@
     <div class="row pt-5">
         <h3>Eggs :D</h3>
         <div class="col">
-             <?php
+            <?php
+                $temp_file_name = '.' . session_id() . '_tmp_egg'; 
                 /* No egg received yet */
-                if ($familiar->get_rarity() === 'NONE') {
-                    echo $familiar->getCard('empty');
+                if ($familiar->get_rarity() === 'NONE') {        
+                    $html = $familiar->getCard('empty');
+                    file_put_contents($temp_file_name, $html);
+                    include($temp_file_name);
+                    unlink($temp_file_name);
                 } else {
-                    echo "You already have an egg :O\n";
-                    echo $familiar->getCard('current');
+                    $html = $familiar->getCard();
+                    file_put_contents($temp_file_name, $html);
+                    include($temp_file_name);
+                    
                 }
             ?>
         </div>

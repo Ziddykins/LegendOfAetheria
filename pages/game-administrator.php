@@ -4,9 +4,16 @@
     $open_ai_key = $_ENV['OPENAI_APIKEY'];
     $open_ai     = new OpenAi($open_ai_key);
 
-   
+    $user_privs = UserPrivileges::name_to_enum($account['privileges']);
+    
+    if ($user_privs->value <= UserPrivileges::MODERATOR->value) {
+        echo "F O R B I D D E N";
+        exit();
+    }
+ 
     echo '<pre>';
     echo var_dump($_REQUEST);
+ 
     if (isset($_REQUEST['prompt']) && isset($_REQUEST['type']) && isset($_REQUEST['count'])) {
         $prompt = $_REQUEST['prompt'];
         $type   = $_REQUEST['type'];
