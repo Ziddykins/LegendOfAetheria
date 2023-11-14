@@ -81,10 +81,8 @@
             if ($str + $def + $intl === MAX_ASSIGNABLE_AP) {
                 /* Passwords match */
                 if ($password === $password_confirm) {
-                    $verification_code = strrev(
-                        sha1(session_id())) . 
-                        substr(md5(strval(rand(0,100))), 0, 15
-                    );
+                    $verification_code  = strrev(sha1(session_id())); 
+                    $verification_code .= substr(md5(strval(rand(0,100))), 0, 15);
                     
                     $password = password_hash($password, PASSWORD_BCRYPT);
 
@@ -117,7 +115,7 @@
                     }
                     
                     $valid_race = 0;
-                    foreach(Races::cases() as $enum_race) {
+                    foreach (Races::cases() as $enum_race) {
                         if ($race === $enum_race->name) {
                             $valid_race = 1;
                         }
@@ -133,8 +131,7 @@
                     }
 
                     $query = $db->query(
-                        'SELECT MAX(id) AS account_id FROM ' 
-                        . $_ENV['SQL_ACCT_TBL']
+                        'SELECT MAX(id) AS account_id FROM ' . $_ENV['SQL_ACCT_TBL']
                     );
 
                     $result     = $query->fetch_assoc();
@@ -145,7 +142,8 @@
                         '`str`, `def`, `int`) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
                     $prepped = $db->prepare($sql_query);
-                    $prepped->bind_param('isssiii',
+                    $prepped->bind_param(
+                        'isssiii',
                         $account_id, $avatar, $char_name, $race, $str, $def, $intl
                     );
 
