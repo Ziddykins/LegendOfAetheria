@@ -13,7 +13,7 @@
         protected $eggsSeen;
         protected $avatar;
         protected $lastRoll;
-
+        
         protected $health, $maxHealth;
         protected $mana, $maxMana;
         protected $energy, $maxEnergy;
@@ -31,12 +31,15 @@
             $sql_time   = get_mysql_datetime();
             $hatch_time = get_mysql_datetime('+8 hours');
 
-            $sql_query = 'INSERT INTO ' . $_ENV['SQL_FMLR_TBL'] . ' (`character_id`) ' .
-                         "VALUES ($this->characterID)";
+            $sql_query = 'INSERT INTO ' . $_ENV['SQL_FMLR_TBL'] . 
+                " (`character_id`) VALUES ($this->characterID)";
+            
             $db->query($sql_query);
 
-            $sql_query    = 'SELECT `id` FROM ' . $_ENV['SQL_FMLR_TBL'] . " WHERE `character_id` = $this->characterID";
-            $result       = $db->query($sql_query);
+            $sql_query = 'SELECT `id` FROM ' . $_ENV['SQL_FMLR_TBL'] . 
+                " WHERE `character_id` = $this->characterID";
+            
+            $result = $db->query($sql_query);
 
             $familiar_id  = $result->fetch_assoc();
 
@@ -63,7 +66,10 @@
 
             foreach((Array)$this as $key => $val) {
                 if ($key !== 'id') {
-                    $column = clsprop_to_tblcol(preg_replace("/[^a-zA-Z_]+/", '', $key));
+                    $column = clsprop_to_tblcol(
+                        preg_replace("/[^a-zA-Z_]+/", '', $key)
+                    );
+                    
                     $sql_query .= "$column = ";
                     
                     if (is_numeric($val)) {
@@ -73,6 +79,7 @@
                     } else {
                         $sql_query .= "'$val'";
                     }
+                    
                     $sql_query .= ', ';
                 }
             }
@@ -93,13 +100,21 @@
 
         public function getCard($which = 'current') {
             if ($which === 'empty') {
-                $html = file_get_contents(ROOT_WEB_DIRECTORY . 'html/card-egg-none.html');
+                $html = file_get_contents(
+                    ROOT_WEB_DIRECTORY . 'html/card-egg-none.html'
+                );
 
                 return $html;
             } else if ($which === 'current') {
-                $build_timer = '<script>init_egg_timer("' . $this->hatchTime . '", "egg-timer");</script>';
+                $build_timer = '<script>init_egg_timer("' . $this->hatchTime . 
+                    '", "egg-timer");</script>';
+                
                 $html = "$build_timer\n";
-                $html .= file_get_contents(ROOT_WEB_DIRECTORY . 'html/card-egg-current.html');
+                
+                $html .= file_get_contents(
+                    ROOT_WEB_DIRECTORY . 'html/card-egg-current.html'
+                );
+                
                 $html .= "\n";
 
                 return $html;
@@ -109,11 +124,13 @@
         public function loadFamiliar($characterID) {
             global $db, $log;
 
-            $sql_query = 'SELECT * FROM ' . $_ENV['SQL_FMLR_TBL'] . " WHERE `character_id` = $characterID";
+            $sql_query = 'SELECT * FROM ' . $_ENV['SQL_FMLR_TBL'] . ' ' .
+                         "WHERE `character_id` = $characterID";
             $result = $db->query($sql_query);
 
             if ($result->num_rows == 0) {
-                $log->warning('Attempted to load familiar but no corresponding character ID found: ' . $characterID);
+                $log->warning('Attempted to load familiar but no ' .
+                              'corresponding character ID found: ' . $characterID);
                 $this->registerFamiliar();
                 return;
             }
@@ -134,7 +151,10 @@
             $var = lcfirst(substr($method, 4));
 
             if (strncasecmp($method, "get_", 4) === 0) {
-                $log->info("'get_' triggered for var '$var'; returning '" . $this->$var . "'");
+                $log->info(
+                    "'get_' triggered for var '$var'; " . 
+                    "returning '$this->$var'"
+                );
                 return $this->$var;
             }
 
@@ -153,12 +173,13 @@
                 $db->query($sql_query);
                 $this->$var = $params[0];
 
-                $log->info("'set_' triggered for var '\$this->$var'; assigning '" . $params[0] . "' to it",
-                    [ 
-                        'SQLQuery' => $sql_query,
-                        'CallingFunc' => $caller,
-                        'PropToCol' => $table_col
-                    ]
+                $log->info("'set_' triggered for var '\$this->$var';" .
+                           "assigning '" . $params[0] . "' to it",
+                                [ 
+                                    'SQLQuery' => $sql_query,
+                                    'CallingFunc' => $caller,
+                                    'PropToCol' => $table_col
+                                ]
                 );
             }
         }
