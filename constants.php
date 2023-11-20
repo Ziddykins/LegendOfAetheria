@@ -5,6 +5,7 @@
     define('MAX_ASSIGNABLE_AP',       40);
     define('ENERGY_PER_TICK',          3);
     define('ROOT_WEB_DIRECTORY', '/var/www/html/dankaf.ca/loa/');
+    
     enum Races {
         public static function random(): self {
             $count = count(self::cases()) - 1;
@@ -114,6 +115,8 @@
         case FRIEND_STATUS_ERROR       = -3000;
 
         case MAIL_UNKNOWN_DIRECTIVE    = -4000;
+        
+        case CRON_HTTP_DIRECT_ACCESS   = -5000;
     }
 
     # Global:

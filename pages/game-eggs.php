@@ -33,7 +33,7 @@
 </script>-->
 <div class="container text-center">
     <div class="row pt-5">
-        <h3>Eggs :D</h3>
+        <h3>Eggs</h3>
         <div class="col">
             <?php
                 $temp_file_name = '.' . session_id() . '_tmp_egg'; 
@@ -47,7 +47,7 @@
                     $html = $familiar->getCard();
                     file_put_contents($temp_file_name, $html);
                     include($temp_file_name);
-                    
+                    unlink($temp_file_name);
                 }
             ?>
         </div>

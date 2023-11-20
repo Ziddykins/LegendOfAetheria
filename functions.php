@@ -13,6 +13,14 @@
         return date("Y-m-d H:i:s", strtotime("$modifier"));
     }
 
+    function sub_mysql_datetime(string $date_one, string $date_two) {
+        $date_one_secs = strtotime($date_one);
+        $date_two_secs = strtotime($date_two);
+        $seconds_left  = $date_two_secs - $date_one_secs;
+
+        return $seconds_left;
+    }
+
     function table_to_obj($identifier, $type) {
         global $db, $log;
         $table = '';
