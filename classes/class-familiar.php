@@ -1,25 +1,42 @@
 <?php
     class Familiar {
+        protected $id;
         protected $characterID;
+        protected $level;
+        
+        protected $health;
+        protected $maxHealth;
+    
+        protected $mana;
+     	protected $maxMana;
+    
+        protected $energy;
+ 	    protected $maxEnergy;
+
+        protected $intelligence;
+     	protected $strength;
+ 	    protected $defense;
+    
+        protected $experience;
+        protected $nextLevel;
+               
+        protected $eggsOwned;
+        protected $eggsSeen;
+       
         protected $name;
+        
         protected $rarity;
         protected $rarityColor;
-        protected $level;
+        protected $avatar;
+        protected $lastRoll;
+
+        /* Classes 
+        protected $stats;
+        protected $egg;
+        */ 
         protected $hatchTime;
         protected $dateAcquired;
         protected $hatched;
-        protected $id;
-        protected $eggsOwned;
-        protected $eggsSeen;
-        protected $avatar;
-        protected $lastRoll;
-        
-        protected $health, $maxHealth;
-        protected $mana, $maxMana;
-        protected $energy, $maxEnergy;
-
-        protected $intelligence, $strength, $defense;
-        protected $experience, $nextLevel;
 
         public function __construct($characterID) {
             $this->characterID = $characterID;
@@ -55,6 +72,8 @@
             $this->avatar       = 'img/generated/eggs/egg-unhatched.jpeg';
             $this->level        = 1;
             $this->lastRoll     = 0.00;
+            $this->stats        = new FamiliarStats();
+            $this->eggs         = new FamiliarEgg();
         
             $this->saveFamiliar(); 
         }
@@ -151,10 +170,6 @@
             $var = lcfirst(substr($method, 4));
 
             if (strncasecmp($method, "get_", 4) === 0) {
-                $log->info(
-                    "'get_' triggered for var '$var'; " . 
-                    "returning '$this->$var'"
-                );
                 return $this->$var;
             }
 
@@ -172,16 +187,66 @@
 
                 $db->query($sql_query);
                 $this->$var = $params[0];
-
-                $log->info("'set_' triggered for var '\$this->$var';" .
-                           "assigning '" . $params[0] . "' to it",
-                                [ 
-                                    'SQLQuery' => $sql_query,
-                                    'CallingFunc' => $caller,
-                                    'PropToCol' => $table_col
-                                ]
-                );
             }
         }
     }
+
+///*
+//    class FamiliarStats
+////    {
+//        private $level;
+//        
+//        private $health
+//        private $maxHealth;
+//    
+//        private $mana
+//     	private $maxMana;
+//    
+//        private $energy
+// 	    private $maxEnergy;
+//
+//        private $intelligence
+//     	private $strength
+// 	    private $defense;
+//    
+//        private $experience
+//        private $nextLevel;
+//               
+//        private $eggsOwned;
+//        private $eggsSeen;
+//        
+//        function __call($method, $params) {
+//            global $log, $db;
+//            $caller = debug_backtrace()[1]['function'];
+//
+//            $var = lcfirst(substr($method, 4));
+//
+//            if (strncasecmp($method, "get_", 4) === 0) {
+//                return $this->$var;
+//            }
+//
+//            if (strncasecmp($method, "set_", 4) === 0) {
+//                $sql_query =  'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' ';
+//                $table_col = clsprop_to_tblcol($var);
+//
+//                if (is_int($params[0])) {
+//                    $sql_query .= "SET `$table_col` = " . $params[0] . " ";
+//                } else {
+//                    $sql_query .= "SET `$table_col` = '" . $params[0] . "' ";
+//                }
+//
+//                $sql_query .= 'WHERE `id` = ' . $this->id;
+//
+//                $db->query($sql_query);
+//                $this->$var = $params[0];
+//            }
+//        }
+//    }
+//
+//    class FamiliarEgg
+//    {
+//        private $hatchTime;
+//        private $dateAcquired;
+//        private $hatched;
+//    }
 ?>

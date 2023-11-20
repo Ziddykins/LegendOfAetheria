@@ -1,30 +1,27 @@
 <?php
-    $hp_textcolor = 'text-white';
-    $mp_textcolor = 'text-white';
+    $hp_textcolor = 'text-black';
+    $mp_textcolor = 'text-black';
     $ep_textcolor = 'text-black';
 
     $cur_hp       = $character['hp'];
     $cur_mp       = $character['mp'];
-    /* $cur_ep       = $character['ep']; */
+    $cur_ep       = $character['ep'];
 
     $max_hp       = $character['max_hp'];
     $max_mp       = $character['max_mp'];
-    /* $max_ep       = $character['max_ep']; */
+    $max_ep       = $character['max_ep'];
 
     if (50 >= $cur_hp / $max_hp * 100) {
-        $hp_textcolor = 'text-black';
+        $hp_textcolor = 'text-white';
     }
 
     if (50 >= $cur_mp / $max_mp * 100) {
-        $mp_textcolor = 'text-black';
+        $mp_textcolor = 'text-white';
     }
 
-    /* EP actually looks fine only black
-        if (50 <= $cur_ep / $max_ep * 100) {
-            $ep_textcolor = 'text-black';
-        }
-    */
-
+    if (50 >= $cur_ep / $max_ep * 100) {
+        $ep_textcolor = 'text-white';
+    }
 ?>
 <script>
     $(document).ready(
@@ -43,6 +40,7 @@
                     <div class="col-4">
                         <img src="img/avatars/<?php echo $character['avatar']; ?>" class="img-fluid rounded m-3" alt="character-avatar">
                     </div>
+
                     <div class="col-6">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo $character['name']; ?></h5>
@@ -77,7 +75,7 @@
                                             data-pattern-size="120"
                                         >
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-4">
                                         <span id="ep" name="ep"   
                                             class="ldBar label-center <?php echo $ep_textcolor; ?>"
                                             data-value="<?php echo $character['ep']; ?>"
@@ -91,13 +89,13 @@
                                 <hr style="opacity: .25; align-self: center;">
                                 
                                 <div class="row mb-3">
-                                    <div class="col-4 text-truncate">
+                                    <div class="col text-truncate">
                                         Strength
                                     </div>
-                                     <div class="col-4 text-truncate">
+                                     <div class="col text-truncate">
                                         Defense
                                     </div>
-                                   <div class="col-4 text-truncate">
+                                   <div class="col text-truncate">
                                         Intelligence
                                     </div>
                                 </div>

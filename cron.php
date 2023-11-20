@@ -1,20 +1,21 @@
 <?php
-     __DIR__ . '/vendor/autoload.php';
+    declare(strict_types = 1);
+    session_start();
+    require __DIR__ . '/vendor/autoload.php';
+
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-    $dotenv->safeLoad();
-    
+    $dotenv->safeLoad();  
+
     require_once 'logger.php';
     require_once 'db.php';
     require_once 'constants.php';
     require_once 'functions.php';
     
     if (!isset($argv)) {
-        $log->warning('Access to cron.php directly is not allowed!', ['REQUEST' => print_r($_REQUEST, 1)]);
+        $log->warning('Access to cron.php directly is not allowed!', ['REQUEST' => print_r($_REQUEST, true)]);
         echo 'Access to cron.php directly is not allowed!';
-        exit(1);
+        exit(CRON_HTTP_DIRECT_ACCESS);
     }
-    
-    $log->info('cronjob running', ['argv[1]' => $argv[1]]);
     
     switch ($argv[1]) {
         case 'minute':
@@ -26,13 +27,14 @@
         case 'daily':
             do_daily();
             break;
-        case 'default':
+        default:
             $log->warning('No cron job specified!');
-            die('No cron job specified!');
+            echo 'No cron job specified!';
     }
 
     function do_minute() {
         add_energy();
+        check_eggs();
     }
     
     function do_hourly() {
@@ -83,4 +85,31 @@
             $db->query($sql_query);
         }
     }
+
+    function check_eggs() {
+        global $db, $log;
+
+        $sql_query = 'SELECT ' .
+            '`id`, `character_id`, `hatch_time`, `hatched`, `date_acquired` ' .
+            'FROM ' . $_ENV['SQL_FMLR_TBL'] . ' WHERE `hatched` = "False"';
+
+        $results = $db->query($sql_query);        
+        while ($player = $results->fetch_assoc()) {
+            $hatch_time    = $player['hatch_time'];
+            $hatched       = $player['hatched'];
+            $date_acquired = $player['date_acquired'];
+            
+            $time_remaining = sub_mysql_datetime($date_acquired, $hatch_time);
+
+            if (!$time_remaining) {
+                $sql_query = 'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' ' .
+                             'SET `hatched` = ?' .
+                             'WHERE `character_id` = ?';
+                $prepped = $db->prepare($sql_query);
+                $prepped->bind_param('si', 'True', $player['character_id']);
+                $prepped->execute();
+            }
+        }
+    }
+
 ?>

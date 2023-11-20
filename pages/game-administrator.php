@@ -29,8 +29,8 @@
         }
     
         $complete = $open_ai->image([
-                    "prompt" => "A cat drinking milk",
-                    "n" => 1,
+                    "prompt" => $prompt,
+                    "n" => (int)$count,
                     "size" => "256x256",
                     "response_format" => "url",
                 ]);
