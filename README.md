@@ -8,6 +8,7 @@ A browser-based RPG game written in PHP/JS using the Bootstrap 5 framework
 > [!IMPORTANT]
 > The recommended method for getting this up and running is using the [AutoInstaller](#AutoInstaller),
 > however step-by-step Manual instructions will be covered later.
+
 > [!NOTE]
 > For best results, this should be run on a fresh install of Debian or Windows.
 
@@ -35,7 +36,8 @@ It will take care of just about every aspect of work which needs to be
 created/imported/modified/configured; from fork/clone, right to SSL-enforced,
 web-accessible browser game (provided your A/CNAME records are set up of course!)
 
-You can provide the flag `--interactive` if you want to be prompted at each step.
+> [!TODO]
+> You can provide the flag `--interactive` if you want to be prompted at each step.
 
 ```sh
 cd install
@@ -60,14 +62,9 @@ sudo perl AutoInstaller.pl
 | SQL Importing    | [SQLImport](#SQLImport)     |
 | CRON Jobs        | [CRONJobs](#CRONJobs)       |
  
+## Steps
 
-
-
-
-
-
-
-## EnvTemplate
+### EnvTemplate
 
 
 
