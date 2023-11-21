@@ -6,12 +6,7 @@
 !_TAG_PROGRAM_VERSION	0.10.0	//
 Character	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^    class Character {$/;"	c	line:2
 ENERGY_PER_TICK	/var/www/html/dankaf.ca/loa/constants.php	/^    define('ENERGY_PER_TICK',          3);$/;"	d	line:6
-EggBag	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^class EggBag {$/;"	c	line:160
 Familiar	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^    class Familiar {$/;"	c	line:2
-Familiar	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^class Familiar$/;"	c	line:2
-FamiliarEgg	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^class FamiliarEgg {$/;"	c	line:207
-FamiliarStats	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^class FamiliarStats {$/;"	c	line:177
-GPT	/var/www/html/dankaf.ca/loa/openai.php	/^    $GPT = new OpenAI($/;"	v	line:21
 Inventory	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^    class Inventory {$/;"	c	line:80
 MAX_ASSIGNABLE_AP	/var/www/html/dankaf.ca/loa/constants.php	/^    define('MAX_ASSIGNABLE_AP',       40);$/;"	d	line:5
 MAX_STARTING_INVSLOTS	/var/www/html/dankaf.ca/loa/constants.php	/^    define('MAX_STARTING_INVSLOTS',   30);$/;"	d	line:4
@@ -29,16 +24,11 @@ Stats	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^	class Stats {$/
 _SESSION	/var/www/html/dankaf.ca/loa/logout.php	/^    $_SESSION = [];$/;"	v	line:3
 __call	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        function __call($method, $params) {$/;"	m	line:28	class:Character	access:public
 __call	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        function __call($method, $params) {$/;"	m	line:166	class:Familiar	access:public
-__call	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    function __call($method, $params) {$/;"	m	line:153	class:Familiar	access:public
-__call	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    function __call($method, $params) {$/;"	m	line:199	class:FamiliarStats	access:public
-__call	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    function __call($method, $params) {$/;"	m	line:212	class:FamiliarEgg	access:public
 __call	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        function __call($method, $params) {$/;"	m	line:22	class:Monster	access:public
 __construct	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        public function __construct($accountID, $email) {$/;"	m	line:12	class:Character	access:public
 __construct	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        public function __construct($slotCount, $maxWeight) {$/;"	m	line:89	class:Inventory	access:public
 __construct	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        public function __construct() {$/;"	m	line:109	class:Slot	access:public
 __construct	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        public function __construct($characterID) {$/;"	m	line:41	class:Familiar	access:public
-__construct	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    public function __construct($characterID) {$/;"	m	line:27	class:Familiar	access:public
-__construct	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    public function __construct($slotCount, $maxWeight) {$/;"	m	line:164	class:EggBag	access:public
 __construct	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public function __construct($accountID) {$/;"	m	line:6	class:MailBox	access:public
 __construct	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public function __construct($account_id, MailFolderType $folder = MailFolderType::INBOX) {$/;"	m	line:30	class:MailFolder	access:public
 __construct	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        public function __construct(MonsterScope $scope, $account_id = null) {$/;"	m	line:57	class:Monster	access:public
@@ -57,20 +47,16 @@ accountID	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $a
 accountID	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $accountID;$/;"	p	line:3	class:MailBox	access:public
 accountID	/var/www/html/dankaf.ca/loa/classes/class-player.php	/^        private $accountID;$/;"	p	line:3	class:Player	access:private
 account_email	/var/www/html/dankaf.ca/loa/game.php	/^            $account_email    = $_SESSION['email'];$/;"	v	line:46
-action	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^        $action = $_REQUEST['action'];$/;"	v	line:6
+action	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^        $action = $_REQUEST['action'];$/;"	v	line:5
 add_energy	/var/www/html/dankaf.ca/loa/cron.php	/^    function add_energy() {$/;"	f	line:73
 amount	/var/www/html/dankaf.ca/loa/functions.php	/^        $amount   = substr($modifier, 1);$/;"	v	line:10	function:get_mysql_datetime
 apiKey	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^        protected $apiKey;$/;"	p	line:3	class:OpenAI	access:protected
-api_endpoint	/var/www/html/dankaf.ca/loa/openai.php	/^    $api_endpoint = 'https://api.openai.com/v1/chat/completions';$/;"	v	line:14
+api_endpoint	/var/www/html/dankaf.ca/loa/openai.php	/^    $api_endpoint = 'https://api.openai.com/v1/chat/completions';$/;"	v	line:10
 avatar	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $avatar;$/;"	p	line:30	class:Familiar	access:protected
-avatar	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $avatar;$/;"	p	line:20	class:Familiar	access:protected
 block_user	/var/www/html/dankaf.ca/loa/functions-friends.php	/^    function block_user($email) {$/;"	f	line:71
 block_user	/var/www/html/dankaf.ca/loa/functions.php	/^    function block_user($email) {$/;"	f	line:163
 caller	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^            $caller = debug_backtrace()[1]['function'];$/;"	v	line:30	method:Character::__call
 caller	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $caller = debug_backtrace()[1]['function'];$/;"	v	line:168	method:Familiar::__call
-caller	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $caller = debug_backtrace()[1]['function'];$/;"	v	line:154	method:Familiar::__call
-caller	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $caller = debug_backtrace()[1]['function'];$/;"	v	line:200	method:FamiliarStats::__call
-caller	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $caller = debug_backtrace()[1]['function'];$/;"	v	line:213	method:FamiliarEgg::__call
 caller	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^            $caller = debug_backtrace()[1]['function'];$/;"	v	line:24	method:Monster::__call
 ch	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^            $ch = curl_init($this->endPoint);$/;"	v	line:18	method:OpenAI::doRequest
 char_menu_icon	/var/www/html/dankaf.ca/loa/game.php	/^    $char_menu_icon = $character['hp'] > 0 $/;"	v	line:33
@@ -82,7 +68,8 @@ character	/var/www/html/dankaf.ca/loa/pages/game-friends.php	/^    $character   
 character	/var/www/html/dankaf.ca/loa/pages/game-hunt.php	/^    $character = table_to_obj($account['id'], 'character');$/;"	v	line:4
 character	/var/www/html/dankaf.ca/loa/pages/game-mail.php	/^    $character = table_to_obj($account['id'], 'character');$/;"	v	line:5
 characterID	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $characterID;$/;"	p	line:4	class:Familiar	access:protected
-characterID	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $characterID;$/;"	p	line:10	class:Familiar	access:protected
+chat_response	/var/www/html/dankaf.ca/loa/openai.php	/^    $chat_response = $response->choices[0]->message->content;$/;"	v	line:45
+chatbot	/var/www/html/dankaf.ca/loa/openai.php	/^    $chatbot = new OpenAI($/;"	v	line:17
 check_eggs	/var/www/html/dankaf.ca/loa/cron.php	/^    function check_eggs() {$/;"	f	line:89
 check_mail	/var/www/html/dankaf.ca/loa/functions.php	/^    function check_mail($what, $account_id) {$/;"	f	line:81
 classes	/var/www/html/dankaf.ca/loa/game.php	/^    $classes = scandir('classes/');$/;"	v	line:14
@@ -90,11 +77,12 @@ clsprop_to_tblcol	/var/www/html/dankaf.ca/loa/functions.php	/^    function clspr
 color	/var/www/html/dankaf.ca/loa/navs/nav-status.php	/^        $color = 'text-danger';$/;"	v	line:9
 color	/var/www/html/dankaf.ca/loa/navs/nav-status.php	/^    $color = 'text-success';$/;"	v	line:5
 column	/var/www/html/dankaf.ca/loa/functions.php	/^        $column = '';$/;"	v	line:27	function:table_to_obj
-complete	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^        $complete = $open_ai->image([$/;"	v	line:31
+complete	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^    $complete = $open_ai->image([$/;"	v	line:29
 confirm_password	/var/www/html/dankaf.ca/loa/game.php	/^            $confirm_password = $_REQUEST['profile-confirm-password'];$/;"	v	line:45
 count	/var/www/html/dankaf.ca/loa/cron.php	/^        $count = 0;$/;"	v	line:60	function:revive_all_players
-count	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^            $count = 5;$/;"	v	line:23
-count	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^        $count  = $_REQUEST['count'];$/;"	v	line:20
+count	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^        $count = 2;$/;"	v	line:21
+count	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^    $count  = $_REQUEST['count'];$/;"	v	line:17
+count	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^$count = 0;$/;"	v	line:6
 count_one	/var/www/html/dankaf.ca/loa/functions-friends.php	/^        $count_one    = $results_us->num_rows;$/;"	v	line:8	function:friend_status
 count_one	/var/www/html/dankaf.ca/loa/functions.php	/^        $count_one    = $results_us->num_rows;$/;"	v	line:100	function:friend_status
 count_two	/var/www/html/dankaf.ca/loa/functions-friends.php	/^        $count_two    = $results_them->num_rows;$/;"	v	line:12	function:friend_status
@@ -103,19 +91,15 @@ cur_ep	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^    $cur_ep       = $c
 cur_hp	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^    $cur_hp       = $character['hp'];$/;"	v	line:6
 cur_mp	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^    $cur_mp       = $character['mp'];$/;"	v	line:7
 cur_weather	/var/www/html/dankaf.ca/loa/cron.php	/^        $cur_weather = get_globals('weather');$/;"	v	line:49	function:cycle_weather
-current_egg	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^    $current_egg = null;$/;"	v	line:3
+current_egg	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^    $current_egg = null;$/;"	v	line:2
 cycle_weather	/var/www/html/dankaf.ca/loa/cron.php	/^    function cycle_weather() {$/;"	f	line:48
-data	/var/www/html/dankaf.ca/loa/openai.php	/^    $data = ($/;"	v	line:29
+data	/var/www/html/dankaf.ca/loa/openai.php	/^    $data = [$/;"	v	line:25
 date	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $date;$/;"	p	line:71	class:MailEnvelope	access:public
 dateAcquired	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $dateAcquired;$/;"	p	line:38	class:Familiar	access:protected
-dateAcquired	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $dateAcquired;$/;"	p	line:209	class:FamiliarEgg	access:private
-dateAcquired	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $dateAcquired;$/;"	p	line:24	class:Familiar	access:protected
 date_one_secs	/var/www/html/dankaf.ca/loa/functions.php	/^        $date_one_secs = strtotime($date_one);$/;"	v	line:17	function:sub_mysql_datetime
 date_two_secs	/var/www/html/dankaf.ca/loa/functions.php	/^        $date_two_secs = strtotime($date_two);$/;"	v	line:18	function:sub_mysql_datetime
 db	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            global $db, $log;$/;"	v	line:144	method:Familiar::loadFamiliar
 db	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            global $db, $log;$/;"	v	line:46	method:Familiar::registerFamiliar
-db	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        global $db, $log;$/;"	v	line:131	method:Familiar::loadFamiliar
-db	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        global $db, $log;$/;"	v	line:32	method:Familiar::registerFamiliar
 db	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^            global $db;$/;"	v	line:40	method:MailFolder::get_messages
 db	/var/www/html/dankaf.ca/loa/cron.php	/^        global $db, $log;$/;"	v	line:59	function:revive_all_players
 db	/var/www/html/dankaf.ca/loa/cron.php	/^        global $db, $log;$/;"	v	line:74	function:add_energy
@@ -132,10 +116,9 @@ db	/var/www/html/dankaf.ca/loa/functions.php	/^        global $db, $log;$/;"	v	l
 db	/var/www/html/dankaf.ca/loa/functions.php	/^        global $db;$/;"	v	line:173	function:save_character
 db	/var/www/html/dankaf.ca/loa/functions.php	/^        global $db;$/;"	v	line:60	function:get_globals
 db	/var/www/html/dankaf.ca/loa/functions.php	/^        global $db;$/;"	v	line:70	function:set_globals
-default_headers	/var/www/html/dankaf.ca/loa/openai.php	/^    $default_headers = [$/;"	v	line:16
+default_headers	/var/www/html/dankaf.ca/loa/openai.php	/^    $default_headers = [$/;"	v	line:12
 defense	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $defense;$/;"	p	line:75	class:Stats	access:protected
 defense	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^ 	    protected $defense;$/;"	p	line:18	class:Familiar	access:protected
-defense	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $defense;$/;"	p	line:191	class:FamiliarStats	access:private
 defense	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $defense;$/;"	p	line:14	class:Monster	access:protected
 doRequest	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^        public function doRequest($method, $headers, $data) {$/;"	m	line:17	class:OpenAI	access:public
 do_daily	/var/www/html/dankaf.ca/loa/cron.php	/^    function do_daily() {$/;"	f	line:44
@@ -144,19 +127,13 @@ do_minute	/var/www/html/dankaf.ca/loa/cron.php	/^    function do_minute() {$/;"	
 dotenv	/var/www/html/dankaf.ca/loa/cron.php	/^    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);$/;"	v	line:6
 dotenv	/var/www/html/dankaf.ca/loa/game.php	/^    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);$/;"	v	line:6
 dotenv	/var/www/html/dankaf.ca/loa/index.php	/^    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);$/;"	v	line:6
-dotenv	/var/www/html/dankaf.ca/loa/openai.php	/^    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);$/;"	v	line:6
+dotenv	/var/www/html/dankaf.ca/loa/openai.php	/^    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);$/;"	v	line:7
 dotenv	/var/www/html/dankaf.ca/loa/verification.php	/^    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);$/;"	v	line:6
 dropLevel	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $dropLevel;$/;"	p	line:16	class:Monster	access:protected
-egg	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $egg;$/;"	p	line:35	class:Familiar	access:protected
-egg	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $egg;$/;"	p	line:6	class:Familiar	access:protected
-egg_name	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^                $egg_name = $_REQUEST['egg-name'];$/;"	v	line:16
-egg_name	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^            $egg_name = null;$/;"	v	line:13
+egg_name	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^                $egg_name = $_REQUEST['egg-name'];$/;"	v	line:15
+egg_name	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^            $egg_name = null;$/;"	v	line:12
 eggsOwned	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $eggsOwned;$/;"	p	line:23	class:Familiar	access:protected
-eggsOwned	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $eggsOwned;$/;"	p	line:196	class:FamiliarStats	access:private
-eggsOwned	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $eggsOwned;$/;"	p	line:13	class:Familiar	access:protected
 eggsSeen	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $eggsSeen;$/;"	p	line:24	class:Familiar	access:protected
-eggsSeen	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $eggsSeen;$/;"	p	line:197	class:FamiliarStats	access:private
-eggsSeen	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $eggsSeen;$/;"	p	line:14	class:Familiar	access:protected
 email	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $email;$/;"	p	line:5	class:Character	access:protected
 email	/var/www/html/dankaf.ca/loa/functions-friends.php	/^        $email = filter_var($email, FILTER_SANITIZE_EMAIL);$/;"	v	line:4	function:friend_status
 email	/var/www/html/dankaf.ca/loa/functions.php	/^        $email = filter_var($email, FILTER_SANITIZE_EMAIL);$/;"	v	line:96	function:friend_status
@@ -164,19 +141,15 @@ email	/var/www/html/dankaf.ca/loa/index.php	/^        $email    = $_REQUEST['log
 email	/var/www/html/dankaf.ca/loa/verification.php	/^        $email             = $_REQUEST['email'];$/;"	v	line:16
 endPoint	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^        protected $endPoint;$/;"	p	line:4	class:OpenAI	access:protected
 energy	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $energy;$/;"	p	line:13	class:Familiar	access:protected
-energy	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $energy;$/;"	p	line:186	class:FamiliarStats	access:private
 envelopes	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $envelopes = Array();$/;"	p	line:26	class:MailFolder	access:public
 ep	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $ep;$/;"	p	line:70	class:Stats	access:protected
 ep_textcolor	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^        $ep_textcolor = 'text-white';$/;"	v	line:23
 ep_textcolor	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^    $ep_textcolor = 'text-black';$/;"	v	line:4
 expAwarded	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $expAwarded, $goldAwarded;$/;"	p	line:17	class:Monster	access:protected
 experience	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $experience;$/;"	p	line:20	class:Familiar	access:protected
-experience	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $experience;$/;"	p	line:193	class:FamiliarStats	access:private
 familiar	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $familiar = $result->fetch_assoc();$/;"	v	line:157	method:Familiar::loadFamiliar
-familiar	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $familiar = $result->fetch_assoc();$/;"	v	line:144	method:Familiar::loadFamiliar
 familiar	/var/www/html/dankaf.ca/loa/game.php	/^    $familiar = new Familiar($character['id']);$/;"	v	line:30
 familiar_id	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $familiar_id  = $result->fetch_assoc();$/;"	v	line:61	method:Familiar::registerFamiliar
-familiar_id	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $familiar_id        = $result->fetch_assoc();$/;"	v	line:47	method:Familiar::registerFamiliar
 favorite	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $favorite;$/;"	p	line:73	class:MailEnvelope	access:public
 filename	/var/www/html/dankaf.ca/loa/pages/game-spooky.php	/^        $filename = __DIR__ . '/img/generated/spooky/124157157123160157157153171064115145.gif';$/;"	v	line:2
 focusedFolder	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $focusedFolder;$/;"	p	line:4	class:MailBox	access:public
@@ -184,9 +157,9 @@ folder	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $fold
 folderType	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $folderType;$/;"	p	line:27	class:MailFolder	access:public
 friend_status	/var/www/html/dankaf.ca/loa/functions-friends.php	/^    function friend_status($email) {$/;"	f	line:2
 friend_status	/var/www/html/dankaf.ca/loa/functions.php	/^    function friend_status($email) {$/;"	f	line:94
+generate	/var/www/html/dankaf.ca/loa/components.php	/^    function generate(Components $which, $data_object) {$/;"	f	line:5
 generate_egg	/var/www/html/dankaf.ca/loa/functions.php	/^    function generate_egg($familiar, $rarity_roll) {$/;"	f	line:195
 getCard	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        public function getCard($which = 'current') {$/;"	m	line:120	class:Familiar	access:public
-getCard	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    public function getCard($which = 'current') {$/;"	m	line:107	class:Familiar	access:public
 getStat	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        public function getStat($stat) {$/;"	m	line:24	class:Character	access:public
 get_friend_counts	/var/www/html/dankaf.ca/loa/functions-friends.php	/^    function get_friend_counts($which) {$/;"	f	line:54
 get_friend_counts	/var/www/html/dankaf.ca/loa/functions.php	/^    function get_friend_counts($which, $id = 0) {$/;"	f	line:145
@@ -196,58 +169,43 @@ get_messages	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public
 get_model	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^        public function get_model() {$/;"	m	line:42	class:OpenAI	access:public
 get_mysql_datetime	/var/www/html/dankaf.ca/loa/functions.php	/^    function get_mysql_datetime($modifier = 'now') {$/;"	f	line:6
 get_rarity_color	/var/www/html/dankaf.ca/loa/functions.php	/^    function get_rarity_color($rarity) {$/;"	f	line:216
-getset_dbsync	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^function getset_dbsync($method, $params, $caller, $table, &$that) {$/;"	f	line:220
 hashed_password	/var/www/html/dankaf.ca/loa/game.php	/^                    $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);$/;"	v	line:51
 hatchTime	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $hatchTime;$/;"	p	line:37	class:Familiar	access:protected
-hatchTime	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $hatchTime;$/;"	p	line:208	class:FamiliarEgg	access:private
-hatchTime	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $hatchTime;$/;"	p	line:23	class:Familiar	access:protected
 hatch_time	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $hatch_time = get_mysql_datetime('+8 hours');$/;"	v	line:49	method:Familiar::registerFamiliar
-hatch_time	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $hatch_time = get_mysql_datetime('+8 hours');$/;"	v	line:35	method:Familiar::registerFamiliar
 hatched	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $hatched;$/;"	p	line:39	class:Familiar	access:protected
-hatched	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $hatched;$/;"	p	line:210	class:FamiliarEgg	access:private
-hatched	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $hatched;$/;"	p	line:25	class:Familiar	access:protected
 header_charname	/var/www/html/dankaf.ca/loa/pages/game-friends.php	/^        $header_charname = $character['name'] . "'";$/;"	v	line:30
 header_charname	/var/www/html/dankaf.ca/loa/pages/game-friends.php	/^    $header_charname = $character['name'] . "'s";$/;"	v	line:5
 health	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $health;$/;"	p	line:7	class:Familiar	access:protected
-health	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $health;$/;"	p	line:180	class:FamiliarStats	access:private
 hp	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^		protected $hp;$/;"	p	line:66	class:Stats	access:protected
 hp	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $hp, $maxHP;$/;"	p	line:10	class:Monster	access:protected
 hp	/var/www/html/dankaf.ca/loa/navs/nav-status.php	/^    $hp = $character['hp'];$/;"	v	line:2
 hp_textcolor	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^        $hp_textcolor = 'text-white';$/;"	v	line:15
 hp_textcolor	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^    $hp_textcolor = 'text-black';$/;"	v	line:2
 html	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^                $html = file_get_contents($/;"	v	line:122	method:Familiar::getCard
-html	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^            $html = file_get_contents($/;"	v	line:109	method:Familiar::getCard
-html	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^                    $html = $familiar->getCard('empty');$/;"	v	line:43
+html	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^                    $html = $familiar->getCard('empty');$/;"	v	line:42
 icon	/var/www/html/dankaf.ca/loa/navs/nav-status.php	/^        $icon = 'bi bi-emoji-dizzy-fill';$/;"	v	line:8
 icon	/var/www/html/dankaf.ca/loa/navs/nav-status.php	/^    $icon = 'bi bi-emoji-smile-fill';$/;"	v	line:4
 id	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $id;$/;"	p	line:3	class:Character	access:protected
 id	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $id;$/;"	p	line:3	class:Familiar	access:protected
-id	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $id;$/;"	p	line:9	class:Familiar	access:protected
 images	/var/www/html/dankaf.ca/loa/navs/nav-login.php	/^                                                $images = scandir('img/avatars');$/;"	v	line:118
 important	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $important;$/;"	p	line:74	class:MailEnvelope	access:public
 inbox_count	/var/www/html/dankaf.ca/loa/pages/game-mail.php	/^    $inbox_count = $user_mailbox->focusedFolder->get_message_count();$/;"	v	line:10
 intelligence	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $intelligence;$/;"	p	line:74	class:Stats	access:protected
 intelligence	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $intelligence;$/;"	p	line:16	class:Familiar	access:protected
-intelligence	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $intelligence;$/;"	p	line:189	class:FamiliarStats	access:private
 intelligence	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $intelligence;$/;"	p	line:13	class:Monster	access:protected
 inventory	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $inventory;$/;"	p	line:10	class:Character	access:protected
 itemName	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $itemName;$/;"	p	line:105	class:Slot	access:protected
 itemSockets	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $itemSockets;$/;"	p	line:107	class:Slot	access:protected
 itemWeight	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $itemWeight;$/;"	p	line:106	class:Slot	access:protected
+json_obj	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^    $json_obj = json_decode($complete);$/;"	v	line:35
 lastRoll	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $lastRoll;$/;"	p	line:31	class:Familiar	access:protected
-lastRoll	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $lastRoll;$/;"	p	line:21	class:Familiar	access:protected
 level	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $level;$/;"	p	line:5	class:Familiar	access:protected
-level	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $level;$/;"	p	line:178	class:FamiliarStats	access:private
-level	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $level;$/;"	p	line:11	class:Familiar	access:protected
 loadFamiliar	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        public function loadFamiliar($characterID) {$/;"	m	line:143	class:Familiar	access:public
-loadFamiliar	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    public function loadFamiliar($characterID) {$/;"	m	line:130	class:Familiar	access:public
 load_character	/var/www/html/dankaf.ca/loa/functions.php	/^    function load_character($id) {$/;"	f	line:180
 load_monster_sheet	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        public function load_monster_sheet() {$/;"	m	line:62	class:Monster	access:public
 log	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^            global $log, $db;$/;"	v	line:29	method:Character::__call
 log	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            global $log, $db;$/;"	v	line:167	method:Familiar::__call
 log	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            global $log, $db;$/;"	v	line:82	method:Familiar::saveFamiliar
-log	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        global $log, $db;$/;"	v	line:69	method:Familiar::saveFamiliar
-log	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    global $log, $db;$/;"	v	line:221	function:getset_dbsync
 log	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^            global $log, $db;$/;"	v	line:15	method:MailBox::populate_focused_folder
 log	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^            global $log, $db;$/;"	v	line:23	method:Monster::__call
 log	/var/www/html/dankaf.ca/loa/functions.php	/^        global $log;$/;"	v	line:196	function:generate_egg
@@ -259,15 +217,11 @@ log	/var/www/html/dankaf.ca/loa/pages/game-friends.php	/^    global $log;$/;"	v	
 mail	/var/www/html/dankaf.ca/loa/mailer.php	/^            $mail = new PHPMailer(true);$/;"	v	line:12	function:send_mail
 mail_id	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $mail_id;$/;"	p	line:65	class:MailEnvelope	access:public
 mana	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $mana;$/;"	p	line:10	class:Familiar	access:protected
-mana	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $mana;$/;"	p	line:183	class:FamiliarStats	access:private
 maxEnergy	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^ 	    protected $maxEnergy;$/;"	p	line:14	class:Familiar	access:protected
-maxEnergy	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $maxEnergy;$/;"	p	line:187	class:FamiliarStats	access:private
 maxEp	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $maxEp;$/;"	p	line:71	class:Stats	access:protected
 maxHealth	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $maxHealth;$/;"	p	line:8	class:Familiar	access:protected
-maxHealth	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $maxHealth;$/;"	p	line:181	class:FamiliarStats	access:private
 maxHp	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^		protected $maxHp;$/;"	p	line:67	class:Stats	access:protected
 maxMana	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^     	protected $maxMana;$/;"	p	line:11	class:Familiar	access:protected
-maxMana	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^ 	private $maxMana;$/;"	p	line:184	class:FamiliarStats	access:private
 maxMp	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $maxMp;$/;"	p	line:69	class:Stats	access:protected
 maxWeight	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $maxWeight;$/;"	p	line:85	class:Inventory	access:protected
 max_ep	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^    $max_ep       = $character['max_ep'];$/;"	v	line:12
@@ -276,7 +230,7 @@ max_hp	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^    $max_hp       = $c
 max_mp	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^    $max_mp       = $character['max_mp'];$/;"	v	line:11
 message	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $message;$/;"	p	line:69	class:MailEnvelope	access:public
 model	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^        protected $model;$/;"	p	line:6	class:OpenAI	access:protected
-model	/var/www/html/dankaf.ca/loa/openai.php	/^    $model = $GPT->get_model();$/;"	v	line:27
+model	/var/www/html/dankaf.ca/loa/openai.php	/^    $model = $chatbot->get_model();$/;"	v	line:23
 modifier	/var/www/html/dankaf.ca/loa/functions.php	/^        $modifier = $operand . $amount;$/;"	v	line:11	function:get_mysql_datetime
 monsterClass	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $monsterClass;$/;"	p	line:19	class:Monster	access:protected
 monsters	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^            $monsters = Array();$/;"	v	line:63	method:Monster::load_monster_sheet
@@ -288,15 +242,13 @@ mp_textcolor	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^        $mp_text
 mp_textcolor	/var/www/html/dankaf.ca/loa/pages/game-sheet.php	/^    $mp_textcolor = 'text-black';$/;"	v	line:3
 name	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $name;$/;"	p	line:6	class:Character	access:protected
 name	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $name;$/;"	p	line:26	class:Familiar	access:protected
-name	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $name;$/;"	p	line:16	class:Familiar	access:protected
 name	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $name;$/;"	p	line:3	class:Monster	access:protected
 new_password	/var/www/html/dankaf.ca/loa/game.php	/^            $new_password     = $_REQUEST['profile-new-password'];$/;"	v	line:44
 nextAvailableSlot	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $nextAvailableSlot;$/;"	p	line:87	class:Inventory	access:protected
 nextLevel	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $nextLevel;$/;"	p	line:21	class:Familiar	access:protected
-nextLevel	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    private $nextLevel;$/;"	p	line:194	class:FamiliarStats	access:private
 old_password	/var/www/html/dankaf.ca/loa/game.php	/^            $old_password     = $_REQUEST['profile-old-password'];$/;"	v	line:43
-open_ai	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^    $open_ai     = new OpenAi($open_ai_key);$/;"	v	line:5
-open_ai_key	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^    $open_ai_key = $_ENV['OPENAI_APIKEY'];$/;"	v	line:4
+open_ai	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^$open_ai     = new OpenAi($open_ai_key);$/;"	v	line:5
+open_ai_key	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^$open_ai_key = $_ENV['OPENAI_APIKEY'];$/;"	v	line:4
 operand	/var/www/html/dankaf.ca/loa/functions.php	/^        $operand  = substr($modifier, 0, 1);$/;"	v	line:9	function:get_mysql_datetime
 page_uri	/var/www/html/dankaf.ca/loa/game.php	/^                            $page_uri = 'pages/game-' .  $requested_page . '.php';$/;"	v	line:373
 password	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $password;$/;"	p	line:7	class:Character	access:protected
@@ -315,33 +267,28 @@ prepped	/var/www/html/dankaf.ca/loa/pages/game-friends.php	/^                   
 prepped	/var/www/html/dankaf.ca/loa/verification.php	/^        $prepped = $db->prepare($sql_query);$/;"	v	line:20
 privileges	/var/www/html/dankaf.ca/loa/game.php	/^                                    $privileges = UserPrivileges::name_to_value($account['privileges']);$/;"	v	line:351
 processPrompt	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^        public static function processPrompt($user_prompt) {$/;"	m	line:38	class:OpenAI	access:public
-prompt	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^        $prompt = $_REQUEST['prompt'];$/;"	v	line:18
+produced_html	/var/www/html/dankaf.ca/loa/components.php	/^        $produced_html = null;$/;"	v	line:6	function:generate
+prompt	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^    $prompt = $_REQUEST['prompt'];$/;"	v	line:18
 random_float	/var/www/html/dankaf.ca/loa/functions.php	/^    function random_float($min, $max) {$/;"	f	line:77
 random_monster	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        public function random_monster($dropLevel = 0) {$/;"	m	line:69	class:Monster	access:public
 rarity	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $rarity;$/;"	p	line:28	class:Familiar	access:protected
-rarity	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $rarity;$/;"	p	line:18	class:Familiar	access:protected
 rarity	/var/www/html/dankaf.ca/loa/functions.php	/^        $rarity       = ObjectRarity::getObjectRarity($rarity_roll);$/;"	v	line:198	function:generate_egg
 rarityColor	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $rarityColor;$/;"	p	line:29	class:Familiar	access:protected
-rarityColor	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $rarityColor;$/;"	p	line:19	class:Familiar	access:protected
 rarity_color	/var/www/html/dankaf.ca/loa/functions.php	/^        $rarity_color = get_rarity_color($rarity);$/;"	v	line:199	function:generate_egg
-rarity_name	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^            $rarity_name = $familiar->get_rarity();$/;"	v	line:9
+rarity_name	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^            $rarity_name = $familiar->get_rarity();$/;"	v	line:8
 read	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $read;$/;"	p	line:72	class:MailEnvelope	access:public
 recipient	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $recipient;$/;"	p	line:67	class:MailEnvelope	access:public
 recvreqs	/var/www/html/dankaf.ca/loa/pages/game-friends.php	/^    $recvreqs = $db->query("SELECT * FROM tbl_friends WHERE email_2 = '" . $account['email'] . "' OR email_1 = '" . $account['email'] . "'");$/;"	v	line:10
 registerFamiliar	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        public function registerFamiliar() {$/;"	m	line:45	class:Familiar	access:public
-registerFamiliar	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    public function registerFamiliar() {$/;"	m	line:31	class:Familiar	access:public
 replied_to	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $replied_to;$/;"	p	line:75	class:MailEnvelope	access:public
 requested_page	/var/www/html/dankaf.ca/loa/game.php	/^                            $requested_page = preg_replace('/[^a-z-]+/', '', $_REQUEST['page']);$/;"	v	line:372
 requests	/var/www/html/dankaf.ca/loa/game.php	/^                                        $requests = get_friend_counts('requests');$/;"	v	line:321
 requests	/var/www/html/dankaf.ca/loa/pages/game-friends.php	/^    $requests = $requested = $friends = $blocked = Array();$/;"	v	line:7
 response	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^            $response = curl_exec($ch);$/;"	v	line:30	method:OpenAI::doRequest
-response	/var/www/html/dankaf.ca/loa/openai.php	/^    $response = $GPT->doRequest($/;"	v	line:43
 rest_disabled	/var/www/html/dankaf.ca/loa/game.php	/^                                                    $rest_disabled = 'disabled';$/;"	v	line:207
 rest_disabled	/var/www/html/dankaf.ca/loa/game.php	/^                                                $rest_disabled = '';$/;"	v	line:205
 result	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $result = $db->query($sql_query);$/;"	v	line:148	method:Familiar::loadFamiliar
 result	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $result = $db->query($sql_query);$/;"	v	line:59	method:Familiar::registerFamiliar
-result	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $result             = $db->query($sql_query);$/;"	v	line:45	method:Familiar::registerFamiliar
-result	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $result = $db->query($sql_query);$/;"	v	line:135	method:Familiar::loadFamiliar
 result	/var/www/html/dankaf.ca/loa/functions-friends.php	/^        $result = $db->query($result)->fetch_assoc();$/;"	v	line:75	function:block_user
 result	/var/www/html/dankaf.ca/loa/functions.php	/^        $result = $db->query($result)->fetch_assoc();$/;"	v	line:167	function:block_user
 result	/var/www/html/dankaf.ca/loa/functions.php	/^        $result = $db->query($sql_query);$/;"	v	line:63	function:get_globals
@@ -359,11 +306,10 @@ results_us	/var/www/html/dankaf.ca/loa/functions-friends.php	/^        $results_
 results_us	/var/www/html/dankaf.ca/loa/functions.php	/^        $results_us   = $db->query($sql_query);$/;"	v	line:99	function:friend_status
 ret_val	/var/www/html/dankaf.ca/loa/functions.php	/^        $ret_val = '';$/;"	v	line:61	function:get_globals
 revive_all_players	/var/www/html/dankaf.ca/loa/cron.php	/^    function revive_all_players() {$/;"	f	line:58
-roll	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^            $roll = random_float(0, 12);$/;"	v	line:11
+roll	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^            $roll = random_float(0, 12);$/;"	v	line:10
 row	/var/www/html/dankaf.ca/loa/functions.php	/^        $row    = $result->fetch_assoc();$/;"	v	line:54	function:table_to_obj
 row	/var/www/html/dankaf.ca/loa/functions.php	/^        $row = $result->fetch_assoc();$/;"	v	line:64	function:get_globals
 saveFamiliar	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        public function saveFamiliar() {$/;"	m	line:81	class:Familiar	access:public
-saveFamiliar	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    public function saveFamiliar() {$/;"	m	line:68	class:Familiar	access:public
 save_character	/var/www/html/dankaf.ca/loa/functions.php	/^    function save_character($id, $character) {$/;"	f	line:172
 scope	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $scope;$/;"	p	line:5	class:Monster	access:protected
 seconds_left	/var/www/html/dankaf.ca/loa/functions.php	/^        $seconds_left  = $date_two_secs - $date_one_secs;$/;"	v	line:19	function:sub_mysql_datetime
@@ -376,11 +322,8 @@ set_focused_folder	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        
 set_globals	/var/www/html/dankaf.ca/loa/functions.php	/^    function set_globals($name, $value) {$/;"	f	line:69
 set_model	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^        public function set_model($model) {$/;"	m	line:46	class:OpenAI	access:public
 slotCount	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $slotCount;$/;"	p	line:82	class:Inventory	access:protected
-slotCount	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $slotCount;$/;"	p	line:162	class:EggBag	access:protected
 slots	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $slots;$/;"	p	line:81	class:Inventory	access:protected
-slots	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $slots; /* Array */$/;"	p	line:161	class:EggBag	access:protected
 spacesLeft	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        public static function spacesLeft() {$/;"	m	line:99	class:Inventory	access:public
-spacesLeft	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    public static function spacesLeft() {$/;"	m	line:172	class:EggBag	access:public
 splits	/var/www/html/dankaf.ca/loa/functions.php	/^        $splits = preg_split('/(?=[A-Z]{1,2})/', $property); $/;"	v	line:258	function:clsprop_to_tblcol
 sql_db	/var/www/html/dankaf.ca/loa/db.php	/^    $sql_db   = $_ENV['SQL_DB'];$/;"	v	line:6
 sql_host	/var/www/html/dankaf.ca/loa/db.php	/^    $sql_host = $_ENV['SQL_HOST'];$/;"	v	line:4
@@ -393,12 +336,6 @@ sql_query	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $
 sql_query	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $sql_query = 'SELECT `id` FROM ' . $_ENV['SQL_FMLR_TBL'] . $/;"	v	line:56	method:Familiar::registerFamiliar
 sql_query	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $sql_query = 'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' SET ';$/;"	v	line:84	method:Familiar::saveFamiliar
 sql_query	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $sql_query = rtrim($sql_query, ', ');$/;"	v	line:106	method:Familiar::saveFamiliar
-sql_query	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $sql_query =  'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' ';$/;"	v	line:230	function:getset_dbsync
-sql_query	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $sql_query = 'INSERT INTO ' . $_ENV['SQL_FMLR_TBL'] . $/;"	v	line:37	method:Familiar::registerFamiliar
-sql_query	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_FMLR_TBL'] . ' ' .$/;"	v	line:133	method:Familiar::loadFamiliar
-sql_query	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $sql_query = 'SELECT `id` FROM ' . $_ENV['SQL_FMLR_TBL'] . $/;"	v	line:42	method:Familiar::registerFamiliar
-sql_query	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $sql_query = 'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' SET ';$/;"	v	line:71	method:Familiar::saveFamiliar
-sql_query	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $sql_query = rtrim($sql_query, ', ');$/;"	v	line:93	method:Familiar::saveFamiliar
 sql_query	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^             $sql_query = 'SELECT * FROM ' . $_ENV['SQL_MAIL_TBL'] . $/;"	v	line:41	method:MailFolder::get_messages
 sql_query	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^                $sql_query =  'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' ';$/;"	v	line:34	method:Monster::__call
 sql_query	/var/www/html/dankaf.ca/loa/cron.php	/^        $sql_query = "SELECT * FROM `" . $ENV['SQL_CHAR_TBL'] . "` WHERE hp = 0;";$/;"	v	line:62	function:revive_all_players
@@ -424,42 +361,34 @@ sql_query	/var/www/html/dankaf.ca/loa/pages/game-dungeon.php	/^        $sql_quer
 sql_query	/var/www/html/dankaf.ca/loa/pages/game-friends.php	/^                $sql_query = "DELETE FROM `" . $_ENV['SQL_FRND_TBL'] . "` " .$/;"	v	line:36
 sql_query	/var/www/html/dankaf.ca/loa/verification.php	/^        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE `verification_code` = ? AND `email` = ?';$/;"	v	line:18
 sql_time	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $sql_time   = get_mysql_datetime();$/;"	v	line:48	method:Familiar::registerFamiliar
-sql_time	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $sql_time   = get_mysql_datetime();$/;"	v	line:34	method:Familiar::registerFamiliar
 sql_user	/var/www/html/dankaf.ca/loa/db.php	/^    $sql_user = $_ENV['SQL_USER'];$/;"	v	line:7
 stats	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $stats;$/;"	p	line:9	class:Character	access:protected
-stats	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^        protected $stats;$/;"	p	line:34	class:Familiar	access:protected
-stats	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    protected $stats;$/;"	p	line:5	class:Familiar	access:protected
 status	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $status;$/;"	p	line:77	class:Stats	access:protected
 status_string	/var/www/html/dankaf.ca/loa/navs/nav-status.php	/^    $status_string = "<div class=\"col $color\"><i class=\"bi $icon\"></i>$hp/$max_hp</div> |";$/;"	v	line:17
 strength	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^        protected $strength;$/;"	p	line:73	class:Stats	access:protected
 strength	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^     	protected $strength;$/;"	p	line:17	class:Familiar	access:protected
-strength	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^ 	private $strength;$/;"	p	line:190	class:FamiliarStats	access:private
 strength	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $strength;$/;"	p	line:12	class:Monster	access:protected
 sub_mysql_datetime	/var/www/html/dankaf.ca/loa/functions.php	/^    function sub_mysql_datetime(string $date_one, string $date_two) {$/;"	f	line:16
 subject	/var/www/html/dankaf.ca/loa/classes/class-mail.php	/^        public $subject;$/;"	p	line:68	class:MailEnvelope	access:public
 summondBy	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $summondBy;$/;"	p	line:8	class:Monster	access:protected
 systemPrompt	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^        protected $systemPrompt;$/;"	p	line:8	class:OpenAI	access:protected
-table	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $table  = $_ENV['SQL_FMLR_TBL'];$/;"	v	line:155	method:Familiar::__call
-table	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $table  = $_ENV['SQL_FMLR_TBL'];$/;"	v	line:201	method:FamiliarStats::__call
-table	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $table  = $_ENV['SQL_FMLR_TBL'];$/;"	v	line:214	method:FamiliarEgg::__call
 table	/var/www/html/dankaf.ca/loa/functions.php	/^        $table = '';$/;"	v	line:26	function:table_to_obj
 table_col	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^                $table_col = clsprop_to_tblcol($var);$/;"	v	line:41	method:Character::__call
 table_col	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^                $table_col = clsprop_to_tblcol($var);$/;"	v	line:178	method:Familiar::__call
-table_col	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^        $table_col = clsprop_to_tblcol($var);$/;"	v	line:231	function:getset_dbsync
 table_col	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^                $table_col = clsprop_to_tblcol($var);$/;"	v	line:35	method:Monster::__call
 table_column	/var/www/html/dankaf.ca/loa/functions.php	/^        $table_column = $splits[0] . '_' . strtolower($splits[1]);$/;"	v	line:266	function:clsprop_to_tblcol
 table_to_obj	/var/www/html/dankaf.ca/loa/functions.php	/^    function table_to_obj($identifier, $type) {$/;"	f	line:24
-temp_file_name	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^                $temp_file_name = '.' . session_id() . '_tmp_egg'; $/;"	v	line:40
+temp_file_name	/var/www/html/dankaf.ca/loa/pages/game-eggs.php	/^                $temp_file_name = '.' . session_id() . '_tmp_egg'; $/;"	v	line:39
 test	/var/www/html/dankaf.ca/loa/navs/nav-status.php	/^    $test = Weather::SNOWING; $/;"	v	line:11
 total_monsters	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^        protected $total_monsters;$/;"	p	line:76	class:MonsterPool	access:protected
-type	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^        $type   = $_REQUEST['type'];$/;"	v	line:19
+type	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^    $type   = $_REQUEST['type'];$/;"	v	line:16
+type	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^$type  = 'enemies';$/;"	v	line:7
 unread_mail	/var/www/html/dankaf.ca/loa/game.php	/^                                            $unread_mail = check_mail('unread', $account['id']);$/;"	v	line:334
 userPrompt	/var/www/html/dankaf.ca/loa/classes/class-openai.php	/^        protected $userPrompt;$/;"	p	line:10	class:OpenAI	access:protected
 user_mailbox	/var/www/html/dankaf.ca/loa/pages/game-mail.php	/^    $user_mailbox = new MailBox($account['id']);$/;"	v	line:7
-user_privs	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^    $user_privs = UserPrivileges::name_to_enum($account['privileges']);$/;"	v	line:7
+user_privs	/var/www/html/dankaf.ca/loa/pages/game-administrator.php	/^$user_privs = UserPrivileges::name_to_enum($account['privileges']);$/;"	v	line:8
 var	/var/www/html/dankaf.ca/loa/classes/class-character.php	/^            $var = lcfirst(substr($method, 4));$/;"	v	line:32	method:Character::__call
 var	/var/www/html/dankaf.ca/loa/classes/class-familiar.php	/^            $var = lcfirst(substr($method, 4));$/;"	v	line:170	method:Familiar::__call
-var	/var/www/html/dankaf.ca/loa/classes/class-familiar2.php	/^    $var = lcfirst(substr($method, 4));$/;"	v	line:223	function:getset_dbsync
 var	/var/www/html/dankaf.ca/loa/classes/class-monster.php	/^            $var = lcfirst(substr($method, 4));$/;"	v	line:26	method:Monster::__call
 verification_code	/var/www/html/dankaf.ca/loa/verification.php	/^        $verification_code = $_REQUEST['code'];$/;"	v	line:15
 weather_string	/var/www/html/dankaf.ca/loa/navs/nav-status.php	/^    $weather_string = '<div class="col">';$/;"	v	line:12

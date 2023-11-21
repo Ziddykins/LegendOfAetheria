@@ -2,15 +2,11 @@
     declare(strict_types = 1);
     session_start();
     require __DIR__ . '/vendor/autoload.php';
-
+    require_once 'classes/class-openai.php';
+    
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 
-    //require_once 'logger.php';
-    //require_once 'db.php';
-    //require_once 'constants.php';
-    //require_once 'functions.php';
-    require_once 'classes/class-openai.php';
     $api_endpoint = 'https://api.openai.com/v1/chat/completions';
     
     $default_headers = [
@@ -18,35 +14,38 @@
             'Authorization: Bearer ' . $_ENV['OPENAI_APIKEY'],
     ];
     
-    $GPT = new OpenAI(
+    $chatbot = new OpenAI(
         $_ENV['OPENAI_APIKEY'],
         $api_endpoint
     );
 
-    $GPT->set_model('gpt-3.5-turbo');
-    $model = $GPT->get_model();
-    
-    $data = (
-    [
-        'model'    => $GPT->get_model(),
-        'messages' => [
-            'role'    => 'system',
-            'content' => 'You are an informative dungeon master, helping this ' .
-                         'new warrior along his quest for glory.'
-        ], 
-        [
-            'role'    => 'user',
-            'content' =>  'Where am I? Why can\'t I remember anything?'
-        ]
-    ]);
+    $chatbot->set_model('gpt-3.5-turbo');
+    $model = $chatbot->get_model();
 
-    $response = $GPT->doRequest(
+    $data = [
+        "model" => $chatbot->get_model(),
+        "messages" => [
+            [
+                "role" => "system",
+                "content" =>  "You're a customer support rep for a multi-national conglomerancy focused on cloud computing",
+            ],
+            [
+                "role" => "user",
+                "content" => "How do I internet?",
+            ],
+        ],
+    ];
+
+    /*$response = json_decode($chatbot->doRequest(
         HttpMethod::POST,
         $default_headers,
-        $data
+        $data)
     );
+     */
+    $chat_response = $response->choices[0]->message->content;
 
-    echo "<pre>";
-    print_r($response);
+?>
 
-    print_r($GPT);
+<div class="container justify-content-center">
+    <div class="row">
+        <div class="col">

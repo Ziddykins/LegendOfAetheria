@@ -1,3 +1,0 @@
-0-59 * * * * /usr/bin/php /var/www/html/dankaf.ca/loa/cron.php minute
-@hourly /usr/bin/php /var/www/html/dankaf.ca/loa/cron.php hourly
-@daily /usr/bin/php /var/www/html/dankaf.ca/loa/cron.php daily

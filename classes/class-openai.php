@@ -18,7 +18,7 @@
             $ch = curl_init($this->endPoint);
 
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_HEADER, 1);
+//            curl_setopt($ch, CURLOPT_HEADER, 1);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
             
             if ($method == HttpMethod::POST) {
