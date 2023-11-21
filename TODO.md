@@ -27,6 +27,11 @@
         xp/gold
   * [ ] maybe once per day a golden egg grants boosts or equip
 
+* [ ] Livechat - PHP/MySQL/jQuery/AJAX
+
+* [ ] AutoInstaller
+
+
 # Icons
 
   vitality or hp - change color
