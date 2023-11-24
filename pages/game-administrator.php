@@ -1,107 +1,167 @@
-<?php
-use Orhanerday\OpenAi\OpenAi;
+<?php include('html/opener.html'); ?>
+    <head>
+        <?php include('html/headers.html'); ?>
 
-$open_ai_key = $_ENV['OPENAI_APIKEY'];
-$open_ai     = new OpenAi($open_ai_key);
-$count = 0;
-$type  = 'enemies';
-$user_privs = UserPrivileges::name_to_enum($account['privileges']);
-
-if ($user_privs->value <= UserPrivileges::MODERATOR->value) {
-    echo "F O R B I D D E N";
-    exit();
-}
-
-if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) { 
-    $type   = $_REQUEST['type'];
-    $count  = $_REQUEST['count'];
-    $prompt = $_REQUEST['prompt'];
-
-    if ($count < 1 || $count > 5) {
-        $count = 2;
-    }
-
-    if ($type !== 'eggs' and $type !== 'enemies' and $type !== 'avatars') {
-        echo "Invalid type";
-        exit();
-    }
-
-    $complete = $open_ai->image([
-        "prompt" => $prompt,
-        "n" => (int)$count,
-        "size" => "256x256",
-        "response_format" => "b64_json",
-    ]);
-    $json_obj = json_decode($complete);
-}
-?>
-<form id="generate-images" name="generate-images" method="POST" action="?page=administrator">
-        <div class="row">
+    </head>
+        
+    <body>
+    <pre><small>
+    <div id="debug" class="border">
+        _===============÷÷÷÷÷÷÷_
+       #    _,.;'‾DEBUG‾';.,_   #
+        ‾===============÷÷÷÷÷÷÷‾
+    </div>
+    </small></pre>
+         <div class="row bg-primary text-white">
+            <div class="col">
+                <h4>AI and Model</h4>
+            </div>
+        </div>
+        <div class="row mb-3 mt-2 bg-tertiary">
+            <div class="col">
+                <div class="input-group">
+                    <span class="input-group-text" id="prompt-icon" name="prompt-icon">
+                        <span class="material-symbols-sharp">psychology_alt</span>
+                    </span>
+                    <select class="form-select form-control" aria-label="form-select" id="ai-type" name="ai-type" style="font-size: 1.00rem" required>
+                        <option value="Select Type" disabled selected>Select Type</option>
+                        <option value="gpt">GPT-3.5 - GPT 4</option>
+                        <option value="dalle">DALL-E 2/DALL-E 3</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3 mt-2 bg-tertiary">
             <div class="col">
                 <div class="input-group">
                     <span class="input-group-text" id="prompt-icon" name="prompt-icon">
                         <span class="material-symbols-sharp">cognition</span>
                     </span>
-                    <div class="form-floating">
-                        <input type="text" class="form-control form-control-sm" id="prompt" name="prompt" required>
-                        <label for="prompt">Prompt</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row"> 
-            <div class="col">
-                <div class="input-group">
-                    <span class="input-group-text" id="generate-images-icon">
-                        <span class="material-symbols-sharp">sort_by_alpha</span>
-                    </span>
-
-                    <select class="form-select form-control" aria-label="form-select" id="type" name="type" style="font-size: 1.00rem" required>
-                        <option value="Select Type" disabled selected>Select Type</option>
-                        <option value="avatars">Avatar</option>
-                        <option value="eggs">Egg</option>
-                        <option value="enemies">Enemy</option>
+                    <select class="form-select form-control" aria-label="form-select" id="ai-model" name="ai-model" style="font-size: 1.00rem" required>
+                    
                     </select>
                 </div>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col">
-                <div class="input-group">
-                    <span class="input-group-text" id="generate-images-icon">
-                        <span class="material-symbols-sharp">recent_actors</span>
-                    </span>
-
-                    <input type="number" id="count" name="count" value="5">
+        <div class="container" id="dall-e" name="dall-e">
+            <div class="d-flex container justify-content-evenly border p-3">
+            <form id="generate-images" name="generate-images" method="POST" action="?page=administrator">
+                <div class="row bg-primary text-white">
+                    <div class="col">
+                        <h4>Generate Images</h4>
+                    </div>
                 </div>
-            </div>
-        </div>
+                <div class="row mb-3 mt-2 bg-tertiary">
+                    <div class="col">
+                        <div class="input-group">
+                            <span class="input-group-text" id="prompt-icon" name="prompt-icon">
+                                <span class="material-symbols-sharp">cognition</span>
+                            </span>
+                            <div class="form-floating">
+                                <input type="text" class="form-control form-control-sm" id="prompt" name="prompt" required>
+                                <label for="prompt">Prompt</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="row">
-            <div class="col">
-                <button class="btn btn-success" id="gen-images" name="gen-images" value="1">Generate</button>
-            </div>
+                <div class="row mb-3"> 
+                    <div class="col">
+                        <div class="input-group">
+                            <span class="input-group-text" id="generate-images-icon">
+                                <span class="material-symbols-sharp">sort_by_alpha</span>
+                            </span>
+
+                            <select class="form-select form-control" aria-label="form-select" id="type" name="type" style="font-size: 1.00rem" required>
+                                <option value="Select Type" disabled selected>Select Type</option>
+                                <option value="avatars">Avatar</option>
+                                <option value="eggs">Egg</option>
+                                <option value="enemies">Enemy</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="input-group">
+                            <span class="input-group-text" id="generate-images-icon">
+                                <span class="material-symbols-sharp">recent_actors</span>
+                            </span>
+
+                            <input type="number" id="count" name="count" value="5">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3 justify-content-center align-content-center d-flex">
+                    <div class="col text-center">
+                        <button class="btn btn-success" id="gen-images" name="gen-images" value="1">Generate</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-</form>
-
-<div class="d-flex container justify-content-evenly">
+    <script type="text/javascript" src="../js/openai.js"></script>
 <?php
-    $count = 1;
-    foreach ($json_obj->data as $image) {
-        foreach ($image as $property) {            
-               echo '<div class="row">
-                    <div class="col">
-                        <h5>Image ' . $count . '</h5>
-                    </div>
-                    <div class="col p-2 m-2 border">
-                        <img src="data:image/png;base64,' . $property . '" alt="user-generated-' . $i . '>"></img>
-                    </div>
-                </div>
-            </div>';
-        }
-        $count++;
+exit();
+require_once 'classes/class-openai.php';
+
+$gpt_models = [
+    'gpt-4',
+    'gpt-3.5-turbo-1106',
+    'gpt-3.5-turbo',
+    'gpt-3.5-turbo-16k'
+];
+
+$dalle_models = [
+    'dall-e-3',
+    'dall-e-2'
+];
+
+
+
+$openai_apikey = $_ENV['OPENAI_APIKEY'];
+$openai = new OpenAI($openai_apikey,'');;
+
+$count = 0;
+$user_privs = UserPrivileges::name_to_enum($account['privileges']);
+
+if ($user_privs->value < UserPrivileges::OWNER->value) {
+    echo "F O R B I D D E N";
+    exit();
+}
+
+if (isset($_REQUEST['submit']) && $_REQUEST['submit'] == 1) { 
+    $type   = $_REQUEST['type'];
+    $mnodel = $_REQUEST['model'];
+    $count  = $_REQUEST['count'];
+    $prompt = $_REQUEST['prompt'];
+    $icount = 1;
+
+    if ($count < 1 || $count > 5) {
+        $count = 2;
     }
+
+    $json_obj = json_decode($complete);
+    
+    echo '<div class="d-flex container">';
+    foreach ($json_obj->data as $image) {
+        foreach ($image as $property) {   
+                    echo '<div class="row-cols-3">
+                        <div class="col">
+                            <h5>Image ' . $icount . '</h5>
+                        </div>
+                        <div class="col p-2 m-2 border">
+                            <img src="data:image/png;base64,' . $property . '" alt="user-generated-' . $i . '></img>
+                        </div>
+                        <div class="col">
+                            <small>' . $prompt . '</small>
+                        </div>
+                    </div>';
+        }
+        $icount++;
+    }
+    echo '</div>';
+}
 ?>
