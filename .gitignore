@@ -1,5 +1,4 @@
 composer.phar
-composer.lock
 /vendor/
 *.swp
 .env
@@ -12,3 +11,4 @@ esp32.html
 /sheets/
 *ctags*
 .*_tmp_egg
+phpctags.*
