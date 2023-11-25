@@ -68,6 +68,23 @@ my $CYAN   = "\e[36m";
 my $GREY   = "\e[37m";
 my $RESET  =  "\e[0m";
 
+# NOCONFIG - Replacements for Templates
+my @replacements = (
+    "s/###REPL_PHP_BINARY###/$PHP_BINARY/g",
+	"s/###REPL_WEB_ROOT###/$GAME_WEB_ROOT/g",
+	"s/###REPL_SQL_DB###/$SQL_DATABASE/g",
+	"s/###REPL_SQL_USER###/$SQL_USERNAME/g",
+	"s/###REPL_SQL_PASS###/$SQL_PASSWORD/g",
+	"s/###REPL_SQL_HOST###/$SQL_HOST/g",
+	"s/###REPL_SQL_PORT###/$SQL_PORT/g",
+	"s/###REPL_SQL_TBL_ACCOUNTS###/$SQL_TBL_ACCOUNTS/g",
+	"s/###REPL_SQL_TBL_CHARACTERS###/$SQL_TBL_CHARACTERS/g",
+	"s/###REPL_SQL_TBL_FAMILIARS###/$SQL_TBL_FAMILIARS/g",
+	"s/###REPL_SQL_TBL_FRIENDS###/$SQL_TBL_FRIENDS/g",
+	"s/###REPL_SQL_TBL_GLOBALS###/$SQL_TBL_GLOBALS/g",
+	"s/###REPL_SQL_TBL_MAIL###/$SQL_TBL_MAIL/g",
+	"s/###REPL_SQL_USER###/$SQL_USERNAME/g"
+);
 ## NO MORE CONFIGURATION BEYOND THIS POINT ##
 
 %completed;
@@ -339,7 +356,7 @@ sub composer_pull {
 
 sub process_templates {
     open my $fh_env, '<', $ENV_TEMPLATE;
-    open my $fh_sql, '<', $SQL_TEMPLATET;
+    open my $fh_sql, '<', $SQL_TEMPLATE;
     open my $fh_cron, '<', $CRONTAB_TEMPLATE;
 
     my $env_contents = <$fh_env>;
@@ -348,7 +365,25 @@ sub process_templates {
 
     close $fh_env, $fh_sql, $fh_cron;
 
-    $env_contents =~ s/
+    foreach my $replacement (@replacements) {
+        $env_contents =~ $replacement;
+        $cron_contents =~ $replacement;
+        $sql_contents =~ $replacement;
+    }
+
+    tell_user('SUCCESS', "Replacements have been made in all template files\n");
+    tell_user('INFO', "Moving template files to the proper spots now\n");
+
+    my $mv_output;
+    $mv_output = `mv $GAME_TEMPLATE_DIR/env.template $GAME_WEB_ROOT/.env`;
+    tell_user*('ERROR', "Move env.template result: $mv_output\n") if $? != 0;
+
+    $mv_output = `mv $GAME_TEMPLATE_DIR/crontab.template $CRONTAB_DIRECTORY_WEBUSER`;
+    tell_user('ERROR', "Move crontab.template result: $!") if $? != 0;
+
+    $mv_output = `mv $GAME_TEMPLATE_DIR/htaccess.template $GAME_WEB_ROOT/.htaccess`;
+    tell_user('ERROR', "Move htaccess.template result: $!") if $? != 0;
+}
 
 ## INTERNAL SCRIPT FUNCTIONS ##
 
@@ -451,17 +486,3 @@ sub tell_user {
 
 
 
-###REPL_PHP_BINARY###  ###REPL_WEB_ROOT###
-###REPL_PHP_BINARY### ###REPL_WEB_ROOT###
-###REPL_SQL_DB###
-###REPL_SQL_DB###.* TO '###REPL_SQL_USER###' IDENTIFIED BY '###REPL_SQL_PASS###
-###REPL_SQL_HOST###
-###REPL_SQL_PASS###
-###REPL_SQL_PORT###
-###REPL_SQL_TBL_ACCOUNTS###
-###REPL_SQL_TBL_CHARACTERS###
-###REPL_SQL_TBL_FAMILIARS###
-###REPL_SQL_TBL_FRIENDS###
-###REPL_SQL_TBL_GLOBALS###
-###REPL_SQL_TBL_MAIL###
-###REPL_SQL_USER###
