@@ -1,8 +1,7 @@
 <?php
     declare(strict_types = 1);
     session_start();
-    require '../../vendor/autoload.php';
-    
+    require '../../../vendor/autoload.php';
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 
@@ -25,19 +24,21 @@
     }
 
     $account   = table_to_obj($_SESSION['email'], 'account');
-    $character = table_to_obj($account['id'], 'character');
-
-    $familiar = new Familiar($character['id']);
-    $familiar->loadFamiliar($character['id']);
-
-    $char_menu_icon = $character['hp'] > 0 
-        ? 'bi-emoji-laughing-fill' 
-        : 'bi-emoji-dizzy-fill';
-
-    $_SESSION['name'] = $character['name'];
-
+    
     /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
+        $character = table_to_obj($account['id'], 'character');
+
+
+        $familiar = new Familiar($character['id']);
+        $familiar->loadFamiliar($character['id']);
+
+        $char_menu_icon = $character['hp'] > 0 
+            ? 'bi-emoji-laughing-fill' 
+            : 'bi-emoji-dizzy-fill';
+
+        $_SESSION['name'] = $character['name'];
+
         /* Check if the user has clicked the apply button on the profile tab */
         if (isset($_REQUEST['profile-apply']) && $_REQUEST['profile-apply'] == 1) {
             $old_password     = $_REQUEST['profile-old-password'];
@@ -95,7 +96,7 @@
                                         <span class="ms-1 d-none d-sm-inline">Character</span>
                                     </a>
                                     
-                                    <ul id="menu-header-character" class="nav nav-pills nav-flush flex-column mb-auto" data-bs-parent="#menu" aria-expanded="false">
+                                    <ul id="menu-header-character" class="nav nav-pills collapse nav-flush flex-column mb-auto" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
                                             <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link px-0">
                                                 <span class="material-symbols-sharp ms-3">account_circle</span>
@@ -378,7 +379,7 @@
             </div>
 
             <div id="footer"> 
-                <?php include 'html/footer.html'; ?>
+                <?php include 'html/footers.html'; ?>
             </div>
 
             <div aria-live="polite" aria-atomic="true" class="position-relative">

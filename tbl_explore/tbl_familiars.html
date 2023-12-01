@@ -1,0 +1,18 @@
+<pre>
++---------------+----------------------+------+-----+---------------------------------------+----------------+
+| Field         | Type                 | Null | Key | Default                               | Extra          |
++---------------+----------------------+------+-----+---------------------------------------+----------------+
+| id            | int(9) unsigned      | NO   | PRI | NULL                                  | auto_increment |
+| character_id  | int(9) unsigned      | NO   |     | NULL                                  |                |
+| name          | varchar(128)         | YES  |     | !Unset!                               |                |
+| hatched       | enum('True','False') | YES  |     | False                                 |                |
+| rarity        | varchar(56)          | YES  |     | NONE                                  |                |
+| date_acquired | datetime             | YES  |     | NULL                                  |                |
+| hatch_time    | datetime             | YES  |     | NULL                                  |                |
+| rarity_color  | varchar(56)          | YES  |     | #000                                  |                |
+| level         | int(9) unsigned      | YES  |     | 1                                     |                |
+| eggs_owned    | int(9) unsigned      | YES  |     | 0                                     |                |
+| eggs_seen     | int(9) unsigned      | YES  |     | 0                                     |                |
+| last_roll     | float unsigned       | YES  |     | 0                                     |                |
+| avatar        | varchar(255)         | YES  |     | img/generated/eggs/egg-unhatched.jpeg |                |
++---------------+----------------------+------+-----+---------------------------------------+----------------+

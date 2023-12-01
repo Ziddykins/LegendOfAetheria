@@ -72,8 +72,6 @@
             $this->avatar       = 'img/generated/eggs/egg-unhatched.jpeg';
             $this->level        = 1;
             $this->lastRoll     = 0.00;
-            $this->stats        = new FamiliarStats();
-            $this->eggs         = new FamiliarEgg();
         
             $this->saveFamiliar(); 
         }
@@ -145,6 +143,7 @@
 
             $sql_query = 'SELECT * FROM ' . $_ENV['SQL_FMLR_TBL'] . ' ' .
                          "WHERE `character_id` = $characterID";
+
             $result = $db->query($sql_query);
 
             if ($result->num_rows == 0) {

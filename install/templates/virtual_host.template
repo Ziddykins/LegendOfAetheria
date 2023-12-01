@@ -1,0 +1,14 @@
+<VirtualHost loa.dankaf.ca:80>
+	ServerName loa.dankaf.ca
+    ServerAlias loa.dankaf.ca
+	ServerAdmin ziddy@dankaf.ca
+	DocumentRoot /var/www/html/dankaf.ca/loa
+    
+    LogLevel info ssl:warn
+	ErrorLog ${APACHE_LOG_DIR}/loa.dankaf.ca-error.log
+	CustomLog ${APACHE_LOG_DIR}/loa.dankaf.ca-access.log combined
+
+    RewriteEngine on
+    RewriteCond %{SERVER_NAME} =loa.dankaf.ca
+    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>

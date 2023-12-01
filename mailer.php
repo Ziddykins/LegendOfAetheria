@@ -3,7 +3,7 @@
     use PHPMailer\PHPMailer\SMTP;
     use PHPMailer\PHPMailer\Exception;
 
-    require '../../vendor/autoload.php';
+    require '../../../vendor/autoload.php';
 
     function send_mail($email) {
         try {

@@ -1,0 +1,16 @@
+<IfModule mod_ssl.c>
+    <VirtualHost loa.dankaf.ca:443>
+        ServerName loa.dankaf.ca
+        ServerAlias loa.dankaf.ca
+       	ServerAdmin ziddy@dankaf.ca
+       	DocumentRoot /var/www/html/dankaf.ca/loa
+    
+        LogLevel info ssl:warn
+      	ErrorLog ${APACHE_LOG_DIR}/loa.dankaf.ca-error.log
+       	CustomLog ${APACHE_LOG_DIR}/loa.dankaf.ca-access.log combined
+
+        SSLCertificateFile /etc/letsencrypt/live/dankaf.ca/fullchain.pem
+        SSLCertificateKeyFile /etc/letsencrypt/live/dankaf.ca/privkey.pem
+        Include /etc/letsencrypt/options-ssl-apache.conf
+    </VirtualHost>
+</IfModule>

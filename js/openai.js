@@ -2,14 +2,15 @@
 
 function write_debug(text) {
     let debug = document.getElementById("debug");
-    document.body ÷ "hurr";
+    document.body + "hurr";
     debug.innerHTML = debug.innerHTML + "<br><br>" + text;
 }
 
-$("#ai-type").on("click", function (event) {
-    write_debug("hur=");
-    let type_select  = document.getElementById("ai-type");
-    let model_select = document.getElemebtById("ai-model");
+$("#ai-type").change(function (event) {
+    let selected_value = this[this.selectedIndex].value;
+    let model_select = document.getElementById("ai-model");
+    let gpt_container = document.getElementById("gpt");
+    let dalle_container = document.getElementById("dalle");
     let focused_models = null;
     let max = 0;
 
@@ -25,16 +26,19 @@ $("#ai-type").on("click", function (event) {
         'dall-e-2'
     ];
 
-    write_debug("selected fug");
-    if (type_select.value == 'gtp') {
+    if (selected_value == 'gpt') {
         focused_models = gpt_models;
+        dalle_container.classList.add('invisible');
+        gpt_container.classList.remove('invisible');
         write_debug("selected gpt");
-    } else if (type_select.value == 'dalle') {
+    } else if (selected_value == 'dalle') {
         focused_models = dalle_models;
+        dalle_container.classList.remove('invisible');
+        gpt_container.classList.add('invisible');
         write_debug("got dalle");
     }
 
-    max = focused_models.length - 1;
+    max = focused_models.length;
 
     for (i=0; i<max; i++) {
         model = focused_models[i];
