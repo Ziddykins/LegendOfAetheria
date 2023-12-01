@@ -1,3 +1,0 @@
-0-59 * * * * ###REPL_PHP_BINARY### ###REPL_WEB_ROOT###/cron.php minute
-@hourly ###REPL_PHP_BINARY### ###REPL_WEB_ROOT###/cron.php hourly
-@daily ###REPL_PHP_BINARY###  ###REPL_WEB_ROOT###/cron.php daily

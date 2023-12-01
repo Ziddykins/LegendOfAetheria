@@ -13,6 +13,7 @@
                                 <i class="bi bi-xs bi-diamond" style="font-size: 10px;"></i> Contact</button>
                         </li>
                     </ul>
+                    
 
                     <div class="tab-content" id="login-box-content">
                         <p></p>
@@ -23,15 +24,15 @@
                                         <div class="p-2 flex-grow-1"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
                                     </div>
                                 </div>
-                                <div class="mb-3 input-group">
-                                    <span class="input-group-text" id="icon-email"><i class="bi bi-envelope-plus"></i></span>
+                                <div class="input-group">
+                                    <span class="input-group-text rounded-0" id="icon-email"><i class="bi bi-envelope-plus"></i></span>
                                     <div class="form-floating flex-grow-1">
                                         <input type="email" class="form-control" aria-label="Email" aria-describedby="icon-email" id="login-email" name="login-email" placeholder="Email" required>
                                         <label for="login-email">E-mail</label>
                                     </div>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <span class="input-group-text" id="icon-password"><i class="bi bi-key"></i></span>
+                                    <span class="input-group-text rounded-0" id="icon-password"><i class="bi bi-key"></i></span>
                                     <div class="form-floating flex-grow-1">
                                         <input type="password" class="form-control" id="login-password" name="login-password" placeholder="Password" aria-label="Password" aria-describedby="icon-password" required>
                                         <label for="login-password">Password</label>
@@ -45,30 +46,30 @@
 
                         <div class="tab-pane fade" id="register-tab-pane" role="tabpanel" aria-labelledby="register-tab" tabindex="1">
                             <form id="register-form" name="register-form" action="/" method="POST">
-                                <div class="border">
+                                <div>
                                     <div class="d-flex bg-body-secondary border">
                                         <div class="p-2 flex-grow-1"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
                                     </div>
 
                                     <div>
-                                        <div class="input-group mb-1">
-                                            <span class="input-group-text" id="register-icon-email"><i class="bi bi-envelope-plus"></i></span>
+                                        <div class="input-group">
+                                            <span class="input-group-text rounded-0" id="register-icon-email"><i class="bi bi-envelope-plus"></i></span>
                                             <div class="form-floating flex-grow-1">
                                                 <input type="email" class="form-control" aria-label="Email" aria-describedby="register-icon-email" id="register-email" name="register-email" placeholder="Email" required>
                                                 <label for="login-email">E-mail</label>
                                             </div>
                                         </div>
 
-                                        <div class="input-group mb-1">
-                                            <span class="input-group-text" id="register-icon-password"><i class="bi bi-key"></i></span>
+                                        <div class="input-group">
+                                            <span class="input-group-text rounded-0" id="register-icon-password"><i class="bi bi-key"></i></span>
                                             <div class="form-floating flex-grow-1">
                                                 <input type="password" class="form-control" id="register-password" name="register-password" placeholder="Password" aria-label="Password" aria-describedby="register-icon-password" required>
                                                 <label for="login-password">Password</label>
                                             </div>
                                         </div>
 
-                                        <div class="input-group mb-1">
-                                            <span class="input-group-text" id="register-icon-password"><i class="bi bi-key"></i><sup style="margin-left: -12px; margin-top: -8px;">x2</sup></span>
+                                        <div class="input-group">
+                                            <span class="input-group-text rounded-0" id="register-icon-password"><i class="bi bi-key"></i><sup style="margin-left: -12px; margin-top: -8px;">x2</sup></span>
                                             <div class="form-floating flex-grow-1">
                                                 <input type="password" class="form-control" id="register-password-confirm" name="register-password-confirm" placeholder="Password (Confirm)" aria-label="Password" aria-describedby="register-icon-password-confirm" required>
                                                 <label for="login-password">Password (Confirm)</label>
@@ -76,13 +77,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="border">
+                                <div>
                                     <div class="d-flex bg-body-secondary border">
                                         <div class="p-2 flex-grow-1"><h6><i class="bi bi-emoji-laughing-fill"></i> Character</h6></div>
                                     </div>
                                 
-                                    <div class="input-group mb-1">
-                                        <span class="input-group-text" id="register-icon-character">
+                                    <div class="input-group">
+                                        <span class="input-group-text rounded-0" id="register-icon-character">
                                             <i class="bi bi-credit-card-2-front"></i>
                                         </span>
                                         <div class="form-floating flex-grow-1">
@@ -91,8 +92,8 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="input-group mb-1">
-                                        <span class="input-group-text" id="register-icon-character">
+                                    <div class="input-group">
+                                        <span class="input-group-text rounded-0" id="register-icon-character">
                                             <i class="bi bi-droplet"></i>
                                         </span>
                                         <select class="form-select form-select form-control" style="font-size: 1.00rem;" aria-label=".form-select" id="race-select" name="race-select" required>
@@ -109,7 +110,7 @@
                                     </div>
 
                                     <div class="input-group">
-                                        <span class="input-group-text" id="register-icon-avatar">
+                                        <span class="input-group-text rounded-0" id="register-icon-avatar">
                                             <i class="bi bi-person-bounding-box"></i>
                                         </span>
                                         <select class="form-select form-select form-control" aria-label=".form-select" id="avatar-select" name="avatar-select" style="font-size: 1.00rem" required>
@@ -126,13 +127,17 @@
                                             ?>
                                         </select>
                                     </div>
-
-                                    <div class="justify-content-center align-items-center d-flex">
-                                        <div class="border shadow mb-1" id="avatar-image-cont" name="avatar-image-cont">
+                                    
+                                    <div id="avatar-img" name="avatar-img" class="justify-content-center align-items-center d-flex invisible">
+                                        <div class="border shadow" id="avatar-image-cont" name="avatar-image-cont">
                                             <!-- avatar img placeholder -->
                                         </div>
                                     </div>
-
+                                    <script>$("#avatar-select").change(function(event) {
+                                        document.getElementById("avatar-img").classList.remove("invisible");
+                                    });
+                                        </script>
+                                    
                                     <div class="border">
                                         <div class="d-flex bg-body-secondary border">
                                         <div class="p-2 flex-grow-1"><h6><i class="bi bi-dice-5-fill"></i> Stats</h6></div>
@@ -219,23 +224,22 @@
                                             </div>
                                         </div>
 
-                                        <div class="mb-3 input-group">
-                                            <span class="input-group-text" id="icon-name"><i class="bi bi-envelope-plus"></i></span>
+                                        <div class="input-group">
+                                            <span class="input-group-text rounded-0" id="icon-name"><i class="bi bi-envelope-plus"></i></span>
                                             <div class="form-floating flex-grow-1">
                                                 <input type="email" class="form-control" aria-label="Email" aria-describedby="icon-email" id="contact-email" name="contact-email" placeholder="Email" required>
-                                                <label for="contact-email">E-mail</label>
+                                                <label for="contact-email">E-mail<span class="form-text text-danger">*</span></label>
                                             </div>
-                                            <div class="form-text text-danger">*</div>
                                         </div>
 
-                                        <div class="input-group mb-3">
-                                            <span class="input-group-text" id="icon-message"><i class="bi bi-chat-dots-fill"></i></span>
+                                        <div class="input-group">
+                                            <span class="input-group-text rounded-0" id="icon-message"><i class="bi bi-chat-dots-fill"></i></span>
                                             <div class="form-floating flex-grow-1">
                                                 <textarea class="form-control" id="contact-message" name="contact-message" placeholder="Message" aria-label="Message" aria-describedby="contact-message" style="height: 200px;" required></textarea>
                                                 <label for="contact-message">Message</label>
                                             </div>
-                                        </div>
-                                        <div class="form-text text-danger">* Required</div>
+                                        </div><br>
+                                        <spam class="form-text text-danger fw-bold">*</span> Required
 
                                         <button class="btn btn-primary mb-3" id="contact-submit" name="contact-submit" value="1">
                                             🤍 Submit

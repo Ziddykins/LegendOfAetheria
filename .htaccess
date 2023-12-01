@@ -8,6 +8,9 @@
     RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.php[? ].*$"
     RewriteRule .* - [L,R=404]
 
+    RewriteCond %{THE_REQUEST} "^[^ ]* .*?install/.*$"
+    RewriteRule .* - [L,R=404]
+    
     # No reading .txt files!
     RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.txt[? ].*$"
     RewriteRule .* - [L,R=404]

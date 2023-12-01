@@ -1,5 +1,5 @@
 <?php
-    require_once '../../vendor/autoload.php';
+    require_once '../../../vendor/autoload.php';
     require_once 'logger.php';
     require_once 'constants.php';
 

@@ -1,3 +1,33 @@
+function gen_toast(id, type, icon, header_txt, message) {
+    let toast_div = document.createElement('div');
+    let toast_badge_text = type[0].toUpperCase() + type.slice(1);
+    toast_badge_text = toast_badge_text.replace('Danger', 'Error');
+    
+    toast_div.id = id;
+    toast_div.classList.add('toast');
+    toast_div.ariaLive = 'assertive';
+    toast_div.ariaAtomic = 'true';
+    toast_div.role = 'alert';
+
+    toast_div.innerHTML = `<div class="toast-header">
+                                <span class="badge text-bg-${type} me-auto">
+                                    <i class="bi ${icon} rounded me-2"></i> ${toast_badge_text}
+                                </span> ${header_txt}
+                                
+                                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                ${message}
+                            </div>
+                        </div>`;
+
+    document.getElementById('toast-container').append(toast_div);
+
+    let toast = document.querySelector(`#toast-container #${id}`);
+    let toast_bubble = bootstrap.Toast.getOrCreateInstance(toast);
+    toast_bubble.show();
+};
+
 $(document).ready(function() {
     let query =  new URLSearchParams(location.search);
 
@@ -7,7 +37,7 @@ $(document).ready(function() {
         gen_toast('success-register-toast', 'success', 'bi-check', 'Success', 'Account and Character successfully created, you can now log in');
     } else if (query.has('do_register')) {
         document.getElementById('register-tab').click();
-        document.getElementById('register-email').value = params.get('email');
+        document.getElementById('register-email').value = query.get('email');
         gen_toast('account-not-exist', 'success', 'bi-check', 'Success', 'No account associated with this email, register?');
     } else if (query.has('logged_out')) {
         gen_toast('logged-out', 'success', 'bi-check', 'Logged Out', 'Successfully logged out!');

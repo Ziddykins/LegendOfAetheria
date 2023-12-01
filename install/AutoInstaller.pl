@@ -6,14 +6,15 @@ use strict;
 use Carp;
 
 # CONFIG - Server #
-my $FQDN             = 'loa.dankaf.ca';
-my ($SUB, $DOM)      = split '.', $FQDN;
-my $IP_ADDRESS       = '127.0.2.1';
-my $LOG_TO_FILE      = '';
-my $PHP_BINARY       = $1 if `whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/;
-my $GAME_WEB_ROOT    = "/var/www/html/$DOM/$SUB";
+my $FQDN              = 'loa.dankaf.ca';
+my ($SUB, $DOM, $TLD) = split /\./, $FQDN;
+my $IP_ADDRESS        = '127.0.1.1';
+my $LOG_TO_FILE       = '';
+my $PHP_BINARY        = $1 if `whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/;
+my $GAME_WEB_ROOT     = "/var/www/html/$DOM.$TLD/$SUB";
 my $GAME_TEMPLATE_DIR = "$GAME_WEB_ROOT/install/templates";
-my $WEB_ADMIN_EMAIL  = "webmaster\@$DOM";
+my $WEB_ADMIN_EMAIL   = "webmaster\@$DOM";
+my $CRONTAB_DIRECTORY = '/var/spool/cron/crontabs';
 
 # CONFIG - SQL Tables / Template Replacements #
 my $SQL_TBL_CHARACTERS = 'tbl_characters';
@@ -29,6 +30,7 @@ my $SQL_USERNAME = 'user_loa';
 my $SQL_PASSWORD = gen_random(15);
 my $SQL_DATABASE = 'db_loa';
 my $SQL_HOST     = '127.0.2.1';
+my $SQL_PORT     = 3306;
 
 # CONFIG - SSL Certificate information #
 my $SSL_ENABLED = 1;
@@ -47,13 +49,15 @@ my $XAMPP_MARIADB_CHPW   = 'mysqladmin.exe -u root password';
 
 # CONFIG - Composer #
 my $COMPOSER_RUNAS = 'www-data';
+my $APACHE_RUNAS   = 'www-data';
 
 # CONFIG - Template Files #
-my $ENV_TEMPLATE      = "$GAME_TEMPLATE_DIR/env.template";
-my $HTACCESS_TEMPLATE = "$GAME_TEMPLATE_DIR/htaccess.template";
-my $CRONTAB_TEMPLATE  = "$GAME_TEMPLATE_DIR/crontab.template";
-my $SQL_TEMPLATE      = "$GAME_TEMPLATE_DIR/INITIALIZE_GAME.sql";
-
+my $VIRTHOST_SSL_TEMPLATE = "$GAME_TEMPLATE_DIR/virtual_host_ssl.template";
+my $VIRTHOST_TEMPLATE     = "$GAME_TEMPLATE_DIR/virtual_host.template";
+my $HTACCESS_TEMPLATE     = "$GAME_TEMPLATE_DIR/htaccess.template";
+my $CRONTAB_TEMPLATE      = "$GAME_TEMPLATE_DIR/crontab.template";
+my $ENV_TEMPLATE          = "$GAME_TEMPLATE_DIR/env.template";
+my $SQL_TEMPLATE          = "$GAME_TEMPLATE_DIR/sql.template";
 
 # NOCONFIG - Hosts files #
 my $WIN32_HOSTS_FILE = 'c:\windows\system32\drivers\etc\hosts';
@@ -70,26 +74,27 @@ my $RESET  =  "\e[0m";
 
 # NOCONFIG - Replacements for Templates
 my @replacements = (
-    "s/###REPL_PHP_BINARY###/$PHP_BINARY/g",
-	"s/###REPL_WEB_ROOT###/$GAME_WEB_ROOT/g",
-	"s/###REPL_SQL_DB###/$SQL_DATABASE/g",
-	"s/###REPL_SQL_USER###/$SQL_USERNAME/g",
-	"s/###REPL_SQL_PASS###/$SQL_PASSWORD/g",
-	"s/###REPL_SQL_HOST###/$SQL_HOST/g",
-	"s/###REPL_SQL_PORT###/$SQL_PORT/g",
-	"s/###REPL_SQL_TBL_ACCOUNTS###/$SQL_TBL_ACCOUNTS/g",
-	"s/###REPL_SQL_TBL_CHARACTERS###/$SQL_TBL_CHARACTERS/g",
-	"s/###REPL_SQL_TBL_FAMILIARS###/$SQL_TBL_FAMILIARS/g",
-	"s/###REPL_SQL_TBL_FRIENDS###/$SQL_TBL_FRIENDS/g",
-	"s/###REPL_SQL_TBL_GLOBALS###/$SQL_TBL_GLOBALS/g",
-	"s/###REPL_SQL_TBL_MAIL###/$SQL_TBL_MAIL/g",
-	"s/###REPL_SQL_USER###/$SQL_USERNAME/g"
+    "###REPL_PHP_BINARY###%%%$PHP_BINARY",
+	"###REPL_WEB_ROOT###%%%$GAME_WEB_ROOT",
+	"###REPL_SQL_DB###%%%$SQL_DATABASE",
+	"###REPL_SQL_USER###%%%$SQL_USERNAME",
+	"###REPL_SQL_PASS###%%%$SQL_PASSWORD",
+	"###REPL_SQL_HOST###%%%$SQL_HOST",
+	"###REPL_SQL_PORT###%%%$SQL_PORT",
+	"###REPL_SQL_TBL_ACCOUNTS###%%%$SQL_TBL_ACCOUNTS",
+	"###REPL_SQL_TBL_CHARACTERS###%%%$SQL_TBL_CHARACTERS",
+	"###REPL_SQL_TBL_FAMILIARS###%%%$SQL_TBL_FAMILIARS",
+	"###REPL_SQL_TBL_FRIENDS###%%%$SQL_TBL_FRIENDS",
+	"###REPL_SQL_TBL_GLOBALS###%%%$SQL_TBL_GLOBALS",
+	"###REPL_SQL_TBL_MAIL###%%%$SQL_TBL_MAIL",
+	"###REPL_SQL_USER###%%%$SQL_USERNAME"
 );
+
 ## NO MORE CONFIGURATION BEYOND THIS POINT ##
 
-%completed;
+my %completed;
 my @steps = qw/hosts software hostname apache apache-enables
-              php composer templates sqlimport crons certificate/;
+              composer templates php sqlimport crons certificate/;
 
 foreach my $step (@steps) {
     -e ".loa.step.$step" 
@@ -100,15 +105,15 @@ foreach my $step (@steps) {
 foreach my $key (keys %completed) {
     next if !$completed{$key};
     print "It looks like you have ran this script before; do you want to\n";
-    print "resume from step: ($step) you left off on or start from\n";
-    prinbt "the [b]eginning or [s]tart over?\nChoice: ";
+    print "[c]ontinue from step '$key' where you left off, or [r]estart from\n";
+    print "the beginning?\n[r]estart/[c]ontinue: ";
     chomp(my $answer = <STDIN>);
 
-    if ($answer =~ /[Bb](eginning)?/) {
+    if ($answer =~ /[rR](estart)?/) {
         clean_up();
         foreach my $key (keys %completed) {
             $completed{$key} = 0;
-        :}
+        }
     }
 }
 
@@ -144,7 +149,7 @@ if (ask_user("Enable the required Apache conf/mods/sites?")) {
 }
 
 if (ask_user("Update PHP configurations? (security, performance)")) {
-    update_php_confs() if !$completed{php};
+   update_php_confs() if !$completed{php};
     `touch .loa.step.php`;
 }
 
@@ -155,7 +160,7 @@ if (ask_user("Run composer to download required dependencies?")) {
 
 if (ask_user("There are multiple template files which need to be processed; make " .
              "sure that all of the sections marked with 'Template Replacements' " .
-             "are filled out properly - Continue?");
+             "are filled out properly - Continue?")) {
     process_templates();
     `touch .loa.step.templates`;
 }
@@ -175,25 +180,30 @@ sub check_platform {
 # Step: hosts
 sub update_hosts {
     my $fh;
-    my ($sub, $domain) = split '.', $FQDN;
     
     if (check_platform() eq "linux") {
-        open $fh, '+<', $LINUX_HOSTS_FILE
+        open $fh, '<', $LINUX_HOSTS_FILE
             or die "Unable to open file for rw: $!\n";
     } else {
-        open $fh, '+<', $WIN32_HOSTS_FILE
+        open $fh, '<', $WIN32_HOSTS_FILE
             or die "Unable to open file for rw: $!\n";
     }
     
-    my $contents = <$fh>;
+    my @tmp_contents = <$fh>;
+    close $fh;
+
+    open $fh, '>', $LINUX_HOSTS_FILE;
+    my $contents = join '', @tmp_contents;
     
-    if ($contents =~ /$FQDN/) {
-        tell_user(
-            'WARN',
-            'Looks like the hosts file entry is already there, skipping it'
-        );
+    if ($contents =~ /$IP_ADDRESS/) {
+        if (ask_user('Looks like the entry is already there, overwrite?')) {
+            $contents =~ 
+                s/.*?$IP_ADDRESS.*?/\n\n# Added by LoA\n$IP_ADDRESS\t$FQDN\t$SUB/;
+            print $fh $contents;
+        }
     } else {
-        print $fh "\n$IP_ADDRESS\t$FQDN $sub.$domain";
+        print $fh $contents;
+        print $fh "\n\n# Added by LoA\n$IP_ADDRESS\t$FQDN $SUB\n";
         tell_user('SUCCESS', 'Hosts entry added');
     }
     
@@ -209,7 +219,7 @@ sub install_software {
         $apt_output = `apt update 2>&1`;
         tell_user('SYSTEM', $apt_output);
     }
-    my $packages = 'php8.2 php8.2-{cli,common,curl,dev,fpm,http,mbstring,mysql,xml,xdebug} mariad-server apache2 libapache2-mod-log-sql-{mysql,ssl} libapache2-mod-{php,php8.2} composer'
+    my $packages = 'php8.2 php8.2-cli php8.2-common php8.2-curl php8.2-dev php8.2-fpm php8.2-mbstring php8.2-mysql php8.2-xml php8.2-xdebug mariadb-server apache2 libapache2-mod-log-sql-mysql libapache2-mod-log-sql-ssl libapache2-mod-php libapache2-mod-php8.2 composer';
     $apt_output = `apt install -y $packages 2>&1`;
     tell_user('SYSTEM', $apt_output);
 }
@@ -272,23 +282,23 @@ sub apache_config {
         </VirtualHost>
     #;
 
-    if (ask_user("Do you want to add the default configuration for $FQDN to the " .
-                 "virtual host config at $VIRTHOST_CONF_FILE?")) {
+    if (ask_user("Do you want to add the default virtual host " .
+                 "configuration for $FQDN to $VIRTHOST_CONF_FILE?")) {
         if (-e $VIRTHOST_CONF_FILE) {
             file_exists($VIRTHOST_CONF_FILE, $conf_file_data);
         } else {
             open my $fh, '>', $VIRTHOST_CONF_FILE;
-            print $fh $conf_file;
+            print $fh $conf_file_data;
             close $fh;
         }
     }
 
     if (ask_user('Do you want to add the SSL-enabled configuration as well?')) {
         if (-e $VIRTHOST_CONF_FILE_SSL) {
-            file_exists($VIRTHOST_CONF_FILE_SSL, $ssl_config_file_data);
+            file_exists($VIRTHOST_CONF_FILE_SSL, $ssl_conf_file_data);
         } else {
             open my $fh, '>', $VIRTHOST_CONF_FILE;
-            print $fh $ssl_config_file_data;
+            print $fh $ssl_conf_file_data;
             close $fh;
         }
     }
@@ -302,11 +312,11 @@ sub apache_config {
         my @lines = <$fh>;
         close $fh;
         
-        my $output;
+        my $vhost_output;
         for (my $i=0; $i<scalar @lines - 1; $i++) {
             $output .= $lines[$i] . "\n";
             if ($lines[$i+1] =~ /<\/VirtualHost>/) {
-                $output .= qq#
+                $vhost_output .= qq#
                     <IfModule mod_rewrite>
                         RewriteEngine on
                         RewriteCond %{SERVER_NAME} =$FQDN
@@ -322,66 +332,79 @@ sub apache_config {
 
 # Step: apache_enables
 sub apache_enables {
+    my $success = 0;
+
+    tell_user('INFO', 'Enabling required Apache configurations, sites and modules');
     my $conf_output      = `a2enconf php8.2-fpm 2>&1`;
-    tell_user('INFO', 'Enabling required Apache confs...');
-    
+    $success = $? == 0 ? 1 : 0;
+
     my $mods_output      = `a2enmod php8.2 rewrite setenvif 2>&1`;
-    tell_user('INFO', 'Enabling required Apache mods...');
+    $success = $? == 0 ? 1 : 0;
     
-    my $sites_output     = `a2ensite $VHOST_CONF_FILE 2>&1`;
-    tell_user('INFO', 'Enabling required Apache sites...');
+    my $sites_output     = `a2ensite $VIRTHOST_CONF_FILE 2>&1`;
+    $success = $? == 0 ? 1 : 0;
     
-    my $sites_ssl_output = `a2ensite $VHOST_CONF_FILE_SSL 2>&1`;
-    
+    my $sites_ssl_output = `a2ensite $VIRTHOST_CONF_FILE_SSL 2>&1`;
+    $success = $? == 0 ? 1 : 0;
 
     tell_user('SYSTEM', "          conf result: $conf_output");
     tell_user('SYSTEM', "          mods result: $mods_output");
     tell_user('SYSTEM', "site (non-ssl) result: $sites_output");
     tell_user('SYSTEM', "     site (ssl) resul: $sites_ssl_output");
 
-    tell_user('SUCCESS', "Apache configuration completed");
+    if ($success) {
+        tell_user('SUCCESS', "Apache configuration completed");
+    } else {
+        tell_user('ERROR', "There were errors - See above output\n");
+        if (!ask_user('Continue?') {
+            die "Quitting at user request\n";
+        }
+    }
 }
 
 # Step: composer
 sub composer_pull {
-    if (ask_user("Composer is going to download/install these as $COMPOSER_RUNA\n" .
+    if (!ask_user("Composer is going to download/install these as $COMPOSER_RUNAS\n" .
                  "Do you want to change this? It should be the same user which\n"  .
                  "Apache runs under")) {
         my $cmd = "sudo -u $COMPOSER_RUNAS " .
-                  "composer -n --working-dir="$GAME_WEB_ROOT" install --force";
+                  "composer --working-dir \"$GAME_WEB_ROOT\" install --force";
         my $cmd_output = `$cmd 2>&1`;
         tell_user('SYSTEM', $cmd_output);
     }
 }
 
 sub process_templates {
-    open my $fh_env, '<', $ENV_TEMPLATE;
-    open my $fh_sql, '<', $SQL_TEMPLATE;
+    open my $fh_env,  '<', $ENV_TEMPLATE;
+    open my $fh_sql,  '<', $SQL_TEMPLATE;
     open my $fh_cron, '<', $CRONTAB_TEMPLATE;
 
-    my $env_contents = <$fh_env>;
-    my $sql_contents = <$fh_sql>;
+    my $env_contents  = <$fh_env>;
+    my $sql_contents  = <$fh_sql>;
     my $cron_contents = <$fh_cron>;
 
-    close $fh_env, $fh_sql, $fh_cron;
+    close $fh_env;
+    close $fh_sql;
+    close $fh_cron;
 
     foreach my $replacement (@replacements) {
-        $env_contents =~ $replacement;
-        $cron_contents =~ $replacement;
-        $sql_contents =~ $replacement;
+        my ($search, $replace) = split /%%%/, $replacement;
+        $env_contents  =~ s=$search=$replace=g
+        $cron_contents =~ s=$search=$replace=g;
+        $sql_contents  =~ s=$search=$replace=g;
     }
 
     tell_user('SUCCESS', "Replacements have been made in all template files\n");
-    tell_user('INFO', "Moving template files to the proper spots now\n");
+    tell_user('INFO', "Copying template files to the proper spots now\n");
 
-    my $mv_output;
-    $mv_output = `mv $GAME_TEMPLATE_DIR/env.template $GAME_WEB_ROOT/.env`;
-    tell_user*('ERROR', "Move env.template result: $mv_output\n") if $? != 0;
+    my $copy_output;
+    $copy_output = `cp $GAME_TEMPLATE_DIR/env.template $GAME_WEB_ROOT/.env`;
+    tell_user('ERROR', "Copy env.template result: $copy_output\n") if $? != 0;
 
-    $mv_output = `mv $GAME_TEMPLATE_DIR/crontab.template $CRONTAB_DIRECTORY_WEBUSER`;
+    $copy_output = `cp $GAME_TEMPLATE_DIR/crontab.template $CRONTAB_DIRECTORY/$APACHE_RUNASR`;
     tell_user('ERROR', "Move crontab.template result: $!") if $? != 0;
 
-    $mv_output = `mv $GAME_TEMPLATE_DIR/htaccess.template $GAME_WEB_ROOT/.htaccess`;
+    $copy_output = `cp $GAME_TEMPLATE_DIR/htaccess.template $GAME_WEB_ROOT/.htaccess`;
     tell_user('ERROR', "Move htaccess.template result: $!") if $? != 0;
 }
 
@@ -389,7 +412,7 @@ sub process_templates {
 
 sub clean_up {
     foreach my $step (@steps) {
-        $file = "$GAME_WEB_ROOT/.loa.step-$step";
+        my $file = "$GAME_WEB_ROOT/.loa.step-$step";
         unlink($file)
             or tell_user('ERROR', "Couldn't remove progress file ($file): $!\n");
         tell_user('SUCCESS', "Removed progress file $file\n");
@@ -431,9 +454,10 @@ sub file_exists {
 
 sub ask_user {
     my $question = $_[0];
-    
-    print $question;
-    print "Choice[${GREEN}y${RESET}/${RED}n${RESET}]: ";
+    my $date = get_date();
+
+    print $date . ' -> ' . $question;
+    print "\n$date  ->Choice[${GREEN}y${RESET}/${RED}n${RESET}]: ";
     
     chomp(my $answer = <STDIN>);
     print "\n";
@@ -445,10 +469,15 @@ sub ask_user {
     return 0;
 }
 
+sub get_date {
+    my ($sec, $min, $hour, $day, $mon, $year) = localtime();
+    my $date  = sprintf("[%02d-%02d %02d:%02d:%02d] -> ",$mon, $day, $hour, $min, $sec);
+    return $date;
+}
+
 sub tell_user {
     my ($severity, $message, $result) = @_;
-    my ($sec, $min, $hour, $day, $mon, $year) = localtime();
-    my $date  = "$year-$mon-$day $hour:$min:$sec";
+    my $date = get_date();
     my $prefix = "$date [";
     
     if ($severity eq 'INFO') {
@@ -482,7 +511,3 @@ sub tell_user {
         close $fh or die "Couldn't close file: $!\n";
     }
 }
-
-
-
-
