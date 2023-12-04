@@ -3,7 +3,7 @@
         protected $id;
         protected $characterID;
         protected $level;
-        
+ /*       
         protected $health;
         protected $maxHealth;
     
@@ -19,7 +19,7 @@
     
         protected $experience;
         protected $nextLevel;
-               
+   */            
         protected $eggsOwned;
         protected $eggsSeen;
        

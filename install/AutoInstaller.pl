@@ -4,7 +4,12 @@ use warnings;
 use strict;
 
 use Carp;
-
+for (1 .. 10) {
+    print "random: ";
+    print gen_random(15);
+    print "---\n";
+}
+die;
 # CONFIG - Server #
 my $FQDN              = 'loa.dankaf.ca';
 my ($SUB, $DOM, $TLD) = split /\./, $FQDN;
@@ -43,7 +48,7 @@ my $VIRTHOST_CONF_FILE = "/etc/apache2/sites-available/$FQDN.conf";
 my $VIRTHOST_CONF_FILE_SSL = "/etc/apache2/sites-available/ssl-$FQDN.conf";
 
 # CONFIG - XAMPP configuration #
-my $XAMPP_INSTALLER_BIN  = 'https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.2.4/xampp-windows-x64-8.2.4-0-VS16-installer.exe';
+my $XAMPP_INSTALLER_BIN  = 'https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.3.4/xampp-windows-x64-8.3.4-0-VS16-installer.exe';
 my $XAMPP_INSTALLER_ARGS = '--mode unattended --enabled-components xampp_server,xampp_apache,xampp_mysql,xampp_program_languages,xampp_php,xampp_perl,xampp_tools';
 my $XAMPP_MARIADB_CHPW   = 'mysqladmin.exe -u root password';
 
@@ -219,7 +224,7 @@ sub install_software {
         $apt_output = `apt update 2>&1`;
         tell_user('SYSTEM', $apt_output);
     }
-    my $packages = 'php8.2 php8.2-cli php8.2-common php8.2-curl php8.2-dev php8.2-fpm php8.2-mbstring php8.2-mysql php8.2-xml php8.2-xdebug mariadb-server apache2 libapache2-mod-log-sql-mysql libapache2-mod-log-sql-ssl libapache2-mod-php libapache2-mod-php8.2 composer';
+    my $packages = 'php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-dev php8.3-fpm php8.3-mbstring php8.3-mysql php8.3-xml php8.3-xdebug mariadb-server apache2 libapache2-mod-log-sql-mysql libapache2-mod-log-sql-ssl libapache2-mod-php libapache2-mod-php8.3 composer';
     $apt_output = `apt install -y $packages 2>&1`;
     tell_user('SYSTEM', $apt_output);
 }
@@ -335,10 +340,10 @@ sub apache_enables {
     my $success = 0;
 
     tell_user('INFO', 'Enabling required Apache configurations, sites and modules');
-    my $conf_output      = `a2enconf php8.2-fpm 2>&1`;
+    my $conf_output      = `a2enconf php8.3-fpm 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
-    my $mods_output      = `a2enmod php8.2 rewrite setenvif 2>&1`;
+    my $mods_output      = `a2enmod php8.3 rewrite setenvif 2>&1`;
     $success = $? == 0 ? 1 : 0;
     
     my $sites_output     = `a2ensite $VIRTHOST_CONF_FILE 2>&1`;
@@ -356,7 +361,7 @@ sub apache_enables {
         tell_user('SUCCESS', "Apache configuration completed");
     } else {
         tell_user('ERROR', "There were errors - See above output\n");
-        if (!ask_user('Continue?') {
+        if (!ask_user('Continue?')) {
             die "Quitting at user request\n";
         }
     }
@@ -388,10 +393,10 @@ sub process_templates {
     close $fh_cron;
 
     foreach my $replacement (@replacements) {
-        my ($search, $replace) = split /%%%/, $replacement;
-        $env_contents  =~ s=$search=$replace=g
-        $cron_contents =~ s=$search=$replace=g;
-        $sql_contents  =~ s=$search=$replace=g;
+    #   my ($search, $replace) = split /%%%/, $replacement;
+    #    $env_contents  =~ s=$search=$replace=g
+    #    $cron_contents =~ s=$search=$replace=g;
+    #    $sql_contents  =~ s=$search=$replace=g;
     }
 
     tell_user('SUCCESS', "Replacements have been made in all template files\n");
@@ -401,7 +406,7 @@ sub process_templates {
     $copy_output = `cp $GAME_TEMPLATE_DIR/env.template $GAME_WEB_ROOT/.env`;
     tell_user('ERROR', "Copy env.template result: $copy_output\n") if $? != 0;
 
-    $copy_output = `cp $GAME_TEMPLATE_DIR/crontab.template $CRONTAB_DIRECTORY/$APACHE_RUNASR`;
+    $copy_output = `cp $GAME_TEMPLATE_DIR/crontab.template $CRONTAB_DIRECTORY/$APACHE_RUNAS`;
     tell_user('ERROR', "Move crontab.template result: $!") if $? != 0;
 
     $copy_output = `cp $GAME_TEMPLATE_DIR/htaccess.template $GAME_WEB_ROOT/.htaccess`;

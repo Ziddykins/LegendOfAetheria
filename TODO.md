@@ -1,6 +1,6 @@
 # **Ideas**
 
-* [ ] **Mail system (in-game)**
+- [ ] **Mail system (in-game)**
 
   * [X] Must be on friends list
   * [X] Implement class for users' mailboxes

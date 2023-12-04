@@ -1,0 +1,4 @@
+Contact: mailto:webmaster@dankaf.ca
+Expires: 2025-01-01T05:00:00.000Z
+Preferred-Languages: en
+Canonical: https://loa.dankaf.ca/.well-known/security.txt

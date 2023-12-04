@@ -256,7 +256,7 @@
                         let chosen_pic  = document.querySelector('#avatar-select').value;
                         let target_div  = document.querySelector('#avatar-image-cont');
                         let pic_path    = "img/avatars/avatar-" + chosen_pic;
-                        let html_string = "<img src=\"" + pic_path + ".png\" style=\"width: 256px; height: auto;\" alt=\"" + chosen_pic + "\">";
+                        let html_string = "<img src=\"" + pic_path + ".webp\" style=\"width: 256px; height: auto;\" alt=\"" + chosen_pic + "\">";
 
                         target_div.innerHTML = html_string;
                     });

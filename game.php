@@ -83,7 +83,7 @@
                 <div class="col-2 px-0 border border-grey">
                     <div class="d-flex flex-column flex-shrink-0 bg-body-tertiary">
                         <a href="/game" class="pb-3 text-white text-decoration-none">
-                            <img src="img/logos/logo-banner-no-bg.png" class="mt-2 w-100">
+                            <img src="img/logos/logo-banner-no-bg.webp" class="mt-2 w-100">
                         </a>
 
                         <hr style="width: 35%; opacity: .25; align-self: center;">
