@@ -1,18 +1,27 @@
 
+let debug = document.getElementById("debug");
+debug.inner1HTML = '<span class="d-block p-2 text-bg-primary"><small><pre>' +
+'        _===============÷÷÷÷÷÷÷_' +
+"#    _,.;'‾DEBUG‾';.,_   #" +
+'" ‾===============÷÷÷÷÷÷÷‾</pre></span><pre>';
 
 function write_debug(text) {
-    let debug = document.getElementById("debug");
+    debug = document.getElementById("debug");
     document.body + "hurr";
-    debug.innerHTML = debug.innerHTML + "<br><br>" + text;
+    debug.innerHTML = debug.innerHTML + '<span class="d-block p-2 text-bg-dark">' + text + '</span>';
 }
 
 $("#ai-type").change(function (event) {
     let selected_value = this[this.selectedIndex].value;
     let model_select = document.getElementById("ai-model");
     let gpt_container = document.getElementById("gpt");
-    let dalle_container = document.getElementById("dalle");
+    let dalle_container = document.getElementById("dall-e");
     let focused_models = null;
     let max = 0;
+    
+    $("#ai-model").empty();
+    write_debug("Cleared model dropdown");
+    console.log(JSON.stringify(gpt_container));
 
     let gpt_models = [
         'gpt-4',
@@ -22,14 +31,19 @@ $("#ai-type").change(function (event) {
     ];
 
     let dalle_models = [
+        '',
         'dall-e-3',
         'dall-e-2'
     ];
 
     if (selected_value == 'gpt') {
         focused_models = gpt_models;
-        dalle_container.classList.add('invisible');
-        gpt_container.classList.remove('invisible');
+        try {
+            dalle_container.classList.add('invisible');
+            gpt_container.classList.remove('invisible');
+        } catch (event) {
+            console.log("nah" + " " + JSON.stringify(event));
+        }
         write_debug("selected gpt");
     } else if (selected_value == 'dalle') {
         focused_models = dalle_models;
@@ -48,4 +62,10 @@ $("#ai-type").change(function (event) {
         option.value = model;
         model_select.appendChild(option);
     }
+});
+
+$("#ai-model").change(function (event) {
+    let selected_model = this[this.selectedIndex].value;
+    document.getElementById("model").value = selected_model;
+    console.log("model set to " + selected_model);
 });

@@ -7,7 +7,7 @@
 ?>
 <div class="row row-cols-4 border border-1 text-white">
     <div class="col pt-3">
-        <img src="img/enemies/enemy-kobold.png" style="width: 100%;"/>
+        <img src="img/enemies/enemy-kobold.webp" style="width: 100%;"/>
     </div>
     <div class="col">
         <div class="row">

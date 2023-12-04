@@ -5,11 +5,9 @@
     </head>
         
     <body>
-    <pre><small>
+    <small>
     <div id="debug" class="border">
-        _===============÷÷÷÷÷÷÷_
-       #    _,.;'‾DEBUG‾';.,_   #
-        ‾===============÷÷÷÷÷÷÷‾
+
     </div>
     </small></pre>
          <div class="row bg-primary text-white">
@@ -46,112 +44,115 @@
 
         <div class="container invisible" id="dall-e" name="dall-e">
             <div class="d-flex container justify-content-evenly border p-3">
-            <form id="generate-images" name="generate-images" method="POST" action="?page=administrator">
-                <div class="row bg-primary text-white">
-                    <div class="col">
-                        <h4>Generate Images</h4>
+                <form id="generate-images" name="generate-images" method="POST" action="?page=administrator">
+                    <div class="row bg-primary text-white">
+                        <div class="col">
+                            <h4>Generate Images</h4>
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3 mt-2 bg-tertiary">
-                    <div class="col">
-                        <div class="input-group">
-                            <span class="input-group-text" id="prompt-icon" name="prompt-icon">
-                                <span class="material-symbols-sharp">cognition</span>
-                            </span>
-                            <div class="form-floating">
-                                <input type="text" class="form-control form-control-sm" id="prompt" name="prompt" required>
-                                <label for="prompt">Prompt</label>
+                    <div class="row mb-3 mt-2 bg-tertiary">
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text" id="prompt-icon" name="prompt-icon">
+                                    <span class="material-symbols-sharp">cognition</span>
+                                </span>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control form-control-sm" id="prompt" name="prompt" required>
+                                    <label for="prompt">Prompt</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row mb-3"> 
-                    <div class="col">
-                        <div class="input-group">
-                            <span class="input-group-text" id="generate-images-icon">
-                                <span class="material-symbols-sharp">sort_by_alpha</span>
-                            </span>
+                    <div class="row mb-3"> 
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text" id="generate-images-icon">
+                                    <span class="material-symbols-sharp">sort_by_alpha</span>
+                                </span>
 
-                            <select class="form-select form-control" aria-label="form-select" id="type" name="type" style="font-size: 1.00rem" required>
-                                <option value="Select Type" disabled selected>Select Type</option>
-                                <option value="avatars">Avatar</option>
-                                <option value="eggs">Egg</option>
-                                <option value="enemies">Enemy</option>
-                            </select>
+                                <select class="form-select form-control" aria-label="form-select" id="type" name="type" style="font-size: 1.00rem" required>
+                                    <option value="Select Type" disabled selected>Select Type</option>
+                                    <option value="avatars">Avatar</option>
+                                    <option value="eggs">Egg</option>
+                                    <option value="enemies">Enemy</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row mb-3">
-                    <div class="col">
-                        <div class="input-group">
-                            <span class="input-group-text" id="generate-images-icon">
-                                <span class="material-symbols-sharp">recent_actors</span>
-                            </span>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text" id="generate-images-icon">
+                                    <span class="material-symbols-sharp">recent_actors</span>
+                                </span>
 
-                            <input type="number" id="count" name="count" value="5">
+                                <input type="number" id="count" name="count" value="5">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row mb-3 justify-content-center align-content-center d-flex">
-                    <div class="col text-center">
-                        <button class="btn btn-success" id="gen-images" name="gen-images" value="1">Generate</button>
+                    <input type="hidden" id="model" name="model">
+
+                    <div class="row mb-3 justify-content-center align-content-center d-flex">
+                        <div class="col text-center">
+                            <button class="btn btn-success" id="gen-images" name="gen-images" value="1">Generate</button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-        <div class="container" id="gpt" name="gpt">
+        <div class="container invisible" id="gpt" name="gpt">
             <div class="d-flex container justify-content-evenly border p-3">
-            <form id="generate-images" name="generate-images" method="POST" action="?page=administrator">
-                <div class="row bg-primary text-white">
-                    <div class="col">
-                        <h4>Chat it up why not</h4>
+                <form id="generate-images" name="generate-images" method="POST" action="?page=administrator">
+                    <div class="row bg-primary text-white">
+                        <div class="col">
+                            <h4>Chat it up why not</h4>
+                        </div>
                     </div>
-                </div>
-                <div class="row mb-3 mt-2 bg-tertiary">
-                    <div class="col">
-                        <div class="input-group">
-                            <span class="input-group-text" id="prompt-icon" name="prompt-icon">
-                                <span class="material-symbols-sharp">cognition</span>
-                            </span>
-                            <div class="form-floating">
-                                <input type="text" class="form-control form-control-sm" id="prompt" name="prompt" required>
-                                <label for="prompt">Prompt</label>
+                    <div class="row mb-3 mt-2 bg-tertiary">
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text" id="prompt-icon" name="prompt-icon">
+                                    <span class="material-symbols-sharp">cognition</span>
+                                </span>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control form-control-sm" id="prompt" name="prompt" required>
+                                    <label for="prompt">Prompt</label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row mb-3"> 
-                    <div class="col">
-                        <div class="input-group">
-                            <span class="input-group-text" id="generate-images-icon">
-                                <span class="material-symbols-sharp">sort_by_alpha</span>
-                            </span>
+                    <div class="row mb-3"> 
+                        <div class="col">
+                            <div class="input-group">
+                                <span class="input-group-text" id="generate-images-icon">
+                                    <span class="material-symbols-sharp">sort_by_alpha</span>
+                                </span>
 
-                            <select class="form-select form-control" aria-label="form-select" id="type" name="type" style="font-size: 1.00rem" required>
-                                <option value="Select Type" disabled selected>Select system type</option>
-                                <option value="avatars">Assistant</option>
-                                <option value="eggs">other</option>
-                                <option value="enemies">other2</option>
-                            </select>
+                                <select class="form-select form-control" aria-label="form-select" id="type" name="type" style="font-size: 1.00rem" required>
+                                    <option value="Select Type" disabled selected>Select system type</option>
+                                    <option value="avatars">Assistant</option>
+                                    <option value="eggs">other</option>
+                                    <option value="enemies">other2</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row mb-3 justify-content-center align-content-center d-flex">
-                    <div class="col text-center">
-                        <button class="btn btn-success" id="gen-images" name="gen-images" value="1">Generate</button>
+                    <div class="row mb-3 justify-content-center align-content-center d-flex">
+                        <div class="col text-center">
+                            <button class="btn btn-success" id="gen-images" name="gen-images" value="1">Generate</button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
     <script type="text/javascript" src="../js/openai.js"></script>
 <?php
-exit();
 require_once 'classes/class-openai.php';
 
 $gpt_models = [
@@ -166,12 +167,6 @@ $dalle_models = [
     'dall-e-2'
 ];
 
-
-
-$openai_apikey = $_ENV['OPENAI_APIKEY'];
-$openai = new OpenAI($openai_apikey,'');;
-
-$count = 0;
 $user_privs = UserPrivileges::name_to_enum($account['privileges']);
 
 if ($user_privs->value < UserPrivileges::OWNER->value) {
@@ -179,18 +174,52 @@ if ($user_privs->value < UserPrivileges::OWNER->value) {
     exit();
 }
 
-if (isset($_REQUEST['submit']) && $_REQUEST['submit'] == 1) { 
+if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) { 
+    echo "in gen img";
     $type   = $_REQUEST['type'];
-    $mnodel = $_REQUEST['model'];
+    $model = $_REQUEST['model'];
     $count  = $_REQUEST['count'];
     $prompt = $_REQUEST['prompt'];
-    $icount = 1;
+    $endpoint = 'https://api.openai.com/v1/images/generations';
+    
+    if (in_array($model, $dalle_models)) {
+        if ($count < 1 || $count > 5) {
+            $count = 2;
+        }
+        
+        $openai_apikey = $_ENV['OPENAI_APIKEY'];    
+        $OpenAI = new OpenAI($openai_apikey,'$endpoint');
+        
+        $headers = [
+            'Content-Type'  => 'application/json',
+            'Authorization' => "Bearer " . $OpenAI->get_apiKey()
+        ];
 
-    if ($count < 1 || $count > 5) {
-        $count = 2;
+        $OpenAI->set_imageModel($model);
+        $OpenAI->set_imagePrompt($prompt);
+        $OpenAI->set_imageCount($count);
+        $OpenAI->set_imageSize("256x256");
+
+        $OpenAI->buildRequest();
+        $OpenAI->showPayload();
+        
+        $response = $OpenAI->doRequest(
+            HttpMethod::POST,
+            $headers,
+            $OpenAI->get_payload()
+        );
+        print_r("PAYLOAD:");
+        print_r($response);
+        exit();
+    } else {
+        echo "sry no";
+        print_r($_REQUEST);
+        exit();
     }
 
-    $json_obj = json_decode($complete);
+    $json_obj = json_decode($response);
+    print_r($json_obj);
+    exit();
     
     echo '<div class="d-flex container">';
     foreach ($json_obj->data as $image) {

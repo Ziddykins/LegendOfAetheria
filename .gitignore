@@ -12,3 +12,4 @@ esp32.html
 *ctags*
 .*_tmp_egg
 phpctags.*
+/.well-known/

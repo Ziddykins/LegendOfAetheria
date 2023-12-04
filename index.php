@@ -50,7 +50,7 @@
         }
     } else if (isset($_REQUEST['register-submit']) 
             && $_REQUEST['register-submit'] == 1) {
-        $avatar           = 'avatar-' . $_REQUEST['avatar-select'] . '.png';
+        $avatar           = 'avatar-' . $_REQUEST['avatar-select'] . '.webp';
         $email            = $_REQUEST['register-email'];
         $password         = $_REQUEST['register-password'];
         $password_confirm = $_REQUEST['register-password-confirm'];
@@ -194,7 +194,7 @@
         <div class="container-sm my-5 shadow" style="width: 70%;">
             <div class="row">
                 <div class="col p-4">
-                    <img src="img/logos/logo-banner-no-bg.png" style="width: 100%;"></img>
+                    <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" style="width: 100%;"></img>
                 </div>
             </div>
             <div class="row">
