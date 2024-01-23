@@ -76,10 +76,12 @@ CREATE TABLE `###REPL_SQL_TBL_CHARACTERS###` (
   `max_mp` bigint(20) unsigned NOT NULL DEFAULT 100,
   `alignment` int(9) NOT NULL DEFAULT 0,
   `gold` bigint(20) unsigned NOT NULL DEFAULT 1000,
+  `spindels` bigint(20) unsigned  NOT NULL DEFAULT 5,
   `exp` bigint(20) unsigned NOT NULL DEFAULT 0,
   `ep` int(9) unsigned NOT NULL DEFAULT 100,
   `max_ep` int(9) unsigned NOT NULL DEFAULT 100,
   `floor` int(9) unsigned NOT NULL DEFAULT 1,
+  `description` varchar(255) NOT NULL DEFAULT 'None Provided',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `account_id` (`account_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

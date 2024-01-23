@@ -77,15 +77,15 @@ apt install -y php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-dev php8.3-fpm
 
 ### Hostname
 
-Setup your host to have a FQDN with `hostnamectl set-hostname <fqdn>` and `hostnamectl set-hostname <fqdn> --pretty`
-Make sure to update your `/etc/hosts` file
+Setup your host to have a FQDN with `hostnamectl set-hostname <fqdn>` and 
+`hostnamectl set-hostname <fqdn> --pretty`. Make sure to update your `/etc/hosts` file.
 
 ### Apache
 
 Virtual Hosts, for non-SSL:
 
 ```apacheconf
-        <VirtualHost <FQDN here>:80>
+    <VirtualHost <FQDN here>:80>
         ServerName <FQDN here>
         ServerAlias <FQDN here>
         ServerAdmin <Your Email>
@@ -217,10 +217,3 @@ a2enconf php8.3-fpm
 ## Development
 
 Want to contribute? Check out [CONTRIBUTING.md](CONTRIBUTING.md)
-
-
-## Need Help?
-
-For manual setup, general troubleshooting and more
-in-depth explanations, head on over to the [Wiki](https://github.com/Ziddykins/LegendOfAetheria/wiki/Home/)
-

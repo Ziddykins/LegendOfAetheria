@@ -111,6 +111,7 @@
         
         case SQLDB_NOCONNECTION        = -2000;
         case SQLDB_PREPPED_EXECUTE     = -2001;
+        case SQLDB_UNKNOWN_SAVE_TYPE   = -2002;
 
         case FRIEND_STATUS_ERROR       = -3000;
 

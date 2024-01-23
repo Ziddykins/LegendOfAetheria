@@ -2,131 +2,89 @@
     declare(strict_types = 1);
     session_start();
     require '../../../vendor/autoload.php';
-    require_once 'classes/class-openai.php';
-    
+    require_once 'classes/class-openai.php';  
+    require_once 'logger.php';
+    require_once 'db.php';
+    require_once 'constants.php';
+    require_once 'functions.php';
+
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 
-    $api_endpoint = 'https://api.openai.com/v1/chat/completions';
-    
-    $default_headers = [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $_ENV['OPENAI_APIKEY'],
-    ];
-    
-    $chatbot = new OpenAI(
-        $_ENV['OPENAI_APIKEY'],
-        $api_endpoint
-    );
+    if (isset($_REQUEST['generate_description']) 
+            && $_REQUEST['generate_description'] == 1
+            && isset($_REQUEST['characterID'])) {
+        
+        $credits = $account['credits'];
 
-    $chatbot->set_model('gpt-3.5-turbo');
-    $model = $chatbot->get_model();
+        if ($ai_credits < 1) {
+            echo "Not Enough Credits\n";
+            exit();
+        } else {
+            $ai_credits--;
+        }
 
-    $data = [
-        "model" => $chatbot->get_model(),
-        "messages" => [
-            [
-                "role" => "system",
-                "content" =>  "You're a customer support rep for a multi-national conglomerancy focused on cloud computing",
+        $sql_query = "SELECT `char.name`, `char.race`, `ch.account_id`, `acct.credits` " .
+                     "FROM " . $_ENV['SQL_CHAR_TBL'] . " AS `char` " .
+                     "JOIN " . $_ENV['SQL_ACCT_TBL'] . " AS `acct` " .
+                     "ON ch.`account_id` = `acct.id`"
+                     "WHERE id = ?";
+
+        $prepped = $db->prepare($sql_query);
+        $prepped->bind_param('d', $_REQUEST['characterID']);
+        $prepped->execute();
+        
+        $result    = $prepped->get_result();
+        $character = $result->fetch_assoc();
+
+        $sql_query = "UPDATE " . $_ENV['SQL_ACCT_TBL'] . . " " .
+                     "SET ai_credits = ?";
+
+        $api_endpoint = 'https://api.openai.com/v1/chat/completions';
+        
+        $chatbot = new OpenAI(
+            $_ENV['OPENAI_APIKEY'],
+            $api_endpoint
+        );
+
+        $chatbot->set_model('gpt-3.5-turbo');
+        $chatbot->set_maxTokens(200);
+
+        $prompt = "Generate a character description for a(n) " . $character['race'] . " named " . $character['name'];
+
+        $data = [
+            "model" => $chatbot->get_model(),
+            "messages" => [
+                [
+                    "role" => "system",
+                    "content" =>  "You are a dungeon master who generates highly-detailed character descriptions",
+                ],
+                [
+                    "role" => "user",
+                    "content" => "$prompt",
+                ],
             ],
-            [
-                "role" => "user",
-                "content" => "How do I internet?",
-            ],
-        ],
-    ];
+            "max_tokens" => $chatbot->get_maxTokens()
+        ];
 
-    /*$response = json_decode($chatbot->doRequest(
-        HttpMethod::POST,
-        $default_headers,
-        $data)
-    );
-     */
-    //$chat_response = $response->choices[0]->message->content;
+        $response = json_decode(
+            $chatbot->doRequest(HttpMethod::POST, $data)
+        );
 
+        $content = $response->choices[0]->message->content;
+        $finish_reason = $response->choices[0]->finish_reason;
+        $description = "";
+
+        if ($finish_reason == 'length') {
+            $tmp = explode("\n\n", $content);
+
+            for ($i=0; $i<count($tmp) - 2; $i++) {
+                $description .= $tmp[$i] . "\n\n";
+            }
+        }
+
+        echo $description;
+    } else {
+        echo "Invalid Query";
+    }
 ?>
-<div class="d-flex container justify-content-evenly border p-3">
-    <form id="generate-images" name="generate-images" method="POST" action="?page=administrator">
-        <div class="row bg-primary text-white">
-            <div class="col">
-                <h4>Generate Images</h4>
-            </div>
-        </div>
-        <div class="row mb-3 mt-2 bg-tertiary">
-            <div class="col">
-                <div class="input-group">
-                    <span class="input-group-text" id="prompt-icon" name="prompt-icon">
-                        <span class="material-symbols-sharp">cognition</span>
-                    </span>
-                    <div class="form-floating">
-                        <input type="text" class="form-control form-control-sm" id="prompt" name="prompt" required>
-                        <label for="prompt">Prompt</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-3"> 
-            <div class="col">
-                <div class="input-group">
-                    <span class="input-group-text" id="select-ai-type">
-                        <span class="material-symbols-sharp">sort_by_alpha</span>
-                    </span>
-
-                    <select class="form-select form-control" aria-label="form-select" id="type" name="type" style="font-size: 1.00rem" required>
-                    </select>
-                </div>
-            </div>
-            <div class="col">
-                <div class="input-group">
-                    <span class="input-group-text" id="select-ai-model">
-                        <span class="material-symbols-sharp">sort_by_alpha</span>
-                    </span>
-
-                    <select class="form-select form-control" aria-label="form-select" id="model" name="model" style="font-size: 1.00rem" required>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-3"> 
-            <div class="col">
-                <div class="input-group">
-                    <span class="input-group-text" id="generate-images-icon">
-                        <span class="material-symbols-sharp">sort_by_alpha</span>
-                    </span>
-
-                    <select class="form-select form-control" aria-label="form-select" id="type" name="type" style="font-size: 1.00rem" required>
-                        <option value="Select Type" disabled selected>Select Type</option>
-                        <option value="avatars">Avatar</option>
-                        <option value="eggs">Egg</option>
-                        <option value="enemies">Enemy</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col">
-                <div class="input-group">
-                    <span class="input-group-text" id="generate-images-icon">
-                        <span class="material-symbols-sharp">recent_actors</span>
-                    </span>
-
-                    <input type="number" id="count" name="count" value="5">
-                </div>
-            </div>
-        </div>
-
-        <div class="row mb-3 justify-content-center align-content-center d-flex">
-            <div class="col text-center">
-                <button class="btn btn-success" id="gen-images" name="gen-images" value="1">Generate</button>
-            </div>
-        </div>
-    </form>
-</div>
-
-
-<div class="container justify-content-center">
-    <div class="row">
-        <div class="col">
