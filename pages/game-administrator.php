@@ -134,7 +134,7 @@
 
                                 <select class="form-select form-control" aria-label="form-select" id="type" name="type" style="font-size: 1.00rem" required>
                                     <option value="Select Type" disabled selected>Select system type</option>
-                                    <option value="avatars">Assistant</option>
+                                    <option value="assistant">Assistant</option>
                                     <option value="eggs">other</option>
                                     <option value="enemies">other2</option>
                                 </select>

@@ -1,5 +1,12 @@
 <?php
+    $header_charname = $character['name'] . "'s";
+    
+    if (substr($character['name'], -1, 1) == "s") {
+        $header_charname = $character['name'] . "'";
+    }
 ?>
+
+
 
 <div class="container">
     <div class="row pt-5">
@@ -12,22 +19,22 @@
                     Character
                 </a>
                 <a class="list-group-item list-group-item-action " id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">
-                    Messages
+                    Messages / Mail
                 </a>
-                <a class="list-group-item list-group-item-action " id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">
-                    hi
+                <a class="list-group-item list-group-item-action " id="list-chat-list" data-bs-toggle="list" href="#list-chat" role="tab" aria-controls="list-chat">
+                    Chat
                 </a>
             </div>
         </div>
 
-        <div class="col-8 pt-2">
-            <div class="row text-center">
-                <div class="col">
-                    <h3><?php echo $_SESSION['name']; ?>'s Profile</h3>
-                </div>
-            </div>
+        <div class="col-8">
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+                    <div class="row text-center">
+                        <div class="col">
+                            <h3><?php echo $_SESSION['name']; ?>'s Account</h3>
+                        </div>
+                    </div>
                     <div class="mb-3 row">
                         <label for="staticEmail" class="col-sm-2 col-form-label fw-bold">Email:</label>
                         <div class="col-sm-10">
@@ -69,34 +76,143 @@
 
 
 
-                        <button id="profile-apply" name="profile-apply" class="btn btn-primary" value="1">Apply</button>
-                        <button id="profile-discard" name="profile-discard" class="btn btn-danger">Discard</button>
-<script type="text/javascript">
-$("#profile-apply").on("click", function(e) {
-    let new_pass = document.querySelector("#profile-new-password").value;
-    let pass_confirm = document.querySelector("#profile-confirm-password").value;
-    if (new_pass !== pass_confirm) {
-        e.preventDefault();
-        e.stopPropagation();
-        gen_toast('error-nologin-toast', 'danger', 'bi-key', 'Password Mis-match', 'Please ensure passwords match');
-    }
-});
-</script>
+                        <button id="profile-apply" name="profile-apply" class="btn btn-primary border border-black" value="1">Apply</button>
+                        <button id="profile-discard" name="profile-discard" class="btn btn-danger border border-black">Discard</button>
                     </form>
                 </div>
 
                 <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
-                    o look some more settings
+                    <div class="container row-cols-3">
+                        <div class="mb-3 row">
+                            <label for="character-name" class="col-form-label fw-bold">Character Name:</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="character-name" name="character-name" value="<?php echo $character['name']; ?>" disabled>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="character-race" class="col-form-label fw-bold">Character Race:</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="character-race" name="character-race" value="<?php echo $character['race']; ?>" disabled>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="character-description" class="form-label fw-bold">Character Description:</label>
+                            <textarea class="form-control" id="character-description" name="character-description" rows="3"><?php echo $character['description']; ?></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <button  id="generate-description" name="generate-description" class="btn btn-primary border border-black swap-icon">
+                                <i id="generate-icon" name="generate-icon" class="bi bi-magic"></i> AI Generate
+                            </button>
+                            <button id="save-description" name="save-description" class="btn btn-success border border-black swap-icon">
+                                <i id="save-icon" name="save-icon" class="bi bi-save"></i> Save
+                            </button>
+                            <button id="clear-description" name="clear-description" class="btn btn-warning border border-black swap-icon">
+                                <i id="clear-icon" name="clear-icon" class="bi bi-x-lg"></i> Clear
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
                     o look some message things
                 </div>
 
-                <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
-                    get out
+                <div class="tab-pane fade" id="list-chat" role="tabpanel" aria-labelledby="list-chat-list">
+                    <a href="https://ᛠᛐᛈᛠᜀᛈᛔᜀᜀmௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌ.memelife.ca/">https://ᛠᛐᛈᛠᜀᛈᛔᜀᜀmௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌ.memelife.ca/</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    let original_description = "<?php echo $character['description'];?>";
+    let description_changed  = 0;
+    let swap_icons = document.querySelectorAll(".swap-icon");
+    let id = null;
+
+    $("#character-description").on("change", 
+        function (event) {
+            if (document.getElementById("character-description").textContent == original_description) {
+                description_changed = 0;
+            } else {
+                description_changed = 1;
+            }
+        }
+    );
+
+
+    swap_icons.forEach(
+        function(element) {
+            element.addEventListener('click', 
+                function () {
+                    let icon_par = element.parentElement;
+                    id = '#' + $(element)[0].children[0].id;
+                    
+                    
+                    
+                    if (id == '#clear-icon') {
+                        document.getElementById("character-description").textContent = "";
+                    } else {
+                        $(id).hide();
+                        $(element).prepend('<span id="spinner" class="spinner-border spinner-border-sm">');
+                        icon_par.classList.add('disabled');
+                    
+                        let do_ajax = 0;
+                        let data    = null;
+                        let url     = null;
+                        
+                        if (id == "#save-icon") {
+                            url = "/game?page=save";
+                            data = {
+                                type: 'character',
+                                id: <?php echo $character['id']; ?>,
+                                tdata: {
+                                    "description": document.getElementById("character-description").textContent
+                                }
+                            };
+                            do_ajax = 1;
+                        } else if (id == "#generate-icon") {
+                            if ()
+                            url = "openai";
+                            data = { 
+                                characterID: <?php echo $character['id']; ?>,
+                                generate_description: 1
+                            };
+                            do_ajax = 1;
+                        }
+
+                        if (do_ajax) {
+                            $.ajax({
+                                type: "POST",
+                                url: url,
+                                data: data,
+                                dataType: "json"
+                            }).always(function (response) {
+                                    document.querySelector("#character-description").value = response.responseText;
+                                    $("#spinner").remove();
+                                    $(id).show();
+                                    icon_par.classList.remove('disabled');
+                                    console.log(icon_par);
+                                }
+                            );
+                        }
+                    }
+                }
+            );
+        }
+    );
+
+    document.getElementById('profile-apply').addEventListener('click',
+        function(e) {
+            let new_pass = document.querySelector("#profile-new-password").value;
+            let pass_confirm = document.querySelector("#profile-confirm-password").value;
+            if (new_pass !== pass_confirm) {
+                e.preventDefault();
+                e.stopPropagation();
+                gen_toast('error-nologin-toast', 'danger', 'bi-key', 'Password Mis-match', 'Please ensure passwords match');
+            }
+        }
+    );
+</script>

@@ -18,7 +18,7 @@ let eles = document.querySelectorAll('div').forEach(function(e) {
 <div class="glitch">
     <div class="glitch__container">
         <div class="glitch__text">
-            <img id="fat" src='img/generated/spooky/124157157123160157157153171064115145.gif' style="opacity: 15%;">
+            <img id="fat" src='img/generated/spooky/124157157123160157157153171064115145.gif' style="opacity: 5%;">
             <h1 class="glitch__text__title glitch-effect">
                 <span class="glitch-effect-text-clr1">
                     <img src='img/generated/spooky/124157157123160157157153171064115145.gif' />
@@ -34,9 +34,9 @@ let eles = document.querySelectorAll('div').forEach(function(e) {
 <script>
       
     $("#fat").fadeOut(3000);</script>
+    $("#fat").fadeIn(3000);</script>
     $("#fat").fadeOut(3000);</script>
-    $("#fat").fadeOut(3000);</script>
-    $("#fat").fadeOut(3000);</script>
+    $("#fat").fadeInq(3000);</script>
     $("#fat").fadeOut(3000);</script>
     $("#fat").fadeOut(3000);</script>
     $("#fat").fadeOut(3000);</script>

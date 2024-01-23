@@ -55,5 +55,7 @@ $(document).ready(function() {
         gen_toast('password-changed', 'success', 'bi-key', 'Password Changed', 'Your password has been successfully updated - Please re-login');
     } else if (query.has('verification_failed')) {
         gen_toast('failed-verification', 'danger', 'bi-envelope-slash', 'Verification Failed', 'Account verification failed - check email/code combination');
+    } else if (query.has('page', 'friends') && query.has('action', 'send_request')) {
+        gen_toast('request-sent', 'success', 'bi-person-plus-fill', 'Friend Request Sent', 'Your friend request has been sent to the user');
     }
 });
