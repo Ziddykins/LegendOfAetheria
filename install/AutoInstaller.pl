@@ -4,20 +4,17 @@ use warnings;
 use strict;
 
 use Carp;
-for (1 .. 10) {
-    print "random: ";
-    print gen_random(15);
-    print "---\n";
-}
-die;
+
+
 # CONFIG - Server #
-my $FQDN              = 'loa.dankaf.ca';
+my $FQDN              = 'loa.didney.whorl';
 my ($SUB, $DOM, $TLD) = split /\./, $FQDN;
-my $IP_ADDRESS        = '127.0.1.1';
+my $IP_ADDRESS        = '127.0.2.1';
 my $LOG_TO_FILE       = '';
 my $PHP_BINARY        = $1 if `whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/;
 my $GAME_WEB_ROOT     = "/var/www/html/$DOM.$TLD/$SUB";
 my $GAME_TEMPLATE_DIR = "$GAME_WEB_ROOT/install/templates";
+my $GAME_SCRIPTS_DIR  = "$GAME_WEB_ROOT/install/scripts";
 my $WEB_ADMIN_EMAIL   = "webmaster\@$DOM";
 my $CRONTAB_DIRECTORY = '/var/spool/cron/crontabs';
 
@@ -187,29 +184,24 @@ sub update_hosts {
     my $fh;
     
     if (check_platform() eq "linux") {
-        open $fh, '<', $LINUX_HOSTS_FILE
-            or die "Unable to open file for rw: $!\n";
+        open $fh, '<', $LINUX_HOSTS_FILE  or die "Unable to open file for read: $!\n";
+			my $tmp = <$fh>;
+			my @hosts = split /[\r\n]/, $tmp;
+		close $fh;
+
+		open my $fh, '>', $LINUX_HOSTS_FILE or die "Unable to open file for write: $!\n";
+
+		
+		if (grep(/$IP_ADDRESS\s+loa\./, @hosts)) {
+			tell_user('Looks like the entry is already there, skipping');
+		} else {
+        	print $fh @hosts;
+	        print $fh "\n# Added by LoA\n$IP_ADDRESS\t$FQDN $SUB\n";
+	        tell_user('SUCCESS', 'Hosts entry added');
+    	}
     } else {
         open $fh, '<', $WIN32_HOSTS_FILE
             or die "Unable to open file for rw: $!\n";
-    }
-    
-    my @tmp_contents = <$fh>;
-    close $fh;
-
-    open $fh, '>', $LINUX_HOSTS_FILE;
-    my $contents = join '', @tmp_contents;
-    
-    if ($contents =~ /$IP_ADDRESS/) {
-        if (ask_user('Looks like the entry is already there, overwrite?')) {
-            $contents =~ 
-                s/.*?$IP_ADDRESS.*?/\n\n# Added by LoA\n$IP_ADDRESS\t$FQDN\t$SUB/;
-            print $fh $contents;
-        }
-    } else {
-        print $fh $contents;
-        print $fh "\n\n# Added by LoA\n$IP_ADDRESS\t$FQDN $SUB\n";
-        tell_user('SUCCESS', 'Hosts entry added');
     }
     
     close $fh or die "Unable to close file: $!\n";
@@ -217,15 +209,42 @@ sub update_hosts {
 
 #Step: software
 sub install_software {
-    my $apt_output;
+    my ($apt_output, $sury_output);
+    my $install_cmd;
+
+    if (-e '/etc/apt/sources.list.d/php.list') {
+	    tell_user('INFO', 'Sury repo entries already present');
+	} else {
+		tell_user(
+			'INFO',
+		   	'Sury PHP repositories not found, running script to add necessary entries'
+		);
+		$sury_output = `sh $GAME_SCRIPTS_DIR/sury_install.sh`;
+		tell_user('SYSTEM', $sury_output);
+	}
+
+    tell_user('INFO', 'Updating system packages');
+    $apt_output = `apt update 2>&1`;
+    tell_user('SYSTEM', $apt_output);
     
-    if (ask_user("Update too?")) {
-        tell_user('INFO', 'Updating system packages');
-        $apt_output = `apt update 2>&1`;
-        tell_user('SYSTEM', $apt_output);
-    }
-    my $packages = 'php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-dev php8.3-fpm php8.3-mbstring php8.3-mysql php8.3-xml php8.3-xdebug mariadb-server apache2 libapache2-mod-log-sql-mysql libapache2-mod-log-sql-ssl libapache2-mod-php libapache2-mod-php8.3 composer';
-    $apt_output = `apt install -y $packages 2>&1`;
+	my @packages = (
+		'php8.3',
+		'php8.3-cli',
+		'php8.3-common',
+		'php8.3-curl',
+		'php8.3-dev',
+		'php8.3-fpm',
+		'php8.3-mbstring',
+		'php8.3-mysql',
+		'php8.3-xml',
+		'mariadb-server',
+		'apache2',
+		'libapache2-mod-php',
+		'libapache2-mod-php8.3',
+		'composer',
+	);
+    $install_cmd = 'apt install -y ' . join(' ', @packages) . '2>&1';
+    $apt_output = `$install_cmd`;
     tell_user('SYSTEM', $apt_output);
 }
 
