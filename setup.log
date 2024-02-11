@@ -1,0 +1,223 @@
+Hosts entry addedSury PHP repositories not found, adding necessary entriesUpdating system packages
+		Reading package lists...
+		Hosts entry addedSury PHP repositories not found, adding necessary entriesHit:2 https://downloads.1password.com/linux/debian/amd64 stable InRelease
+		Updating system packages
+		Reading package lists...
+		Hosts entry addedSury repo entries already presentUpdating system packages
+		Reading package lists...
+		Hostname for the system has been successfully set
+Please reboot after
+	Output if any: 
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Cleaned up all of our temp files!Hosts entry addedSury repo entries already presentUpdating system packages
+		Reading package lists...
+		Hostname for the system has been successfully set
+Please reboot after
+	Output if any: 
+Preparing to overwrite existing file: /etc/apache2/sites-available/loa.didney.whorl.confDone writing to /etc/apache2/sites-available/loa.didney.whorl.conf
+Preparing to overwrite existing file: /etc/apache2/sites-available/ssl-loa.didney.whorl.confDone writing to /etc/apache2/sites-available/ssl-loa.didney.whorl.conf
+Enabling mod_rewrite if it isn't alreadyModule rewrite already enabled
+		Enabling required Apache configurations, sites and modules          conf result: ERROR: Conf php8.3-fpm does not exist!
+		          mods result: ERROR: Module php8.3 does not exist!
+		Module rewrite already enabled
+		Module setenvif already enabled
+		site (non-ssl) result: ERROR: Site /etc/apache2/sites-available/loa.didney.whorl does not exist!
+		     site (ssl) resul: ERROR: Site /etc/apache2/sites-available/ssl-loa.didney.whorl does not exist!
+		There were errors - See above output
+sudo: composer: command not found
+		Replacements have been made in all template files
+Copying template files to the proper spots now
+Move htaccess.template result: Creating database, adding SQL user, granting privilges, and importing schemaERROR 2002 (HY000): Can't connect to server on '127.0.2.1' (115)
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Cleaned up all of our temp files!Hosts entry addedSury repo entries already presentUpdating system packages
+		Reading package lists...
+		Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Cleaned up all of our temp files!Hosts entry addedSury repo entries already presentUpdating system packages
+		
+		Hostname for the system has been successfully set
+Please reboot after
+	Output if any: 
+Skipping write-to-file operation for /etc/apache2/sites-available/loa.didney.whorl.confSkipping write-to-file operation for /etc/apache2/sites-available/ssl-loa.didney.whorl.confEnabling mod_rewrite if it isn't alreadyModule rewrite already enabled
+		Enabling required Apache configurations, sites and modules          conf result: Enabling conf php8.2-fpm.
+		To activate the new configuration, you need to run:
+		  systemctl reload apache2
+		          mods result: Considering dependency mpm_prefork for php8.2:
+		Considering conflict mpm_event for mpm_prefork:
+		Considering conflict mpm_worker for mpm_prefork:
+		Module mpm_prefork already enabled
+		Considering conflict php5 for php8.2:
+		Module php8.2 already enabled
+		Module rewrite already enabled
+		Module setenvif already enabled
+		site (non-ssl) result: ERROR: Site /etc/apache2/sites-available/loa.didney.whorl does not exist!
+		     site (ssl) resul: ERROR: Site /etc/apache2/sites-available/ssl-loa.didney.whorl does not exist!
+		There were errors - See above output
+Replacements have been made in all template files
+Copying template files to the proper spots now
+Move htaccess.template result: Creating database, adding SQL user, granting privilges, and importing schemaERROR 2002 (HY000): Can't connect to server on '127.0.2.1' (115)
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Cleaned up all of our temp files!Hosts entry addedSury repo entries already presentUpdating system packages
+		
+		Hostname for the system has been successfully set
+Please reboot after
+	Output if any: 
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Cleaned up all of our temp files!Hosts entry addedSury repo entries already presentUpdating system packages
+		
+		Hostname for the system has been successfully set
+Please reboot after
+	Output if any: 
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Cleaned up all of our temp files!Hosts entry addedSury repo entries already presentUpdating system packages
+		
+		Hostname for the system has been successfully set
+Please reboot after
+	Output if any: 
+Enabling required Apache configurations, sites and modules          conf result: Conf php8.2-fpm already enabled
+		          mods result: Considering dependency mpm_prefork for php8.2:
+		Considering conflict mpm_event for mpm_prefork:
+		Considering conflict mpm_worker for mpm_prefork:
+		Module mpm_prefork already enabled
+		Considering conflict php5 for php8.2:
+		Module php8.2 already enabled
+		Module rewrite already enabled
+		Module setenvif already enabled
+		site (non-ssl) result: ERROR: Site /etc/apache2/sites-available/loa.didney.whorl does not exist!
+		     site (ssl) resul: ERROR: Site /etc/apache2/sites-available/ssl-loa.didney.whorl does not exist!
+		There were errors - See above output
+
+		                                        
+		  The "--force" option does not exist.  
+		                                        
+		
+		install [--prefer-source] [--prefer-dist] [--prefer-install PREFER-INSTALL] [--dry-run] [--download-only] [--dev] [--no-suggest] [--no-dev] [--no-autoloader] [--no-progress] [--no-install] [--audit] [--audit-format AUDIT-FORMAT] [-v|vv|vvv|--verbose] [-o|--optimize-autoloader] [-a|--classmap-authoritative] [--apcu-autoloader] [--apcu-autoloader-prefix APCU-AUTOLOADER-PREFIX] [--ignore-platform-req IGNORE-PLATFORM-REQ] [--ignore-platform-reqs] [--] [<packages>...]
+		
+		Replacements have been made in all template files
+Creating database, adding SQL user, granting privilges, and importing schemaERROR 2002 (HY000): Can't connect to server on '127.0.2.1' (115)Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-services): No such file or directory
+Cleaned up all of our temp files!Hosts entry addedSury repo entries already presentUpdating system packages
+		
+		Hostname for the system has been successfully set
+Please reboot after
+	Output if any: 
+Enabling required Apache configurations, sites and modules          conf result: Conf php8.2-fpm already enabled
+		          mods result: Considering dependency mpm_prefork for php8.2:
+		Considering conflict mpm_event for mpm_prefork:
+		Considering conflict mpm_worker for mpm_prefork:
+		Module mpm_prefork already enabled
+		Considering conflict php5 for php8.2:
+		Module php8.2 already enabled
+		Module rewrite already enabled
+		Module setenvif already enabled
+		site (non-ssl) result: ERROR: Site /etc/apache2/sites-available/loa.didney.whorl does not exist!
+		     site (ssl) resul: ERROR: Site /etc/apache2/sites-available/ssl-loa.didney.whorl does not exist!
+		There were errors - See above output
+Installing dependencies from lock file (including require-dev)
+		Verifying lock file contents can be installed on current platform.
+		Package operations: 10 installs, 0 updates, 0 removals
+		Cannot create cache directory /var/www/.cache/composer/files/, or directory is not writable. Proceeding without cache. See also cache-read-only config if your filesystem is read-only.
+		  - Downloading psr/log (3.0.0)
+		  - Downloading monolog/monolog (3.5.0)
+		  - Downloading orhanerday/open-ai (4.9.1)
+		  - Downloading symfony/polyfill-ctype (v1.28.0)
+		  - Downloading phpmailer/phpmailer (v6.8.1)
+		  - Downloading symfony/polyfill-php80 (v1.28.0)
+		  - Downloading symfony/polyfill-mbstring (v1.28.0)
+		  - Downloading phpoption/phpoption (1.9.2)
+		  - Downloading graham-campbell/result-type (v1.1.2)
+		  - Downloading vlucas/phpdotenv (v5.6.0)
+		  0/10 [>---------------------------]   0%
+		  3/10 [========>-------------------]  30%
+		  6/10 [================>-----------]  60%
+		  7/10 [===================>--------]  70%
+		  8/10 [======================>-----]  80%
+		  9/10 [=========================>--]  90%
+		 10/10 [============================] 100%
+		  - Installing psr/log (3.0.0): Extracting archive
+		  - Installing monolog/monolog (3.5.0): Extracting archive
+		  - Installing orhanerday/open-ai (4.9.1): Extracting archive
+		  - Installing symfony/polyfill-ctype (v1.28.0): Extracting archive
+		  - Installing phpmailer/phpmailer (v6.8.1): Extracting archive
+		  - Installing symfony/polyfill-php80 (v1.28.0): Extracting archive
+		  - Installing symfony/polyfill-mbstring (v1.28.0): Extracting archive
+		  - Installing phpoption/phpoption (1.9.2): Extracting archive
+		  - Installing graham-campbell/result-type (v1.1.2): Extracting archive
+		  - Installing vlucas/phpdotenv (v5.6.0): Extracting archive
+		  0/10 [>---------------------------]   0%
+		 10/10 [============================] 100%
+		Generating autoload files
+		9 packages you are using are looking for funding.
+		Use the `composer fund` command to find out more!
+		Replacements have been made in all template files
+Creating database, adding SQL user, granting privilges, and importing schemaERROR 2002 (HY000): Can't connect to server on '127.0.2.1' (115)
