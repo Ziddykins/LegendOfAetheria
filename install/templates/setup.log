@@ -1,0 +1,66 @@
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-services): No such file or directory
+Cleaned up all of our temp files!Replacements have been made in all template files
+Creating database, adding SQL user, granting privilges, and importing schemaCouldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-services): No such file or directory
+Cleaned up all of our temp files!Replacements have been made in all template files
+Creating database, adding SQL user, granting privilges, and importing schemaERROR 1045 (28000): Access denied for user 'user_loa'@'localhost' (using password: YES)Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-services): No such file or directory
+Cleaned up all of our temp files!Replacements have been made in all template files
+Creating database, adding SQL user, granting privilges, and importing schemaERROR 1045 (28000): Access denied for user 'user_loa'@'localhost' (using password: YES)Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-services): No such file or directory
+Cleaned up all of our temp files!Replacements have been made in all template files
+Creating database, adding SQL user, granting privilges, and importing schemaERROR 1045 (28000): Access denied for user 'user_loa'@'localhost' (using password: YES)Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hosts): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-software): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-hostname): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-apache-enables): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-composer): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-templates): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-php): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-sqlimport): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-crons): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-certificate): No such file or directory
+Couldn't remove progress file (/var/www/html/didney.whorl/loa/.loa.step-services): No such file or directory
+Cleaned up all of our temp files!Replacements have been made in all template files
+Creating database, adding SQL user, granting privilges, and importing schemaERROR 1045 (28000): Access denied for user 'user_loa'@'localhost' (using password: YES)
