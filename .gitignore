@@ -13,3 +13,4 @@ esp32.html
 .*_tmp_egg
 phpctags.*
 /.well-known/
+gcm-diagnose.log
