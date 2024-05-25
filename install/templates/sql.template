@@ -177,4 +177,4 @@ CREATE TABLE `tbl_mail` (
 
 -- Dump completed on 2023-11-12 18:42:21
 
-GRANT ALL PRIVILEGES ON db_loa.* TO 'user_loa' IDENTIFIED BY ':4ysiz5`MQ7:Ve^';
+GRANT ALL PRIVILEGES ON ###REPL_SQL_DB###.* TO '###REPL_SQL_USER###' IDENTIFIED BY '###REPL_SQL_PASS###';

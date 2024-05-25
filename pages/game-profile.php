@@ -4,7 +4,14 @@
     if (substr($character['name'], -1, 1) == "s") {
         $header_charname = $character['name'] . "'";
     }
+    $header_charname = $character['name'] . "'s";
+    
+    if (substr($character['name'], -1, 1) == "s") {
+        $header_charname = $character['name'] . "'";
+    }
 ?>
+
+
 
 
 
@@ -20,7 +27,10 @@
                 </a>
                 <a class="list-group-item list-group-item-action " id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">
                     Messages / Mail
+                    Messages / Mail
                 </a>
+                <a class="list-group-item list-group-item-action " id="list-chat-list" data-bs-toggle="list" href="#list-chat" role="tab" aria-controls="list-chat">
+                    Chat
                 <a class="list-group-item list-group-item-action " id="list-chat-list" data-bs-toggle="list" href="#list-chat" role="tab" aria-controls="list-chat">
                     Chat
                 </a>
@@ -28,8 +38,14 @@
         </div>
 
         <div class="col-8">
+        <div class="col-8">
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+                    <div class="row text-center">
+                        <div class="col">
+                            <h3><?php echo $_SESSION['name']; ?>'s Account</h3>
+                        </div>
+                    </div>
                     <div class="row text-center">
                         <div class="col">
                             <h3><?php echo $_SESSION['name']; ?>'s Account</h3>
@@ -78,10 +94,42 @@
 
                         <button id="profile-apply" name="profile-apply" class="btn btn-primary border border-black" value="1">Apply</button>
                         <button id="profile-discard" name="profile-discard" class="btn btn-danger border border-black">Discard</button>
+                        <button id="profile-apply" name="profile-apply" class="btn btn-primary border border-black" value="1">Apply</button>
+                        <button id="profile-discard" name="profile-discard" class="btn btn-danger border border-black">Discard</button>
                     </form>
                 </div>
 
                 <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
+                    <div class="container row-cols-3">
+                        <div class="mb-3 row">
+                            <label for="character-name" class="col-form-label fw-bold">Character Name:</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="character-name" name="character-name" value="<?php echo $character['name']; ?>" disabled>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="character-race" class="col-form-label fw-bold">Character Race:</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="character-race" name="character-race" value="<?php echo $character['race']; ?>" disabled>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="character-description" class="form-label fw-bold">Character Description:</label>
+                            <textarea class="form-control" id="character-description" name="character-description" rows="3"><?php echo $character['description']; ?></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <button  id="generate-description" name="generate-description" class="btn btn-primary border border-black swap-icon">
+                                <i id="generate-icon" name="generate-icon" class="bi bi-magic"></i> AI Generate
+                            </button>
+                            <button id="save-description" name="save-description" class="btn btn-success border border-black swap-icon">
+                                <i id="save-icon" name="save-icon" class="bi bi-save"></i> Save
+                            </button>
+                            <button id="clear-description" name="clear-description" class="btn btn-warning border border-black swap-icon">
+                                <i id="clear-icon" name="clear-icon" class="bi bi-x-lg"></i> Clear
+                            </button>
+                        </div>
+                    </div>
                     <div class="container row-cols-3">
                         <div class="mb-3 row">
                             <label for="character-name" class="col-form-label fw-bold">Character Name:</label>
@@ -118,6 +166,8 @@
                     o look some message things
                 </div>
 
+                <div class="tab-pane fade" id="list-chat" role="tabpanel" aria-labelledby="list-chat-list">
+                    <a href="https://ᛠᛐᛈᛠᜀᛈᛔᜀᜀmௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌ.memelife.ca/">https://ᛠᛐᛈᛠᜀᛈᛔᜀᜀmௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌ.memelife.ca/</a>
                 <div class="tab-pane fade" id="list-chat" role="tabpanel" aria-labelledby="list-chat-list">
                     <a href="https://ᛠᛐᛈᛠᜀᛈᛔᜀᜀmௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌ.memelife.ca/">https://ᛠᛐᛈᛠᜀᛈᛔᜀᜀmௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌௌ.memelife.ca/</a>
                 </div>
@@ -174,7 +224,6 @@
                             };
                             do_ajax = 1;
                         } else if (id == "#generate-icon") {
-                            if ()
                             url = "openai";
                             data = { 
                                 characterID: <?php echo $character['id']; ?>,
