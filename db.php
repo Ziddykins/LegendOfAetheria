@@ -1,5 +1,9 @@
 <?php
+    require 'vendor/autoload.php';
     include('logger.php');
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->safeLoad();
+    
 
     $sql_host = $_ENV['SQL_HOST'];
     $sql_port = $_ENV['SQL_PORT'];
