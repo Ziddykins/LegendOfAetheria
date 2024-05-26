@@ -162,9 +162,9 @@
                                                     </p>
                                                     <div class="row">
                                                         <div class="btn-group">
-                                                            <button id="btn-accept" name="btn-accept" class="btn btn-primary btn-block" value="1">Accept</button>
-                                                            <button id="btn-decline" name="btn-decline" class="btn btn-warning btn-block" value="1">Decline</button>
-                                                            <button id="btn-block" name="btn-block" class="btn btn-danger btn-block" value="1">Block</button>                                                            
+                                                            <button id="btn-accept" name="btn-accept" class="btn btn-primary btn-block rounded" value="1">Accept&nbsp;</button>&nbsp;
+                                                            <button id="btn-decline" name="btn-decline" class="btn btn-warning btn-block rounded" value="1">Decline</button>&nbsp;
+                                                            <button id="btn-block" name="btn-block" class="btn btn-danger btn-block rounded" value="1">&nbsp;Block&nbsp;</button>                                                            
                                                             <input type="hidden" id="focused-request" name="focused-request" value="' . $temp_account['email'] . '">
                                                         </div>
                                                     </div>

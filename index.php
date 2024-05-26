@@ -41,10 +41,36 @@
             header('Location: /game');
             exit();
         } else {
+            $ip = $_SERVER['REMOTE_ADDR'];
+            $sql_query_get_count       = 'SELECT COUNT(*) AS `count` FROM ' . $_ENV['SQL_LOGS_TBL'] . ' WHERE ' .
+                                            'ip = ? AND ' .
+                                            '`date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW() AND ' .
+                                            "type = 'FAILED_LOGIN'";
+
+            $failed_login_count = $db->execute_query($sql_query_get_count, [$_SERVER['REMOTE_ADDR']])->fetch_assoc()['count'];
+
+            if ($failed_login_count >= 4) {
+                header('Location: /banned');
+                exit();
+            } else {
+                $prepped      = NULL;
+                $sql_datetime = get_mysql_datetime();
+                $sql_query    = "INSERT INTO " . $_ENV['SQL_LOGS_TBL'] . " (date, type, message, ip) VALUES (?, ?, ?, ?)";
+                $login_error  = 'Failed login for IP Address ' . $_SERVER['REMOTE_ADDR'] . ', trying ' . $_REQUEST['login-email'];
+                $error_type   = 'FAILED_LOGIN';
+
+                $prepped      = $db->prepare($sql_query);
+                $prepped->bind_param('ssss', $sql_datetime, $error_type, $login_error, $_SERVER['REMOTE_ADDR']);
+
+                $prepped->execute();
+                $result  = $prepped->get_result();
+            }
+            
             $log->error('Account login FAILED', [
                 'Email'      => $email,
                 'IpAddr'     => $_SERVER['REMOTE_ADDR']
             ]);
+
             header('Location: /?failed_login');
             exit();
         }
