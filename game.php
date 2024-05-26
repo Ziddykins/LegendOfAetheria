@@ -98,7 +98,7 @@
                                     
                                     <ul id="menu-header-character" class="nav nav-pills collapse nav-flush flex-column mb-auto" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
-                                            <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link px-0">
+                                            <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link px-0  text-decoration-none">
                                                 <span class="material-symbols-sharp ms-3">account_circle</span>
                                                 <span class="d-none d-md-inline ms-2"> Sheet</span>
                                             </a>
@@ -128,8 +128,8 @@
                                             </a>
                                         </li>
                                         <script>
-    function saveChar() {
-        preventDefault();
+                                            function saveChar() {
+                                                preventDefault();
                                                 $.ajax("/?page=save").done(
                                                     function(data) {
                                                         $("#output").innerHTML = data;
