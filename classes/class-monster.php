@@ -1,5 +1,7 @@
 <?php
    class Monster {
+        protected $id;
+        protected $accountID;
         protected $name;
         
         protected $scope;

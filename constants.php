@@ -1,5 +1,4 @@
 <?php
-
     define('MAX_STARTING_INVWEIGHT', 500);
     define('MAX_STARTING_INVSLOTS',   30);
     define('MAX_ASSIGNABLE_AP',       40);
@@ -35,6 +34,7 @@
             }
             throw new \ValueError("$name is not a valid backing value for enum " . self::class);
         }
+        
         public static function name_to_enum(string $name) {
             foreach (self::cases() as $privilege) {
                 if ($name === $privilege->name){
@@ -42,9 +42,8 @@
                 }
             }
             throw new \ValueError("$name is not a valid backing value for enum " . self::class);
-       }
+        }
 
-        
         case BANNED = 1;
         case MUTED = 2;
         case UNREGISTERED = 4;
@@ -57,7 +56,6 @@
         case OWNER = 512;
         case ROOTED = 1024;
     }
-
 
     enum Weather {
         public function random(): self {
@@ -105,6 +103,8 @@
     #   - SQLDB - Directly relating to the database, i.e. invalid
     #             prepare statements or connection issues
     #   - FRNDS - Well, friend related issues
+    #   - MAIL  - Mail related issues
+    #   - CRON  - Cron related issues
     enum LOAError: int {
         case FUNCT_DOSQL_INVALIDACTION = -1000;
         case FUNCT_GENCOMP_UNKNOWN     = -1001;
@@ -113,9 +113,10 @@
         case SQLDB_PREPPED_EXECUTE     = -2001;
         case SQLDB_UNKNOWN_SAVE_TYPE   = -2002;
 
-        case FRIEND_STATUS_ERROR       = -3000;
+        case FRNDS_FRIEND_STATUS_ERROR = -3000;
 
         case MAIL_UNKNOWN_DIRECTIVE    = -4000;
+        case MAIL_ALREADY_BLOCKED      = -4001;
         
         case CRON_HTTP_DIRECT_ACCESS   = -5000;
     }

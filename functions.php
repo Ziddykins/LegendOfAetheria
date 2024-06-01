@@ -121,7 +121,7 @@
                 return FriendStatus::NONE;
         }
 
-        return LOAError::FRIEND_STATUS_ERROR;
+        return LOAError::FRNDS_FRIEND_STATUS_ERROR;
     }
 
     function accept_friend_req($email) {
@@ -135,8 +135,8 @@
             
             $log->info('Friend request accepted', 
                 [
-                    email_1 => $account['email'], 
-                    email_2 => $email
+                    'email_1' => $account['email'], 
+                    'email_2' => $email
                 ]
             );
         }
@@ -144,52 +144,37 @@
 
     function get_friend_counts($which, $id = 0) {
         global $db, $account;
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE `id` <> ' . $account['id'];
+        $sql_query = 'SELECT DISTINCT email FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE `id` <> ' . $account['id'];
         $results = $db->query($sql_query);
 
         switch ($which) {
-        case 'requests':
-            $requests = 0;
-            while ($row = $results->fetch_assoc()) {
-                if (friend_status($row['email']) === FriendStatus::REQUEST) {
-                    $requests++;
+            case 'requests':
+                $requests = 0;
+                while ($row = $results->fetch_assoc()) {
+                    if (friend_status($row['email']) === FriendStatus::REQUEST) {
+                        $requests++;
+                    }
                 }
-            }
-            return $requests;
+                return $requests;
         }
     }
 
     /* TODO: test */
-    function block_user($email) {
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_FRND_TBL'] . 
-                     "WHERE `email_2` = '$email' " .
-                     "AND `email_1` = '" . $account['email'] . "'";
-        $result = $db->query($result)->fetch_assoc();
+    function block_user($email_1, $email_2) {
+        global $db;
+        $sqlQuery = 'SELECT email_2 FROM ' . $_ENV['SQL_FRND_TBL'] . 
+                     "WHERE `email_1` = ? " .
+                     "AND `email_2` = ?"; 
+                     //'" . $account['email'] . "'";
+        
+        $result = $db->execute_query($sqlQuery, [$email_1, $email_2])->fetch_assoc();
+
+        if (str_starts_with($result['email_2'], '¿b¿')) {
+            return LOAError::MAIL_ALREADY_BLOCKED;
+        }
+
         print_r($result);
         die();
-    }
-
-    function save_character($id, $character) {
-        global $db;
-        $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
-                     "SET `serialized_character` = '$serialized_data' ";
-                     "WHERE `id` = $id";
-        $db->query($sql_query); 
-    }
-
-    function load_character($id) {
-        $sql_query = 'SELECT `serialized_character` ' .
-                     'FROM ' . $_ENV['SQL_ACCT_TBL'] . 
-                     " WHERE `id` = $account_id";
-        
-        $db->query($sql_query);
-        
-        $serialized_data = $db->fetch_assoc();
-    
-        $character = new Character($account_id);
-        $character = unserialize($serialized_data);
-        
-        return $character;
     }
 
     function generate_egg($familiar, $rarity_roll) {
@@ -258,11 +243,10 @@
         $splits = preg_split('/(?=[A-Z]{1,2})/', $property); 
 
        $log->warning(print_r($splits, 1)); 
+
         if (count($splits) === 1) {
             return $property;
         }
-
-
         $table_column = $splits[0] . '_' . strtolower($splits[1]);
 
         if (isset($splits[2])) {
