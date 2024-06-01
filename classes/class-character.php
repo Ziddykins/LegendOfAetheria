@@ -17,12 +17,50 @@
             $this->stats     = new Stats();
         }
             
-        public function setStat($stat, $value) {
+        private function setStat(Stats $stat, $value) {
             $this->stats->$stat = $value;
         }   
         
-        public function getStat($stat) {
+        private function getStat(Stats $stat) {
             return $this->stats->$stat;
+        }
+
+        private function saveCharacter($accountID, Character $character, $slot = 0) {
+            global $db, $log;
+    
+            $serializedCharacter = serialize($character);
+            $serializedInventory = serialize($this->inventory);
+            $serializedStats     = serialize($this->stats);
+
+            $serializedCompleteCharacter = $serializedCharacter . '###' .
+                                           $serializedInventory . '###' .
+                                           $serializedStats     . '###';
+
+            $sqlQuery = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
+                         "SET `serialized_character` = ? " .
+                         "WHERE `id` = ?";
+
+            $db->execute_query($sqlQuery, [$serializedCompleteCharacter, $accountID])->fetch_assoc();
+            
+            $log->info('Saving character', ['id' => $accountID, 'character' => $character->name]);
+            $log->debug('Serialized data', ['serialized_character' => $serializedCompleteCharacter]);
+        }
+    
+        private function loadCharacter($accountID) {
+            global $db, $log;
+
+            $sqlQuery = 'SELECT `serialized_character` ' .
+                         'FROM ' . $_ENV['SQL_ACCT_TBL'] . 
+                         " WHERE `id` = ?";
+
+            $serializedCompleteCharacter = $db->execute_query($sqlQuery, [$accountID])->fetch_assoc();
+            [$serializedCharacter, $serializedInventory, $serializedStats] = explode('###', $serializedCompleteCharacter);
+
+            $character = unserialize($serializedCharacter);
+            $inventory = unserialize($serializedInventory);
+            $stats     = unserialize($serializedStats);
+            
+            return $character;
         }
 
         function __call($method, $params) {
@@ -81,7 +119,7 @@
         protected $slots;
         protected $slotCount;
         
-        protected $weight;
+        protected $currentWeight;
         protected $maxWeight;
 
         protected $nextAvailableSlot;
@@ -91,12 +129,13 @@
                 $this->slots[$i] = new Slot();
             }
             
-            $this->weight    = 0;
-            $this->maxWeight = 1000;
+            $this->currentWeight    = 0;
+            $this->maxWeight = $maxWeight;
+
             $this->nextAvailableSlot = 0;
         }
         
-        public static function spacesLeft() {
+        public function spacesLeft() {
             return (count($this->slots) - $this->nextAvailableSlot);
         }
     }
