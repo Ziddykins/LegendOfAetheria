@@ -4,12 +4,21 @@ use warnings;
 use strict;
 use autodie;
 
+# NOCONFIG - Colors #
+my $RED    = "\e[31m";
+my $GREEN  = "\e[32m";
+my $YELLOW = "\e[33m";
+my $BLUE   = "\e[34m";
+my $CYAN   = "\e[36m";
+my $GREY   = "\e[37m";
+my $RESET  = "\e[0m";
+
 # CONFIG - Server #
-my $FQDN = 'loa.didney.whorl';
+my $FQDN              = 'loa2.dankaf.ca';
 my ($SUB, $DOM, $TLD) = split /\./, $FQDN;
-my $IP_ADDRESS  = '127.0.2.1';
-my $LOG_TO_FILE = 'setup.log';
-my $PHP_BINARY  = $1 if `whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/;
+my $IP_ADDRESS        = '127.0.2.1';
+my $LOG_TO_FILE       = 'setup.log';
+my $PHP_BINARY        = $1 if `whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/;
 my $GAME_WEB_ROOT     = "/var/www/html/$DOM.$TLD/$SUB";
 my $GAME_TEMPLATE_DIR = "$GAME_WEB_ROOT/install/templates";
 my $GAME_SCRIPTS_DIR  = "$GAME_WEB_ROOT/install/scripts";
@@ -24,12 +33,13 @@ my $SQL_TBL_FRIENDS    = 'tbl_friends';
 my $SQL_TBL_GLOBALS    = 'tbl_globals';
 my $SQL_TBL_MAIL       = 'tbl_mail';
 my $SQL_TBL_CHATS      = 'tbl_chats';
+my $SQL_TBL_MONSTERS   = 'tbl_monsters';
 
 # CONFIG - SQL Credentials / Template Replacements #
 my $SQL_USERNAME           = 'user_loa';
 my $SQL_PASSWORD           = gen_random(15);
 my $SQL_DATABASE           = 'db_loa';
-my $SQL_HOST               = '127.0.2.1';
+my $SQL_HOST               = $IP_ADDRESS;
 my $SQL_PORT               = 3306;
 my $SQL_SERVER_CONFIG_FILE = '/etc/mysql/mariadb.conf.d/50-server.cnf';
 
@@ -53,6 +63,47 @@ my $XAMPP_MARIADB_CHPW = 'mysqladmin.exe -u root password';
 my $COMPOSER_RUNAS = 'www-data';
 my $APACHE_RUNAS   = 'www-data';
 
+# CONFIG - PHP #
+my $PHP_VERSION;
+my $PHP_INI_FILE = 'unset';
+
+if (!$PHP_VERSION) {
+    tell_user('WARN', "PHP version not specified, attempting to find it...\n");
+
+    if (check_platform() eq 'linux') {
+        chomp($PHP_VERSION = `php --version | awk '{print \$2}' | head -n1`);
+        if ($PHP_VERSION =~ /\d\.\d\.?\d?/) {
+            $PHP_VERSION =~ s/(\d\.\d)\.\d?/$1/;
+            tell_user('SUCCESS', "Found PHP version $PHP_VERSION");
+        } else {
+            tell_user(
+                'ERROR',
+                'Failed to find PHP version, please manually specify in this file'
+            );
+            die "Exiting on failure...\n";
+        }
+    }
+} else {
+    die "Invalid or unsupported PHP version set in the installer\n" .
+        "supported PHP versions: 7.0 - 8.3\n\n";
+}
+
+if (check_platform() eq 'linux' && $PHP_INI_FILE eq 'unset') {
+    $PHP_INI_FILE = "/etc/php/$PHP_VERSION/php.ini";
+} else {
+    $PHP_INI_FILE = 'C:\xampp\php\php.ini';
+}
+
+# CONFIG - OpenAI #
+my $OPENAI_ENABLE = 0;
+my $OPENAI_APIKEY;
+
+if ($OPENAI_ENABLE) {
+    print "OpenAI configuration is enabled; please enter your OpenAI API key:\n";
+    print "Key: ";
+    chomp($OPENAI_APIKEY = <STDIN>);
+}
+
 # CONFIG - Template Files #
 my $VIRTHOST_SSL_TEMPLATE = "$GAME_TEMPLATE_DIR/virtual_host_ssl.template";
 my $VIRTHOST_TEMPLATE     = "$GAME_TEMPLATE_DIR/virtual_host.template";
@@ -65,31 +116,33 @@ my $SQL_TEMPLATE          = "$GAME_TEMPLATE_DIR/sql.template";
 my $WIN32_HOSTS_FILE = 'c:\windows\system32\drivers\etc\hosts';
 my $LINUX_HOSTS_FILE = '/etc/hosts';
 
-# NOCONFIG - Colors #
-my $RED    = "\e[31m";
-my $GREEN  = "\e[32m";
-my $YELLOW = "\e[33m";
-my $BLUE   = "\e[34m";
-my $CYAN   = "\e[36m";
-my $GREY   = "\e[37m";
-my $RESET  = "\e[0m";
-
 # NOCONFIG - Replacements for Templates
 my @replacements = (
-    "###REPL_PHP_BINARY###%%%$PHP_BINARY",
-    "###REPL_WEB_ROOT###%%%$GAME_WEB_ROOT",
-    "###REPL_SQL_DB###%%%$SQL_DATABASE",
-    "###REPL_SQL_USER###%%%$SQL_USERNAME",
-    "###REPL_SQL_PASS###%%%$SQL_PASSWORD",
-    "###REPL_SQL_HOST###%%%$SQL_HOST",
-    "###REPL_SQL_PORT###%%%$SQL_PORT",
-    "###REPL_SQL_TBL_ACCOUNTS###%%%$SQL_TBL_ACCOUNTS",
-    "###REPL_SQL_TBL_CHARACTERS###%%%$SQL_TBL_CHARACTERS",
-    "###REPL_SQL_TBL_FAMILIARS###%%%$SQL_TBL_FAMILIARS",
-    "###REPL_SQL_TBL_FRIENDS###%%%$SQL_TBL_FRIENDS",
-    "###REPL_SQL_TBL_GLOBALS###%%%$SQL_TBL_GLOBALS",
-    "###REPL_SQL_TBL_MAIL###%%%$SQL_TBL_MAIL",
-    "###REPL_SQL_USER###%%%$SQL_USERNAME"
+    "###REPL_PHP_BINARY###%%\%$PHP_BINARY",
+
+    "###REPL_WEB_ROOT###%%\%$GAME_WEB_ROOT",
+    "###REPL_WEB_ADMIN_EMAIL###%%\%$WEB_ADMIN_EMAIL",
+    "###REPL_WEB_FQDN###%%\%$FQDN",
+    "###REPL_WEB_DOCROOT###%%\%$GAME_WEB_ROOT",
+    "###REPL_WEB_SSL_FULLCER###%%\%$SSL_FULLCER",
+    "###REPL_WEB_SSL_PRIVKEY###%%\%$SSL_PRIVKEY",
+
+    "###REPL_SQL_DB###%%\%$SQL_DATABASE",
+    "###REPL_SQL_USER###%%\%$SQL_USERNAME",
+    "###REPL_SQL_PASS###%%\%$SQL_PASSWORD",
+    "###REPL_SQL_HOST###%%\%$SQL_HOST",
+    "###REPL_SQL_PORT###%%\%$SQL_PORT",
+
+    "###REPL_SQL_TBL_ACCOUNTS###%%\%$SQL_TBL_ACCOUNTS",
+    "###REPL_SQL_TBL_CHARACTERS###%\%%$SQL_TBL_CHARACTERS",
+    "###REPL_SQL_TBL_FAMILIARS###%%\%$SQL_TBL_FAMILIARS",
+    "###REPL_SQL_TBL_FRIENDS###%%\%$SQL_TBL_FRIENDS",
+    "###REPL_SQL_TBL_GLOBALS###%%\%$SQL_TBL_GLOBALS",
+    "###REPL_SQL_TBL_MAIL###%%\%$SQL_TBL_MAIL",
+    "###REPL_SQL_TBL_MONSTERS###\%$SQL_TBL_MONSTERS",
+    "###REPL_SQL_USER###%%\%$SQL_USERNAME",
+
+    "###REPL_OPENAI_APIKEY###%%\%$OPENAI_APIKEY",
 );
 
 ## NO MORE CONFIGURATION BEYOND THIS POINT ##
@@ -106,6 +159,7 @@ foreach my $step (@steps) {
 
 foreach my $key (keys %completed) {
     next if !$completed{$key};
+
     print "It looks like you have ran this script before; do you want to\n";
     print "[c]ontinue from step '$key' where you left off, or [r]estart from\n";
     print "the beginning?\n[r]estart/[c]ontinue: ";
@@ -125,9 +179,18 @@ if (!-e '/etc/debian_version' && check_platform() eq "linux") {
     die "sry no :')";
 }
 
-if (ask_user("Update hosts file?")) {
-    update_hosts() if !$completed{hosts};
-    `touch $GAME_WEB_ROOT/.loa-step-hosts`;
+#if (ask_user("Update hosts file?")) {
+#    update_hosts() if !$completed{hosts};
+#    `touch $GAME_WEB_ROOT/.loa-step-hosts`;
+#}
+
+if (ask_user(
+        "Multiple variables in this script are marked with " .
+        "'Template Replacements' - Make sure these are filled out properly before " .
+        "continuing\nContinue and generate templates?"
+    )) {
+    generate_templates();
+    `touch $GAME_WEB_ROOT/.loa.step.templates`;
 }
 
 if (ask_user("Install required software?")) {
@@ -135,10 +198,10 @@ if (ask_user("Install required software?")) {
     `touch $GAME_WEB_ROOT/.loa-step-software`;
 }
 
-if (ask_user("Update system hostname to match FQDN?")) {
-    update_hostname() if !$completed{hostname};
-    `touch $GAME_WEB_ROOT/.loa.step.hostname`;
-}
+#if (ask_user("Update system hostname to match FQDN?")) {
+#    update_hostname() if !$completed{hostname};
+#   `touch $GAME_WEB_ROOT/.loa.step.hostname`;
+#}
 
 if (ask_user("Perform necessary apache updates?")) {
     apache_config() if !$completed{apache};
@@ -158,15 +221,6 @@ if (ask_user("Update PHP configurations? (security, performance)")) {
 if (ask_user("Run composer to download required dependencies?")) {
     composer_pull() if !$completed{composer};
     `touch $GAME_WEB_ROOT/.loa.step.composer`;
-}
-
-if (ask_user(
-        "Multiple variables in this script are marked with " .
-        "'Template Replacements' - Make sure these are filled out properly before " .
-        "continuing\nContinue and process templates?"
-    )) {
-    process_templates();
-    `touch $GAME_WEB_ROOT/.loa.step.templates`;
 }
 
 if (ask_user("Configure the SQL server and import processed template to create " .
@@ -234,8 +288,10 @@ sub install_software {
     if (-e '/etc/apt/sources.list.d/php.list') {
         tell_user('INFO', 'Sury repo entries already present');
     } else {
-        tell_user('INFO',
-            'Sury PHP repositories not found, adding necessary entries');
+        tell_user(
+            'INFO',
+            'Sury PHP repositories not found, adding necessary entries'
+        );
 
         tell_user('SYSTEM', `sh $GAME_SCRIPTS_DIR/sury_setup.sh`);
     }
@@ -244,13 +300,23 @@ sub install_software {
     tell_user('SYSTEM', `apt update 2>&1`);
 
     my @packages = (
-        'php8.2',                'php8.2-cli',
-        'php8.2-common',         'php8.2-curl',
-        'php8.2-dev',            'php8.2-fpm',
-        'php8.2-mbstring',       'php8.2-mysql',
-        'php8.2-xml',            'mariadb-server',
-        'apache2',               'libapache2-mod-php',
-        'libapache2-mod-php8.2', 'composer',
+        "php$PHP_VERSION",
+        "php$PHP_VERSION-cli",
+        "php$PHP_VERSION-common",
+        "php$PHP_VERSION-curl",
+        "php$PHP_VERSION-dev",
+        "php$PHP_VERSION-fpm",
+        "php$PHP_VERSION-mbstring",
+        "php$PHP_VERSION-mysql",
+        "php$PHP_VERSION-xml",
+        "mariadb-server",
+        "apache2",
+        "letsencrypt",
+        "python-is-python3",
+        "python3-certbot-apache",
+        "libapache2-mod-php",
+        "libapache2-mod-php$PHP_VERSION",
+        "composer",
     );
 
     my $apt_cmd = 'apt install -y ' . join (' ', @packages) . ' 2>&1';
@@ -281,66 +347,9 @@ sub update_hostname {
 
 # Step: apache
 sub apache_config {
-    my $conf_file_data = qq#
-        <VirtualHost $FQDN:80>
-            ServerName $FQDN
-            ServerAdmin $WEB_ADMIN_EMAIL
-            DocumentRoot $GAME_WEB_ROOT
-            ErrorLog \${APACHE_LOG_DIR}/$FQDN.error.log
-            CustomLog \${APACHE_LOG_DIR}/$FQDN.access.log combined
-            LimitInternalRecursion 15;
-        </VirtualHost>
-    #;
-
-    my $ssl_conf_file_data = qq#
-        <VirtualHost $FQDN:443>
-    	    ServerName $FQDN
-            ServerAdmin $WEB_ADMIN_EMAIL
-    	    DocumentRoot $GAME_WEB_ROOT
-    	    LogLevel info ssl:warn
-    	    ErrorLog \${APACHE_LOG_DIR}/$FQDN-error.log
-    	    CustomLog \${APACHE_LOG_DIR}/$FQDN-access.log combined
-    	    SSLEngine on
-    	    SSLCertificateFile "$SSL_FULLCER"
-    	    SSLCertificateKeyFile "$SSL_PRIVKEY"
-
-	        <FilesMatch "\.(?:cgi|shtml|phtml|php)$">
-              	SSLOptions +StdEnvVars
-	        </FilesMatch>
-	        <Directory /usr/lib/cgi-bin>
-            	SSLOptions +StdEnvVars
-	        </Directory>	
-        </VirtualHost>
-    #;
-
     if (
         ask_user(
-                "Do you want to add the default virtual host "
-              . "configuration for $FQDN to $VIRTHOST_CONF_FILE?"
-        )
-    ) {
-        if (-e $VIRTHOST_CONF_FILE) {
-            file_exists($VIRTHOST_CONF_FILE, $conf_file_data);
-        } else {
-            open my $fh, '>', $VIRTHOST_CONF_FILE;
-            print $fh $conf_file_data;
-            close $fh;
-        }
-    }
-
-    if (ask_user('Do you want to add the SSL-enabled configuration as well?')) {
-        if (-e $VIRTHOST_CONF_FILE_SSL) {
-            file_exists($VIRTHOST_CONF_FILE_SSL, $ssl_conf_file_data);
-        } else {
-            open my $fh, '>', $VIRTHOST_CONF_FILE_SSL;
-            print $fh $ssl_conf_file_data;
-            close $fh;
-        }
-    }
-
-    if (
-        ask_user(
-                "Do you also want to redirect traffic from http:80 to "
+                "Do you want to redirect traffic from http:80 to "
               . "https:443? A valid certificate needs to be set in the "
               . "script configuration!\n- Currently set -\n"
               . "Certificate: $SSL_FULLCER\n"
@@ -351,26 +360,9 @@ sub apache_config {
         tell_user('INFO',   'Enabling mod_rewrite if it isn\'t already');
         tell_user('SYSTEM', `a2enmod rewrite 2>&1`);
 
-        open my $fh, '<', $VIRTHOST_CONF_FILE;
-        my @lines = <$fh>;
-        close $fh;
+        tell_user('INFO', 'Enabling rewrite directives in $VIR');
+        `sed -i 's/# REM //' $VIRTHOST_CONF_FILE`;
 
-        my $vhost_output;
-        for (my $i = 0; $i < scalar @lines - 1; $i++) {
-            $vhost_output .= $lines[$i] . "\n";
-
-            if ($lines[$i + 1] =~ /<\/VirtualHost>/) {
-                $vhost_output .= qq#
-                    <IfModule mod_rewrite>
-                        RewriteEngine on
-                        RewriteCond %{SERVER_NAME} =$FQDN
-                        RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
-                        </IfModule>
-                    </VirtualHost>
-                #;
-                last;
-            }
-        }
     }
 }
 
@@ -381,10 +373,10 @@ sub apache_enables {
     tell_user('INFO',
         'Enabling required Apache configurations, sites and modules');
 
-    my $conf_output = `a2enconf php8.2-fpm 2>&1`;
+    my $conf_output = `a2enconf php$PHP_VERSION-fpm 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
-    my $mods_output = `a2enmod php8.2 rewrite setenvif 2>&1`;
+    my $mods_output = `a2enmod php$PHP_VERSION rewrite setenvif ssl 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
     my $sites_output = `a2ensite $VIRTHOST_CONF_FILE 2>&1`;
@@ -422,15 +414,14 @@ sub composer_pull {
               . "Apache runs under"
         )
     ) {
-        my $cmd = "sudo -u $COMPOSER_RUNAS "
-          . "composer --working-dir \"$GAME_WEB_ROOT\" install";
+        my $cmd = "sudo -u $COMPOSER_RUNAS composer --working-dir \"$GAME_WEB_ROOT\" install";
         my $cmd_output = `$cmd 2>&1`;
         tell_user('SYSTEM', $cmd_output);
     }
 }
 
 # Step: Template imports
-sub process_templates {
+sub generate_templates {
     my $copy_output;
     my $cron_contents = '';
     my $fh_cron;
@@ -439,42 +430,67 @@ sub process_templates {
     `sed -i 's/bind-address.*/bind-address = $IP_ADDRESS/' $SQL_SERVER_CONFIG_FILE`;
 
     # key = in file, value = out file
-    $templates{$ENV_TEMPLATE}      = "$GAME_WEB_ROOT/.env";
-    $templates{$HTACCESS_TEMPLATE} = "$GAME_WEB_ROOT/.htaccess";
-    $templates{$SQL_TEMPLATE}      = "$SQL_TEMPLATE.ready";
-    $templates{$CRONTAB_TEMPLATE}  = "$CRONTAB_DIRECTORY/$APACHE_RUNAS";
-
+    $templates{$ENV_TEMPLATE}          = "$ENV_TEMPLATE.ready";
+    $templates{$HTACCESS_TEMPLATE}     = "$HTACCESS_TEMPLATE.ready";
+    $templates{$SQL_TEMPLATE}          = "$SQL_TEMPLATE.ready";
+    $templates{$CRONTAB_TEMPLATE}      = "$CRONTAB_TEMPLATE.ready";
+    $templates{$VIRTHOST_SSL_TEMPLATE} = "$VIRTHOST_SSL_TEMPLATE.ready";
+    $templates{$VIRTHOST_TEMPLATE}     = "$VIRTHOST_TEMPLATE.ready";
+    
     foreach my $replacement (@replacements) {
         my ($search, $replace) = split /%%%/, $replacement;
         foreach my $template (keys %templates) {
+            tell_user('SYSTEM', "[$template] $search -> $replace\n";
             replace_in_file($search, $replace, $template, $templates{$template});
-            print "[$template] $search -> $replace\n";
-            `sed -i 's/$search/$replace/g' $template`;
+            tell_user('SYSTEM', "[$template] Finished, wrote to $template.ready");
         }
     }
 
     tell_user('SUCCESS', "Replacements have been made in all template files\n");
-    
-    tell_user('INFO',
-        'Creating database, adding SQL user, granting privilges, and importing schema'
-    );
-    
-    my $sql_cmd = "mysql -u $SQL_USERNAME -p'$SQL_PASSWORD' -h $SQL_HOST " .
-                  "-P $SQL_PORT < $SQL_TEMPLATE 2>&1";
+}
 
+sub process_templates {
+    my $cp_cmd;
+    if (check_platform() eq 'linux') {
+        $cp_cmd = "cp";
+    } else {
+        $cp_cmd = "copy";
+    }
+
+    tell_user('INFO', "Importing SQL schema, creating user and granting privileges")
+    
+    my $sql_cmd = "mysql -u $SQL_USERNAME -p'$SQL_PASSWORD' -h $SQL_HOST -P $SQL_PORT < $SQL_TEMPLATE.ready 2>&1";
     chomp(my $sql_import_result = `$sql_cmd`);
-
     $sql_import_result //= 'Successfully imported database schema';
 
-    tell_user(
-        (!!$? ? 'ERROR' : 'SUCCESS'),    # LOL
-        $sql_import_result
-    );
+    # LOL
+    tell_user((!!$? ? 'ERROR' : 'SUCCESS'), $sql_import_result);
+    
+    tell_user('INFO', "Copying over $ENV_TEMPLATE.ready to $GAME_WEB_ROOT/.env");
+    file_write("$ENV_TEMPLATE.ready", "$GAME_WEB_ROOT/.env", 'file');
+
+    tell_user('INFO', "Copying over $VIRTHOST_TEMPLATE.ready to $VIRTHOST_CONF_FILE");
+    file_write("$VIRTHOST_TEMPLATE.ready", $VIRTHOST_CONF_FILE, 'file');
+
+    if ($SSL_ENABLED) {
+        tell_user('INFO', "Copying over $VIRTHOST_SSL_TEMPLATE.ready to $VIRTHOST_CONF_FILE_SSL");
+        file_write("$VIRTHOST_SSL_TEMPLATE.ready", $VIRTHOST_CONF_FILE_SSL, 'file');
+    }
+
+    tell_user('INFO', "Copying over $HTACCESS_TEMPLATE.ready to $GAME_WEB_ROOT/.htaccess");
+    file_write("$HTACCESS_TEMPLATE.ready", "$GAME_WEB_ROOT/.htaccess", 'file');
+
+    tell_user('INFO', "Copying over $CRONTAB_TEMPLATE to $CRONTAB_DIRECTORY/$APACHE_RUNAS")
+    file_write("$CRONTAB_TEMPLATE.ready", "$CRONTAB_DIRECTORY/$APACHE_RUNAS");
+    tell_user('INFO', "Updating permissions on new crontab to $APACHE_RUNAS:crontab");
+    `chown $APACHE_RUNAS:crontab $CRONTAB_DIRECTORY/$APACHE_RUNAS`;
+
+    tell_user('SUCCESS', "All template files have been applied");    
 }
 
 #Step: start services
 sub start_services {
-    my @services = qw/mariadb php8.2-fpm apache2/;
+    my @services = qq/mariadb php$PHP_VERSION-fpm apache2/;
 
     foreach my $service (@services) {
         tell_user('SYSTEM', `systemctl restart $service`);
@@ -494,7 +510,12 @@ sub replace_in_file {
 
     for (my $i=0; $i<scalar @contents - 1; $i++) {
         print "Then: " . $contents[$i] . "\n";
+        
         $contents[$i] =~ s/.*$search.*[\r\n]+/$replace/gm;
+        # just to be sure? i forget why i did it the above way
+        # but the below way makes more sense to me as of today
+        $contents[$i] =~ s/$search/$replace/g;
+
         print "Now : " . $contents[$i] . "\n";
     }
 
@@ -525,35 +546,54 @@ sub gen_random {
     my $password;
 
     for (1 .. $length) {
-        $password .= chr (int (rand (94) + 32));
+        $password .= chr(int(rand(94)) + 33);
     }
 
     return $password;
 }
 
-sub file_exists {
-    my ($file, $data) = @_;
+sub file_write {
+    my ($dst, $src, $type) = @_;
     my $fh;
+    my $data;
 
-    print "$file exists already...\n";
-    print '[o]verwrite, [a]ppend, [s]kip -> ';
+    if ($type eq 'file') {
+        open my $src_fh, '<', $src or die "Can't open source file '$src': $@\n";
+            $data = <$src_fh>;
+        close $src_fh or die "Can't close source file '$src': $@\n";
+        tell_user('INFO', "Loaded data from file '$src'");
+    } elsif ($type eq 'data') {
+        $data = $src;
+        tell_user('INFO', "Loaded data directly from passed variable");
+    }
 
+    if (!-e $dst) {
+        tell_user('INFO', "File '$dst' doesn't exist already, writing new file");
+        
+        open $fh, '>', $dst or die "Can't open file '$dst' for write: $@\n";
+            print $fh $data;
+        close $fh or die "Can't close file '$dst': $@";
+
+        return 0;
+    }
+
+    print "$dst exists already\n";
+    print '[o]verwrite, [a]ppend, [s]kip: ';
     chomp (my $answer = <STDIN>);
 
-    if ($answer =~ /[Oo](verwrite)?/) {
-        open $fh, '>', $file;
-        tell_user('INFO', "Preparing to overwrite existing file: $file");
-        print $fh $file;
-    } elsif ($answer =~ /[Aa](ppend)?/) {
-        open $fh, '>>', $file;
-        tell_user('INFO', "Preparing to append to existing file: $file");
-    } elsif ($answer =~ /[Ss](kip)?/) {
-        tell_user('WARN', "Skipping write-to-file operation for $file");
+    if ($answer =~ /[Oo]v?e?r?w?r?i?t?e?/) {
+        tell_user('INFO', "Preparing to overwrite existing file: $dst");
+        open $fh, '>', $dst;
+    } elsif ($answer =~ /[Aa]p?p?e?n?d?/) {
+        tell_user('INFO', "Preparing to append to existing file: $dst");
+        open $fh, '>>', $dst;
+    } elsif ($answer =~ /[Ss]k?i?p?/) {
+        tell_user('WARN', "Skipping write-to-file operation for $dst");
         return;
     }
 
     print $fh $file;
-    tell_user('SUCCESS', "Done writing to $file\n");
+    tell_user('SUCCESS', "Done writing to $src\n");
     close $fh;
 }
 

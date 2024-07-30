@@ -2,7 +2,8 @@
     define('MAX_STARTING_INVWEIGHT', 500);
     define('MAX_STARTING_INVSLOTS',   30);
     define('MAX_ASSIGNABLE_AP',       40);
-    define('ENERGY_PER_TICK',          3);
+    define('REGEN_PER_TICK',           3);
+    
     define('ROOT_WEB_DIRECTORY', '/var/www/html/dankaf.ca/loa/');
     
     enum Races {

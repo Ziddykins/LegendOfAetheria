@@ -1,8 +1,9 @@
--- MariaDB dump 10.19  Distrib 10.11.5-MariaDB, for debian-linux-gnu (x86_64)
+/*!999999\- enable the sandbox mode */ 
+-- MariaDB dump 10.19-11.4.2-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: db_loa
 -- ------------------------------------------------------
--- Server version	10.11.5-MariaDB-3-log
+-- Server version	11.4.2-MariaDB-4
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -13,28 +14,18 @@
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+/*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
 
 --
--- Current Database: `db_loa`
+-- Table structure for table `###REPL_SQL_TBL_ACCOUNTS###`
 --
 
-/*!40000 DROP DATABASE IF EXISTS `db_loa`*/;
-
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `db_loa` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
-
-USE `db_loa`;
-
---
--- Table structure for table `tbl_accounts`
---
-
-DROP TABLE IF EXISTS `tbl_accounts`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_ACCOUNTS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `tbl_accounts` (
-  `id` int(9) unsigned NOT NULL CREMENT,
-  `email` varchar(256) DEFAULT NULL,
+CREATE TABLE `###REPL_SQL_TBL_ACCOUNTS###` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) DEFAULT NULL,
   `password` varchar(64) DEFAULT NULL,
   `date_registered` datetime NOT NULL DEFAULT curdate(),
   `verified` enum('True','False') NOT NULL DEFAULT 'False',
@@ -47,19 +38,21 @@ CREATE TABLE `tbl_accounts` (
   `failed_logins` int(10) unsigned NOT NULL DEFAULT 0,
   `ip_address` tinytext DEFAULT NULL,
   `serialized_character` longtext DEFAULT NULL,
+  `credits` int(9) unsigned NOT NULL DEFAULT 10,
+  `session_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_characters`
+-- Table structure for table `###REPL_SQL_TBL_CHARACTERS###`
 --
 
-DROP TABLE IF EXISTS `tbl_characters`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_CHARACTERS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `tbl_characters` (
-  `id` int(9) unsigned NOT NULL CREMENT,
+CREATE TABLE `###REPL_SQL_TBL_CHARACTERS###` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(9) NOT NULL,
   `name` varchar(50) NOT NULL,
   `race` varchar(50) NOT NULL,
@@ -76,26 +69,25 @@ CREATE TABLE `tbl_characters` (
   `max_mp` bigint(20) unsigned NOT NULL DEFAULT 100,
   `alignment` int(9) NOT NULL DEFAULT 0,
   `gold` bigint(20) unsigned NOT NULL DEFAULT 1000,
-  `spindels` bigint(20) unsigned  NOT NULL DEFAULT 5,
   `exp` bigint(20) unsigned NOT NULL DEFAULT 0,
   `ep` int(9) unsigned NOT NULL DEFAULT 100,
   `max_ep` int(9) unsigned NOT NULL DEFAULT 100,
   `floor` int(9) unsigned NOT NULL DEFAULT 1,
-  `description` varchar(255) NOT NULL DEFAULT 'None Provided',
+  `description` text DEFAULT 'None Provided',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `account_id` (`account_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_familiars`
+-- Table structure for table `###REPL_SQL_TBL_FAMILIARS###`
 --
 
-DROP TABLE IF EXISTS `tbl_familiars`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_FAMILIARS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `tbl_familiars` (
-  `id` int(9) unsigned NOT NULL CREMENT,
+CREATE TABLE `###REPL_SQL_TBL_FAMILIARS###` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `character_id` int(9) unsigned NOT NULL,
   `name` varchar(128) DEFAULT '!Unset!',
   `hatched` enum('True','False') DEFAULT 'False',
@@ -109,60 +101,104 @@ CREATE TABLE `tbl_familiars` (
   `last_roll` float unsigned DEFAULT 0,
   `avatar` varchar(255) DEFAULT 'img/generated/eggs/egg-unhatched.jpeg',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_friends`
+-- Table structure for table `###REPL_SQL_TBL_FRIENDS###`
 --
 
-DROP TABLE IF EXISTS `tbl_friends`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_FRIENDS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `tbl_friends` (
-  `id` int(9) unsigned NOT NULL CREMENT,
+CREATE TABLE `###REPL_SQL_TBL_FRIENDS###` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `email_1` varchar(255) NOT NULL,
   `email_2` varchar(255) NOT NULL,
   `created` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_globals`
+-- Table structure for table `###REPL_SQL_TBL_GLOBALS###`
 --
 
-DROP TABLE IF EXISTS `tbl_globals`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_GLOBALS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `tbl_globals` (
-  `id` int(10) unsigned NOT NULL CREMENT,
+CREATE TABLE `###REPL_SQL_TBL_GLOBALS###` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '0',
   `value` varchar(50) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_mail`
+-- Table structure for table `###REPL_SQL_TBL_LOGS###`
 --
 
-DROP TABLE IF EXISTS `tbl_mail`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_LOGS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `tbl_mail` (
+CREATE TABLE `###REPL_SQL_TBL_LOGS###` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `date` datetime DEFAULT current_timestamp(),
+  `type` enum('FAILED_LOGIN','LOGIN','LOGOUT') DEFAULT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `ip` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `###REPL_SQL_TBL_MAIL###`
+--
+
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_MAIL###`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `###REPL_SQL_TBL_MAIL###` (
   `id` int(9) unsigned NOT NULL,
   `account_id` int(9) unsigned NOT NULL,
   `folder` enum('Inbox','Outbox','Deleted') NOT NULL,
   `to` varchar(50) NOT NULL,
   `from` varchar(50) NOT NULL,
   `subject` varchar(50) NOT NULL,
-  `message` varchar(50) NOT NULL,
+  `message` longtext NOT NULL,
   `date` datetime NOT NULL,
   `read` enum('True','False') NOT NULL DEFAULT 'False',
   `important` enum('True','False') NOT NULL DEFAULT 'False',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `account_id` (`account_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `###REPL_SQL_TBL_MONSTERS###`
+--
+
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_MONSTERS###`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `###REPL_SQL_TBL_MONSTERS###` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `scope` enum('Global','Local') DEFAULT NULL,
+  `account_id` int(10) unsigned DEFAULT 0,
+  `name` varchar(255) DEFAULT NULL,
+  `hp` bigint(20) unsigned DEFAULT NULL,
+  `max_hp` bigint(20) unsigned DEFAULT NULL,
+  `mp` bigint(20) unsigned DEFAULT NULL,
+  `max_mp` bigint(20) unsigned DEFAULT NULL,
+  `strength` int(10) unsigned DEFAULT NULL,
+  `intelligence` int(10) unsigned DEFAULT NULL,
+  `defense` int(10) unsigned DEFAULT NULL,
+  `drop_level` int(10) unsigned DEFAULT NULL,
+  `expires` datetime DEFAULT (current_timestamp() + interval 7 day),
+  `exp_awarded` bigint(20) unsigned DEFAULT NULL,
+  `gold_awarded` bigint(20) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -173,8 +209,9 @@ CREATE TABLE `tbl_mail` (
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+/*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2023-11-12 18:42:21
+-- Dump completed on 2024-07-30 19:36:41
 
-GRANT ALL PRIVILEGES ON ###REPL_SQL_DB###.* TO '###REPL_SQL_USER###' IDENTIFIED BY '###REPL_SQL_PASS###';
+CREATE USER ###REPL_SQL_USER###;
+GRANT ALL PRIVILEGES ON ###REPL_SQL_DB###.* TO ###REPL_SQL_USER### IDENTIFIED BY '###REPL_SQL_PASS###';

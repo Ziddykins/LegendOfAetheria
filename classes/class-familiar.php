@@ -38,22 +38,24 @@ class Familiar {
     protected $dateAcquired;
     protected $hatched;
 
-    public function __construct($characterID) {
+    protected $table;
+
+    public function __construct($characterID, $table) {
         $this->characterID = $characterID;
+        $this->table = $table;
     }
 
     public function registerFamiliar() {
-        global $db, $log;
+        global $db;
 
-        $sql_time   = get_mysql_datetime();
-        $hatch_time = get_mysql_datetime('+8 hours');
+        //$sql_time   = get_mysql_datetime();
+        //$hatch_time = get_mysql_datetime('+8 hours');
 
-        $sql_query = 'INSERT INTO ' . $_ENV['SQL_FMLR_TBL'] . 
-            " (`character_id`) VALUES ($this->characterID)";
+        $sql_query = "INSERT INTO " . $this->table . "(`character_id`) VALUES ($this->characterID)";
         
         $db->query($sql_query);
 
-        $sql_query = 'SELECT `id` FROM ' . $_ENV['SQL_FMLR_TBL'] . 
+        $sql_query = 'SELECT `id` FROM ' . $this->table . 
             " WHERE `character_id` = $this->characterID";
         
         $result = $db->query($sql_query);
@@ -77,9 +79,9 @@ class Familiar {
     }
 
     public function saveFamiliar() {
-        global $log, $db;
+        global $db;
 
-        $sql_query = 'UPDATE '.$_ENV['SQL_FMLR_TBL'].' SET ';
+        $sql_query = 'UPDATE '.$this->table.' SET ';
 
         foreach ((Array)$this as $key => $val) {
             if ($key !== 'id') {
@@ -102,9 +104,9 @@ class Familiar {
         }
         
         $sql_query = rtrim($sql_query, ', ');
-        $sql_query .= " WHERE `id` = $this->id";
+        $sql_query .= " WHERE `id` = ?";
+        $db->execute_query($sql_query, $this->id);
 
-        $db->query($sql_query);
     }
 
     public function getCard($which = 'current') {
@@ -133,12 +135,10 @@ class Familiar {
     public function loadFamiliar($characterID) {
         global $db, $log;
 
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_FMLR_TBL'] . ' ' .
-                        "WHERE `character_id` = $characterID";
+        $sql_query = "SELECT * FROM " . $this->table . " WHERE `character_id` = ?";
+        $result = $db->execute_query($sql_query, [ $characterID ]);
 
-        $result = $db->query($sql_query);
-
-        if ($result->num_rows == 0) {
+        if ($result->num_rows === 0) {
             $log->warning('Attempted to load familiar but no ' .
                             'corresponding character ID found: ' . $characterID);
             $this->registerFamiliar();
@@ -148,6 +148,9 @@ class Familiar {
         $familiar = $result->fetch_assoc();
 
         foreach ((Array)$this as $key => $val) {
+            if ($key == 'table') {
+                continue;
+            }
             $key = preg_replace("/[^a-zA-Z_]/", '', $key);
             $table_column = clsprop_to_tblcol($key);
             $this->$key = $familiar[$table_column];
@@ -189,12 +192,15 @@ class Familiar {
             case "GODLY":
                 return "#FF2501";
                 break;
+            default:
+                return "#FFF000";
+                break;
         }
     }
 
     public function generate_egg($familiar, $rarity_roll) {
         global $log;
-    
+        
         $rarity       = ObjectRarity::getObjectRarity($rarity_roll);
         $rarity_color = $this->get_rarity_color($rarity);
 
@@ -224,13 +230,13 @@ class Familiar {
         }
 
         if (strncasecmp($method, "set_", 4) === 0) {
-            $sql_query =  'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' ';
-            $table_col = clsprop_to_tblcol($var);
+            $sql_query =  'UPDATE ' . $this->table . ' ';
+            $this->table_col = clsprop_to_tblcol($var);
 
             if (is_int($params[0])) {
-                $sql_query .= "SET `$table_col` = " . $params[0] . " ";
+                $sql_query .= "SET `$this->table_col` = " . $params[0] . " ";
             } else {
-                $sql_query .= "SET `$table_col` = '" . $params[0] . "' ";
+                $sql_query .= "SET `$this->table_col` = '" . $params[0] . "' ";
             }
 
             $sql_query .= 'WHERE `id` = ' . $this->id;
@@ -276,13 +282,13 @@ class Familiar {
 //            }
 //
 //            if (strncasecmp($method, "set_", 4) === 0) {
-//                $sql_query =  'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' ';
-//                $table_col = clsprop_to_tblcol($var);
+//                $sql_query =  'UPDATE ' . $this->table . ' ';
+//                $this->table_col = clsprop_to_tblcol($var);
 //
 //                if (is_int($params[0])) {
-//                    $sql_query .= "SET `$table_col` = " . $params[0] . " ";
+//                    $sql_query .= "SET `$this->table_col` = " . $params[0] . " ";
 //                } else {
-//                    $sql_query .= "SET `$table_col` = '" . $params[0] . "' ";
+//                    $sql_query .= "SET `$this->table_col` = '" . $params[0] . "' ";
 //                }
 //
 //                $sql_query .= 'WHERE `id` = ' . $this->id;

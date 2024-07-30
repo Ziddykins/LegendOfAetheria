@@ -29,7 +29,7 @@
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         $character = table_to_obj($account['id'], 'character');
 
-        $familiar = new Familiar($character['id']);
+        $familiar = new Familiar($character['id'], $_ENV['SQL_FMLR_TBL']);
         $familiar->loadFamiliar($character['id']);
 
         $char_menu_icon = $character['hp'] > 0 
