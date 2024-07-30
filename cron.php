@@ -33,7 +33,7 @@
     }
 
     function do_minute() {
-        add_energy();
+        regenerate();
         check_eggs();
     }
     
@@ -70,18 +70,22 @@
         $log->info("$count players revived during daily cronrun");
     }
     
-    function add_energy() {
+    function regenerate() {
         global $db, $log;
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_CHAR_TBL'] . ' WHERE ep <> max_ep';
+        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_CHAR_TBL'] . ' WHERE ep <> max_ep OR hp <> max_hp OR mp <> max_mp';
         $results = $db->query($sql_query);
     
         while ($player = $results->fetch_assoc()) {
-            $new_ep = $player['ep'] + 3;
-            $new_ep = min($new_ep, $player['max_ep']);
+            $stats = [ "mp", "hp", "ep" ];
+
+            foreach ($stats as $stat) {
+                $new_stat = $player[$stat] + REGEN_PER_TICK;
+                $new_stat = min($new_stat, $player["max_$stat"]);
     
-            $sql_query = 'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . " SET ep = $new_ep WHERE id = " . $player['id'];
-          
-            $log->info("Updating ep to $new_ep", ['SQL_QUERY' => $sql_query]);
+            $sql_query = 'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . " SET $stat = ? WHERE id = ?";
+            $db->execute_query($sql_query, [ $new_stat, $player['id'] ]);
+
+            $log->info("Updating $stat to $new_stat", ['SQL_QUERY' => $sql_query]);
             $db->query($sql_query);
         }
     }
