@@ -17,7 +17,6 @@ let tick_counter = setInterval(
         let icon          = 'bi bi-battery-full';
         let txt_color     = 'text-success';
         
-
         tick = (60 - Math.ceil(tick/1000) % 60) - 1;
         
         if (tick < 10) {
@@ -31,7 +30,7 @@ let tick_counter = setInterval(
         obj_tick_left.innerHTML = out_string;
 
         if (cur_energy >= max_energy) {
-            obj_ep_value.innerHTML = Math.random(max_energy - 1);
+            obj_ep_value.innerHTML = Math.random() % (max_energy - 1);
         }
 
         if (percent_full > 0 && percent_full < 49) {

@@ -38,6 +38,11 @@
             $_SESSION['logged-in'] = 1;
             $_SESSION['email'] = $account['email'];
             
+            $db->execute_query(
+                'UPDATE tbl_accounts SET session_id = ? WHERE id = ?',
+                [ session_id(), $account['id'] ]
+            );
+            
             header('Location: /game');
             exit();
         } else {
@@ -107,8 +112,8 @@
             if ($str + $def + $intl === MAX_ASSIGNABLE_AP) {
                 /* Passwords match */
                 if ($password === $password_confirm) {
-                    $verification_code  = strrev(sha1(session_id())); 
-                    $verification_code .= substr(md5(strval(rand(0,100))), 0, 15);
+                    $verification_code  = strrev(hash('sha256', session_id())); 
+                    $verification_code .= substr(hash('sha256', strval(rand(0,100))), 0, 15);
                     
                     $password = password_hash($password, PASSWORD_BCRYPT);
 

@@ -1,12 +1,3 @@
-function tgl_active (e) {
-    document.querySelectorAll('i[class$="diamond-fill"]').forEach(function(e) {
-        e.classList.remove('bi-diamond-fill');
-        e.classList.add('bi-diamond');
-    });
-    e.childNodes[1].classList.add('bi-diamond-fill');
-    e.childNodes[1].classList.remove('bi-diamond');
-};
-
 function gen_envelope(subject, sender, message_fragment, date) {
     let envelope_html = '<div class="list-group">';
     envelope_html    += '    <a href="#" class="list-group-item list-group-item-action active" aria-current="true">';
