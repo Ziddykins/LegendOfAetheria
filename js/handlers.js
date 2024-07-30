@@ -11,9 +11,3 @@ $("a[id^='menu-anchor']").on("click",
         ev.currentTarget.classList.add('text-white');
     }
 );
-
-$(document).ready(function(){ 
-    if (document.body.contains(document.getElementById('login-email'))) {
-        document.getElementById('login-email').focus();
-    };
-});

@@ -70,7 +70,6 @@
             $var = lcfirst(substr($method, 4));
 
             if (strncasecmp($method, "get_", 4) === 0) {
-                $log->info("'get_' triggered for var '$var'; returning '" . $this->$var . "'");
                 return $this->$var;
             }
 

@@ -7,14 +7,15 @@
     $requests = $requested = $friends = $blocked = Array();
     
     /* Populate global $requests array with incoming requests */
-    $recvreqs = $db->query("SELECT * FROM tbl_friends WHERE email_2 = '" . $account['email'] . "' OR email_1 = '" . $account['email'] . "'");
+    $recvreqs = $db->execute_query(
+        "SELECT * FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_2` = ? or `email_1` = ?",
+        [ $account['email'], $account['email'] ]
+    );
     
     if ($recvreqs->num_rows) {
         while ($row = $recvreqs->fetch_assoc()) {
             $status_in  = friend_status($row['email_1']);
             $status_out = friend_status($row['email_2']);
-
-            $log->warning("Checking friend status for ". $row['email_1']." and ". $row['email_2'] ." - ". $status->name);
 
             if ($status_in == FriendStatus::REQUEST) {
                 array_push($requests, $row);
@@ -32,37 +33,49 @@
     
     if ($_REQUEST['page'] == 'friends') {
         if (isset($_REQUEST['action'])) {
+            [$email, $focused_email, $requested_email] = [null, null, null];
+            $posts = ['friends-request-send', 'email', 'focused-request'];
+
+            foreach ($posts as $post) {
+                if (isset($_POST[$post])) {
+                    if (!check_valid_email($_POST[$post])) {
+                        $log->error('Invalid email', ['email' => $_POST[$post]]);
+                    } else {
+                        // If the current post is one of these, set the corresponding variable to the sent value
+                        // Otherwise, set the value to itself (no change)
+                        $email           = $post == 'email'                ? $_POST[$post] : $email;
+                        $focused_email   = $post == 'focused-request'      ? $_POST[$post] : $focused_email;
+                        $requested_email = $post == 'friends-request-send' ? $_POST[$post] : $requested_email;
+                    }
+                }
+            }
+
             if ($_REQUEST['action'] == 'cancel_request') {
-                $sql_query = "DELETE FROM `" . $_ENV['SQL_FRND_TBL'] . "` " .
-                             "WHERE email_1 = ? AND email_2 = ?";
-                             
-                if (friend_status($_REQUEST['email']) === FriendStatus::REQUESTED) {
-                    $prepped = $db->prepare($sql_query);
-                    $prepped->bind_param("ss", $account['email'], $_REQUEST['email']);
-                    $prepped->execute();
+                if (friend_status($email) === FriendStatus::REQUESTED) {
+                    $sql_query = 'DELETE FROM `' . $_ENV['SQL_FRND_TBL'] . '` ' .
+                                "WHERE email_1 = ? AND email_2 = ?";
+                    $db->execute_query($sql_query, [ $account['email'], $email ]);
+                    $log->info("Sent friend request deleted", [ 'To' => $email, 'From' => $account['email'] ]);
                 }
             } else if ($_REQUEST['action'] == 'accept_request') {
                 if (isset($_REQUEST['btn-accept']) && $_REQUEST['btn-accept'] == "1") {
-                    accept_friend_req($_REQUEST['focused-request']);
-                    $log->info('Friend request accepted', 
-                        [ 'email_1' => $account['email'], 'email_2' => $_REQUEST['focused-request'] ]);
+                    accept_friend_req($focused_email);
+                    $log->info('Friend request accepted', [ 'email_1' => $account['email'], 'email_2' => $focused_email]);
                 }
             } else if ($_REQUEST['action'] == 'send_request') {
                 if (isset($_REQUEST['friends-send-request']) && $_REQUEST['friends-send-request'] == "1") {
                     if (isset($_REQUEST['friends-request-send'])) {
-                        $requested_email = filter_var($_REQUEST['friends-request-send'], FILTER_SANITIZE_EMAIL);
-               
                         if (friend_status($requested_email) == FriendStatus::NONE) {
-                            $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
-                            $prepped = $db->prepare($sql_query);
-                            $prepped->bind_param("ss", $account['email'], $requested_email);
-                            $prepped->execute();
-                            $log->warning('Friend request sent', [ 'email_1' => $account['email'], 'email_2' => $requested_email ]);
+                            if (check_valid_email($requested_email)) {
+                                $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
+                                $db->execute_query($sql_query, [ $account['email'], $requested_email ]);
+                                $log->info('Friend request sent', [ 'email_1' => $account['email'], 'email_2' => $requested_email ]);
+                            }
                         }
                     }
                 }
             }
-         }
+        }
     }
 ?>
 
@@ -70,19 +83,24 @@
     <div class="row pt-5">
         <div class="col">
             <div class="list-group" id="list-tab" role="tablist">
-                <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">
+                <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list"
+                    href="#list-home" role="tab" aria-controls="list-home">
                     Friends
                 </a>
-                <a class="list-group-item list-group-item-action" id="list-friendreqs-header" data-bs-toggle="list" href="#friends-request" role="tab" aria-controls="friends-request">
+                <a class="list-group-item list-group-item-action" id="list-friendreqs-header" data-bs-toggle="list"
+                    href="#friends-request" role="tab" aria-controls="friends-request">
                     Requests
-                    <?php if (count($requests) > 0) {?>
-                        <span class="badge rounded-pill bg-<?php echo count($requests) ? 'danger' : 'primary'; ?>"><?php echo count($requests); ?></span>
-                    <?php } ?>
+                    <?php if (count($requests) > 0): ?>
+                    <span
+                        class="badge rounded-pill bg-<?php echo count($requests) ? 'danger' : 'primary'; ?>"><?php echo count($requests); ?></span>
+                    <?php endif; ?>
                 </a>
-                <a class="list-group-item list-group-item-action" id="list-friendreqd-header" data-bs-toggle="list" href="#friends-requested" role="tab" aria-controls="friends-requested">
+                <a class="list-group-item list-group-item-action" id="list-friendreqd-header" data-bs-toggle="list"
+                    href="#friends-requested" role="tab" aria-controls="friends-requested">
                     Requested
                 </a>
-                <a class="list-group-item list-group-item-action" id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">
+                <a class="list-group-item list-group-item-action" id="list-settings-list" data-bs-toggle="list"
+                    href="#list-settings" role="tab" aria-controls="list-settings">
                     Blocked
                 </a>
             </div>
@@ -96,10 +114,11 @@
                         </div>
                     </div>
                     <?php
-                        for ($i=0; $i<count($friends)-1; $i++) {
+                        for ($i=0; $i<count($friends); $i++) {
                             $temp_account   = table_to_obj($friends[$i]['email_1'], 'account');
                             $sender_account = table_to_obj($temp_account['id'], 'character');
-                            $check_user     = file_exists(escapeshellcmd('/var/lib/php/sessions/sess_' . $temp_account['session_id']));
+                            clearstatcache();                            
+                            $check_user     = filesize((escapeshellcmd('/var/lib/php/sessions/sess_' . $temp_account['session_id'])));
                             
                             $log->info('Account online status: ', [ 'email' => $temp_account['email'], 'check_user' => $check_user ]);
                             $online_indicator = '<p class="badge bg-secondary"><i class="bi bi-lightbulb"></i> Offline</p>';
@@ -141,8 +160,8 @@
                         <div class="col">
                             <h3><?php echo $header_charname; ?> Requests</h3>
                         </div>
-                    </div>    
-                    
+                    </div>
+
                     <?php
                         for ($i=0; $i<count($requests); $i++) {
                             $temp_account   = table_to_obj($requests[$i]['email_1'], 'account');
@@ -176,6 +195,13 @@
                                 </div>
                             </form>';
                         }
+                        if (!count($requests)) {
+                            echo '<div class="row">
+                                    <div class="col">
+                                        <p class="lead">No new requests.</p>
+                                    </div>
+                                </div>';
+                        }
                     ?>
                 </div>
                 <div class="tab-pane fade" id="friends-requested" role="tabpanel" aria-labelledby="list-friendreqd-header">
@@ -192,7 +218,7 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        <div class="row mb-5">
                             <div class="col-8">
                                 <input id="friends-request-send" name="friends-request-send" class="form-control">
                             </div>
@@ -202,14 +228,20 @@
                         </div>
                     </form>
 
-                    <div class="row mb-3">
+                    <div class="row">
+                        <div class="col text-bg-primary border text-center">
+                            Pending Sent Requests
+                        </div>
+                    </div>
+               
+                    <div class="row border">
                         <div class="col">
                             <table class="table table-hover text-center">
                                 <thead>
-                                    <th scope="col">Id</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Sent</th>
-                                    <th scope="col">Cancel</th>
+                                    <th scope="col" class="border">Id</th>
+                                    <th scope="col" class="border">Email</th>
+                                    <th scope="col" class="border">Sent</th>
+                                    <th scope="col" class="border">Cancel</th>
                                 </thead>
                                 <tbody>
                                     <?php
@@ -221,13 +253,18 @@
                                                       <td><a href="/game?page=friends&action=cancel_request&email=' . $requested[$i]['email_2'] . '">X</a>
                                                   </tr>';
                                         }
+                                        if (!count($requested)) {
+                                            echo '<tr class="border">
+                                                    <td colspan="4" align="center" valign="middle">None</td>
+                                                </tr>';
+                                        }
                                     ?>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            
+
                 <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
                     <form id="settings-account" name="settings-account" action="/set_settings.php" method="POST">
                         <div class="row">

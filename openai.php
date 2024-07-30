@@ -27,7 +27,7 @@
         $sql_query = "SELECT `char.name`, `char.race`, `ch.account_id`, `acct.credits` " .
                      "FROM " . $_ENV['SQL_CHAR_TBL'] . " AS `char` " .
                      "JOIN " . $_ENV['SQL_ACCT_TBL'] . " AS `acct` " .
-                     "ON ch.`account_id` = `acct.id`"
+                     "ON ch.`account_id` = `acct.id` " .
                      "WHERE id = ?";
 
         $prepped = $db->prepare($sql_query);
@@ -37,7 +37,7 @@
         $result    = $prepped->get_result();
         $character = $result->fetch_assoc();
 
-        $sql_query = "UPDATE " . $_ENV['SQL_ACCT_TBL'] . . " " .
+        $sql_query = "UPDATE " . $_ENV['SQL_ACCT_TBL'] . " " .
                      "SET ai_credits = ?";
 
         $api_endpoint = 'https://api.openai.com/v1/chat/completions';
