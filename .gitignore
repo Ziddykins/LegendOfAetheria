@@ -14,3 +14,7 @@ esp32.html
 phpctags.*
 /.well-known/
 gcm-diagnose.log
+*loa.step*
+*.ready
+setup.log
+=

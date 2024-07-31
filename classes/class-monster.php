@@ -17,7 +17,6 @@ class Monster {
     protected $expAwarded;
     protected $goldAwarded;
     protected $monsterClass;
-    protected $tableName;
 
     /**
     * Magic method to handle dynamic getters and setters for the Monster class properties.
@@ -81,11 +80,5 @@ class Monster {
     public function random_monster($dropLevel = 0) {
         
     }
-}
-
-class MonsterPool {
-    protected $monsters;
-    protected $total_monsters;
-
 }
 ?>
