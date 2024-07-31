@@ -14,7 +14,7 @@ my $GREY   = "\e[37m";
 my $RESET  = "\e[0m";
 
 # CONFIG - Server #
-my $FQDN              = 'loa2.dankaf.ca';
+my $FQDN              = 'loa.dankaf.ca';
 my ($SUB, $DOM, $TLD) = split /\./, $FQDN;
 my $IP_ADDRESS        = '127.0.2.1';
 my $LOG_TO_FILE       = 'setup.log';
@@ -118,31 +118,31 @@ my $LINUX_HOSTS_FILE = '/etc/hosts';
 
 # NOCONFIG - Replacements for Templates
 my @replacements = (
-    "###REPL_PHP_BINARY###%%\%$PHP_BINARY",
+    "###REPL_PHP_BINARY###%%%$PHP_BINARY",
 
-    "###REPL_WEB_ROOT###%%\%$GAME_WEB_ROOT",
-    "###REPL_WEB_ADMIN_EMAIL###%%\%$WEB_ADMIN_EMAIL",
-    "###REPL_WEB_FQDN###%%\%$FQDN",
-    "###REPL_WEB_DOCROOT###%%\%$GAME_WEB_ROOT",
-    "###REPL_WEB_SSL_FULLCER###%%\%$SSL_FULLCER",
-    "###REPL_WEB_SSL_PRIVKEY###%%\%$SSL_PRIVKEY",
+    "###REPL_WEB_ROOT###%%%$GAME_WEB_ROOT",
+    "###REPL_WEB_ADMIN_EMAIL###%%%$WEB_ADMIN_EMAIL",
+    "###REPL_WEB_FQDN###%%%$FQDN",
+    "###REPL_WEB_DOCROOT###%%%$GAME_WEB_ROOT",
+    "###REPL_WEB_SSL_FULLCER###%%%$SSL_FULLCER",
+    "###REPL_WEB_SSL_PRIVKEY###%%%$SSL_PRIVKEY",
 
-    "###REPL_SQL_DB###%%\%$SQL_DATABASE",
-    "###REPL_SQL_USER###%%\%$SQL_USERNAME",
-    "###REPL_SQL_PASS###%%\%$SQL_PASSWORD",
-    "###REPL_SQL_HOST###%%\%$SQL_HOST",
-    "###REPL_SQL_PORT###%%\%$SQL_PORT",
+    "###REPL_SQL_DB###%%%$SQL_DATABASE",
+    "###REPL_SQL_USER###%%%$SQL_USERNAME",
+    "###REPL_SQL_PASS###%%%$SQL_PASSWORD",
+    "###REPL_SQL_HOST###%%%$SQL_HOST",
+    "###REPL_SQL_PORT###%%%$SQL_PORT",
 
-    "###REPL_SQL_TBL_ACCOUNTS###%%\%$SQL_TBL_ACCOUNTS",
-    "###REPL_SQL_TBL_CHARACTERS###%\%%$SQL_TBL_CHARACTERS",
-    "###REPL_SQL_TBL_FAMILIARS###%%\%$SQL_TBL_FAMILIARS",
-    "###REPL_SQL_TBL_FRIENDS###%%\%$SQL_TBL_FRIENDS",
-    "###REPL_SQL_TBL_GLOBALS###%%\%$SQL_TBL_GLOBALS",
-    "###REPL_SQL_TBL_MAIL###%%\%$SQL_TBL_MAIL",
-    "###REPL_SQL_TBL_MONSTERS###\%$SQL_TBL_MONSTERS",
-    "###REPL_SQL_USER###%%\%$SQL_USERNAME",
+    "###REPL_SQL_TBL_ACCOUNTS###%%%$SQL_TBL_ACCOUNTS",
+    "###REPL_SQL_TBL_CHARACTERS###%%%$SQL_TBL_CHARACTERS",
+    "###REPL_SQL_TBL_FAMILIARS###%%%$SQL_TBL_FAMILIARS",
+    "###REPL_SQL_TBL_FRIENDS###%%%$SQL_TBL_FRIENDS",
+    "###REPL_SQL_TBL_GLOBALS###%%%$SQL_TBL_GLOBALS",
+    "###REPL_SQL_TBL_MAIL###%%%$SQL_TBL_MAIL",
+    "###REPL_SQL_TBL_MONSTERS###%%%$SQL_TBL_MONSTERS",
+    "###REPL_SQL_USER###%%%$SQL_USERNAME",
 
-    "###REPL_OPENAI_APIKEY###%%\%$OPENAI_APIKEY",
+    "###REPL_OPENAI_APIKEY###%%%$OPENAI_APIKEY",
 );
 
 ## NO MORE CONFIGURATION BEYOND THIS POINT ##
@@ -190,7 +190,12 @@ if (ask_user(
         "continuing\nContinue and generate templates?"
     )) {
     generate_templates();
-    `touch $GAME_WEB_ROOT/.loa.step.templates`;
+    `touch $GAME_WEB_ROOT/.loa.step.templates.gen`;
+}
+
+if (ask_user("Process generated templates?")) {
+    process_templates();
+    `touch $GAME_WEB_ROOT/.loa.step.templates.process`;
 }
 
 if (ask_user("Install required software?")) {
@@ -223,15 +228,14 @@ if (ask_user("Run composer to download required dependencies?")) {
     `touch $GAME_WEB_ROOT/.loa.step.composer`;
 }
 
-if (ask_user("Configure the SQL server and import processed template to create " .
-             "databases, users and tables?")) {
-    mysql_setup();
-    `touch $GAME_WEB_ROOT/.loa.step.mysql`;
-}
-
 if (ask_user("Start all services?")) {
    start_services();
    `touch $GAME_WEB_ROOT/.loa.step.services`;
+}
+
+if (ask_user("Fix all webserver permissions?")) {
+    fix_permissions();
+    `touch $GAME_WEB_ROOT/.loa.step.permissions`;
 }
 
 sub check_platform {
@@ -360,10 +364,17 @@ sub apache_config {
         tell_user('INFO',   'Enabling mod_rewrite if it isn\'t already');
         tell_user('SYSTEM', `a2enmod rewrite 2>&1`);
 
-        tell_user('INFO', 'Enabling rewrite directives in $VIR');
+        tell_user('INFO', "Enabling rewrite directives in $VIRTHOST_CONF_FILE");
         `sed -i 's/# REM //' $VIRTHOST_CONF_FILE`;
 
     }
+}
+
+# Step: Fix permissions
+sub fix_permissions {
+    `find $GAME_WEB_ROOT -type f -exec chmod 644 {} + 2>&1`;
+    `find $GAME_WEB_ROOT -type d -exec chmod 755 {} + 2>&1`;
+    `chown -R $APACHE_RUNAS:$APACHE_RUNAS $GAME_WEB_ROOT 2>&1`;
 }
 
 # Step: apache_enables
@@ -379,10 +390,10 @@ sub apache_enables {
     my $mods_output = `a2enmod php$PHP_VERSION rewrite setenvif ssl 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
-    my $sites_output = `a2ensite $VIRTHOST_CONF_FILE 2>&1`;
+    my $sites_output = `a2ensite $FQDN.conf 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
-    my $sites_ssl_output = `a2ensite $VIRTHOST_CONF_FILE_SSL 2>&1`;
+    my $sites_ssl_output = `a2ensite ssl-$FQDN.conf 2>&1`;
     $success = !$? ? 1 : 0;
 
     tell_user('SYSTEM', "          conf result: $conf_output");
@@ -437,12 +448,16 @@ sub generate_templates {
     $templates{$VIRTHOST_SSL_TEMPLATE} = "$VIRTHOST_SSL_TEMPLATE.ready";
     $templates{$VIRTHOST_TEMPLATE}     = "$VIRTHOST_TEMPLATE.ready";
     
-    foreach my $replacement (@replacements) {
-        my ($search, $replace) = split /%%%/, $replacement;
-        foreach my $template (keys %templates) {
-            tell_user('SYSTEM', "[$template] $search -> $replace\n";
-            replace_in_file($search, $replace, $template, $templates{$template});
-            tell_user('SYSTEM', "[$template] Finished, wrote to $template.ready");
+    while(my ($key, $val) = each %templates) {
+        open my $fh, '<', $key;
+        local $/;
+        my $contents = <$fh>;
+        close $fh;
+
+        foreach my $replacement (@replacements) {
+            my ($search, $replace) = split '%%%', $replacement;
+            $contents =~ s/$search/$replace/gm;
+            file_write($templates{$key}, $contents, 'data', 1);           
         }
     }
 
@@ -457,9 +472,9 @@ sub process_templates {
         $cp_cmd = "copy";
     }
 
-    tell_user('INFO', "Importing SQL schema, creating user and granting privileges")
+    tell_user('INFO', "Importing SQL schema, creating user and granting privileges");
     
-    my $sql_cmd = "mysql -u $SQL_USERNAME -p'$SQL_PASSWORD' -h $SQL_HOST -P $SQL_PORT < $SQL_TEMPLATE.ready 2>&1";
+    my $sql_cmd = "mysql -u root < $SQL_TEMPLATE.ready 2>&1";
     chomp(my $sql_import_result = `$sql_cmd`);
     $sql_import_result //= 'Successfully imported database schema';
 
@@ -467,21 +482,22 @@ sub process_templates {
     tell_user((!!$? ? 'ERROR' : 'SUCCESS'), $sql_import_result);
     
     tell_user('INFO', "Copying over $ENV_TEMPLATE.ready to $GAME_WEB_ROOT/.env");
-    file_write("$ENV_TEMPLATE.ready", "$GAME_WEB_ROOT/.env", 'file');
+    file_write("$GAME_WEB_ROOT/.env", "$ENV_TEMPLATE.ready", 'file');
 
     tell_user('INFO', "Copying over $VIRTHOST_TEMPLATE.ready to $VIRTHOST_CONF_FILE");
-    file_write("$VIRTHOST_TEMPLATE.ready", $VIRTHOST_CONF_FILE, 'file');
+    file_write($VIRTHOST_CONF_FILE, "$VIRTHOST_TEMPLATE.ready", 'file');
 
     if ($SSL_ENABLED) {
         tell_user('INFO', "Copying over $VIRTHOST_SSL_TEMPLATE.ready to $VIRTHOST_CONF_FILE_SSL");
-        file_write("$VIRTHOST_SSL_TEMPLATE.ready", $VIRTHOST_CONF_FILE_SSL, 'file');
+        file_write($VIRTHOST_CONF_FILE_SSL, "$VIRTHOST_SSL_TEMPLATE.ready", 'file');
     }
 
     tell_user('INFO', "Copying over $HTACCESS_TEMPLATE.ready to $GAME_WEB_ROOT/.htaccess");
-    file_write("$HTACCESS_TEMPLATE.ready", "$GAME_WEB_ROOT/.htaccess", 'file');
+    file_write("$GAME_WEB_ROOT/.htaccess", "$HTACCESS_TEMPLATE.ready", 'file');
 
-    tell_user('INFO', "Copying over $CRONTAB_TEMPLATE to $CRONTAB_DIRECTORY/$APACHE_RUNAS")
-    file_write("$CRONTAB_TEMPLATE.ready", "$CRONTAB_DIRECTORY/$APACHE_RUNAS");
+    tell_user('INFO', "Copying over $CRONTAB_TEMPLATE to $CRONTAB_DIRECTORY/$APACHE_RUNAS");
+    file_write("$CRONTAB_DIRECTORY/$APACHE_RUNAS", "$CRONTAB_TEMPLATE.ready");
+    
     tell_user('INFO', "Updating permissions on new crontab to $APACHE_RUNAS:crontab");
     `chown $APACHE_RUNAS:crontab $CRONTAB_DIRECTORY/$APACHE_RUNAS`;
 
@@ -507,20 +523,21 @@ sub replace_in_file {
     open my $fh, '<', $file_in;
     my @contents = <$fh>;
     close $fh;
-
+   
     for (my $i=0; $i<scalar @contents - 1; $i++) {
-        print "Then: " . $contents[$i] . "\n";
-        
-        $contents[$i] =~ s/.*$search.*[\r\n]+/$replace/gm;
-        # just to be sure? i forget why i did it the above way
-        # but the below way makes more sense to me as of today
-        $contents[$i] =~ s/$search/$replace/g;
-
-        print "Now : " . $contents[$i] . "\n";
+        next if $contents[$i] !~ /$search/;
+        print "Replacing $search with $replace\n";
+        print "OLD: " . $contents[$i] . "\n";
+        my $new;
+        ($new = $contents[$i]) =~ s/$search/$replace/g;
+        $contents[$i] = $new;
+        print "NEW: $new\n";
     }
 
     print "[" . substr($file_in, -5, 5) . " -> " . substr($file_out, -5, 5) . "] $search -> $replace\n";
     
+    print @contents;
+    <STDIN>;
     open $fh, '>', $file_out;
     print $fh @contents;
     close $fh;
@@ -530,10 +547,8 @@ sub clean_up {
     foreach my $step (@steps) {
         my $file = "$GAME_WEB_ROOT/.loa.step-$step";
         eval {
-            unlink ($file)
-              if -e $file
-              or
-              tell_user('ERROR', "Couldn't remove progress file ($file): $!\n");
+            unlink ($file) if -e $file
+                or tell_user('ERROR', "Couldn't remove progress file ($file): $!\n");
             tell_user('SUCCESS', "Removed progress file $file\n");
         };
     }
@@ -548,19 +563,25 @@ sub gen_random {
     for (1 .. $length) {
         $password .= chr(int(rand(94)) + 33);
     }
+    $password =~ s/"/\\"/g;
 
     return $password;
 }
 
 sub file_write {
-    my ($dst, $src, $type) = @_;
+    my ($dst, $src, $type, $force) = @_;
     my $fh;
     my $data;
+    my $answer;
 
-    if ($type eq 'file') {
-        open my $src_fh, '<', $src or die "Can't open source file '$src': $@\n";
-            $data = <$src_fh>;
-        close $src_fh or die "Can't close source file '$src': $@\n";
+    if ($type eq 'file') { # essentially 'copy'
+        `touch $dst`;
+        if (-e $src) {
+            local $/;
+            open my $src_fh, '<', $src or die "Can't open source file '$src': $@\n";
+                $data = <$src_fh>;
+            close $src_fh or die "Can't close source file '$src': $@\n";
+        }
         tell_user('INFO', "Loaded data from file '$src'");
     } elsif ($type eq 'data') {
         $data = $src;
@@ -577,9 +598,13 @@ sub file_write {
         return 0;
     }
 
-    print "$dst exists already\n";
-    print '[o]verwrite, [a]ppend, [s]kip: ';
-    chomp (my $answer = <STDIN>);
+    if (!$force) {
+        print "$dst exists already\n";
+        print '[o]verwrite, [a]ppend, [s]kip: ';
+        chomp ($answer = <STDIN>);
+    } else {
+        $answer = 'overwrite';
+    }
 
     if ($answer =~ /[Oo]v?e?r?w?r?i?t?e?/) {
         tell_user('INFO', "Preparing to overwrite existing file: $dst");
@@ -592,8 +617,8 @@ sub file_write {
         return;
     }
 
-    print $fh $file;
-    tell_user('SUCCESS', "Done writing to $src\n");
+    print $fh $data;
+    tell_user('SUCCESS', "Done writing to $dst\n");
     close $fh;
 }
 
@@ -615,9 +640,8 @@ sub ask_user {
 }
 
 sub get_date {
-    my ($sec, $min, $hour, $day, $mon, $year) = localtime ();
-    my $date =
-      sprintf ("[%02d-%02d %02d:%02d:%02d] -> ", $mon, $day, $hour, $min, $sec);
+    my ($sec, $min, $hour, $day, $mon, $year) = localtime();
+    my $date = sprintf ("[%02d-%02d %02d:%02d:%02d] -> ", $mon, $day, $hour, $min, $sec);
     return $date;
 }
 
