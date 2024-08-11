@@ -1,33 +1,31 @@
 # **Ideas**
 
 - [ ] **Mail system (in-game)**
-
-  * [X] Must be on friends list
   * [X] Implement class for users' mailboxes
-* [ ] **Friends list**
 
+* [ ] **Friends list**
   * [ ] Have the cancel request link remove the sql entry
   * [ ] repopulate tab on any posts (ajax)
   * [ ] also make decline, block, and message buttons work
-* [ ] **Status bar**
 
+* [ ] **Status bar**
   * [X] no sticky top, so it fits inside game content area
   * [ ] redo the bar so it pulls real values
+
 * [ ] **Cronjobs**
-
   * [X] Cycle weather hourly
-* [ ] **Spinels**
 
+* [ ] **Spinels**
   * [ ] implement
   * [ ] tooltips
 
 * [ ] Eastereggs
   * [ ] Egg icon randomly selects a div, on a random page which all registered
-        playerspi⁸ have acces to, and blends in, hourly - grants random amount of
+        players have access to, and blends in, hourly - grants random amount of
         xp/gold
   * [ ] maybe once per day a golden egg grants boosts or equip
 
-* [ ] Livechat - PHP/MySQL/jQuery/AJAX
+* [ ] Livechat - PHP/MySQL/jQuery/AJAX/websockets
 
 * [ ] AutoInstaller
 
@@ -83,8 +81,3 @@
 
   monies
 `<i class="bi bi-currency-exchange"></i>`
-
-- Dime baggies scattered in the laundry room where I was staying; they popped up out of the blue one day. Some in hard to reach spots; I cleaned them all up.
-- 3 syringes found in the basement in a baggie labeled "dark earth". i threw them in the garbage. Inquired about them, apparently something to do with snake injections.
-
-  -->
