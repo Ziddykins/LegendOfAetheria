@@ -4,6 +4,19 @@ use warnings;
 use strict;
 use autodie;
 
+use File::Path qw(make_path remove_tree);
+use File::Find;
+use Data::Dumper;
+
+use vars qw/*name *dir *prune/;
+*name   = *File::Find::name;
+*dir    = *File::Find::dir;
+*prune  = *File::Find::prune;
+
+sub find_temp;
+sub do_delete ($@);
+
+
 # NOCONFIG - Colors #
 my $RED    = "\e[31m";
 my $GREEN  = "\e[32m";
@@ -34,6 +47,7 @@ my $SQL_TBL_GLOBALS    = 'tbl_globals';
 my $SQL_TBL_MAIL       = 'tbl_mail';
 my $SQL_TBL_CHATS      = 'tbl_chats';
 my $SQL_TBL_MONSTERS   = 'tbl_monsters';
+my $SQL_TBL_LOGS       = 'tbl_logs';
 
 # CONFIG - SQL Credentials / Template Replacements #
 my $SQL_USERNAME           = 'user_loa';
@@ -49,8 +63,9 @@ my $SSL_FULLCER = "/etc/letsencrypt/live/$FQDN/fullchain.pem";
 my $SSL_PRIVKEY = "/etc/letsencrypt/live/$FQDN/privkey.pem";
 
 # CONFIG - Apache VirtualHost configuration #
-my $VIRTHOST_CONF_FILE     = "/etc/apache2/sites-available/$FQDN.conf";
-my $VIRTHOST_CONF_FILE_SSL = "/etc/apache2/sites-available/ssl-$FQDN.conf";
+my $APACHE_DIRECTORY       = "/etc/apache2";
+my $VIRTHOST_CONF_FILE     = "$APACHE_DIRECTORY/sites-available/${FQDN}.conf";
+my $VIRTHOST_CONF_FILE_SSL = "$APACHE_DIRECTORY/sites-available/ssl-${FQDN}.conf";
 
 # CONFIG - XAMPP configuration #
 my $XAMPP_INSTALLER_BIN =
@@ -67,36 +82,9 @@ my $APACHE_RUNAS   = 'www-data';
 my $PHP_VERSION;
 my $PHP_INI_FILE = 'unset';
 
-if (!$PHP_VERSION) {
-    tell_user('WARN', "PHP version not specified, attempting to find it...\n");
-
-    if (check_platform() eq 'linux') {
-        chomp($PHP_VERSION = `php --version | awk '{print \$2}' | head -n1`);
-        if ($PHP_VERSION =~ /\d\.\d\.?\d?/) {
-            $PHP_VERSION =~ s/(\d\.\d)\.\d?/$1/;
-            tell_user('SUCCESS', "Found PHP version $PHP_VERSION");
-        } else {
-            tell_user(
-                'ERROR',
-                'Failed to find PHP version, please manually specify in this file'
-            );
-            die "Exiting on failure...\n";
-        }
-    }
-} else {
-    die "Invalid or unsupported PHP version set in the installer\n" .
-        "supported PHP versions: 7.0 - 8.3\n\n";
-}
-
-if (check_platform() eq 'linux' && $PHP_INI_FILE eq 'unset') {
-    $PHP_INI_FILE = "/etc/php/$PHP_VERSION/php.ini";
-} else {
-    $PHP_INI_FILE = 'C:\xampp\php\php.ini';
-}
-
 # CONFIG - OpenAI #
 my $OPENAI_ENABLE = 0;
-my $OPENAI_APIKEY;
+my $OPENAI_APIKEY = 'unset';
 
 if ($OPENAI_ENABLE) {
     print "OpenAI configuration is enabled; please enter your OpenAI API key:\n";
@@ -141,11 +129,16 @@ my @replacements = (
     "###REPL_SQL_TBL_MAIL###%%%$SQL_TBL_MAIL",
     "###REPL_SQL_TBL_MONSTERS###%%%$SQL_TBL_MONSTERS",
     "###REPL_SQL_USER###%%%$SQL_USERNAME",
+    "###REPL_SQL_TBL_LOGS###%%%$SQL_TBL_LOGS",
 
     "###REPL_OPENAI_APIKEY###%%%$OPENAI_APIKEY",
 );
 
 ## NO MORE CONFIGURATION BEYOND THIS POINT ##
+
+if (check_array(\@ARGV, "--revert-system")) {
+    clean_up('revert');
+}
 
 my %completed;
 my @steps = qw/hosts software hostname apache apache-enables
@@ -184,6 +177,11 @@ if (!-e '/etc/debian_version' && check_platform() eq "linux") {
 #    `touch $GAME_WEB_ROOT/.loa-step-hosts`;
 #}
 
+if (ask_user("Install required software?")) {
+    install_software() if !$completed{software};
+    `touch $GAME_WEB_ROOT/.loa-step-software`;
+}
+
 if (ask_user(
         "Multiple variables in this script are marked with " .
         "'Template Replacements' - Make sure these are filled out properly before " .
@@ -196,11 +194,6 @@ if (ask_user(
 if (ask_user("Process generated templates?")) {
     process_templates();
     `touch $GAME_WEB_ROOT/.loa.step.templates.process`;
-}
-
-if (ask_user("Install required software?")) {
-    install_software() if !$completed{software};
-    `touch $GAME_WEB_ROOT/.loa-step-software`;
 }
 
 #if (ask_user("Update system hostname to match FQDN?")) {
@@ -236,6 +229,10 @@ if (ask_user("Start all services?")) {
 if (ask_user("Fix all webserver permissions?")) {
     fix_permissions();
     `touch $GAME_WEB_ROOT/.loa.step.permissions`;
+}
+
+if (ask_user("Clean up temp files?")) {
+    clean_up();
 }
 
 sub check_platform {
@@ -303,7 +300,30 @@ sub install_software {
     tell_user('INFO',   'Updating system packages');
     tell_user('SYSTEM', `apt update 2>&1`);
 
+    if (!$PHP_VERSION) {
+        tell_user('WARN', "PHP version not specified, attempting to find it...\n");
+
+        if (check_platform() eq 'linux') {
+            chomp(my $ver_output = `php --version | head -n1`);
+
+            if ($ver_output =~ /PHP (\d+\.\d+)/) {
+                $PHP_VERSION = $1;
+            }
+
+            if ($PHP_VERSION) {
+                tell_user('SUCCESS', "Found PHP version $PHP_VERSION");
+            } else {
+                tell_user('ERROR', 'Failed to find PHP version, please manually specify in this file');
+                die "Exiting on failure...\n";
+            }
+        }
+    } else {
+        die "Invalid or unsupported PHP version set in the installer\n" .
+            "supported PHP versions: 7.0 - 8.3\n\n";
+    }
+
     my @packages = (
+        "cron",
         "php$PHP_VERSION",
         "php$PHP_VERSION-cli",
         "php$PHP_VERSION-common",
@@ -413,18 +433,16 @@ sub apache_enables {
 
 #Step: PHP configurations
 sub update_php_confs {
-
+    if (check_platform() eq 'linux' && $PHP_INI_FILE eq 'unset') {
+        $PHP_INI_FILE = "/etc/php/$PHP_VERSION/php.ini";
+    } else {
+        $PHP_INI_FILE = 'C:\xampp\php\php.ini';
+    }
 }
 
 # Step: composer
 sub composer_pull {
-    if (
-        !ask_user(
-            "Composer is going to download/install these as $COMPOSER_RUNAS\n"
-              . "Do you want to change this? It should be the same user which\n"
-              . "Apache runs under"
-        )
-    ) {
+    if (ask_user("Composer is going to download/install these as $COMPOSER_RUNAS - continue?\n")) {
         my $cmd = "sudo -u $COMPOSER_RUNAS composer --working-dir \"$GAME_WEB_ROOT\" install";
         my $cmd_output = `$cmd 2>&1`;
         tell_user('SYSTEM', $cmd_output);
@@ -496,9 +514,18 @@ sub process_templates {
     file_write("$GAME_WEB_ROOT/.htaccess", "$HTACCESS_TEMPLATE.ready", 'file');
 
     tell_user('INFO', "Copying over $CRONTAB_TEMPLATE to $CRONTAB_DIRECTORY/$APACHE_RUNAS");
+    
+    if (!-d $CRONTAB_DIRECTORY) {
+        make_path($CRONTAB_DIRECTORY);
+    }
+    if (-e "$CRONTAB_DIRECTORY/$APACHE_RUNAS") {
+        unlink("$CRONTAB_DIRECTORY/$APACHE_RUNAS");
+    }
+
     file_write("$CRONTAB_DIRECTORY/$APACHE_RUNAS", "$CRONTAB_TEMPLATE.ready");
     
     tell_user('INFO', "Updating permissions on new crontab to $APACHE_RUNAS:crontab");
+
     `chown $APACHE_RUNAS:crontab $CRONTAB_DIRECTORY/$APACHE_RUNAS`;
 
     tell_user('SUCCESS', "All template files have been applied");    
@@ -514,20 +541,18 @@ sub start_services {
 }
 
 ## INTERNAL SCRIPT FUNCTIONS ##
-
 sub replace_in_file {
     my ($search, $replace, $file_in, $file_out) = @_;
     
     $file_out //= $file_in;
 
+    local $/;
     open my $fh, '<', $file_in;
     my @contents = <$fh>;
     close $fh;
    
     for (my $i=0; $i<scalar @contents - 1; $i++) {
         next if $contents[$i] !~ /$search/;
-        print "Replacing $search with $replace\n";
-        print "OLD: " . $contents[$i] . "\n";
         my $new;
         ($new = $contents[$i]) =~ s/$search/$replace/g;
         $contents[$i] = $new;
@@ -536,24 +561,59 @@ sub replace_in_file {
 
     print "[" . substr($file_in, -5, 5) . " -> " . substr($file_out, -5, 5) . "] $search -> $replace\n";
     
-    print @contents;
-    <STDIN>;
     open $fh, '>', $file_out;
     print $fh @contents;
     close $fh;
 }
 
 sub clean_up {
-    foreach my $step (@steps) {
-        my $file = "$GAME_WEB_ROOT/.loa.step-$step";
-        eval {
-            unlink ($file) if -e $file
-                or tell_user('ERROR', "Couldn't remove progress file ($file): $!\n");
-            tell_user('SUCCESS', "Removed progress file $file\n");
-        };
+    my ($mode, $file) = @_;
+
+    if ($mode eq 'revert') {
+        tell_user("INFO", "Searching for temporary and generated files to clean up in $GAME_WEB_ROOT");
+        File::Find::find({wanted => \&find_temp}, "$GAME_WEB_ROOT/");
+
+        tell_user("INFO", "Searching for temporary and generated files to clean up in $APACHE_DIRECTORY");
+        `a2dissite $VIRTHOST_CONF_FILE`;
+        
+        if ($SSL_ENABLED) {
+            `a2dissite $VIRTHOST_CONF_FILE_SSL`;
+        }
+
+        File::Find::find({wanted => \&find_temp}, "$APACHE_DIRECTORY/");
+
+        tell_user("INFO", "Dropping sury repos from sources.list.d");
+        File::Find::find({wanted => \&find_temp}, '/etc/apt/sources.list.d/');
+
+        tell_user("INFO", "Dropping database $SQL_DATABASE and dropping user $SQL_USERNAME");
+        `mysql -e 'DROP DATABASE $SQL_DATABASE; DROP USER $SQL_USERNAME;'`;
+
+        tell_user("INFO", "Removing our crontab at $CRONTAB_DIRECTORY/$APACHE_RUNAS");
+        unlink("$CRONTAB_DIRECTORY/$APACHE_RUNAS");
     }
 
+
+
     tell_user('SUCCESS', 'Cleaned up all of our temp files!');
+}
+
+sub find_temp {
+    my $file = $_;
+
+    my @files_to_remove = (
+        '\.env$',
+        '^\.loa-step',
+        '\.ready$',
+        "ssl-$FQDN.conf\$",
+        "$FQDN.conf\$",
+        'php.list$'
+    );
+
+    if (grep /$file/, @files_to_remove) {
+        tell_user("SUCCESS", "Removed temp file $file");
+#        unlink($file);
+        print "unlink($file) :o\n";
+    }
 }
 
 sub gen_random {
@@ -575,7 +635,6 @@ sub file_write {
     my $answer;
 
     if ($type eq 'file') { # essentially 'copy'
-        `touch $dst`;
         if (-e $src) {
             local $/;
             open my $src_fh, '<', $src or die "Can't open source file '$src': $@\n";
@@ -599,9 +658,11 @@ sub file_write {
     }
 
     if (!$force) {
-        print "$dst exists already\n";
-        print '[o]verwrite, [a]ppend, [s]kip: ';
-        chomp ($answer = <STDIN>);
+        while ($answer !~ /^[OoAaSs]/) {
+            print "$dst exists already\n";
+            print '[o]verwrite, [a]ppend, [s]kip: ';
+            chomp($answer = <STDIN>);
+        }
     } else {
         $answer = 'overwrite';
     }
@@ -639,9 +700,19 @@ sub ask_user {
     return 0;
 }
 
+sub check_array {
+    my ($haystack, $needle) = @_;
+
+    if (grep /$needle/, @{$haystack}) {
+        return 1;
+    }
+
+    return 0;
+}
+
 sub get_date {
     my ($sec, $min, $hour, $day, $mon, $year) = localtime();
-    my $date = sprintf ("[%02d-%02d %02d:%02d:%02d] -> ", $mon, $day, $hour, $min, $sec);
+    my $date = sprintf ("[%04d-%02d-%02d %02d:%02d:%02d] -> ", $year, $mon, $day, $hour, $min, $sec);
     return $date;
 }
 

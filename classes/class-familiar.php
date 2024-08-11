@@ -105,7 +105,7 @@ class Familiar {
         
         $sql_query = rtrim($sql_query, ', ');
         $sql_query .= " WHERE `id` = ?";
-        $db->execute_query($sql_query, $this->id);
+        $db->execute_query($sql_query, [ $this->id ]);
 
     }
 
