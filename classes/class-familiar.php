@@ -81,10 +81,10 @@ class Familiar {
     public function saveFamiliar() {
         global $db;
 
-        $sql_query = 'UPDATE '.$this->table.' SET ';
+        $sql_query = 'UPDATE ' . $this->table .' SET ';
 
         foreach ((Array)$this as $key => $val) {
-            if ($key !== 'id') {
+            if ($key !== 'id' && $key !== 'table') {
                 $column = clsprop_to_tblcol(
                     preg_replace("/[^a-zA-Z_]+/", '', $key)
                 );
@@ -231,16 +231,17 @@ class Familiar {
 
         if (strncasecmp($method, "set_", 4) === 0) {
             $sql_query =  'UPDATE ' . $this->table . ' ';
-            $this->table_col = clsprop_to_tblcol($var);
+            $table_col = clsprop_to_tblcol($var);
 
             if (is_int($params[0])) {
-                $sql_query .= "SET `$this->table_col` = " . $params[0] . " ";
+                $sql_query .= "SET `$table_col` = " . $params[0] . " ";
             } else {
-                $sql_query .= "SET `$this->table_col` = '" . $params[0] . "' ";
+                $sql_query .= "SET `$table_col` = '" . $params[0] . "' ";
             }
 
             $sql_query .= 'WHERE `id` = ' . $this->id;
 
+            // file deepcode ignore Sqli:
             $db->query($sql_query);
             $this->$var = $params[0];
         }

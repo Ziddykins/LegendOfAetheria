@@ -31,7 +31,7 @@ CREATE TABLE `###REPL_SQL_TBL_ACCOUNTS###` (
   `credits` int(9) unsigned NOT NULL DEFAULT 10,
   `session_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Table structure for table `###REPL_SQL_TBL_CHARACTERS###`
@@ -63,7 +63,7 @@ CREATE TABLE `###REPL_SQL_TBL_CHARACTERS###` (
   `description` text DEFAULT 'None Provided',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `account_id` (`account_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Table structure for table `###REPL_SQL_TBL_FAMILIARS###`
@@ -85,7 +85,7 @@ CREATE TABLE `###REPL_SQL_TBL_FAMILIARS###` (
   `last_roll` float unsigned DEFAULT 0,
   `avatar` varchar(255) DEFAULT 'img/generated/eggs/egg-unhatched.jpeg',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Table structure for table `###REPL_SQL_TBL_FRIENDS###`
@@ -98,7 +98,7 @@ CREATE TABLE `###REPL_SQL_TBL_FRIENDS###` (
   `email_2` varchar(255) NOT NULL,
   `created` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Table structure for table `###REPL_SQL_TBL_GLOBALS###`
@@ -124,7 +124,7 @@ CREATE TABLE `###REPL_SQL_TBL_LOGS###` (
   `message` varchar(255) DEFAULT NULL,
   `ip` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Table structure for table `###REPL_SQL_TBL_MAIL###`

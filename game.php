@@ -103,7 +103,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" id="menu-sub-inventory" name="menu-sub-inventory" class="nav-link">
+                                            <a href="?page=inventory" id="menu-sub-inventory" name="menu-sub-inventory" class="nav-link">
                                                 <span class="material-symbols-sharp">deployed_code</span>
                                                 <span class="d-none d-lg-inline"> Inventory</span>
                                             </a>

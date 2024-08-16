@@ -35,6 +35,8 @@ $(document).ready(function() {
         gen_toast('error-login-toast', 'danger', 'bi-dash-circle', 'Error', 'Invalid login credentials!');
     } else if (query.has('register_success')) {
         gen_toast('success-register-toast', 'success', 'bi-check', 'Success', 'Account and Character successfully created, you can now log in');
+        document.getElementById('login-tab').click();
+        document.getElementById('login-tab').focus();        
     } else if (query.has('do_register')) {
         document.getElementById('register-tab').click();
         document.getElementById('register-email').value = query.get('email');
@@ -57,5 +59,11 @@ $(document).ready(function() {
         gen_toast('failed-verification', 'danger', 'bi-envelope-slash', 'Verification Failed', 'Account verification failed - check email/code combination');
     } else if (query.has('page', 'friends') && query.has('action', 'send_request')) {
         gen_toast('request-sent', 'success', 'bi-person-plus-fill', 'Friend Request Sent', 'Your friend request has been sent to the user');
+    } else if (query.has('invalid_email')) {
+        gen_toast('invalid-email', 'danger', 'bi-envelope-slash-fill', 'Invalid Email', 'You have supplied an invalid email address');
+    } else if (query.has('already_verified')) {
+        gen_toast('already-verified', 'warning', 'bi-person-check', 'Already Verified', 'You have already verified your account!');
+        document.getElementById('login-email').value = query.get('email');
+        document.getElementById('login-password').focus();
     }
 });

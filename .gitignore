@@ -18,3 +18,4 @@ gcm-diagnose.log
 *.ready
 setup.log
 =
+/node_modules/

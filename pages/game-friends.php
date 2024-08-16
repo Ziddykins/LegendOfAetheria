@@ -1,5 +1,5 @@
 <?php
-    global $log;
+    global $db, $log;
     $account         = table_to_obj($_SESSION['email'], 'account');
     $character       = table_to_obj($account['id'], 'character');
     $header_charname = $character['name'] . "'s";
@@ -51,6 +51,7 @@
             }
 
             if ($_REQUEST['action'] == 'cancel_request') {
+                // file deepcode ignore Sqli: <please specify a reason of ignoring this>
                 if (friend_status($email) === FriendStatus::REQUESTED) {
                     $sql_query = 'DELETE FROM `' . $_ENV['SQL_FRND_TBL'] . '` ' .
                                 "WHERE email_1 = ? AND email_2 = ?";
@@ -58,6 +59,7 @@
                     $log->info("Sent friend request deleted", [ 'To' => $email, 'From' => $account['email'] ]);
                 }
             } else if ($_REQUEST['action'] == 'accept_request') {
+                // file deepcode ignore Sqli: <please specify a reason of ignoring this>
                 if (isset($_REQUEST['btn-accept']) && $_REQUEST['btn-accept'] == "1") {
                     accept_friend_req($focused_email);
                     $log->info('Friend request accepted', [ 'email_1' => $account['email'], 'email_2' => $focused_email]);

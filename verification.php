@@ -15,31 +15,35 @@
         $verification_code = $_REQUEST['code'];
         $email             = $_REQUEST['email'];
         
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE `verification_code` = ? AND `email` = ?';
+        $sql_query = "SELECT * FROM {$_ENV['SQL_ACCT_TBL']} WHERE `verification_code` = ? AND `email` = ?";
+        $results = $db->execute_query($sql_query, [ $verification_code, $email ]);   
         
-        $prepped = $db->prepare($sql_query);
-        $prepped->bind_param('ss', $verification_code, $email);
-        $prepped->execute();
-        
-        $results = get_results();
         
         /* 
             Player found with matching verification code,
             set privileges to a registered user
         */
         if ($results->num_rows) {
-            $player = $results->fetch_assoc();
-            $db->query('UPDATE ' . $_ENV['SQL_ACCTS_TBL'] . ' ' .
-                         'SET `privileges` = "' . UserPrivileges::VERIFIED->name . '" ' .
-                         'WHERE `id` = ' . $player['id']
-            );
+            $account = $results->fetch_assoc();
+            $current_privs = UserPrivileges::name_to_value($account['privileges']);
             
+            if ($account['verified'] === 'True' || $privs >= UserPrivileges::USER) {
+                $query_path = "/?already_verified=1&email={$account['email']}";
+                header("Location: $query_path");
+                exit();
+            }
+
+            $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `privileges` = '" . UserPrivileges::USER->name . "', `verified` = 'True' WHERE `id` = {$account['id']}";
+            $db->execute_query($sql_query);            
             $log->info("User verification successful",
                         [
-                            'User' => $player['email'],
-                            'Code' => $player['verification_code']
+                            'User' => $account['email'],
+                            'Code' => $account['verification_code']
                         ]
             );
+
+            header('Location: /?verification_successful');
+            exit();
         } else {
             header('Location: /?verification_failed');
             exit();
