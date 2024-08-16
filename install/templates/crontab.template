@@ -1,0 +1,4 @@
+* * * * * /usr/bin/php ###REPL_WEB_DOCROOT###/cron.php minute
+0 * * * * /usr/bin/php ###REPL_WEB_DOCROOT###/cron.php hourly
+0 0 * * * /usr/bin/php ###REPL_WEB_DOCROOT###/cron.php daily
+0 0 1 * * /usr/bin/php ###REPL_WEB_DOCROOT###/cron.php monthly

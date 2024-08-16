@@ -1,4 +1,6 @@
 <?php
+    require_once('../functions.php');
+
     $current_egg = null;
 
     if (isset($_REQUEST['action'])) {
@@ -8,7 +10,7 @@
             $rarity_name = $familiar->get_rarity();
 
             $roll = random_float(0, 12);
-            generate_egg($familiar, $roll);
+            $familiar->generate_egg($familiar, $roll);
             $egg_name = null;
 
             if (isset($_REQUEST['egg-name'])) {

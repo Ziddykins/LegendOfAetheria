@@ -41,3 +41,8 @@ function stat_adjust(which, slider) {
         }
     }
 };
+
+function append_to_header($data, $comment) {
+    document.head.append(`<!-- ${comment} -->`);
+    document.head.append(`${data}`);
+}

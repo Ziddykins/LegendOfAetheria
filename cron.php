@@ -14,7 +14,7 @@
     if (!isset($argv)) {
         $log->warning('Access to cron.php directly is not allowed!', ['REQUEST' => print_r($_REQUEST, true)]);
         echo 'Access to cron.php directly is not allowed!';
-        exit(CRON_HTTP_DIRECT_ACCESS);
+        exit(LOAError::CRON_HTTP_DIRECT_ACCESS);
     }
     
     switch ($argv[1]) {
@@ -47,19 +47,20 @@
     
     function cycle_weather() {
         $cur_weather = get_globals('weather');
-        
+        $new_weather = Weather::random();
+
         while ($new_weather === $cur_weather) {
             $new_weather = Weather::random();
         }
         
-        set_globals('weather', $weather);
+        set_globals('weather', $new_weather);
     }
     
     function revive_all_players() {
         global $db, $log;
         $count = 0;
         
-        $sql_query = "SELECT * FROM `" . $ENV['SQL_CHAR_TBL'] . "` WHERE hp = 0;";
+        $sql_query = "SELECT * FROM " . $_ENV['SQL_CHAR_TBL'] . " WHERE hp = 0;";
         $results   = $db->query($sql_query);
         
         while ($player = $results->fetch_assoc()) {
@@ -82,38 +83,31 @@
                 $new_stat = $player[$stat] + REGEN_PER_TICK;
                 $new_stat = min($new_stat, $player["max_$stat"]);
     
-            $sql_query = 'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . " SET $stat = ? WHERE id = ?";
-            $db->execute_query($sql_query, [ $new_stat, $player['id'] ]);
+                $sql_query = 'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . " SET $stat = ? WHERE id = ?";
+                $db->execute_query($sql_query, [ $new_stat, $player['id'] ]);
 
-            $log->info("Updating $stat to $new_stat", ['SQL_QUERY' => $sql_query]);
-            $db->query($sql_query);
+                $log->info("Updating $stat to $new_stat", ['SQL_QUERY' => $sql_query]);
+                $db->query($sql_query);
+            }
         }
     }
 
     function check_eggs() {
         global $db, $log;
 
-        $sql_query = 'SELECT ' .
-            '`id`, `character_id`, `hatch_time`, `hatched`, `date_acquired` ' .
-            'FROM ' . $_ENV['SQL_FMLR_TBL'] . ' WHERE `hatched` = "False"';
+        $sql_query = 'SELECT `id`, `character_id`, `hatch_time`, `hatched`, `date_acquired` FROM ' . $_ENV['SQL_FMLR_TBL'] . ' WHERE `hatched` = "False"';
+        $results = $db->query($sql_query);
 
-        $results = $db->query($sql_query);        
         while ($player = $results->fetch_assoc()) {
             $hatch_time    = $player['hatch_time'];
-            $hatched       = $player['hatched'];
             $date_acquired = $player['date_acquired'];
             
             $time_remaining = sub_mysql_datetime($date_acquired, $hatch_time);
 
             if (!$time_remaining) {
-                $sql_query = 'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' ' .
-                             'SET `hatched` = ?' .
-                             'WHERE `character_id` = ?';
-                $prepped = $db->prepare($sql_query);
-                $prepped->bind_param('si', 'True', $player['character_id']);
-                $prepped->execute();
+                $sql_query = 'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' SET `hatched` = ? WHERE `character_id` = ?';
+                $db->execute_query($sql_query, [ 'True', $player['character_id'] ]);
             }
         }
     }
-
 ?>

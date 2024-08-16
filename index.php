@@ -17,6 +17,11 @@
         $email    = $_REQUEST['login-email'];
         $password = $_REQUEST['login-password'];
 
+        if (!check_valid_email($email)) {
+            header('Location: /?invalid_email');
+            exit();
+        }
+
         $account = table_to_obj($email, 'account');
 
         if (!$account) {
@@ -38,19 +43,16 @@
             $_SESSION['logged-in'] = 1;
             $_SESSION['email'] = $account['email'];
             
-            $db->execute_query(
-                'UPDATE tbl_accounts SET session_id = ? WHERE id = ?',
-                [ session_id(), $account['id'] ]
-            );
+            $db->execute_query('UPDATE tbl_accounts SET session_id = ? WHERE id = ?', [ session_id(), $account['id'] ]);
             
             header('Location: /game');
             exit();
         } else {
             $ip = $_SERVER['REMOTE_ADDR'];
             $sql_query_get_count       = 'SELECT COUNT(*) AS `count` FROM ' . $_ENV['SQL_LOGS_TBL'] . ' WHERE ' .
-                                            'ip = ? AND ' .
+                                            '`ip` = ? AND ' .
                                             '`date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW() AND ' .
-                                            "type = 'FAILED_LOGIN'";
+                                            "`type` = 'FAILED_LOGIN'";
 
             $failed_login_count = $db->execute_query($sql_query_get_count, [$_SERVER['REMOTE_ADDR']])->fetch_assoc()['count'];
 
@@ -79,8 +81,7 @@
             header('Location: /?failed_login');
             exit();
         }
-    } else if (isset($_REQUEST['register-submit']) 
-            && $_REQUEST['register-submit'] == 1) {
+    } else if (isset($_REQUEST['register-submit']) && $_REQUEST['register-submit'] == 1) {
         $avatar           = 'avatar-' . $_REQUEST['avatar-select'] . '.webp';
         $email            = $_REQUEST['register-email'];
         $password         = $_REQUEST['register-password'];
@@ -90,24 +91,24 @@
         $str              = $_REQUEST['str-ap'];
         $def              = $_REQUEST['def-ap'];
         $intl             = $_REQUEST['int-ap'];
+
+        if (!check_valid_email($email)) {
+            header('Location: /?invalid_email');
+            exit();
+        }
         
         $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $char_name);
-
 
         $time_sqlformat   = get_mysql_datetime();
         $ip_address       = $_SERVER['REMOTE_ADDR'];
         $new_privs        = UserPrivileges::UNVERIFIED->value;
 
-        $prepped = $db->prepare('SELECT * FROM ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
-                                'WHERE email = ?');
-        $prepped->bind_param('s', $email);
-        $prepped->execute();
-        
-        $result  = $prepped->get_result();
-        $account = $result->fetch_assoc();
+        $sql_query = "SELECT * FROM {$_ENV['SQL_ACCT_TBL']} WHERE email = ?";
+        $result = $db->execute_query($sql_query, [ $email ]);
+        $row_count = $result->num_rows;
 
         /* Email doesn't exist */
-        if ($result->num_rows == 0) {
+        if (!$row_count) {
             /* AP assigned properly */            
             if ($str + $def + $intl === MAX_ASSIGNABLE_AP) {
                 /* Passwords match */
@@ -122,13 +123,7 @@
                         'verification_code, privileges, ip_address) ' . ' ' .
                         'VALUES (?, ?, ?, ?, ?, ?)';
 
-                    $prepped = $db->prepare($sql_query);
-                    $prepped->bind_param('ssssis',
-                        $email, $password, $time_sqlformat, $verification_code, 
-                        $new_privs, $ip_address
-                    );
-                    
-                    $prepped->execute();
+                    $db->execute_query($sql_query, [ $email, $password, $time_sqlformat, $verification_code, $new_privs, $ip_address ]);
 
                     $arr_images = scandir('img/avatars');
                     
@@ -161,24 +156,17 @@
                         );
                     } 
 
-                    $query = $db->query(
-                        'SELECT MAX(id) AS account_id FROM ' . $_ENV['SQL_ACCT_TBL']
-                    );
-
-                    $result     = $query->fetch_assoc();
+                    $sql_query  = "SELECT MAX(`id`) AS `account_id` FROM {$_ENV['SQL_ACCT_TBL']}";
+                    $result     = $db->execute_query($sql_query)->fetch_assoc();
                     $account_id = $result['account_id'];
 
-                    $sql_query = 'INSERT INTO ' . $_ENV['SQL_CHAR_TBL'] . ' ' .
-                        '(`account_id`, `avatar`, `name`, `race`, ' . ' ' .
-                        '`str`, `def`, `int`) VALUES (?, ?, ?, ?, ?, ?, ?)';
+                    $sql_query = "INSERT INTO {$_ENV['SQL_CHAR_TBL']} " .
+                                    "(`account_id`, `avatar`, `name`, `race`, `str`, `def`, `int`) " .
+                                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-                    $prepped = $db->prepare($sql_query);
-                    $prepped->bind_param(
-                        'isssiii',
-                        $account_id, $avatar, $char_name, $race, $str, $def, $intl
-                    );
-
-                    if (!$prepped->execute()) {
+                    
+                    
+                    if (!$db->execute_query($sql_query, [ $account_id, $avatar, $char_name, $race, $str, $def, $intl ])) {
                         $log->critical(
                             'Couldn\'t insert user information into character table'
                         );
@@ -199,10 +187,12 @@
                     
                     $serialized_data = serialize($character); 
                         $log->info("serdata: $serialized_data");
-                    save_character($account_id, $serialized_data);
-                        // Verification email
-                    // send_mail($email);
- */
+                    save_character($account_id, $serialized_data);*/
+                    
+                    // Verification email
+                    $account = table_to_obj($email, 'account');
+                    send_mail($email, $account);
+ 
                     header('Location: /?register_success');
                     exit();
                 }
