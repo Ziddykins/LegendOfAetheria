@@ -149,10 +149,11 @@ class Familiar {
 
         foreach ((Array)$this as $key => $val) {
             if ($key == 'table') {
-                continue;
+                break;
             }
             $key = preg_replace("/[^a-zA-Z_]/", '', $key);
             $table_column = clsprop_to_tblcol($key);
+            $log->error("key: $key tblcol: $table_column");
             $this->$key = $familiar[$table_column];
         }
     }
@@ -169,10 +170,10 @@ class Familiar {
                 return "#ADD8D7";
                 break;
             case "ENCHANTED":
-                return "#08E71C";
+                return "#A6D9F8";
                 break;
             case "MAGICAL":
-                return "#A6D9F8";
+                return "#08E71C";
                 break;
             case "LEGENDARY":
                 return "#F8C81C";
@@ -193,7 +194,7 @@ class Familiar {
                 return "#FF2501";
                 break;
             default:
-                return "#FFF000";
+                return "#0000FF";
                 break;
         }
     }

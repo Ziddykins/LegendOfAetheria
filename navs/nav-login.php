@@ -21,7 +21,7 @@
                             <form id="login-form" name="login-form" action="/" method="POST">
                                 <div class="border">
                                     <div class="d-flex bg-body-secondary border">
-                                        <div class="p-2 flex-grow-1"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
+                                        <div class="p-2"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
                                     </div>
                                 </div>
                                 <div class="input-group">

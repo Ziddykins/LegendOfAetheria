@@ -18,6 +18,10 @@ class Monster {
     protected $goldAwarded;
     protected $monsterClass;
 
+    protected $monsters;
+
+    protected $table;
+
     /**
     * Magic method to handle dynamic getters and setters for the Monster class properties.
     *
@@ -42,7 +46,7 @@ class Monster {
         }
 
         if (strncasecmp($method, "set_", 4) === 0) {
-            $sql_query =  "UPDATE $this->tableName ";
+            /*$sql_query =  "UPDATE $this->table ";
             $table_col = clsprop_to_tblcol($var);
 
             if (is_int($params[0])) {
@@ -52,33 +56,38 @@ class Monster {
             }
 
             $sql_query .= 'WHERE `id` = ' . $this->id;
-
-            $db->query($sql_query);
+*/
+            //$db->query($sql_query);
             $this->$var = $params[0];
 
-            $log->info("'set_' triggered for var '\$this->$var'; assigning '" . $params[0] . "' to it",
+            /*$log->info("'set_' triggered for var '\$this->$var'; assigning '" . $params[0] . "' to it",
                 [
                     'SQLQuery'    => $sql_query,
                     'CallingFunc' => $caller,
                     'PropToCol'   => $table_col
                 ]
-            );
+            );*/
         }
+
     }
     
     public function __construct(MonsterScope $scope, $account_id = null, $table_name) {
-        $this->accountID = $account_id;
-        $this->scope     = $scope;
-        $this->tableName = $table_name;
+        $this->table     = $table_name;
     }
 
-    public function load_monster_sheet() {
-        $monsters = Array();
-        $monsters = file_get_contents(__DIR__."monsters.raw");
-    }
+    
 
-    public function random_monster($dropLevel = 0) {
+    function random_monster($dropLevel = 0) {
         
     }
 }
+
+class MonsterPool {
+    public $monsters = [];
+
+    private function get_monster_count() {
+        return count($this->monsters);
+    }
+}
+
 ?>

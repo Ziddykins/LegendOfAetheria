@@ -6,10 +6,17 @@
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 
-    include 'logger.php';
+    require_once 'logger.php';
     require_once 'db.php';
-    include 'constants.php';
-    include 'functions.php';
+    require_once 'constants.php';
+    require_once 'functions.php';
+    require_once 'mailer.php';
+
+    if (isset($_GET['resend']) && $_GET['resend'] === 1) {
+        send_mail($account['email'], $account);
+        header('/game?resent_verification');
+        exit();
+    }
     
     if (isset($_REQUEST['code']) && isset($_REQUEST['email'])) {
         $verification_code = $_REQUEST['code'];
@@ -17,8 +24,7 @@
         
         $sql_query = "SELECT * FROM {$_ENV['SQL_ACCT_TBL']} WHERE `verification_code` = ? AND `email` = ?";
         $results = $db->execute_query($sql_query, [ $verification_code, $email ]);   
-        
-        
+                
         /* 
             Player found with matching verification code,
             set privileges to a registered user
@@ -28,7 +34,7 @@
             $current_privs = UserPrivileges::name_to_value($account['privileges']);
             
             if ($account['verified'] === 'True' || $privs >= UserPrivileges::USER) {
-                $query_path = "/?already_verified=1&email={$account['email']}";
+                $query_path = "/game?already_verified=1&email={$account['email']}";
                 header("Location: $query_path");
                 exit();
             }
@@ -42,7 +48,7 @@
                         ]
             );
 
-            header('Location: /?verification_successful');
+            header('Location: /game?verification_successful');
             exit();
         } else {
             header('Location: /?verification_failed');
