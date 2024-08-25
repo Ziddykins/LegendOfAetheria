@@ -23,12 +23,13 @@
         }
     }
 
+    $monster_pool = new MonsterPool;
+    load_monster_sheet($monster_pool);
+
     $account   = table_to_obj($_SESSION['email'], 'account');
-    
     /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         $character = table_to_obj($account['id'], 'character');
-
         $familiar = new Familiar($character['id'], $_ENV['SQL_FMLR_TBL']);
         $familiar->loadFamiliar($character['id']);
 
@@ -296,19 +297,13 @@
                         
                         <hr style="width: 35%; opacity: .25; align-self: center;">
 
-                        <div id="bottom-menu" name="bottom-menu" class="ms-3 pb-3 fixed-bottom" style="width: 15%;">
-                            <a href="#" 
-                                class="d-flex align-items-center text-decoration-none dropdown-toggle" 
-                                id="dropdownUser1"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                
-                                <img src="img/avatars/<?php echo $character['avatar']; ?>"
-                                     alt="avatar"
-                                     width="50"
-                                     height="50"
-                                     class="rounded-circle"
-                                />
+
+                        <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 fixed-bottom" style="width: 15%;">
+                            <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
+                                <span><img src="img/avatars/<?php echo $character['avatar']; ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
+                            </a>
+                            
+                            <a href="#" class="text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="d-none d-md-inline mx-1 ms-3 fs-6">Account</span>
                             </a>
                         
@@ -326,7 +321,7 @@
                                             $pill_bg = 'bg-primary';
                                         }
                                     ?>
-                                        <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $requests; ?></span>
+    <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $requests; ?></span>
                                     </a>
                                 </li>
                                 <li>
@@ -339,7 +334,7 @@
                                                     $pill_bg = 'bg-primary';
                                             }
                                         ?>
-                                        <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $unread_mail; ?></span>
+<span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $unread_mail; ?></span>
                                     </a>
                                 </li>
                                 <li>
@@ -357,7 +352,7 @@
                                         echo "\n\t\t\t\t\t\t\t\t</li>\n";
                                     }
                                 ?>
-                                <li>
+<li>
                                     <a class="dropdown-item" href="/logout">Sign out</a>
                                 </li>
                             </ul>
@@ -367,12 +362,25 @@
 
                 <div id="content" name="content" class="container border border-danger" style="flex-shrink: 1;">
                     <?php
-                        include('navs/nav-status.php');
+                        $privileges = UserPrivileges::name_to_value($account['privileges']);
+                        
+                        if ($privileges == UserPrivileges::UNVERIFIED->value) {
+                            include('html/verify.html');
+                            exit();
+                        }
+                            
+                        
+                        include('navs/nav-summary.php');
+
+
 
                         if (isset($_REQUEST['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_REQUEST['page']);
                             $page_uri = 'pages/game-' .  $requested_page . '.php';
                             include "$page_uri";
+                        } else {
+                            $page_uri = 'pages/game-sheet.php';
+                            include $page_uri;
                         }
                     ?>
                 </div>

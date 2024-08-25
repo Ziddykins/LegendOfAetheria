@@ -1,6 +1,5 @@
 <?php
-    require_once('../functions.php');
-
+    
     $current_egg = null;
 
     if (isset($_REQUEST['action'])) {
@@ -25,14 +24,7 @@
         }
     }
 ?>
-<!--<script>
-    $(document).ready(
-        function() {
-            $("#footer").append("<! Dynamically loaded content: <?php echo __FILE__; ?>  --");
-            $("#footer").append('<script type="text/javascript" src="js/egg_timer.js"></script>');
-        }
-    );
-</script>-->
+
 <div class="container text-center">
     <div class="row pt-5">
         <h3>Eggs</h3>
@@ -52,6 +44,7 @@
                     unlink($temp_file_name);
                 }
             ?>
+            <script type="text/javascript" src="js/egg_timer.js"></script>
         </div>
     </div>
 </div>

@@ -1,0 +1,30 @@
+<div class="d-flex flex-column align-items-center position-absolute top-50 start-50 translate-middle">
+    <div class="login-box shadow rounded border border-2 border-black">
+        <div class="card card-outline card-primary">
+            <h2 class="card-header text-center pt-3 pb-3"><i class="bi bi-fingerprint"></i>Verification</h2>
+
+            <div class="card-body">
+                In order to verify your account, please enter the code you received in your email:
+                <form action="/verification" method="post">
+                    <div class="d-flex justify-content-center mb-3 mt-3">
+                        <div class="input-group border">
+                            <span class="input-group-text text-bg-primary" id="verify-icon">></span>
+                            <div class="form-floating">
+                                <input id="code" name="code" type="text" class="form-control" aria-label="Code" aria-describedby="verify-icon" placeholder="Code" required />
+                                <label for="code">Code</label>
+                                <input id="email" name="email" type="hidden" value="<?php echo $account['email']; ?>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid col-12 gap-2">
+                        <button type="submit" id="verify-submit" name="verify-submit" class="btn btn-primary mt-3" value="1">Verify</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-footer">
+                    Click <a href="/verification?resend=1">Here</a> to re-send the confirmation email
+            </div>
+        </div>
+    </div>

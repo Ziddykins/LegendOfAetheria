@@ -2,6 +2,7 @@
     require_once '../../../vendor/autoload.php';
     require_once 'logger.php';
     require_once 'constants.php';
+    require_once 'classes/class-monster.php';
 
     /**
      * Retrieves a MySQL datetime string based on the provided modifier.
@@ -356,6 +357,74 @@
                 return true;
             }
         }
+        return false;
+    }
+
+    function load_monster_sheet(&$monster_pool) {
+        global $log;
+        
+        $monsters_arr = [];
+
+        $handle = fopen("monsters.raw", "r");
+
+        if ($handle) {
+            while (($line = fgets($handle)) !== false) {
+                array_push($monsters_arr, $line);
+            }
+        }
+
+        foreach ($monsters_arr as $monster) {
+            $temp_monster = new Monster(MonsterScope::PERSONAL, null, $_ENV['SQL_MNST_TBL']);
+            $temp_stats_arr = explode(',', $monster);
+            
+            $temp_monster->set_name($temp_stats_arr[0]);
+            $temp_monster->set_hp($temp_stats_arr[1]);
+            $temp_monster->set_maxHP($temp_stats_arr[2]);
+            $temp_monster->set_mp($temp_stats_arr[3]);
+            $temp_monster->set_maxMP($temp_stats_arr[4]);
+            $temp_monster->set_strength($temp_stats_arr[5]);
+            $temp_monster->set_intelligence($temp_stats_arr[6]);
+            $temp_monster->set_defense($temp_stats_arr[7]);
+            $temp_monster->set_dropLevel($temp_stats_arr[8]);
+            $temp_monster->set_expAwarded($temp_stats_arr[9]);
+            $temp_monster->set_goldAwarded($temp_stats_arr[10]);
+            $temp_monster->set_monsterClass($temp_stats_arr[11]);
+            $temp_monster->set_seed(rand(0, time()));
+            array_push($monster_pool->monsters, $temp_monster);
+        }
+        $log->info(count($monster_pool->monsters) . " monsters loaded into pool");
+    }
+
+    /**
+     * Checks for potential abuse based on the provided type and data.
+     *
+     * @param AbuseTypes $type The type of abuse to check for (e.g. MULTISIGNUP)
+     * @param mixed $data Additional data to use in the abuse check (e.g. IP address)
+     *
+     * @return bool True if abuse is detected, false otherwise
+     */
+    function check_abuse(AbuseTypes $type, $data = null): bool {
+        global $db, $log;
+
+        switch ($type) {
+            case AbuseTypes::MULTISIGNUP:
+                $sql_query = <<<SQL
+                                SELECT * FROM {$_ENV['SQL_LOGS_TBL']}
+                                WHERE `type` = "AccountCreate" 
+                                    AND `ip` = ? 
+                                    AND `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
+                            SQL;
+                $count = $db->execute_query($sql_query, [ $data ])->num_rows;
+
+                if ($count > 1) {
+                    return true;
+                }
+
+                return false;
+            default:
+                $log->error("No type specified for abuse lookup");
+        }
+        
         return false;
     }
 ?>

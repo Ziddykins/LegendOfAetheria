@@ -32,6 +32,16 @@
 
         /* Password for supplied email was correct */
         if (password_verify($password, $account['password'])) {
+            /* Check if account is IP locked and verify IP logging in matches stored IP lock address */
+            if ($account['ip_lock']) {
+                if ($account['ip_lock_addr'] != $_SERVER['REMOTE_ADDR']) {
+                    $log->info("User tried to login from non-matching IP address on IP locked account",
+                         [ "On File" => $account['ip_lock_addr'], "Current" => $_SERVER['REMOTE_ADDR'] ]);
+                    header('Location: /?ip_locked');
+                    exit();
+                }
+            }
+
             $log->info('Account login success', [
                 'Email'      => $account['email'],
                 'Privileges' => $account['privileges'],
@@ -117,6 +127,14 @@
                     $verification_code .= substr(hash('sha256', strval(rand(0,100))), 0, 15);
                     
                     $password = password_hash($password, PASSWORD_BCRYPT);
+                    
+                    $sql_query = "INSERT INTO {$_ENV['SQL_LOGS_TBL']} (`type`, `message`, `ip`) VALUES (?, ?, ?)";
+                    $db->execute_query($sql_query, ["AccountCreate", "Account created for user {$account['email']}", $ip_address]);
+                    
+                    if (check_abuse(AbuseTypes::MULTISIGNUP, $ip_address)) {
+                        header('Location: /?abuse_signup');
+                        exit();
+                    }
 
                     $sql_query =' INSERT INTO ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
                         '(email, password, date_registered, ' .
@@ -167,9 +185,7 @@
                     
                     
                     if (!$db->execute_query($sql_query, [ $account_id, $avatar, $char_name, $race, $str, $def, $intl ])) {
-                        $log->critical(
-                            'Couldn\'t insert user information into character table'
-                        );
+                        $log->critical('Couldn\'t insert user information into character table');
                     }
     
 /*                    $character = new Character($account_id, $email);
@@ -191,7 +207,8 @@
                     
                     // Verification email
                     $account = table_to_obj($email, 'account');
-                    send_mail($email, $account);
+                    
+                    //send_mail($email, $account);
  
                     header('Location: /?register_success');
                     exit();
@@ -212,7 +229,7 @@
     </head>
     
     <body>    
-        <div class="container-sm my-5 shadow" style="width: 70%;">
+        <div class="container-sm my-5 shadow" style="width: 35%;">
             <div class="row">
                 <div class="col p-4">
                     <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" style="width: 100%;"></img>

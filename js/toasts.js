@@ -10,7 +10,7 @@ function gen_toast(id, type, icon, header_txt, message) {
     toast_div.role = 'alert';
 
     toast_div.innerHTML = `<div class="toast-header">
-                                <span class="badge text-bg-${type} me-auto">
+                                <span class="badge text-bg-${type} bg-gradient me-auto">
                                     <i class="bi ${icon} rounded me-2"></i> ${toast_badge_text}
                                 </span> ${header_txt}
                                 
@@ -55,8 +55,6 @@ $(document).ready(function() {
         gen_toast('success-changepw-fail', 'danger', 'bi-key', 'Password Mis-has', 'The two passwords do not match; password unchanged');
     } else if (query.has('action', 'pw_reset') && query.has('result', 'pass')) {
         gen_toast('password-changed', 'success', 'bi-key', 'Password Changed', 'Your password has been successfully updated - Please re-login');
-    } else if (query.has('verification_failed')) {
-        gen_toast('failed-verification', 'danger', 'bi-envelope-slash', 'Verification Failed', 'Account verification failed - check email/code combination');
     } else if (query.has('page', 'friends') && query.has('action', 'send_request')) {
         gen_toast('request-sent', 'success', 'bi-person-plus-fill', 'Friend Request Sent', 'Your friend request has been sent to the user');
     } else if (query.has('invalid_email')) {
@@ -65,5 +63,16 @@ $(document).ready(function() {
         gen_toast('already-verified', 'warning', 'bi-person-check', 'Already Verified', 'You have already verified your account!');
         document.getElementById('login-email').value = query.get('email');
         document.getElementById('login-password').focus();
+    } else if (query.has('resent_verification')) {
+        gen_toast('resent-verification', 'success', 'bi-envelope-exclamation-fill', 'Verification Resent', 'Verification email has been resent!');
+    } else if (query.has('verification_successful')) {
+        gen_toast('success-verification', 'success', 'bi-envelope-check-fill', 'Verification Successful', 'Account verification successful!');
+    } else if (query.has('verification_failed')) {
+        gen_toast('failed-verification', 'danger', 'bi-envelope-slash', 'Verification Failed', 'Account verification failed - check email/code combination');
+    } else if (query.has('abuse_signup')) {
+        gen_toast('abuse-signup', 'danger', 'bi-slash-circle', 'Sign-Up Abuse', 'Throttled; too many account creations!');
+    } else if (query.has('ip_locked')) {
+        gen_toast('ip-locked-fail', 'danger', 'bi-exclamation-octagon-fill', 'IP Locked', 'IP Locked Account - Non-matching IP address');
     }
+
 });
