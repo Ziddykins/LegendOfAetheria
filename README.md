@@ -5,16 +5,8 @@ A browser-based RPG game written in PHP/JS using the Bootstrap 5 framework
 
 # Getting Started
 
-> [!CAUTION]
-> The autoinstaller is a work-in-progress; don't run it until this banner is gone.
-> Manual steps will be provided shortly.
-
-> [!IMPORTANT]
-> The recommended method for getting this up and running is using the [AutoInstaller](#AutoInstaller),
-> however step-by-step Manual instructions will be covered later.
-
-> [!NOTE]
-> For best results, this should be run on a fresh install of Debian or Windows.
+The recommended method for getting this up and running is using the [AutoInstaller](#AutoInstaller),
+however step-by-step Manual instructions will be covered later.
 
 ## Download
 
