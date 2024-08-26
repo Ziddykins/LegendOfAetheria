@@ -77,7 +77,7 @@
         
     </head>
         
-    <body> 
+    <body class="main-font"> 
         <div class="container-fluid border">
             <div class="row flex-nowrap" style="min-height: 99.5vh!important;">
                 <div class="col-2 px-3 border border-grey">
@@ -100,19 +100,19 @@
                                         <li>
                                             <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link text-decoration-none">
                                                 <span class="material-symbols-sharp">account_circle</span>
-                                                <span class="d-none d-lg-inline"> Sheet</span>
+                                                <span class="d-none d-md-inline"> Sheet</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=inventory" id="menu-sub-inventory" name="menu-sub-inventory" class="nav-link">
                                                 <span class="material-symbols-sharp">deployed_code</span>
-                                                <span class="d-none d-lg-inline"> Inventory</span>
+                                                <span class="d-none d-md-inline"> Inventory</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-skills" name="menu-sub-skills" class="nav-link">
                                                 <span class="material-symbols-sharp">book_2</span>
-                                                <span class="d-none d-lg-inline">Skills</span>
+                                                <span class="d-none d-md-inline">Skills</span>
                                             </a>
                                         </li>
                                         <li>
@@ -219,7 +219,7 @@
                                 <li class="border w-100">
                                     <a href="#menu-header-dungeon" id="menu-anchor-dungeon" name="menu-anchor-dungeon" class="nav-link align-middle" data-bs-toggle="collapse">
                                         <i class="fs-4 bi bi-bricks"></i>
-                                        <span class="ms-1 d-none d-md-inline fs-6">Dungeon</span>
+                                        <span class="d-none d-md-inline fs-6">Dungeon</span>
                                     </a>
 
                                     <ul id="menu-header-dungeon" class="collapse nav flex-column text-start bg-body-secondary" data-bs-parent="#menu" aria-expanded="false">

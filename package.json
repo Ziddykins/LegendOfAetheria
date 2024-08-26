@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "jqueryui": "^1.11.1",
     "smart-webcomponents": "^19.0.8"
   }
 }

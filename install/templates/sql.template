@@ -1,16 +1,5 @@
-CREATE DATABASE ###REPL_SQL_DB###;
+CREATE DATABASE IF NOT EXISTS ###REPL_SQL_DB###;
 use ###REPL_SQL_DB###;
-
--- MariaDB dump 10.19-11.4.2-MariaDB, for debian-linux-gnu (x86_64)
---
--- Host: localhost    Database: db_loa
--- ------------------------------------------------------
--- Server version	11.4.2-MariaDB-4
-
-
---
--- Table structure for table `###REPL_SQL_TBL_ACCOUNTS###`
---
 
 DROP TABLE IF EXISTS `###REPL_SQL_TBL_ACCOUNTS###`;
 CREATE TABLE `###REPL_SQL_TBL_ACCOUNTS###` (
@@ -170,8 +159,15 @@ CREATE TABLE `###REPL_SQL_TBL_MONSTERS###` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_GLOBALS###`;
+CREATE TABLE `###REPL_SQL_TBL_GLOBALS###` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '0',
+  `value` varchar(50) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
 
--- Dump completed on 2024-07-30 19:36:41
+INSERT INTO ###REPL_SQL_TBL_GLOBALS### (`name`, `value`) VALUES ('weather', 'SUNNY');
 
 CREATE USER ###REPL_SQL_USER###;
 GRANT ALL PRIVILEGES ON ###REPL_SQL_DB###.* TO ###REPL_SQL_USER### IDENTIFIED BY '###REPL_SQL_PASS###';

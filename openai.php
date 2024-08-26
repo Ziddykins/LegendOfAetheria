@@ -83,7 +83,7 @@
             }
         }
 
-        echo $description;
+        /*echo $description;*/
     } else {
         echo "Invalid Query";
     }

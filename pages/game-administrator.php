@@ -1,3 +1,10 @@
+<?php
+    if ($user_privs->value < UserPrivileges::OWNER->value) {
+        echo "F O R B I D D E N";
+        exit();
+    }
+?>
+
 <?php include('html/opener.html'); ?>
     <head>
         <?php include('html/headers.html'); ?>
@@ -169,11 +176,6 @@ $dalle_models = [
 
 $user_privs = UserPrivileges::name_to_enum($account['privileges']);
 
-if ($user_privs->value < UserPrivileges::OWNER->value) {
-    echo "F O R B I D D E N";
-    exit();
-}
-
 if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) { 
     echo "in gen img";
     $type   = $_REQUEST['type'];
@@ -222,7 +224,7 @@ if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) {
     exit();
     
     echo '<div class="d-flex container">';
-    foreach ($json_obj->data as $image) {
+  /*  foreach ($json_obj->data as $image) {
         foreach ($image as $property) {   
                     echo '<div class="row-cols-3">
                         <div class="col">
@@ -239,5 +241,6 @@ if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) {
         $icount++;
     }
     echo '</div>';
+    */
 }
 ?>

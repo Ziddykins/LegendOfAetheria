@@ -27,15 +27,23 @@ my $GREY   = "\e[37m";
 my $RESET  = "\e[0m";
 
 # CONFIG - Server #
-my $FQDN              = 'loa.dankaf.ca';
-my ($SUB, $DOM, $TLD) = split /\./, $FQDN;
-my $IP_ADDRESS        = '127.0.2.1';
+my $GAME_WEB_ROOT = "/var/www/html/xxx";
+
+print "Please enter an existing path for your webroot (e.g. /var/www/html/example.com/loa):\n";
+chomp($GAME_WEB_ROOT = <STDIN>);
+$GAME_WEB_ROOT =~ s/\/$//;
+make_path($GAME_WEB_ROOT);
+
+print "Please enter a FQDN/domain to be used for the virtual host (e.g. loa.example.com):\n";
+chomp($FQDN = <STDIN>);
+
+
 my $LOG_TO_FILE       = 'setup.log';
 my $PHP_BINARY        = $1 if `whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/;
-my $GAME_WEB_ROOT     = "/var/www/html/$DOM.$TLD/$SUB";
+
 my $GAME_TEMPLATE_DIR = "$GAME_WEB_ROOT/install/templates";
 my $GAME_SCRIPTS_DIR  = "$GAME_WEB_ROOT/install/scripts";
-my $WEB_ADMIN_EMAIL   = "webmaster\@$DOM";
+my $WEB_ADMIN_EMAIL   = "webmaster\@$FQDN";
 my $CRONTAB_DIRECTORY = '/var/spool/cron/crontabs';
 
 # CONFIG - SQL Tables / Template Replacements #
@@ -53,7 +61,7 @@ my $SQL_TBL_LOGS       = 'tbl_logs';
 my $SQL_USERNAME           = 'user_loa';
 my $SQL_PASSWORD           = gen_random(15);
 my $SQL_DATABASE           = 'db_loa';
-my $SQL_HOST               = $IP_ADDRESS;
+my $SQL_HOST               = '127.0.2.1';
 my $SQL_PORT               = 3306;
 my $SQL_SERVER_CONFIG_FILE = '/etc/mysql/mariadb.conf.d/50-server.cnf';
 
@@ -130,6 +138,7 @@ my @replacements = (
     "###REPL_SQL_TBL_MONSTERS###%%%$SQL_TBL_MONSTERS",
     "###REPL_SQL_USER###%%%$SQL_USERNAME",
     "###REPL_SQL_TBL_LOGS###%%%$SQL_TBL_LOGS",
+    "###REPL_SQL_TBL_GLOBALS###%%%$SQL_TBL_GLOBALS",
 
     "###REPL_OPENAI_APIKEY###%%%$OPENAI_APIKEY",
 );
@@ -171,11 +180,6 @@ check_platform();
 if (!-e '/etc/debian_version' && check_platform() eq "linux") {
     die "sry no :')";
 }
-
-#if (ask_user("Update hosts file?")) {
-#    update_hosts() if !$completed{hosts};
-#    `touch $GAME_WEB_ROOT/.loa-step-hosts`;
-#}
 
 if (ask_user("Install required software?")) {
     install_software() if !$completed{software};
@@ -246,41 +250,6 @@ sub check_platform {
     die "Unsupported OS!\n";
 }
 
-# Step: hosts
-sub update_hosts {
-    if (check_platform() eq "linux") {
-        open my $fh, '<', $LINUX_HOSTS_FILE
-          or die "Unable to open file for read: $!\n";
-
-        my $tmp   = <$fh>;
-        my @hosts = split /[\r\n]/, $tmp;
-
-        close $fh;
-
-        if (grep (/$IP_ADDRESS\s+loa\./, @hosts)) {
-            tell_user('WARNING',
-                'Looks like the entry is already there, skipping');
-        } else {
-            open my $fh, '>', $LINUX_HOSTS_FILE
-              or die "Unable to open file for write: $!\n";
-
-            print $fh @hosts;
-            print $fh "\n# Added by LoA\n$IP_ADDRESS\t$FQDN $SUB\n";
-
-            tell_user('SUCCESS', 'Hosts entry added');
-
-            close $fh;
-        }
-    } else {
-        open my $fh, '<', $WIN32_HOSTS_FILE
-          or die "Unable to open file for rw: $!\n";
-
-        close $fh
-          or die "Unable to close file: $!\n";
-    }
-
-}
-
 #Step: software
 sub install_software {
     my ($apt_output, $sury_output);
@@ -289,10 +258,7 @@ sub install_software {
     if (-e '/etc/apt/sources.list.d/php.list') {
         tell_user('INFO', 'Sury repo entries already present');
     } else {
-        tell_user(
-            'INFO',
-            'Sury PHP repositories not found, adding necessary entries'
-        );
+        tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
 
         tell_user('SYSTEM', `sh $GAME_SCRIPTS_DIR/sury_setup.sh`);
     }
@@ -456,7 +422,7 @@ sub generate_templates {
     my $fh_cron;
     my %templates;
 
-    `sed -i 's/bind-address.*/bind-address = $IP_ADDRESS/' $SQL_SERVER_CONFIG_FILE`;
+    `sed -i 's/bind-address.*/bind-address = $SQL_HOST/' $SQL_SERVER_CONFIG_FILE`;
 
     # key = in file, value = out file
     $templates{$ENV_TEMPLATE}          = "$ENV_TEMPLATE.ready";
@@ -751,7 +717,6 @@ sub tell_user {
 
         print $fh $message;
 
-        close $fh
-          or die "Couldn't close file: $!\n";
+        close $fh or die "Couldn't close file: $!\n";
     }
 }
