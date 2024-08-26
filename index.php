@@ -11,6 +11,7 @@
     require_once 'constants.php';
     require_once 'functions.php';
     require_once 'mailer.php';
+    require_once 'classes/class-account.php';
 
     /* Login submitted */
     if (isset($_REQUEST['login-submit']) && $_REQUEST['login-submit'] == 1) {
@@ -22,47 +23,54 @@
             exit();
         }
 
-        $account = table_to_obj($email, 'account');
+        $sql_query   = "SELECT * FROM {$_ENV['SQL_ACCT_TBL']} WHERE `email` = ?";
+        $tmp_account = $db->execute_query($sql_query, [ $email ])->fetch_assoc();
+        $account     = null;
 
-        if (!$account) {
+        if ($tmp_account) {
+            $account = new Account($tmp_account['id']);
+        } else {
             $log->error('Attempted login with a non-existing account', [ 'Email' => $email ]);
             header("Location: /?do_register&email=$email");
             exit();
         }
 
         /* Password for supplied email was correct */
-        if (password_verify($password, $account['password'])) {
+        if (password_verify($password, $account->get_password())) {
             /* Check if account is IP locked and verify IP logging in matches stored IP lock address */
-            if ($account['ip_lock']) {
-                if ($account['ip_lock_addr'] != $_SERVER['REMOTE_ADDR']) {
+            if ($account->get_ipLock() == 'True') {
+                if ($account->get_ipLockAddr() != $_SERVER['REMOTE_ADDR']) {
                     $log->info("User tried to login from non-matching IP address on IP locked account",
-                         [ "On File" => $account['ip_lock_addr'], "Current" => $_SERVER['REMOTE_ADDR'] ]);
+                     [ "On File" => $account->get_ipLockAddr(), "Current" => $_SERVER['REMOTE_ADDR'] ]);
                     header('Location: /?ip_locked');
                     exit();
                 }
             }
 
             $log->info('Account login success', [
-                'Email'      => $account['email'],
-                'Privileges' => $account['privileges'],
-                'IpAddr'     => $account['ip_address']
+                'Email'      => $account->get_email(),
+                'Privileges' => $account->get_privileges(),
+                'IpAddr'     => $account->get_ipAddress()
             ]);
 
-            $character = table_to_obj($account['email'], 'character');
+            $character = table_to_obj($account->get_email(), 'character');
 
-            $_SESSION['logged-in'] = 1;
-            $_SESSION['email'] = $account['email'];
+            $_SESSION['logged-in']  = 1;
+            $_SESSION['email']      = $account->get_email();
+            $_SESSION['account-id'] = $account->get_id();
             
-            $db->execute_query('UPDATE tbl_accounts SET session_id = ? WHERE id = ?', [ session_id(), $account['id'] ]);
+            $account->set_sessionID(session_id());
             
             header('Location: /game');
             exit();
         } else {
             $ip = $_SERVER['REMOTE_ADDR'];
-            $sql_query_get_count       = 'SELECT COUNT(*) AS `count` FROM ' . $_ENV['SQL_LOGS_TBL'] . ' WHERE ' .
-                                            '`ip` = ? AND ' .
-                                            '`date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW() AND ' .
-                                            "`type` = 'FAILED_LOGIN'";
+            $sql_query_get_count = <<<SQL
+                SELECT COUNT(*) AS `count` FROM {$_ENV['SQL_LOGS_TBL']} WHERE
+                    `ip` = ? AND
+                    `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW() AND
+                    `type` = 'FAILED_LOGIN'
+                SQL;
 
             $failed_login_count = $db->execute_query($sql_query_get_count, [$_SERVER['REMOTE_ADDR']])->fetch_assoc()['count'];
 
@@ -72,15 +80,11 @@
             } else {
                 $prepped      = NULL;
                 $sql_datetime = get_mysql_datetime();
-                $sql_query    = "INSERT INTO " . $_ENV['SQL_LOGS_TBL'] . " (date, type, message, ip) VALUES (?, ?, ?, ?)";
-                $login_error  = 'Failed login for IP Address ' . $_SERVER['REMOTE_ADDR'] . ', trying ' . $_REQUEST['login-email'];
+                $sql_query    = "INSERT INTO {$_ENV['SQL_LOGS_TBL']} (date, type, message, ip) VALUES (?, ?, ?, ?)";
+                $login_error  = "Failed login for IP Address {$_SERVER['REMOTE_ADDR']} trying {$_REQUEST['login-email']}";
                 $error_type   = 'FAILED_LOGIN';
 
-                $prepped      = $db->prepare($sql_query);
-                $prepped->bind_param('ssss', $sql_datetime, $error_type, $login_error, $_SERVER['REMOTE_ADDR']);
-
-                $prepped->execute();
-                $result  = $prepped->get_result();
+                $db->execute_query($sql_query, [ $sql_datetime, $error_type, $login_error, $_SERVER['REMOTE_ADDR'] ]);
             }
             
             $log->error('Account login FAILED', [
@@ -129,7 +133,7 @@
                     $password = password_hash($password, PASSWORD_BCRYPT);
                     
                     $sql_query = "INSERT INTO {$_ENV['SQL_LOGS_TBL']} (`type`, `message`, `ip`) VALUES (?, ?, ?)";
-                    $db->execute_query($sql_query, ["AccountCreate", "Account created for user {$account['email']}", $ip_address]);
+                    $db->execute_query($sql_query, [ "AccountCreate", "Account created for user {$account->get_email()}", $ip_address ]);
                     
                     if (check_abuse(AbuseTypes::MULTISIGNUP, $ip_address)) {
                         header('Location: /?abuse_signup');

@@ -5,8 +5,7 @@ A browser-based RPG game written in PHP/JS using the Bootstrap 5 framework
 
 # Getting Started
 
-The recommended method for getting this up and running is using the [AutoInstaller](#AutoInstaller),
-however step-by-step Manual instructions will be covered later.
+The recommended method to install and configure LoA is by using the auto-installer, however, the auto installer is pretty hefty and a work-in-progress. You may find it easier to go through the manual steps provided below if you find yourself running into issues with the autoinstaller. Please report any bugs found and they will be addressed.
 
 ## Download
 
@@ -17,55 +16,76 @@ cd /var/www/html
 git clone https://github.com/Ziddykins/LegendOfAetheria
 cd LegendOfAetheria
 sudo chown -R www-data:www-data .
+find . -type f -exec chmod 0644 {} \+
+find . -type d -exec chmod 0755 {} \+
 ```
 
 ## AutoInstaller
 
-> [!WARNING]
-> This script heavily modifies the target system.
-> While this is the recommended method for setting
-> Legend of Aetheria up, be sure to read and
-> understand how each step affects your system and setup.
-
-The AutoInstaller script was designed to be ran on a fresh install.
-It will take care of just about every aspect of work which needs to be
-created/imported/modified/configured; from fork/clone, right to SSL-enforced,
+The AutoInstaller script works best on a fresh install, but will work with existing setups with a bit of configuration. It will take care of just about every aspect of work which needs to be
+created/imported/modified/configured - from fork/clone, right to SSL-enforced,
 web-accessible browser game (provided your A/CNAME records are set up of course!)
 
-> [!TODO]
-> You can provide the flag `--interactive` if you want to be prompted at each step.
+> [!IMPORTANT]
+> The autoinstaller has a bunch of variables which will > need your attention before it works.
+> This will be made interactive eventually, but for now, > please go through and any section
+> which has the # CONFIG flag, you should adjust to suit  your needs - These will be found at the top of the file and won't > be scattered throughout the code.
+
+The script must be ran as root, so again, be aware of what is going on if you are installing this
+on a machine with existing services (PHP configs, SQL configs, Apache, etc).
 
 ```sh
 cd install
 chmod +x AutoInstaller.pl
-sudo perl AutoInstaller.pl
+sudo ./AutoInstaller.pl
 ```
 
-
-## Manual / Steps
+# Manual Configuration
+> [!TIP]
+> It's best to do these in order
 
 | Step             | Explanation/Manual Setup    |
-| ---------------- | --------------------------- |
-| Software         | [Software](#Software)       |
-| Hostname         | [Hostname](#Hostname)       |
-| Apache           | [Apache](#Apache)           |
-| Certificates/SSL | [SSL](#SSL)                 |
-| PHP Config       | [PHP](#PHP)                 | 
-| Composer         | [Composer](#Composer)       |
-| Templates        | [Templates](#Templates)     |
-| CRON Jobs        | [CRONJobs](#CRONJobs)       |
+| ---------------: | :-------------------------: |
+| Software         | [Jump To](#Software)        |
+| Templates        | [Jump To](#Templates)       |
+| Hostname         | [Jump To](#Hostname)        |
+| Apache           | [Jump To](#Apache)          |
+| Certificates/SSL | [Jump To](#SSL)             |
+| PHP Config       | [Jump To](#PHP)             | 
+| Composer         | [Jump To](#Composer)        |
+| System Services  | [Jump To](#Composer)        |
+| Permissions      | [Jump To](#Permissions)     |
+| CRON Jobs        | [Jump To](#CRONJobs)        |
+| OpenAI           | [Jump To](#OpenAI)          |
+| Clean-Up         | [Jump To](#CleanUp)         |
  
-## Steps
+## Software
 
-### Software
+LoA requires a bunch of packages, which can be installed with the commands below. You'll also need the Sury repository (https://deb.sury.org/).
 
-LoA requires the following packages, which can be installed with:
+#### Sury
+```bash
+apt-get update
 
-```sh
-apt update
-apt upgrade -y
-apt install -y php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-dev php8.3-fpm php8.3-mbstring php8.3-mysql mariadb-server apache2 libapache2-mod-php8.3 composer
+apt-get -y install lsb-release ca-certificates curl
+
+curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
+
+sh -c 'echo "deb [trusted=yes signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+
+apt-get update
 ```
+
+```bash
+apt update && apt upgrade -y
+
+apt install -y php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-dev php8.3-fpm php8.3-mbstring php8.3-mysql mariadb-server apache2 libapache2-mod-php8.3 composer letsencrypt python-is-python3 python3-certbot-apache
+```
+
+
+### Templates
+
+LoA comes packaged with a bunch of template files, which get their values from the AutoInstaller script. Make sure the template values are all filled in, and suit your system and software. The entire SQL schema will be generated and imported. A random password is chosen for the SQL user, 16 characters long.
 
 ### Hostname
 

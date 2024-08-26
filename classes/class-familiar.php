@@ -1,5 +1,7 @@
 <?php
 class Familiar {
+    use HandlePropsAndCols;
+
     protected $id;
     protected $characterID;
     protected $level;
@@ -85,7 +87,7 @@ class Familiar {
 
         foreach ((Array)$this as $key => $val) {
             if ($key !== 'id' && $key !== 'table') {
-                $column = clsprop_to_tblcol(
+                $column = $this->clsprop_to_tblcol(
                     preg_replace("/[^a-zA-Z_]+/", '', $key)
                 );
                 
@@ -152,7 +154,7 @@ class Familiar {
                 break;
             }
             $key = preg_replace("/[^a-zA-Z_]/", '', $key);
-            $table_column = clsprop_to_tblcol($key);
+            $table_column = $this->clsprop_to_tblcol($key);
             $log->error("key: $key tblcol: $table_column");
             $this->$key = $familiar[$table_column];
         }
@@ -232,7 +234,7 @@ class Familiar {
 
         if (strncasecmp($method, "set_", 4) === 0) {
             $sql_query =  'UPDATE ' . $this->table . ' ';
-            $table_col = clsprop_to_tblcol($var);
+            $table_col = $this->clsprop_to_tblcol($var);
 
             if (is_int($params[0])) {
                 $sql_query .= "SET `$table_col` = " . $params[0] . " ";

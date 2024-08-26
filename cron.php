@@ -38,14 +38,20 @@
     }
     
     function do_hourly() {
+        global $log;
         cycle_weather();
+        $log->info("Hourly cron tick: " . time());
     }
     
     function do_daily() {
+        global $log;
         revive_all_players();
+        $log->info("Daily cron tick: " . time());
     }
     
     function cycle_weather() {
+        global $log;
+
         $cur_weather = get_globals('weather');
         $new_weather = Weather::random();
 
@@ -53,7 +59,10 @@
             $new_weather = Weather::random();
         }
         
-        set_globals('weather', $new_weather);
+        set_globals('weather', $new_weather->name);
+
+        $log->info("Weather change: $cur_weather -> {$new_weather->name}");
+        
     }
     
     function revive_all_players() {

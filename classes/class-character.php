@@ -9,6 +9,8 @@
         protected $stats;
         protected $inventory;
 
+        use HandlePropsAndCols;
+
         public function __construct($accountID, $email) {
             $this->email = $email;
             $this->accountID    = $accountID;
@@ -65,7 +67,6 @@
 
         function __call($method, $params) {
             global $log, $db;
-            $caller = debug_backtrace()[1]['function'];
 
             $var = lcfirst(substr($method, 4));
 
@@ -75,7 +76,7 @@
 
             if (strncasecmp($method, "set_", 4) === 0) {
                 $sql_query =  'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . ' ';
-                $table_col = clsprop_to_tblcol($var);
+                $table_col = $this->clsprop_to_tblcol($var);
 
                 if (is_int($params[0])) {
                     $sql_query .= "SET `$table_col` = " . $params[0] . " ";

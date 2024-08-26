@@ -7,6 +7,18 @@
     $max_mp       = $character['max_mp'];
     $max_ep       = $character['max_ep'];
 
+    $ep_icon  = 'bi-battery-full';
+    $ep_color = 'success';
+    $ep_percent_full = ($cur_ep / $max_ep) * 100;
+    
+    if ($ep_percent_full > 25 && $ep_percent_full < 75) {
+        $ep_icon  = 'bi-battery-half';
+        $ep_color = 'warning';
+    } elseif ($ep_percent_full >= 0 && $ep_percent_full <= 25) {
+        $ep_icon  = 'bi-battery';
+        $ep_color = 'danger';
+    }
+
     $ap = $character['ap'];
 ?>
 
@@ -33,11 +45,10 @@
                 </div>
             </div>
             <div class="row">
-                <div class="d-flex align-items-center col josefin-slab-text">
-                    <i class="bi bi-heart"></i>  Health: <?php echo "$cur_hp/$max_hp"; ?>
-
-                    
-                    
+                <div class="d-flex flex-column josefin-slab-text">
+                    <span><i class="bi bi-heart"></i> <span class="major-mono-display-regular">H</span>ealth: <?php echo "$cur_hp/$max_hp"; ?></span>
+                    <span><i class="bi bi-bookmark-star"></i> <span class="major-mono-display-regular">M</span>agick: <?php echo "$cur_mp/$max_mp"; ?></span>
+                    <span><?php echo "<i class=\"bi $ep_icon $ep_color\"></i>"; ?> <span class="major-mono-display-regular">E</span>nergy: <?php echo "$cur_ep/$max_ep"; ?></span>
                 </div>
             </div>
         </div>

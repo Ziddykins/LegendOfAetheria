@@ -5,6 +5,61 @@
     require_once 'classes/class-monster.php';
 
     /**
+     * Trait to handle conversions between class properties <=> SQL table columns.
+     */
+    trait HandlePropsAndCols {
+        /**
+         * Convert a class property to a table column name.
+         *
+         * @param string $property The class property.
+         * @return string Returns the corresponding table column name.
+         */
+        function clsprop_to_tblcol($property) {
+            $splits = preg_split('/(?=[A-Z]{1,2})/', $property);
+
+            if (count($splits) === 1) {
+                return $property;
+            }
+
+            $table_column = $splits[0] . '_' . strtolower($splits[1]);
+
+            if (isset($splits[2])) {
+                $table_column .= strtolower($splits[2]);
+            }
+
+            return $table_column;
+        }
+
+        /**
+         * Converts a table column name to a class property.
+         *
+         * @param string $column The table column name.
+         * @return string Returns the corresponding class property.
+         *
+         * @throws Exception If the column name does not match the expected format.
+         */
+        function tblcol_to_clsprop($column) {
+            $splits = preg_split('/_/', $column);
+
+            if (count($splits) === 1) {
+                return $column;
+            }
+
+            if ($splits[1] === 'id') {
+                $class_property = $splits[0]. strtoupper($splits[1]);
+            } else {
+                $class_property = $splits[0] . ucfirst($splits[1]);
+            }
+
+            if (isset($splits[2])) {
+                $class_property .= ucfirst($splits[2]);
+            }
+
+            return $class_property;
+        }
+    }
+
+    /**
      * Retrieves a MySQL datetime string based on the provided modifier.
      *
      * This function takes an optional modifier parameter, which defaults to 'now'.
@@ -106,7 +161,7 @@
     function get_globals($which) {
         global $db;
         $ret_val = '';
-        $sql_query = 'SELECT `value` FROM ' . $_ENV['SQL_GLBL_TBL'] . " WHERE `name` = '$which'";
+        $sql_query = "SELECT `value` FROM {$_ENV['SQL_GLBL_TBL']} WHERE `name` = '$which'";
         $result = $db->query($sql_query);
         $row = $result->fetch_assoc();
         
@@ -127,8 +182,7 @@
     function set_globals($name, $value) {
         global $db;
         
-        $sql_query = "UPDATE `tbl_globals` SET `value` = '$value'" .
-                        " WHERE `name` = '$name'";
+        $sql_query = "UPDATE {$_ENV['SQL_GLBL_TBL']} SET `value` = '$value' WHERE `name` = '$name'";
         $db->query($sql_query);
     }
     
@@ -307,35 +361,6 @@
 
         print_r($result);
         die();
-    }
-
-    /**
-     * Converts a class property name to a corresponding table column name.
-     *
-     * @param string $property The name of the class property.
-     * @return string The corresponding table column name.
-     *
-     */    
-    function clsprop_to_tblcol($property) {
-        global $log;
-
-        // Split the property name at each capital letter, allowing for two capital letters in a row.
-        // This is to handle cases where the property name follows a camelCase convention.
-        $splits = preg_split('/(?=[A-Z]{1,2})/', $property); 
-
-        $log->debug(print_r($splits, 1)); 
-
-        if (count($splits) === 1) {
-            return $property;
-        }
-
-        $table_column = $splits[0]. '_'. strtolower($splits[1]);
-
-        if (isset($splits[2])) {
-            $table_column.= strtolower($splits[2]);
-        }
-
-        return $table_column;
     }
 
     /**
