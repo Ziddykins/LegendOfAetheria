@@ -132,8 +132,8 @@
                     
                     $password = password_hash($password, PASSWORD_BCRYPT);
                     
-                    $sql_query = "INSERT INTO {$_ENV['SQL_LOGS_TBL']} (`type`, `message`, `ip`) VALUES (?, ?, ?)";
-                    $db->execute_query($sql_query, [ "AccountCreate", "Account created for user {$account->get_email()}", $ip_address ]);
+                    //$sql_query = "INSERT INTO {$_ENV['SQL_LOGS_TBL']} (`type`, `message`, `ip`) VALUES (?, ?, ?)";
+                    //$db->execute_query($sql_query, [ "AccountCreate", "Account created for user {$account->get_email()}", $ip_address ]);
                     
                     if (check_abuse(AbuseTypes::MULTISIGNUP, $ip_address)) {
                         header('Location: /?abuse_signup');

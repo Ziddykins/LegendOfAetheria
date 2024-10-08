@@ -23,7 +23,7 @@ function save_settings(which) {
     if (which == 'ip_lock') {
         $.ajax({
             type: "POST",
-            url: "/save-settings",
+            url: "/save",
             data: `save=ip_lock&ip=${ip_address}&status=${toggle_sw}`,
             success: function(ret) {
                 $("#status-msg").fadeIn(1000);

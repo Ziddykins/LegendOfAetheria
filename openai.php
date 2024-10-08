@@ -8,37 +8,35 @@
     require_once 'constants.php';
     require_once 'functions.php';
 
+
+
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 
+    $account   = table_to_obj($_SESSION['email'], 'account');
+    $character = table_to_obj($account['id'], 'character');
+
+  
     if (isset($_REQUEST['generate_description']) 
             && $_REQUEST['generate_description'] == 1
             && isset($_REQUEST['characterID'])) {
+
         
         $credits = $account['credits'];
 
-        if ($ai_credits < 1) {
+    
+        if ($credits < 1) {
             echo "Not Enough Credits\n";
             exit();
         } else {
-            $ai_credits--;
+            $sql_query = 'UPDATE tbl_accounts SET credits = credits - 1 WHERE id = ?';
+            $account['credits']--;
+            $db->execute_query($sql_query, [ $account['id'] ]);
         }
 
-        $sql_query = "SELECT `char.name`, `char.race`, `ch.account_id`, `acct.credits` " .
-                     "FROM " . $_ENV['SQL_CHAR_TBL'] . " AS `char` " .
-                     "JOIN " . $_ENV['SQL_ACCT_TBL'] . " AS `acct` " .
-                     "ON ch.`account_id` = `acct.id` " .
-                     "WHERE id = ?";
+        $sql_query = "SELECT ch.`name`, ch.`race`, ch.`account_id`, ac.`credits` FROM {$_ENV['SQL_CHAR_TBL']} AS `ch` JOIN {$_ENV['SQL_ACCT_TBL']} AS `ac` ON (ch.`account_id` = ac.`id`) WHERE ac.`id` = ?;";
 
-        $prepped = $db->prepare($sql_query);
-        $prepped->bind_param('d', $_REQUEST['characterID']);
-        $prepped->execute();
-        
-        $result    = $prepped->get_result();
-        $character = $result->fetch_assoc();
-
-        $sql_query = "UPDATE " . $_ENV['SQL_ACCT_TBL'] . " " .
-                     "SET ai_credits = ?";
+        $db->execute_query($sql_query, [ $account['id'] ]);
 
         $api_endpoint = 'https://api.openai.com/v1/chat/completions';
         
@@ -71,9 +69,10 @@
             $chatbot->doRequest(HttpMethod::POST, $data)
         );
 
-        $content = $response->choices[0]->message->content;
+
+        $content       = $response->choices[0]->message->content;
         $finish_reason = $response->choices[0]->finish_reason;
-        $description = "";
+        $description   = "";
 
         if ($finish_reason == 'length') {
             $tmp = explode("\n\n", $content);
@@ -83,7 +82,7 @@
             }
         }
 
-        /*echo $description;*/
+        echo $content;
     } else {
         echo "Invalid Query";
     }
