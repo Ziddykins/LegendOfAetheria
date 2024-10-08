@@ -35,7 +35,7 @@ $GAME_WEB_ROOT =~ s/\/$//;
 make_path($GAME_WEB_ROOT);
 
 print "Please enter a FQDN/domain to be used for the virtual host (e.g. loa.example.com):\n";
-chomp($FQDN = <STDIN>);
+chomp(my $FQDN = <STDIN>);
 
 
 my $LOG_TO_FILE       = 'setup.log';
@@ -259,7 +259,6 @@ sub install_software {
         tell_user('INFO', 'Sury repo entries already present');
     } else {
         tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
-
         tell_user('SYSTEM', `sh $GAME_SCRIPTS_DIR/sury_setup.sh`);
     }
 

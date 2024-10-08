@@ -10,11 +10,6 @@
         $header_charname = $character['name'] . "'";
     }
 ?>
-
-
-
-
-
     <div class="container">
         <div class="row pt-5">
             <div class="col">
@@ -109,7 +104,7 @@
 
                             <div class="mb-3">
                                 <label for="character-description" class="form-label fw-bold">Character Description:</label>
-                                <textarea class="form-control" id="character-description" name="character-description" rows="3"><?php echo $character['description']; ?></textarea>
+                                <textarea class="form-control" id="character-description" name="character-description" rows="3" width><?php echo $character['description']; ?></textarea>
                             </div>
 
                             <div class="mb-3">
@@ -164,34 +159,33 @@
                 function () {
                     let icon_par = element.parentElement;
                     id = '#' + $(element)[0].children[0].id;
-                    
-                    
-                    
+
                     if (id == '#clear-icon') {
                         document.getElementById("character-description").textContent = "";
                     } else {
+                        let do_ajax = 0;
+                        let data    = null;
+                        let url     = null;
+
                         $(id).hide();
                         $(element).prepend('<span id="spinner" class="spinner-border spinner-border-sm">');
                         icon_par.classList.add('disabled');
                     
-                        let do_ajax = 0;
-                        let data    = null;
-                        let url     = null;
+
                         
                         if (id == "#save-icon") {
                             url = "/game?page=save";
                             data = {
                                 type: 'character',
                                 id: <?php echo $character['id']; ?>,
-                                tdata: {
-                                    "description": document.getElementById("character-description").textContent
-                                }
+                                data: JSON.stringify(document.getElementById("character-description").textContent)
                             };
                             do_ajax = 1;
                         } else if (id == "#generate-icon") {
                             url = "openai";
                             data = { 
                                 characterID: <?php echo $character['id']; ?>,
+                                accountID: <?php echo $account['id']; ?>,
                                 generate_description: 1
                             };
                             do_ajax = 1;
@@ -222,6 +216,7 @@
         function(e) {
             let new_pass = document.querySelector("#profile-new-password").value;
             let pass_confirm = document.querySelector("#profile-confirm-password").value;
+
             if (new_pass !== pass_confirm) {
                 e.preventDefault();
                 e.stopPropagation();

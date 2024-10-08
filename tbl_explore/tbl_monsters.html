@@ -1,0 +1,20 @@
+<pre>
++--------------+------------------------+------+-----+----------------------------------------+----------------+
+| Field        | Type                   | Null | Key | Default                                | Extra          |
++--------------+------------------------+------+-----+----------------------------------------+----------------+
+| id           | int(10) unsigned       | NO   | PRI | NULL                                   | auto_increment |
+| scope        | enum('Global','Local') | YES  |     | NULL                                   |                |
+| account_id   | int(10) unsigned       | YES  |     | 0                                      |                |
+| name         | varchar(255)           | YES  |     | NULL                                   |                |
+| hp           | bigint(20) unsigned    | YES  |     | NULL                                   |                |
+| max_hp       | bigint(20) unsigned    | YES  |     | NULL                                   |                |
+| mp           | bigint(20) unsigned    | YES  |     | NULL                                   |                |
+| max_mp       | bigint(20) unsigned    | YES  |     | NULL                                   |                |
+| strength     | int(10) unsigned       | YES  |     | NULL                                   |                |
+| intelligence | int(10) unsigned       | YES  |     | NULL                                   |                |
+| defense      | int(10) unsigned       | YES  |     | NULL                                   |                |
+| drop_level   | int(10) unsigned       | YES  |     | NULL                                   |                |
+| expires      | datetime               | YES  |     | (current_timestamp() + interval 7 day) |                |
+| exp_awarded  | bigint(20) unsigned    | YES  |     | NULL                                   |                |
+| gold_awarded | bigint(20) unsigned    | YES  |     | NULL                                   |                |
++--------------+------------------------+------+-----+----------------------------------------+----------------+
