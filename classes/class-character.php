@@ -18,14 +18,6 @@
             $this->inventory = new Inventory(MAX_STARTING_INVSLOTS, MAX_STARTING_INVWEIGHT);
             $this->stats     = new Stats();
         }
-            
-        private function setStat(Stats $stat, $value) {
-            $this->stats->$stat = $value;
-        }   
-        
-        private function getStat(Stats $stat) {
-            return $this->stats->$stat;
-        }
 
         private function saveCharacter($accountID, Character $character, $slot = 0) {
             global $db, $log;
@@ -34,13 +26,9 @@
             $serializedInventory = serialize($this->inventory);
             $serializedStats     = serialize($this->stats);
 
-            $serializedCompleteCharacter = $serializedCharacter . '###' .
-                                           $serializedInventory . '###' .
-                                           $serializedStats     . '###';
+            $serializedCompleteCharacter = "$serializedCharacter###$serializedInventory###$serializedStats";
 
-            $sqlQuery = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
-                         "SET `serialized_character` = ? " .
-                         "WHERE `id` = ?";
+            $sqlQuery = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `serialized_character` = ? WHERE `id` = ?";
 
             $db->execute_query($sqlQuery, [$serializedCompleteCharacter, $accountID])->fetch_assoc();
             
@@ -51,16 +39,24 @@
         private function loadCharacter($accountID) {
             global $db, $log;
 
-            $sqlQuery = 'SELECT `serialized_character` ' .
-                         'FROM ' . $_ENV['SQL_ACCT_TBL'] . 
-                         " WHERE `id` = ?";
+            $sqlQuery = "SELECT `serialized_character` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
 
             $serializedCompleteCharacter = $db->execute_query($sqlQuery, [$accountID])->fetch_assoc();
             [$serializedCharacter, $serializedInventory, $serializedStats] = explode('###', $serializedCompleteCharacter);
 
             $character = unserialize($serializedCharacter);
-            $inventory = unserialize($serializedInventory);
-            $stats     = unserialize($serializedStats);
+            $character->inventory = unserialize($serializedInventory);
+            $character->stats     = unserialize($serializedStats);
+
+            $log->debug(
+                "Loaded character {$character['name']} from account ID $accountID",
+                [
+                     'full'      => $serializedCompleteCharacter,
+                     'character' => $serializedCharacter,
+                     'inventory' => $serializedInventory,
+                     'stats'     => $serializedStats
+                ]
+            );
             
             return $character;
         }
@@ -68,15 +64,15 @@
         function __call($method, $params) {
             global $log, $db;
 
-            $var = lcfirst(substr($method, 4));
-
+            $prop = lcfirst(substr($method, 4));
+            
             if (strncasecmp($method, "get_", 4) === 0) {
-                return $this->$var;
-            }
+                return $this->$prop;
+            } elseif (strncasecmp($method, "set_", 4) === 0) {
+                $sql_query = 'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . ' ';
+                $table_col = $this->clsprop_to_tblcol($prop);
 
-            if (strncasecmp($method, "set_", 4) === 0) {
-                $sql_query =  'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . ' ';
-                $table_col = $this->clsprop_to_tblcol($var);
+
 
                 if (is_int($params[0])) {
                     $sql_query .= "SET `$table_col` = " . $params[0] . " ";
@@ -87,9 +83,9 @@
                 $sql_query .= 'WHERE `id` = ' . $this->accountID;
 
                 $db->query($sql_query);
-                $this->$var = $params[0];
+                $this->$prop = $params[0];
 
-                $log->info("'set_' triggered for var '\$this->$var'; assigning '" . $params[0] . "' to it",
+                $log->info("'set_' triggered for var '\$this->$prop'; assigning '" . $params[0] . "' to it",
                     [ 
                         'SQLQuery' => $sql_query,
                         'CallingFunc' => $caller,
@@ -129,7 +125,7 @@
                 $this->slots[$i] = new Slot();
             }
             
-            $this->currentWeight    = 0;
+            $this->currentWeight = 0;
             $this->maxWeight = $maxWeight;
 
             $this->nextAvailableSlot = 0;

@@ -45,7 +45,7 @@
             $api_endpoint
         );
 
-        $chatbot->set_model('gpt-3.5-turbo');
+        $chatbot->set_model('gpt-3.5-turbo-1106');
         $chatbot->set_maxTokens(200);
 
         $prompt = "Generate a character description for a(n) " . $character['race'] . " named " . $character['name'];

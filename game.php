@@ -24,9 +24,11 @@
     }
 
     $monster_pool = new MonsterPool;
+    
     load_monster_sheet($monster_pool);
-
+    
     $account   = table_to_obj($_SESSION['email'], 'account');
+
     /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         $character = table_to_obj($account['id'], 'character');
@@ -91,14 +93,14 @@
                         <div class="d-flex flex-column">
                             <ul class="nav nav-flush flex-column mb-auto" id="menu">
                                 <li class="border rounded w-100">
-                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary text-white" data-bs-toggle="collapse">
+                                <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary text-white" data-bs-toggle="collapse" aria-expanded="true">
                                         <i class="fs-5 bi <?php echo $char_menu_icon; ?>"></i>
                                         <span class="d-none d-md-inline">Character</span>
                                     </a>
                                     
                                     <ul id="menu-header-character" class="nav nav-pills collapse nav-flush flex-column bg-body-secondary" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
-                                            <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link text-decoration-none">
+                                            <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link text-decoration-none d-md-inline text-center">
                                                 <span class="material-symbols-sharp">account_circle</span>
                                                 <span class="d-none d-md-inline"> Sheet</span>
                                             </a>
@@ -278,7 +280,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" id="menu-sub-achievements" name="menu-sub-achievements" class="nav-link">
+                                            <a href="?page=achievements" id="menu-sub-achievements" name="menu-sub-achievements" class="nav-link">
                                                 <span class="material-symbols-sharp">military_tech</span>
                                                 <span class="d-none d-lg-inline">Achievements</span>
                                             </a>

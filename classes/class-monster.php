@@ -36,7 +36,6 @@ class Monster {
     */
     public function __call($method, $params) {
         global $log, $db;
-        $caller = debug_backtrace()[1]['function'];
 
         $var = lcfirst(substr($method, 4));
 
