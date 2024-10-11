@@ -1,5 +1,5 @@
 <?php
-    $header_charname = $character['name'] . "'s";
+    $header_charname = $character['name'];
     
     if (substr($character['name'], -1, 1) == "s") {
         $header_charname = $character['name'] . "'";
@@ -34,28 +34,36 @@
                     <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
                         <div class="row text-center">
                             <div class="col">
-                                <h3><?php echo $_SESSION['name']; ?>'s Account</h3>
+                                <h3><?php echo $header_charname; ?> Account</h3>
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label for="staticEmail" class="col-sm-2 col-form-label fw-bold">Email:</label>
-                            <div class="col-sm-10">
-                                <span><?php echo $account['email']; ?></span>
+                            <label for="account-email" class="col-form-label fw-bold">Email:</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="account-email" name="account-email" value="<?php echo $account['email'] ?>" disabled>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                        <label for="account-registered" class="col-form-label fw-bold">Date Registered:</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="account-registered" name="account-registered" value="<?php echo $account['date_registered']; ?>" disabled>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="account-privileges" class="col-form-label fw-bold">Privileges:</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="account-privileges" name="account-privileges" value="<?php echo $account['privileges']; ?>" disabled>
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <label for="staticEmail" class="col-sm-2 col-form-label fw-bold">Date Registered:</label>
-                            <div class="col-sm-10">
-                                <span><?php echo $account['date_registered']; ?></span>
-                            </div>
-                        </div>
-
-                        <div class="mb-3 row">
-                            <label for="staticEmail" class="col-sm-2 col-form-label fw-bold">Privileges:</label>
-                            <div class="col-sm-10">
-                                <span><?php print $account['privileges'] ?></span>
+                            <label for="character-race" class="col-form-label fw-bold">LoAI Credits</label>
+                            <div class="col">
+                                <input type="text" class="form-control" id="account-credits" name="account-credits" value="<?php echo $account['credits']; ?>" disabled>
+                                <small>Credits can be used for some OpenAI generation, such as your character's description below. Each generation costs 1 credit</small>
                             </div>
                         </div>
 
@@ -87,7 +95,7 @@
                     </div>
 
                     <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
-                        <div class="container row-cols-3">
+                        <div class="container row-cols-2">
                             <div class="mb-3 row">
                                 <label for="character-name" class="col-form-label fw-bold">Character Name:</label>
                                 <div class="col">
@@ -101,7 +109,7 @@
                                     <input type="text" class="form-control" id="character-race" name="character-race" value="<?php echo $character['race']; ?>" disabled>
                                 </div>
                             </div>
-
+                            
                             <div class="mb-3">
                                 <label for="character-description" class="form-label fw-bold">Character Description:</label>
                                 <textarea class="form-control" id="character-description" name="character-description" rows="3" width><?php echo $character['description']; ?></textarea>
@@ -170,9 +178,7 @@
                         $(id).hide();
                         $(element).prepend('<span id="spinner" class="spinner-border spinner-border-sm">');
                         icon_par.classList.add('disabled');
-                    
 
-                        
                         if (id == "#save-icon") {
                             url = "/game?page=save";
                             data = {

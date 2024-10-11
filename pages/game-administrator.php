@@ -1,5 +1,7 @@
 <?php
-    if ($user_privs->value < UserPrivileges::OWNER->value) {
+    $user_privs = UserPrivileges::name_to_enum($account['privileges']);
+
+    if ($user_privs->value < UserPrivileges::ADMINISTRATOR->value) {
         echo "F O R B I D D E N";
         exit();
     }
@@ -190,7 +192,7 @@ if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) {
         }
         
         $openai_apikey = $_ENV['OPENAI_APIKEY'];    
-        $OpenAI = new OpenAI($openai_apikey,'$endpoint');
+        $OpenAI = new OpenAI($openai_apikey, $endpoint);
         
         $headers = [
             'Content-Type'  => 'application/json',
@@ -203,24 +205,23 @@ if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) {
         $OpenAI->set_imageSize("256x256");
 
         $OpenAI->buildRequest();
+        echo '<pre>';
         $OpenAI->showPayload();
         
         $response = $OpenAI->doRequest(
             HttpMethod::POST,
-            $headers,
             $OpenAI->get_payload()
         );
-        print_r("PAYLOAD:");
-        print_r($response);
-        exit();
+        print_r("RESPONSE:");
+        
     } else {
         echo "sry no";
-        print_r($_REQUEST);
         exit();
     }
 
     $json_obj = json_decode($response);
-    print_r($json_obj);
+
+    echo '<img src="' . $json_obj->data[0]->url. '"></img>';
     exit();
     
     echo '<div class="d-flex container">';

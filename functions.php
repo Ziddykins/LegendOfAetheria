@@ -14,6 +14,7 @@
          * @param string $property The class property.
          * @return string Returns the corresponding table column name.
          */
+        
         function clsprop_to_tblcol($property) {
             $splits = preg_split('/(?=[A-Z]{1,2})/', $property);
 

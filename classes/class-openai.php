@@ -18,21 +18,21 @@
         }
 
         public function doRequest($method, $data) {
-            $ch = curl_init($this->endPoint);
-            
-            $default_headers = [];
-            $default_headers[] = 'Content-Type: application/json';
-            $default_headers[] = 'Authorization: Bearer ' . $this->apiKey;
+            $ch = curl_init();
 
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $default_headers);
+            curl_setopt($ch, CURLOPT_URL, $this->endPoint);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $this->apiKey
+            ]);
             curl_setopt($ch, CURLOPT_TIMEOUT, 30);
             
             if ($method == HttpMethod::POST) {
                 curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
             }
             
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             
             $response = curl_exec($ch);
 
@@ -46,9 +46,8 @@
                 $data = [
                     "model"  => $this->imageModel,
                     "prompt" => $this->imagePrompt,
-                    "n"      => $this->imageCount,
-                    "size"   => $this->imageSize,
-                    "max_tokens" => $this->maxTokens
+                    "n"      => 1,
+                    "size"   => "1024x1024"
                 ];
                 $this->payload = json_encode($data);
             } else {
