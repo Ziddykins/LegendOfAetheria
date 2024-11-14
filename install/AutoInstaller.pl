@@ -386,7 +386,7 @@ sub apache_enables {
     tell_user('SYSTEM', "          conf result: $conf_output");
     tell_user('SYSTEM', "          mods result: $mods_output");
     tell_user('SYSTEM', "site (non-ssl) result: $sites_output");
-    tell_user('SYSTEM', "     site (ssl) resul: $sites_ssl_output");
+    tell_user('SYSTEM', "    site (ssl) result: $sites_ssl_output");
 
     if ($success) {
         tell_user('SUCCESS', "Apache configuration completed");
@@ -400,8 +400,35 @@ sub apache_enables {
 
 #Step: PHP configurations
 sub update_php_confs {
-    if (check_platform() eq 'linux' && $PHP_INI_FILE eq 'unset') {
-        $PHP_INI_FILE = "/etc/php/$PHP_VERSION/php.ini";
+    if (check_platform() eq 'linux') {
+        my @keys = qw/expose_php error_reporting display_errors display_startup_errors allow_url_fopen allow_url_include session.gc_maxlifetime disable_functions session.cookie_domain session.use_strict_mode session.use_cookies session.cookie_lifetime session.cookie_secure session.cookie_httponly session.cookie_samesite session.cache_expire/;
+        my $ini_contents;
+        my $template_file;
+
+        if ($PHP_INI_FILE eq 'unset') {
+            $PHP_INI_FILE = "/etc/php/$PHP_VERSION/php.ini";
+        }
+
+        {
+            local $/;
+            open my $t_fh, '<', 'install\templates\php.template' or die "Couldn't open template file for read: $!\n";
+            $template_file = <$t_fh>;
+            close $t_fh;
+        }
+
+
+        {
+            local $/;
+            open my $fh, '<', $PHP_INI_FILE or die "Couldn't open '$PHP_INI_FILE' for read: $!\n";
+            $ini_contents = <$fh>;
+            close $fh;
+        }
+
+        foreach my $key (@keys) {
+            $ini_contents =~ s/$key ?=.*?$[\r\n]//;
+        }
+
+        file_write('install\templates\php.template', $PHP_INI_FILE, 'file', 1);
     } else {
         $PHP_INI_FILE = 'C:\xampp\php\php.ini';
     }
