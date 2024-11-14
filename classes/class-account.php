@@ -53,8 +53,10 @@
 
             $result = $db->execute_query($query, [$id])->fetch_assoc();
 
+            print_r($result);
+
             if (!$result) {
-                header('Location: /login');
+                header('Location: /');
                 exit();
             }
 

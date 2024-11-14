@@ -41,21 +41,6 @@
             return $response;
         }
 
-        public function buildRequest() {
-            if ($this->imageCount && $this->imagePrompt) {
-                $data = [
-                    "model"  => $this->imageModel,
-                    "prompt" => $this->imagePrompt,
-                    "n"      => 1,
-                    "size"   => "1024x1024"
-                ];
-                $this->payload = json_encode($data);
-            } else {
-                echo "something missing";
-                exit();
-            }
-        }
-
         public function showPayload() {
             if (isset($this->payload)) {
                 print_r($this->payload);

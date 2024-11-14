@@ -1,31 +1,56 @@
 <?php
-
     $account   = table_to_obj($_SESSION['email'], 'account');
     $character = table_to_obj($account['id'], 'character');
-
+    $monster   = null;
     
+    if (!$character['monster']) {
+        $monster   = $monster_pool->random_monster();
+        $name = $monster->get_name();
+        $hp = $monster->get_hp();
+        $maxHP = $monster->get_maxHP();
+        $mp = $monster->get_mp();
+        $maxMP = $monster->get_maxMP();
+        $str = $monster->get_strength();
+        $int = $monster->get_intelligence();
+        $def = $monster->get_defense();
+    } else {
+        $monster = $character->get_monster();
+    }
 ?>
-<div class="row row-cols-4 border border-1 text-white">
+
+<div class="row row-cols-4 border border-1">
     <div class="col pt-3">
-        <img src="img/enemies/enemy-kobold.webp" style="width: 100%;"/>
+        <img src="img/enemies/enemy-kobold.webp" width="100" height="100" class="rounded-circle"/>
     </div>
     <div class="col">
         <div class="row">
             <div class="col">
-                Name: Kobold
+                Name: <?php echo $name; ?>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                Health: 100/100
+                Health: <?php echo "$hp/$maxHP"; ?>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                Resist: 492
+                Magic : <?php echo "$mp/$maxMP"; ?>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                STR: <?php echo $str; ?>
+            </div>
+            <div class="col">
+                DEF: <?php echo $def; ?>
+            </div>
+            <div class="col">
+                INT: <?php echo $int; ?>
             </div>
         </div>
     </div>
+
     <div class="col">
         <div class="row">
             <div class="col">

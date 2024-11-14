@@ -4,16 +4,18 @@
                             <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-tab-pane" type="button" role="tab" aria-controls="login-tab-pane" aria-selected="true" onclick=tgl_active_signup(this)>
                             <i class="fa-sm bi bi-diamond-fill" style="font-size: 10px;"></i> Login</button>
                         </li>
+
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register-tab-pane" type="button" role="tab" aria-controls="register-tab-pane" aria-selected="false" onclick=tgl_active_signup(this)>
                                 <i class="fa-sm bi bi-diamond"  style="font-size: 10px;"></i> Register</button>
                         </li>
+
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false" onclick=tgl_active_signup(this)>
-                                <i class="bi bi-xs bi-diamond" style="font-size: 10px;"></i> Contact</button>
+                                <i class="bi bi-xs bi-diamond" style="font-size: 10px;"></i> Contact
+                            </button>
                         </li>
                     </ul>
-                    
 
                     <div class="tab-content" id="login-box-content">
                         <p></p>
@@ -24,6 +26,7 @@
                                         <div class="p-2"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
                                     </div>
                                 </div>
+
                                 <div class="input-group">
                                     <span class="input-group-text rounded-0" id="icon-email"><i class="bi bi-envelope-plus"></i></span>
                                     <div class="form-floating flex-grow-1">
@@ -31,6 +34,7 @@
                                         <label for="login-email">E-mail</label>
                                     </div>
                                 </div>
+
                                 <div class="input-group mb-3">
                                     <span class="input-group-text rounded-0" id="icon-password"><i class="bi bi-key"></i></span>
                                     <div class="form-floating flex-grow-1">
@@ -38,9 +42,12 @@
                                         <label for="login-password">Password</label>
                                     </div>
                                 </div>
-                                <button class="btn btn-primary mb-3" id="login-submit" name="login-submit" value="1">
-                                    <i class="bi bi-door-open-fill"></i> Login
-                                </button>
+
+                                <div class="vstack gap-1">                                    
+                                    <button class="btn btn-primary mb-1" id="login-submit" name="login-submit" value="1" onclick=google_login>
+                                        <i class="bi bi-door-open-fill"></i> Login
+                                    </button>
+                                </div>
                             </form>
                         </div>
 
@@ -48,12 +55,19 @@
                             <form id="register-form" name="register-form" action="/" method="POST">
                                 <div>
                                     <div class="d-flex bg-body-secondary border">
-                                        <div class="p-2 flex-grow-1"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
+                                        <div class="p-2 flex-grow-1">
+                                            <h6>
+                                                <i class="bi bi-person-fill-gear"></i> Account
+                                            </h6>
+                                        </div>
                                     </div>
 
                                     <div>
                                         <div class="input-group">
-                                            <span class="input-group-text rounded-0" id="register-icon-email"><i class="bi bi-envelope-plus"></i></span>
+                                            <span class="input-group-text rounded-0" id="register-icon-email">
+                                                <i class="bi bi-envelope-plus"></i>
+                                            </span>
+
                                             <div class="form-floating flex-grow-1">
                                                 <input type="email" class="form-control" aria-label="Email" aria-describedby="register-icon-email" id="register-email" name="register-email" placeholder="Email" required>
                                                 <label for="login-email">E-mail</label>
@@ -61,7 +75,9 @@
                                         </div>
 
                                         <div class="input-group">
-                                            <span class="input-group-text rounded-0" id="register-icon-password"><i class="bi bi-key"></i></span>
+                                            <span class="input-group-text rounded-0" id="register-icon-password">
+                                                <i class="bi bi-key"></i>
+                                            </span>
                                             <div class="form-floating flex-grow-1">
                                                 <input type="password" class="form-control" id="register-password" name="register-password" placeholder="Password" aria-label="Password" aria-describedby="register-icon-password" required>
                                                 <label for="login-password">Password</label>
@@ -69,7 +85,10 @@
                                         </div>
 
                                         <div class="input-group">
-                                            <span class="input-group-text rounded-0" id="register-icon-password"><i class="bi bi-key"></i><sup style="margin-left: -12px; margin-top: -8px;">x2</sup></span>
+                                            <span class="input-group-text rounded-0" id="register-icon-password">
+                                                <i class="bi bi-key"></i>
+                                                <sup style="margin-left: -12px; margin-top: -8px;">x2</sup>
+                                            </span>
                                             <div class="form-floating flex-grow-1">
                                                 <input type="password" class="form-control" id="register-password-confirm" name="register-password-confirm" placeholder="Password (Confirm)" aria-label="Password" aria-describedby="register-icon-password-confirm" required>
                                                 <label for="login-password">Password (Confirm)</label>
@@ -79,7 +98,11 @@
                                 </div>
                                 <div>
                                     <div class="d-flex bg-body-secondary border">
-                                        <div class="p-2 flex-grow-1"><h6><i class="bi bi-emoji-laughing-fill"></i> Character</h6></div>
+                                        <div class="p-2 flex-grow-1">
+                                            <h6>
+                                                <i class="bi bi-emoji-laughing-fill"></i> Character
+                                            </h6>
+                                        </div>
                                     </div>
                                 
                                     <div class="input-group">
@@ -113,6 +136,7 @@
                                         <span class="input-group-text rounded-0" id="register-icon-avatar">
                                             <i class="bi bi-person-bounding-box"></i>
                                         </span>
+
                                         <select class="form-select form-select form-control" aria-label=".form-select" id="avatar-select" name="avatar-select" style="font-size: 1.00rem" required>
                                             <option value="select avatar" disabled selected>select avatar</option>
                                             <?php
@@ -133,10 +157,12 @@
                                             <!-- avatar img placeholder -->
                                         </div>
                                     </div>
-                                    <script>$("#avatar-select").change(function(event) {
-                                        document.getElementById("avatar-img").classList.remove("invisible");
-                                    });
-                                        </script>
+
+                                    <script>
+                                        $("#avatar-select").change(function(event) {
+                                            document.getElementById("avatar-img").classList.remove("invisible");
+                                        });
+                                    </script>
                                     
                                     <div class="border">
                                         <div class="d-flex bg-body-secondary border">
@@ -239,7 +265,7 @@
                                                 <label for="contact-message">Message</label>
                                             </div>
                                         </div><br>
-                                        <spam class="form-text text-danger fw-bold">*</span> Required
+                                        <small class="form-text text-danger fw-bold">* Required</small>
 
                                         <button class="btn btn-primary mb-3" id="contact-submit" name="contact-submit" value="1">
                                             🤍 Submit

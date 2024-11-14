@@ -1,5 +1,7 @@
 <?php
 class Monster {
+    use HandlePropsAndCols;
+
     protected $id;
     protected $accountID;
     protected $name;
@@ -70,22 +72,34 @@ class Monster {
 
     }
     
-    public function __construct(MonsterScope $scope, $account_id = null, $table_name) {
-        $this->table     = $table_name;
-    }
-
-    
-
-    function random_monster($dropLevel = 0) {
-        
+    public function __construct(MonsterScope $scope = MonsterScope::PERSONAL, $character_id = null, $table_name = 'tbl_monsters') {
+        $this->table = $table_name;
     }
 }
 
 class MonsterPool {
     public $monsters = [];
 
-    private function get_monster_count() {
+    public function __construct() {
+
+    }
+
+    protected function get_monster_count() {
         return count($this->monsters);
+    }
+
+    public function random_monster() {
+        return $this->monsters[rand(0,$this->get_monster_count()-1)];
+    }
+
+    public function get_monster($character_id, $monster_id) {
+        global $db;
+        $monster = $this->tbl_to_obj($monster_id, 'monster');
+        
+        
+
+
+        return $monster;
     }
 }
 

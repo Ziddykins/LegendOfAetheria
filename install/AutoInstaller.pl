@@ -107,7 +107,7 @@ my $HTACCESS_TEMPLATE     = "$GAME_TEMPLATE_DIR/htaccess.template";
 my $CRONTAB_TEMPLATE      = "$GAME_TEMPLATE_DIR/crontab.template";
 my $ENV_TEMPLATE          = "$GAME_TEMPLATE_DIR/env.template";
 my $SQL_TEMPLATE          = "$GAME_TEMPLATE_DIR/sql.template";
-
+my $PHP_TEMPLATE          = "$GAME_TEMPLATE_DIR/php.template";
 # NOCONFIG - Hosts files #
 my $WIN32_HOSTS_FILE = 'c:\windows\system32\drivers\etc\hosts';
 my $LINUX_HOSTS_FILE = '/etc/hosts';

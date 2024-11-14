@@ -13,7 +13,7 @@
     require_once 'mailer.php';
     require_once 'classes/class-account.php';
 
-    /* Login submitted */
+
     if (isset($_REQUEST['login-submit']) && $_REQUEST['login-submit'] == 1) {
         $email    = $_REQUEST['login-email'];
         $password = $_REQUEST['login-password'];
@@ -41,7 +41,7 @@
             if ($account->get_ipLock() == 'True') {
                 if ($account->get_ipLockAddr() != $_SERVER['REMOTE_ADDR']) {
                     $log->info("User tried to login from non-matching IP address on IP locked account",
-                     [ "On File" => $account->get_ipLockAddr(), "Current" => $_SERVER['REMOTE_ADDR'] ]);
+                        [ "On File" => $account->get_ipLockAddr(), "Current" => $_SERVER['REMOTE_ADDR'] ]);
                     header('Location: /?ip_locked');
                     exit();
                 }
@@ -60,7 +60,7 @@
             $_SESSION['account-id'] = $account->get_id();
             
             $account->set_sessionID(session_id());
-            
+
             header('Location: /game');
             exit();
         } else {
@@ -250,6 +250,7 @@
                 </div>
             </div>
         </div>
+
         <?php include 'html/footers.html'; ?>
     </body>
 </html>
