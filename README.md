@@ -197,9 +197,45 @@ a2ensite ssl-loa.example.com
 a2enmod php8.3 headers setenvif http2 ssl
 a2enconf php8.3-fpm
 ```
-### SSL
+
+> [!IMPORTANT]
+> The following lines should only be added to the http-version .conf file **AFTER** you've applied a valid SSL to the FQDN of your domain or subdomain, otherwise, you will not be able to get a certificate from certbot/letsencrypt.
+>```conf
+> RewriteEngine on
+> RewriteCond %{SERVER_NAME} =loa.example.com
+> RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+> ```
+
+Then go ahead and get your certificate:
+```bash
+certbot -d <fqdn>
+```
+
+The certificate should be activated and downloaded after that
 
 ### PHP
+
+The main PHP section is mostly updating some of your php.ini variables
+Locate the below variables and make the appropriate replacements:
+
+```ini
+expose_php = off
+error_reporting = E_NONE
+display_errors = Off
+display_startup_errors = Off
+allow_url_fopen = Off
+allow_url_include = Off
+session.gc_maxlifetime = 600
+disable_functions = apache_child_terminate, apache_setenv, chdir, chmod, dbase_open, dbmopen, define_syslog_variables, escapeshellarg, escapeshellcmd, eval, exec, filepro, filepro_retrieve, filepro_rowcount, fopen_with_path, fp, fput, ftp_connect, ftp_exec, ftp_get, ftp_login, ftp_nb_fput, ftp_put, ftp_raw, ftp_rawlist, highlight_file, ini_alter, ini_get_all, ini_restore, inject_code, mkdir, move_uploaded_file, mysql_pconnect, openlog, passthru, phpAds_XmlRpc, phpAds_remoteInfo, phpAds_xmlrpcDecode, phpAds_xmlrpcEncode, php_uname, phpinfo, popen, posix_getpwuid, posix_kill, posix_mkfifo posix_mkfifo, posix_setpgid, posix_setsid, posix_setuid, posix_uname, proc_close, proc_get_status, proc_nice, proc_open, proc_terminate, putenv, rename, rmdir, shell_exec, show_source, syslog, system, xmlrpc_entity_decode
+session.cookie_domain = **<Your FQDN Here>**
+session.use_strict_mode = 1
+session.use_cookies = 1
+session.cookie_lifetime = 14400
+session.cookie_secure = 1
+session.cookie_httponly = 1
+session.cookie_samesite = Strict
+session.cache_expire = 30
+```
 
 ### Composer
 
