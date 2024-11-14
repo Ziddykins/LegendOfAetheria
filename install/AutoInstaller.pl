@@ -108,6 +108,7 @@ my $CRONTAB_TEMPLATE      = "$GAME_TEMPLATE_DIR/crontab.template";
 my $ENV_TEMPLATE          = "$GAME_TEMPLATE_DIR/env.template";
 my $SQL_TEMPLATE          = "$GAME_TEMPLATE_DIR/sql.template";
 my $PHP_TEMPLATE          = "$GAME_TEMPLATE_DIR/php.template";
+
 # NOCONFIG - Hosts files #
 my $WIN32_HOSTS_FILE = 'c:\windows\system32\drivers\etc\hosts';
 my $LINUX_HOSTS_FILE = '/etc/hosts';
@@ -368,8 +369,7 @@ sub fix_permissions {
 sub apache_enables {
     my $success = 0;
 
-    tell_user('INFO',
-        'Enabling required Apache configurations, sites and modules');
+    tell_user('INFO', 'Enabling required Apache configurations, sites and modules');
 
     my $conf_output = `a2enconf php$PHP_VERSION-fpm 2>&1`;
     $success = $? == 0 ? 1 : 0;
@@ -402,6 +402,7 @@ sub apache_enables {
 sub update_php_confs {
     if (check_platform() eq 'linux') {
         my @keys = qw/expose_php error_reporting display_errors display_startup_errors allow_url_fopen allow_url_include session.gc_maxlifetime disable_functions session.cookie_domain session.use_strict_mode session.use_cookies session.cookie_lifetime session.cookie_secure session.cookie_httponly session.cookie_samesite session.cache_expire/;
+
         my $ini_contents;
         my $template_file;
 
@@ -411,7 +412,8 @@ sub update_php_confs {
 
         {
             local $/;
-            open my $t_fh, '<', 'install\templates\php.template' or die "Couldn't open template file for read: $!\n";
+            open my $t_fh, '<', "$GAME_TEMPLATE_DIR\php.template"
+		    or die "Couldn't open template file for read: $!\n";
             $template_file = <$t_fh>;
             close $t_fh;
         }
@@ -459,6 +461,7 @@ sub generate_templates {
     $templates{$CRONTAB_TEMPLATE}      = "$CRONTAB_TEMPLATE.ready";
     $templates{$VIRTHOST_SSL_TEMPLATE} = "$VIRTHOST_SSL_TEMPLATE.ready";
     $templates{$VIRTHOST_TEMPLATE}     = "$VIRTHOST_TEMPLATE.ready";
+    $templates{$PHP_TEMPLATE}          = "$PHP_TEMPLATE.ready";
     
     while(my ($key, $val) = each %templates) {
         open my $fh, '<', $key;
@@ -512,16 +515,14 @@ sub process_templates {
     if (!-d $CRONTAB_DIRECTORY) {
         make_path($CRONTAB_DIRECTORY);
     }
+
     if (-e "$CRONTAB_DIRECTORY/$APACHE_RUNAS") {
         unlink("$CRONTAB_DIRECTORY/$APACHE_RUNAS");
     }
 
-    file_write("$CRONTAB_DIRECTORY/$APACHE_RUNAS", "$CRONTAB_TEMPLATE.ready");
-    
+    file_write("$CRONTAB_DIRECTORY/$APACHE_RUNAS", "$CRONTAB_TEMPLATE.ready");    
     tell_user('INFO', "Updating permissions on new crontab to $APACHE_RUNAS:crontab");
-
     `chown $APACHE_RUNAS:crontab $CRONTAB_DIRECTORY/$APACHE_RUNAS`;
-
     tell_user('SUCCESS', "All template files have been applied");    
 }
 
