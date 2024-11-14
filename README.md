@@ -227,7 +227,7 @@ allow_url_fopen = Off
 allow_url_include = Off
 session.gc_maxlifetime = 600
 disable_functions = apache_child_terminate, apache_setenv, chdir, chmod, dbase_open, dbmopen, define_syslog_variables, escapeshellarg, escapeshellcmd, eval, exec, filepro, filepro_retrieve, filepro_rowcount, fopen_with_path, fp, fput, ftp_connect, ftp_exec, ftp_get, ftp_login, ftp_nb_fput, ftp_put, ftp_raw, ftp_rawlist, highlight_file, ini_alter, ini_get_all, ini_restore, inject_code, mkdir, move_uploaded_file, mysql_pconnect, openlog, passthru, phpAds_XmlRpc, phpAds_remoteInfo, phpAds_xmlrpcDecode, phpAds_xmlrpcEncode, php_uname, phpinfo, popen, posix_getpwuid, posix_kill, posix_mkfifo posix_mkfifo, posix_setpgid, posix_setsid, posix_setuid, posix_uname, proc_close, proc_get_status, proc_nice, proc_open, proc_terminate, putenv, rename, rmdir, shell_exec, show_source, syslog, system, xmlrpc_entity_decode
-session.cookie_domain = **<Your FQDN Here>**
+session.cookie_domain = <Your FQDN Here>
 session.use_strict_mode = 1
 session.use_cookies = 1
 session.cookie_lifetime = 14400
@@ -237,7 +237,12 @@ session.cookie_samesite = Strict
 session.cache_expire = 30
 ```
 
+> [!NOTE]
+> Don't forget to change the session.cookie_domain to your own information
+
 ### Composer
+
+Open a terminal and navigate to your webroot, then just issue `sudo -u www-data composer --working-dir <GAME_WEB_ROOT> install`
 
 ### Templates
 
