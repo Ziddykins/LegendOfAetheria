@@ -140,9 +140,5 @@
         protected $itemName;
         protected $itemWeight;
         protected $itemSockets;
-
-        public function __construct() {
-            
-        }
     }
 ?>

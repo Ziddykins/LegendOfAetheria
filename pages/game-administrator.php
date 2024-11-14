@@ -179,49 +179,61 @@ $dalle_models = [
 $user_privs = UserPrivileges::name_to_enum($account['privileges']);
 
 if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) { 
-    echo "in gen img";
-    $type   = $_REQUEST['type'];
-    $model = $_REQUEST['model'];
-    $count  = $_REQUEST['count'];
-    $prompt = $_REQUEST['prompt'];
-    $endpoint = 'https://api.openai.com/v1/images/generations';
-    
-    if (in_array($model, $dalle_models)) {
-        if ($count < 1 || $count > 5) {
-            $count = 2;
+    $count = 0;
+    foreach ($monster_pool->monsters as $monster) {
+        $count++;
+        $prompt = "Generate an image of a " . $monster->get_name();
+        $type   = $_REQUEST['type'];
+        $model = $_REQUEST['model'];
+        $count  = 1;
+
+            $endpoint = 'https://api.openai.com/v1/images/generations';
+        
+        if (in_array($model, $dalle_models)) {
+            if ($count < 1 || $count > 5) {
+                $count = 2;
+            }
+            
+            $openai_apikey = $_ENV['OPENAI_APIKEY'];    
+            $OpenAI = new OpenAI($openai_apikey, $endpoint);
+            
+            $headers = [
+                'Content-Type'  => 'application/json',
+                'Authorization' => "Bearer " . $OpenAI->get_apiKey()
+            ];
+
+            $OpenAI->set_imageModel($model);
+            $OpenAI->set_imagePrompt($prompt);
+            $OpenAI->set_imageCount($count);
+            $OpenAI->set_imageSize("256x256");
+            
+            $response = $OpenAI->doRequest(
+                HttpMethod::POST,
+                $OpenAI->get_payload()
+            );
+        } else {
+            echo "sry no";
+            exit();
+        }
+
+        $json_obj = json_decode($response);
+
+        $img_file = 'img/enemies/' . $monster->get_name() . '.png';
+        $ch = curl_init($json_obj->data[0]->url);
+        $fp = fopen($img_file, 'wb');
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_exec($ch);
+        curl_close($ch);
+        fclose($fp);
+
+        echo "Saved $img_file\n<br>";
+        if ($count % 5 == 0) {
+            echo "sleepin'<br>";
+            sleep(360);
         }
         
-        $openai_apikey = $_ENV['OPENAI_APIKEY'];    
-        $OpenAI = new OpenAI($openai_apikey, $endpoint);
-        
-        $headers = [
-            'Content-Type'  => 'application/json',
-            'Authorization' => "Bearer " . $OpenAI->get_apiKey()
-        ];
-
-        $OpenAI->set_imageModel($model);
-        $OpenAI->set_imagePrompt($prompt);
-        $OpenAI->set_imageCount($count);
-        $OpenAI->set_imageSize("256x256");
-
-        $OpenAI->buildRequest();
-        echo '<pre>';
-        $OpenAI->showPayload();
-        
-        $response = $OpenAI->doRequest(
-            HttpMethod::POST,
-            $OpenAI->get_payload()
-        );
-        print_r("RESPONSE:");
-        
-    } else {
-        echo "sry no";
-        exit();
     }
-
-    $json_obj = json_decode($response);
-
-    echo '<img src="' . $json_obj->data[0]->url. '"></img>';
     exit();
     
     echo '<div class="d-flex container">';

@@ -12,9 +12,11 @@ $("a[id^='menu-anchor']").on("click",
     }
 );
 
-document.getElementById("ip-lock-switch").addEventListener("click", function(e) {
-	document.getElementById("ip-lock-address").classList.toggle("invisible");
-});
+if (document.getElementById("ip-lock-switch")) {
+    document.getElementById("ip-lock-switch").addEventListener("click", function(e) {
+    	document.getElementById("ip-lock-address").classList.toggle("invisible");
+    });
+}
 
 function save_settings(which) {
     let ip_address = document.getElementById("ip-lock-address").value;

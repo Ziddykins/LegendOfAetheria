@@ -1,5 +1,5 @@
 <?php
-    require_once '../../../vendor/autoload.php';
+    require_once 'vendor/autoload.php';
     require_once 'logger.php';
     require_once 'constants.php';
     require_once 'classes/class-monster.php';
@@ -58,6 +58,69 @@
 
             return $class_property;
         }
+
+        /**
+         * Retrieves data from a specified table based on the given identifier and type.
+         *
+         * @param string $identifier The unique identifier to search for in the table.
+         * @param string $type The type of data to retrieve ('account', 'character', 'familiar', or 'monster').
+         * @return array|object|null Returns an associative array of the row data for 'account', 'character', and 'familiar' types.
+         *                           Returns a Monster object for 'monster' type.
+         *                           Returns null if an invalid type is provided.
+         *
+         * @global mysqli $db The database connection object.
+         * @global Logger $log The logging object.
+         *
+         * @throws mysqli_sql_exception If there's an error in the SQL query execution.
+         *
+         * @example
+         * $account_data = table_to_obj('user@example.com', 'account');
+         * $monster_obj = table_to_obj(1, 'monster');
+         */
+        /*function table_to_obj($identifier, $type) {
+            global $db, $log;
+            $table = '';
+            $column = '';
+            $obj = null;
+
+            switch ($type) {
+                case 'account':
+                    $column = 'email';
+                    $table  = $_ENV['SQL_ACCT_TBL'];
+                    $obj    = new Account($identifier);
+                    break;
+                case 'character':
+                    $column = 'account_id';
+                    $table  = $_ENV['SQL_CHAR_TBL'];
+                    break;
+                case 'familiar':
+                    $column = 'account_id';
+                    $table  = $_ENV['SQL_FMLR_TBL'];
+                    break;
+                case 'monster':
+                    $column = 'id';
+                    $table  = $_ENV['SQL_MNST_TBL'];
+                    $obj    = new Monster;
+                    break;
+                default:
+                    $log->critical("Invalid 'type' provided to " . __FUNCTION__ . ": $type"); 
+                    return null;
+            }
+
+            $sql_query = "SELECT * FROM $table WHERE `$column` = ?";
+            
+            $prepped = $db->prepare($sql_query);
+            $prepped->bind_param('s', $identifier);
+            $prepped->execute();
+
+            $result = $prepped->get_result();
+            $row    = $result->fetch_assoc();
+
+            if ($type == 'monster') {
+                return $obj;
+            }
+            return $row;
+        }*/
     }
 
     /**
@@ -81,6 +144,63 @@
         return date("Y-m-d H:i:s", strtotime("$modifier"));
     }
 
+            /**
+         * Retrieves data from a specified table based on the given identifier and type.
+         *
+         * @param string $identifier The unique identifier to search for in the table.
+         * @param string $type The type of data to retrieve ('account', 'character', 'familiar', or 'monster').
+         * @return array|object|null Returns an associative array of the row data for 'account', 'character', and 'familiar' types.
+         *                           Returns a Monster object for 'monster' type.
+         *                           Returns null if an invalid type is provided.
+         *
+         * @global mysqli $db The database connection object.
+         * @global Logger $log The logging object.
+         *
+         * @throws mysqli_sql_exception If there's an error in the SQL query execution.
+         *
+         * @example
+         * $account_data = table_to_obj('user@example.com', 'account');
+         * $monster_obj = table_to_obj(1, 'monster');
+         */
+        function table_to_obj($identifier, $type) {
+            global $db, $log;
+            $table = '';
+            $column = '';
+            $obj = null;
+
+            switch ($type) {
+                case 'account':
+                    $column = 'email';
+                    $table  = $_ENV['SQL_ACCT_TBL'];
+                    $obj    = new Account($identifier);
+                    break;
+                case 'character':
+                    $column = 'account_id';
+                    $table  = $_ENV['SQL_CHAR_TBL'];
+                    break;
+                case 'familiar':
+                    $column = 'account_id';
+                    $table  = $_ENV['SQL_FMLR_TBL'];
+                    break;
+                case 'monster':
+                    $column = 'id';
+                    $table  = $_ENV['SQL_MNST_TBL'];
+                    $obj    = new Monster;
+                    break;
+                default:
+                    $log->critical("Invalid 'type' provided to " . __FUNCTION__ . ": $type"); 
+                    return null;
+            }
+
+            $sql_query = "SELECT * FROM $table WHERE `$column` = ?";
+            $result = $db->execute_query($sql_query, [$identifier])->fetch_assoc();
+
+            if ($type == 'monster') {
+                return $obj;
+            }
+            return $result;
+        }
+
     /**
      * Calculates the difference in seconds between two MySQL datetime strings.
      *
@@ -99,54 +219,6 @@
         $seconds_left  = $date_two_secs - $date_one_secs;
 
         return $seconds_left;
-    }
-
-    /**
-     * Retrieves a record from the specified table based on the provided identifier and type.
-     *
-     * This function connects to the database, selects the appropriate table and column based on the provided type,
-     * and then retrieves a record from the table where the specified column matches the provided identifier.
-     *
-     * @param string $identifier The identifier to search for in the specified column.
-     * @param string $type       The type of record to retrieve. This determines the table and column to search in.
-     *                           Valid values are 'account', 'character', and 'familiar'.
-     *
-     * @return array|null The retrieved record as an associative array, or null if no matching record is found.
-     *                    If an invalid type is provided, the function logs a critical error and returns null.
-     */
-    function table_to_obj($identifier, $type) {
-        global $db, $log;
-        $table = '';
-        $column = '';
-
-        switch ($type) {
-            case 'account':
-                $column = 'email';
-                $table  = $_ENV['SQL_ACCT_TBL'];
-                break;
-            case 'character':
-                $column = 'account_id';
-                $table  = $_ENV['SQL_CHAR_TBL'];
-                break;
-            case 'familiar':
-                $column = 'account_id';
-                $table  = $_ENV['SQL_FMLR_TBL'];
-                break;
-            default:
-                $log->critical("Invalid 'type' provided to " . __FUNCTION__ . ": $type"); 
-                return null;
-        }
-
-        $sql_query = "SELECT * FROM $table WHERE `$column` = ?";
-        
-        $prepped = $db->prepare($sql_query);
-        $prepped->bind_param('s', $identifier);
-        $prepped->execute();
-
-        $result = $prepped->get_result();
-        $row    = $result->fetch_assoc();
-
-        return $row;
     }
     
     /**
