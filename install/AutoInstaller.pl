@@ -9,6 +9,16 @@ use File::Find;
 use File::Copy;
 use Data::Dumper;
 
+# NOCONFIG - Colors #
+my $RED    = "\e[31m";
+my $GREEN  = "\e[32m";
+my $YELLOW = "\e[33m";
+my $BLUE   = "\e[34m";
+my $CYAN   = "\e[36m";
+my $GREY   = "\e[37m";
+my $RESET  = "\e[0m";
+
+
 use vars qw/*name *dir *prune/;
 *name   = *File::Find::name;
 *dir    = *File::Find::dir;
@@ -21,10 +31,9 @@ my $os = check_platform();
 my $distro;
 
 if ($os eq 'linux') {
-    if (-e '/etc/debian_version') {
-        $distro = "debian";
-    } elsif (-e '/etc/lsb-release') {
-        $distro = "ubuntu";
+    my $ver = `uname -v`;
+    if ($ver =~ /(debian|ubuntu)/i) {
+        $distro = $1;
     } else {
         if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
             die "Unsupported distro, exiting\n";
@@ -35,15 +44,6 @@ if ($os eq 'linux') {
 
 chomp(my $loc_check = `pwd`);
 $loc_check =~ s/\/install//;
-
-# NOCONFIG - Colors #
-my $RED    = "\e[31m";
-my $GREEN  = "\e[32m";
-my $YELLOW = "\e[33m";
-my $BLUE   = "\e[34m";
-my $CYAN   = "\e[36m";
-my $GREY   = "\e[37m";
-my $RESET  = "\e[0m";
 
 # NOCONFIG - The user will be asked to fill these in; the default values
 # are there for convenience, just hit enter at the prompt to accept defaults
