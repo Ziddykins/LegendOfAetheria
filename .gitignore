@@ -19,3 +19,6 @@ gcm-diagnose.log
 setup.log
 =
 /node_modules/
+.vstags
+phpctags.ctags
+phpctags.tags

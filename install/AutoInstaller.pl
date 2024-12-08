@@ -16,6 +16,7 @@ use vars qw/*name *dir *prune/;
 sub find_temp;
 sub do_delete ($@);
 
+my $os = check_platform();
 
 # NOCONFIG - Colors #
 my $RED    = "\e[31m";
@@ -26,21 +27,53 @@ my $CYAN   = "\e[36m";
 my $GREY   = "\e[37m";
 my $RESET  = "\e[0m";
 
-# CONFIG - Server #
-my $GAME_WEB_ROOT = "/var/www/html/xxx";
+# NOCONFIG - The user will be asked to fill these in; the default values
+# are there for convenience, just hit enter at the prompt to accept defaults
+my $GAME_WEB_ROOT;
+my $PHP_BINARY;
+my $SQL_CONFIG_FILE;
+my $FQDN;
+my $APACHE_DIRECTORY;
+my $VIRTHOST_CONF_FILE;
+my $VIRTHOST_CONF_FILE_SSL;
+my $SSL_FULLCER;
+my $SSL_PRIVKEY;
+my $SSL_ENABLED;
 
-print "Please enter an existing path for your webroot (e.g. /var/www/html/example.com/loa):\n";
-chomp($GAME_WEB_ROOT = <STDIN>);
+my $question;
+
+$question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
+$FQDN = ask_user($question, '', 'input');
+
+$question = "Enter the location of your webserver's config directory (e.g. /etc/apache2)";
+$APACHE_DIRECTORY = ask_user($question, '/etc/apache2', 'input');
+
+# NOCONFIG - See above
+if ($os eq "linux") {
+    $GAME_WEB_ROOT      = "/var/www/html";
+    $PHP_BINARY         = $1 if `whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/;
+    $SQL_CONFIG_FILE    = '/etc/mysql/mariadb.conf.d/50-server.cnf';
+    $APACHE_DIRECTORY   = '/etc/apache2';
+    $VIRTHOST_CONF_FILE = "$APACHE_DIRECTORY/sites-available/${FQDN}.conf";
+    $SSL_FULLCER        = "/etc/letsencrypt/live/$FQDN/fullchain.pem";
+    $SSL_PRIVKEY        = "/etc/letsencrypt/live/$FQDN/privkey.pem";
+} elsif ($os eq "windows") {
+    #$GAME_WEB_ROOT = "C:\\Program Files\\Apache Software Foundation\\Apache2.4";
+    $GAME_WEB_ROOT      = 'C:\xampp\htdocs';
+    $PHP_BINARY         = 'C:\xampp\php\php.exe';
+    $SQL_CONFIG_FILE    = 'C:\xampp\mysql\bin\my.ini';
+    $APACHE_DIRECTORY   = 'C:\xampp\apache';
+    $VIRTHOST_CONF_FILE = 'C:\xampp\apache\conf\httpd.conf';
+    $SSL_FULLCER        = 'C:\xampp\apache\conf\ssl.crt\server.crt';
+    $SSL_PRIVKEY        = 'C:\xampp\apache\conf\ssl.key\server.key';
+}
+
+$question = "Please enter the path to where the game will reside (e.g. /var/www/html/example.com/loa)";
+$GAME_WEB_ROOT = ask_user($question, $GAME_WEB_ROOT, 'input');
 $GAME_WEB_ROOT =~ s/\/$//;
 make_path($GAME_WEB_ROOT);
 
-print "Please enter a FQDN/domain to be used for the virtual host (e.g. loa.example.com):\n";
-chomp(my $FQDN = <STDIN>);
-
-
-my $LOG_TO_FILE       = 'setup.log';
-my $PHP_BINARY        = $1 if `whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/;
-
+my $LOG_TO_FILE = 'setup.log';
 my $GAME_TEMPLATE_DIR = "$GAME_WEB_ROOT/install/templates";
 my $GAME_SCRIPTS_DIR  = "$GAME_WEB_ROOT/install/scripts";
 my $WEB_ADMIN_EMAIL   = "webmaster\@$FQDN";
@@ -63,17 +96,25 @@ my $SQL_PASSWORD           = gen_random(15);
 my $SQL_DATABASE           = 'db_loa';
 my $SQL_HOST               = '127.0.2.1';
 my $SQL_PORT               = 3306;
-my $SQL_SERVER_CONFIG_FILE = '/etc/mysql/mariadb.conf.d/50-server.cnf';
 
-# CONFIG - SSL Certificate information #
-my $SSL_ENABLED = 1;
-my $SSL_FULLCER = "/etc/letsencrypt/live/$FQDN/fullchain.pem";
-my $SSL_PRIVKEY = "/etc/letsencrypt/live/$FQDN/privkey.pem";
+$question = "Please enter the location of your MySQL configuration file (e.g. /etc/mysql/mariadb/mariadb.conf.d/50-server.conf)";
+$SQL_CONFIG_FILE = ask_user($question, $SQL_CONFIG_FILE, 'input');
 
-# CONFIG - Apache VirtualHost configuration #
-my $APACHE_DIRECTORY       = "/etc/apache2";
-my $VIRTHOST_CONF_FILE     = "$APACHE_DIRECTORY/sites-available/${FQDN}.conf";
-my $VIRTHOST_CONF_FILE_SSL = "$APACHE_DIRECTORY/sites-available/ssl-${FQDN}.conf";
+$question = "Please enter the SQL username to be used for the database";
+$SQL_USERNAME = ask_user($question, $SQL_USERNAME, 'input');
+
+$question = "Please enter the SQL password to be used for the database";
+$SQL_PASSWORD = ask_user($question, $SQL_PASSWORD, 'input');
+
+$question = "Please enter the SQL database to be used for the game";
+$SQL_DATABASE = ask_user($question, $SQL_DATABASE, 'input');
+
+$question = "Please enter the SQL host to be used for the database";
+$SQL_HOST = ask_user($question, $SQL_HOST, 'input');
+
+$question = "Please enter the SQL port to be used for the database";
+$SQL_PORT = ask_user($question, $SQL_PORT, 'input');
+
 
 # CONFIG - XAMPP configuration #
 my $XAMPP_INSTALLER_BIN =
@@ -90,17 +131,19 @@ my $APACHE_RUNAS   = 'www-data';
 my $PHP_VERSION;
 my $PHP_INI_FILE = 'unset';
 
+$question = "Please enter the location of your PHP binary (e.g. /usr/bin/php7.4)";
+$PHP_BINARY = ask_user($question, $PHP_BINARY, 'input');
+
 # CONFIG - OpenAI #
-my $OPENAI_ENABLE = 0;
+my $OPENAI_ENABLE = ask_user("Enable OpenAI features? API key required", 'no', 'yesno');
 my $OPENAI_APIKEY = 'unset';
 
 if ($OPENAI_ENABLE) {
-    print "OpenAI configuration is enabled; please enter your OpenAI API key:\n";
-    print "Key: ";
-    chomp($OPENAI_APIKEY = <STDIN>);
+    $question = "OpenAI configuration is enabled; please enter your OpenAI API key";
+    $OPENAI_APIKEY = ask_user($question, '', 'input');
 }
 
-# CONFIG - Template Files #
+# NOCONFIG - Template Files #
 my $VIRTHOST_SSL_TEMPLATE = "$GAME_TEMPLATE_DIR/virtual_host_ssl.template";
 my $VIRTHOST_TEMPLATE     = "$GAME_TEMPLATE_DIR/virtual_host.template";
 my $HTACCESS_TEMPLATE     = "$GAME_TEMPLATE_DIR/htaccess.template";
@@ -178,13 +221,11 @@ foreach my $key (keys %completed) {
     }
 }
 
-check_platform();
-
-if (!-e '/etc/debian_version' && check_platform() eq "linux") {
+if (!-e '/etc/debian_version' && $os eq "linux") {
     die "sry no :')";
 }
 
-if (ask_user("Install required software?")) {
+if (ask_user("Install required software?", 'yes', 'yesno')) {
     install_software() if !$completed{software};
     `touch $GAME_WEB_ROOT/.loa-step-software`;
 }
@@ -192,13 +233,13 @@ if (ask_user("Install required software?")) {
 if (ask_user(
         "Multiple variables in this script are marked with " .
         "'Template Replacements' - Make sure these are filled out properly before " .
-        "continuing\nContinue and generate templates?"
+        "continuing\nContinue and generate templates?", 'yes', 'yesno'
     )) {
     generate_templates();
     `touch $GAME_WEB_ROOT/.loa.step.templates.gen`;
 }
 
-if (ask_user("Process generated templates?")) {
+if (ask_user("Process generated templates?", 'yes', 'yesno')) {
     process_templates();
     `touch $GAME_WEB_ROOT/.loa.step.templates.process`;
 }
@@ -208,37 +249,37 @@ if (ask_user("Process generated templates?")) {
 #   `touch $GAME_WEB_ROOT/.loa.step.hostname`;
 #}
 
-if (ask_user("Perform necessary apache updates?")) {
+if (ask_user("Perform necessary apache updates?", 'yes', 'yesno')) {
     apache_config() if !$completed{apache};
     `touch $GAME_WEB_ROOT/.loa.step.apache`;
 }
 
-if (ask_user("Enable the required Apache conf/mods/sites?")) {
+if (ask_user("Enable the required Apache conf/mods/sites?", 'yes', 'yesno')) {
     apache_enables() if !$completed{apache_enables};
     `touch $GAME_WEB_ROOT/.loa.step.apache_enables`;
 }
 
-if (ask_user("Update PHP configurations? (security, performance)")) {
+if (ask_user("Update PHP configurations? (security, performance)", 'yes', 'yesno')) {
     update_php_confs() if !$completed{php};
     `touch $GAME_WEB_ROOT/.loa.step.php`;
 }
 
-if (ask_user("Run composer to download required dependencies?")) {
+if (ask_user("Run composer to download required dependencies?", 'yes', 'yesno')) {
     composer_pull() if !$completed{composer};
     `touch $GAME_WEB_ROOT/.loa.step.composer`;
 }
 
-if (ask_user("Start all services?")) {
+if (ask_user("Start all services?", 'yes', 'yesno')) {
    start_services();
    `touch $GAME_WEB_ROOT/.loa.step.services`;
 }
 
-if (ask_user("Fix all webserver permissions?")) {
+if (ask_user("Fix all webserver permissions?", 'yes', 'yesno')) {
     fix_permissions();
     `touch $GAME_WEB_ROOT/.loa.step.permissions`;
 }
 
-if (ask_user("Clean up temp files?")) {
+if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
     clean_up();
 }
 
@@ -271,7 +312,7 @@ sub install_software {
     if (!$PHP_VERSION) {
         tell_user('WARN', "PHP version not specified, attempting to find it...\n");
 
-        if (check_platform() eq 'linux') {
+        if ($os eq 'linux') {
             chomp(my $ver_output = `php --version | head -n1`);
 
             if ($ver_output =~ /PHP (\d+\.\d+)/) {
@@ -287,7 +328,7 @@ sub install_software {
         }
     } else {
         die "Invalid or unsupported PHP version set in the installer\n" .
-            "supported PHP versions: 7.0 - 8.3\n\n";
+            "supported PHP versions: 7.0 - 8.4\n\n";
     }
 
     my @packages = (
@@ -331,7 +372,7 @@ sub update_hostname {
             "Something went wrong setting the hostname\nOutput below:\n\t$output"
         );
 
-        if (!ask_user('Continue anyway?')) {
+        if (!ask_user('Continue anyway?', 'yes', 'yesno')) {
             die "Errors occured during hostname configuration - halting";
         }
     }
@@ -339,15 +380,12 @@ sub update_hostname {
 
 # Step: apache
 sub apache_config {
-    if (
-        ask_user(
-                "Do you want to redirect traffic from http:80 to "
-              . "https:443? A valid certificate needs to be set in the "
-              . "script configuration!\n- Currently set -\n"
-              . "Certificate: $SSL_FULLCER\n"
-              . "Private Key: $SSL_PRIVKEY\n"
-        )
-    ) {
+    if (ask_user("Do you want to redirect traffic from http:80 to "
+        . "https:443? A valid certificate needs to be set in the "
+        . "script configuration!\n- Currently set -\n"
+        . "Certificate: $SSL_FULLCER\n"
+        . "Private Key: $SSL_PRIVKEY\n"
+        , 'yes', 'yesno')) {
 
         tell_user('INFO',   'Enabling mod_rewrite if it isn\'t already');
         tell_user('SYSTEM', `a2enmod rewrite 2>&1`);
@@ -392,7 +430,7 @@ sub apache_enables {
         tell_user('SUCCESS', "Apache configuration completed");
     } else {
         tell_user('ERROR', "There were errors - See above output\n");
-        if (!ask_user('Continue?')) {
+        if (!ask_user('Continue?', 'no', 'yesno')) {
             die "Quitting at user request\n";
         }
     }
@@ -400,9 +438,8 @@ sub apache_enables {
 
 #Step: PHP configurations
 sub update_php_confs {
-    if (check_platform() eq 'linux') {
+    if ($os eq 'linux') {
         my @keys = qw/expose_php error_reporting display_errors display_startup_errors allow_url_fopen allow_url_include session.gc_maxlifetime disable_functions session.cookie_domain session.use_strict_mode session.use_cookies session.cookie_lifetime session.cookie_secure session.cookie_httponly session.cookie_samesite session.cache_expire/;
-
         my $ini_contents;
         my $template_file;
 
@@ -412,16 +449,16 @@ sub update_php_confs {
 
         {
             local $/;
-            open my $t_fh, '<', "$GAME_TEMPLATE_DIR\php.template"
-		    or die "Couldn't open template file for read: $!\n";
+            open my $t_fh, '<', "$GAME_TEMPLATE_DIR/php.template"
+		        or die "Couldn't open template file for read: $!\n";
             $template_file = <$t_fh>;
             close $t_fh;
         }
 
-
         {
             local $/;
-            open my $fh, '<', $PHP_INI_FILE or die "Couldn't open '$PHP_INI_FILE' for read: $!\n";
+            open my $fh, '<', $PHP_INI_FILE
+                or die "Couldn't open '$PHP_INI_FILE' for read: $!\n";
             $ini_contents = <$fh>;
             close $fh;
         }
@@ -452,7 +489,7 @@ sub generate_templates {
     my $fh_cron;
     my %templates;
 
-    `sed -i 's/bind-address.*/bind-address = $SQL_HOST/' $SQL_SERVER_CONFIG_FILE`;
+    `sed -i 's/bind-address.*/bind-address = $SQL_HOST/' $SQL_CONFIG_FILE`;
 
     # key = in file, value = out file
     $templates{$ENV_TEMPLATE}          = "$ENV_TEMPLATE.ready";
@@ -625,9 +662,7 @@ sub gen_random {
 
 sub file_write {
     my ($dst, $src, $type, $force) = @_;
-    my $fh;
-    my $data;
-    my $answer;
+    my ($fh, $data, $answer);
 
     if ($type eq 'file') { # essentially 'copy'
         if (-e $src) {
@@ -653,7 +688,7 @@ sub file_write {
     }
 
     if (!$force) {
-        while ($answer !~ /^[OoAaSs]/) {
+        while ($answer !~ /^`[OoAaSs]/) {
             print "$dst exists already\n";
             print '[o]verwrite, [a]ppend, [s]kip: ';
             chomp($answer = <STDIN>);
@@ -679,20 +714,37 @@ sub file_write {
 }
 
 sub ask_user {
-    my $question = $_[0];
-    my $date     = get_date();
+    my ($prompt, $default, $type) = @_;
+    my $date = get_date();
+    
+    print "$date $prompt\n";
 
-    print $date . ' -> ' . $question;
-    print "\n$date  ->Choice[${GREEN}y${RESET}/${RED}n${RESET}]: ";
+    if ($type eq 'yesno') {
+        print "\n\tChoice[${GREEN}y${RESET}/${RED}n${RESET}]: ";
+    } elsif ($type eq 'input') {
+        if ($default) {
+           print "[$default]> ";
+        } else {
+            print "enter> ";
+        }
+    }
 
     chomp (my $answer = <STDIN>);
     print "\n";
 
-    if ($answer =~ /[Yy]e?s?/) {
+    if ($answer =~ /[Yy]e?s?/ && $type eq 'yesno') {
         return 1;
+    } elsif ($answer =~ /[Nn]o?/ && $type eq 'yesno') {
+        return 0;
     }
 
-    return 0;
+    if (($answer eq '' or !$answer) && $type eq 'input') {
+        return $default;
+    } else {
+        return $answer;
+    }
+
+    return -1;
 }
 
 sub check_array {
@@ -706,8 +758,8 @@ sub check_array {
 }
 
 sub get_date {
-    my ($sec, $min, $hour, $day, $mon, $year) = localtime();
-    my $date = sprintf ("[%04d-%02d-%02d %02d:%02d:%02d] -> ", $year, $mon, $day, $hour, $min, $sec);
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday) = localtime();
+    my $date = sprintf ("[%2d-%02d-%02d %02d:%02d:%02d] -> ", $year % 100, $mon, $mday, $hour, $min, $sec);
     return $date;
 }
 
