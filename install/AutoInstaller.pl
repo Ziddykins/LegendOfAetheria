@@ -19,6 +19,7 @@ sub do_delete ($@);
 
 my $os = check_platform();
 chomp(my $loc_check = `pwd`);
+$loc_check =~ s/\/install//;
 
 # NOCONFIG - Colors #
 my $RED    = "\e[31m";
@@ -324,8 +325,9 @@ sub install_software {
     if (-e '/etc/apt/sources.list.d/php.list') {
         tell_user('INFO', 'Sury repo entries already present');
     } else {
+        my $cmd = "sh $GAME_SCRIPTS_DIR/sury_setup.sh";
         tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
-        tell_user('SYSTEM', `sh $GAME_SCRIPTS_DIR/sury_setup.sh`);
+        tell_user('SYSTEM', `$cmd`);
     }
 
     tell_user('INFO',   'Updating system packages');
