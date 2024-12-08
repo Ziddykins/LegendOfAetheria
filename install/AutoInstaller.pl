@@ -30,6 +30,7 @@ if ($os eq 'linux') {
             die "Unsupported distro, exiting\n";
         }
     }
+    tell_user('INFO', "$distro found to be the current distribution");
 }
 
 chomp(my $loc_check = `pwd`);
@@ -322,16 +323,15 @@ sub install_software {
     } else {
         my $cmd;
         tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
-        tell_user('SYSTEM', `$cmd`);
 
-        if ($os eq 'linux' && $distro eq 'ubuntu') {
+        if ($distro eq 'ubuntu') {
             $cmd = "bash $GAME_SCRIPTS_DIR/sury_setup_ubnt.sh";
-        } elsif ($os eq 'linux' && $distro eq 'debian') {
+        } elsif ($distro eq 'debian') {
             $cmd = "bash $GAME_SCRIPTS_DIR/sury_setup_deb.sh";
         } elsif ($os eq 'windows') {
             # TODO: implement windows setup
         }
-        tell_user('SYSTEM', `$cmd`);
+        tell_user('SYSTEM', `$cmd && apt install php -y`);
     }
 
     tell_user('INFO',   'Updating system packages');
