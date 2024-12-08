@@ -76,6 +76,12 @@ $question = "Please enter the path to where the game will reside (e.g. /var/www/
 $GAME_WEB_ROOT = ask_user($question, $GAME_WEB_ROOT, 'input');
 $GAME_WEB_ROOT =~ s/\/$//;
 
+my $LOG_TO_FILE = 'setup.log';
+my $GAME_TEMPLATE_DIR = "$GAME_WEB_ROOT/install/templates";
+my $GAME_SCRIPTS_DIR  = "$GAME_WEB_ROOT/install/scripts";
+my $WEB_ADMIN_EMAIL   = "webmaster\@$FQDN";
+my $CRONTAB_DIRECTORY = '/var/spool/cron/crontabs';
+
 if ($loc_check ne $GAME_WEB_ROOT) {
     my $error = "Setup has determined the files are not in the correct place,\n" .
                 " or you're not in the correct folder. Please move the contents\n" .
@@ -90,12 +96,6 @@ if (ask_user("Install required software?", 'yes', 'yesno')) {
     install_software() if !$completed{software};
     `touch $GAME_WEB_ROOT/.loa-step-software`;
 }
-
-my $LOG_TO_FILE = 'setup.log';
-my $GAME_TEMPLATE_DIR = "$GAME_WEB_ROOT/install/templates";
-my $GAME_SCRIPTS_DIR  = "$GAME_WEB_ROOT/install/scripts";
-my $WEB_ADMIN_EMAIL   = "webmaster\@$FQDN";
-my $CRONTAB_DIRECTORY = '/var/spool/cron/crontabs';
 
 # CONFIG - SQL Tables / Template Replacements #
 my $SQL_TBL_CHARACTERS = 'tbl_characters';
@@ -326,6 +326,7 @@ sub install_software {
         tell_user('INFO', 'Sury repo entries already present');
     } else {
         my $cmd = "sh $GAME_SCRIPTS_DIR/sury_setup.sh";
+        print "cmd '$cmd'\n" and die;
         tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
         tell_user('SYSTEM', `$cmd`);
     }
