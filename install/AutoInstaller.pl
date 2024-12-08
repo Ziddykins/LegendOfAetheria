@@ -6,6 +6,7 @@ use autodie;
 
 use File::Path qw(make_path remove_tree);
 use File::Find;
+use File::Copy;
 use Data::Dumper;
 
 use vars qw/*name *dir *prune/;
@@ -17,6 +18,8 @@ sub find_temp;
 sub do_delete ($@);
 
 my $os = check_platform();
+my $loc_check;
+($loc_check = __FILE__) =~ s/\/install\/AutoInstaller.pl//;
 
 # NOCONFIG - Colors #
 my $RED    = "\e[31m";
@@ -72,7 +75,14 @@ if ($os eq "linux") {
 $question = "Please enter the path to where the game will reside (e.g. /var/www/html/example.com/loa)";
 $GAME_WEB_ROOT = ask_user($question, $GAME_WEB_ROOT, 'input');
 $GAME_WEB_ROOT =~ s/\/$//;
-make_path($GAME_WEB_ROOT);
+
+if ($loc_check ne $GAME_WEB_ROOT) {
+    my $error = "Setup has determined the files are not in the correct place.\n" .
+                "Please move the contents of the legendofaetheria folder to your\n" .
+                "specified webroot directory: $GAME_WEB_ROOT\n" . 
+                "Current location: $loc_check\n";
+    die $error;
+}    
 
 if (ask_user("Install required software?", 'yes', 'yesno')) {
     install_software() if !$completed{software};
