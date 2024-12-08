@@ -41,6 +41,7 @@ my $SSL_PRIVKEY;
 my $SSL_ENABLED;
 
 my $question;
+my %completed; # Used for checking the current step
 
 $question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
 $FQDN = ask_user($question, '', 'input');
@@ -51,7 +52,7 @@ $APACHE_DIRECTORY = ask_user($question, '/etc/apache2', 'input');
 # NOCONFIG - See above
 if ($os eq "linux") {
     $GAME_WEB_ROOT      = "/var/www/html";
-    $PHP_BINARY         = $1 if `whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/;
+    $PHP_BINARY         = "/usr/bin/php";
     $SQL_CONFIG_FILE    = '/etc/mysql/mariadb.conf.d/50-server.cnf';
     $APACHE_DIRECTORY   = '/etc/apache2';
     $VIRTHOST_CONF_FILE = "$APACHE_DIRECTORY/sites-available/${FQDN}.conf";
@@ -72,6 +73,11 @@ $question = "Please enter the path to where the game will reside (e.g. /var/www/
 $GAME_WEB_ROOT = ask_user($question, $GAME_WEB_ROOT, 'input');
 $GAME_WEB_ROOT =~ s/\/$//;
 make_path($GAME_WEB_ROOT);
+
+if (ask_user("Install required software?", 'yes', 'yesno')) {
+    install_software() if !$completed{software};
+    `touch $GAME_WEB_ROOT/.loa-step-software`;
+}
 
 my $LOG_TO_FILE = 'setup.log';
 my $GAME_TEMPLATE_DIR = "$GAME_WEB_ROOT/install/templates";
@@ -131,8 +137,19 @@ my $APACHE_RUNAS   = 'www-data';
 my $PHP_VERSION;
 my $PHP_INI_FILE = 'unset';
 
-$question = "Please enter the location of your PHP binary (e.g. /usr/bin/php7.4)";
-$PHP_BINARY = ask_user($question, $PHP_BINARY, 'input');
+if (`whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/) {
+    my $found_location = $1;
+
+    $question = "PHP was found on this system at '$found_location' - is this the correct" .
+                "location to the PHP binary you want to use?";
+    
+    if (ask_user($question, 'yes', 'yesno')) {
+        $PHP_BINARY = $found_location;
+    } else {    
+        $question = "Please enter the location of your PHP binary (e.g. /usr/bin/php7.4)";
+        $PHP_BINARY = ask_user($question, $PHP_BINARY, 'input');
+    }
+}
 
 # CONFIG - OpenAI #
 my $OPENAI_ENABLE = ask_user("Enable OpenAI features? API key required", 'no', 'yesno');
@@ -195,7 +212,6 @@ if (check_array(\@ARGV, "--revert-system")) {
     clean_up('revert');
 }
 
-my %completed;
 my @steps = qw/hosts software hostname apache apache-enables
                composer templates php sqlimport crons certificate services/;
 
@@ -223,11 +239,6 @@ foreach my $key (keys %completed) {
 
 if (!-e '/etc/debian_version' && $os eq "linux") {
     die "sry no :')";
-}
-
-if (ask_user("Install required software?", 'yes', 'yesno')) {
-    install_software() if !$completed{software};
-    `touch $GAME_WEB_ROOT/.loa-step-software`;
 }
 
 if (ask_user(
@@ -307,7 +318,7 @@ sub install_software {
     }
 
     tell_user('INFO',   'Updating system packages');
-    tell_user('SYSTEM', `apt update 2>&1`);
+    tell_user('SYSTEM', `apt update 2>&1` . "\n");
 
     if (!$PHP_VERSION) {
         tell_user('WARN', "PHP version not specified, attempting to find it...\n");
@@ -353,7 +364,7 @@ sub install_software {
     );
 
     my $apt_cmd = 'apt install -y ' . join (' ', @packages) . ' 2>&1';
-    tell_user('SYSTEM', `$apt_cmd`);
+    tell_user('SYSTEM', `$apt_cmd` . "\n");
 }
 
 # Step: hostname
