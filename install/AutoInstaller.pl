@@ -19,7 +19,7 @@ sub do_delete ($@);
 
 my $os = check_platform();
 my $loc_check;
-($loc_check = __FILE__) =~ s/\/install\/AutoInstaller.pl//;
+($loc_check = $0) =~ s/\/install\/AutoInstaller.pl//;
 
 # NOCONFIG - Colors #
 my $RED    = "\e[31m";
