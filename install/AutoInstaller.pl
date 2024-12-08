@@ -18,6 +18,20 @@ sub find_temp;
 sub do_delete ($@);
 
 my $os = check_platform();
+my $distro;
+
+if ($os eq 'linux') {
+    if (-e '/etc/debian_version') {
+        $distro = "debian";
+    } elsif (-e '/etc/lsb-release') {
+        $distro = "ubuntu";
+    } else {
+        if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
+            die "Unsupported distro, exiting\n";
+        }
+    }
+}
+
 chomp(my $loc_check = `pwd`);
 $loc_check =~ s/\/install//;
 
@@ -133,13 +147,10 @@ $SQL_HOST = ask_user($question, $SQL_HOST, 'input');
 $question = "Please enter the SQL port to be used for the database";
 $SQL_PORT = ask_user($question, $SQL_PORT, 'input');
 
-
 # CONFIG - XAMPP configuration #
-my $XAMPP_INSTALLER_BIN =
-  'https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.3.4/xampp-windows-x64-8.3.4-0-VS16-installer.exe';
-my $XAMPP_INSTALLER_ARGS =
-  '--mode unattended --enabled-components xampp_server,xampp_apache,xampp_mysql,xampp_program_languages,xampp_php,xampp_perl,xampp_tools';
-my $XAMPP_MARIADB_CHPW = 'mysqladmin.exe -u root password';
+my $XAMPP_INSTALLER_BIN  = 'https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.3.4/xampp-windows-x64-8.3.4-0-VS16-installer.exe';
+my $XAMPP_INSTALLER_ARGS = '--mode unattended --enabled-components xampp_server,xampp_apache,xampp_mysql,xampp_program_languages,xampp_php,xampp_perl,xampp_tools';
+my $XAMPP_MARIADB_CHPW   = 'mysqladmin.exe -u root password';
 
 # CONFIG - Composer #
 my $COMPOSER_RUNAS = 'www-data';
@@ -249,10 +260,6 @@ foreach my $key (keys %completed) {
     }
 }
 
-if (!-e '/etc/debian_version' && $os eq "linux") {
-    die "sry no :')";
-}
-
 if (ask_user(
         "Multiple variables in this script are marked with " .
         "'Template Replacements' - Make sure these are filled out properly before " .
@@ -306,33 +313,28 @@ if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
     clean_up();
 }
 
-sub check_platform {
-    my $platform = $^O;
-
-    if ($platform eq "MSwin32") {
-        return "windows";
-    } elsif ($platform eq "linux") {
-        return "linux";
-    }
-    die "Unsupported OS!\n";
-}
-
 #Step: software
 sub install_software {
     my ($apt_output, $sury_output);
-    my $install_cmd;
 
-    if (-e '/etc/apt/sources.list.d/php.list') {
+    if (-e '/etc/apt/sources.list.d/php.list' || -e '/etc/apt/sources.list.d/ondrej-ubuntu-php-noble.sources') {
         tell_user('INFO', 'Sury repo entries already present');
     } else {
-        my $cmd = "sh $GAME_SCRIPTS_DIR/sury_setup.sh";
-        print "cmd '$cmd'\n" and die;
+        my $cmd;
         tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
+        tell_user('SYSTEM', `$cmd`);
+
+        if ($os eq 'linux' && $distro eq 'ubuntu') {
+            $cmd = "bash $GAME_SCRIPTS_DIR/sury_setup_ubnt.sh";
+        } elsif ($os eq 'linux' && $distro eq 'debian') {
+            $cmd = "bash $GAME_SCRIPTS_DIR/sury_setup_deb.sh";
+        } elsif ($os eq 'windows') {
+            # TODO: implement windows setup
+        }
         tell_user('SYSTEM', `$cmd`);
     }
 
     tell_user('INFO',   'Updating system packages');
-    tell_user('SYSTEM', `apt update 2>&1` . "\n");
 
     if (!$PHP_VERSION) {
         tell_user('WARN', "PHP version not specified, attempting to find it...\n");
@@ -417,7 +419,6 @@ sub apache_config {
 
         tell_user('INFO', "Enabling rewrite directives in $VIRTHOST_CONF_FILE");
         `sed -i 's/# REM //' $VIRTHOST_CONF_FILE`;
-
     }
 }
 
@@ -426,12 +427,12 @@ sub fix_permissions {
     `find $GAME_WEB_ROOT -type f -exec chmod 644 {} + 2>&1`;
     `find $GAME_WEB_ROOT -type d -exec chmod 755 {} + 2>&1`;
     `chown -R $APACHE_RUNAS:$APACHE_RUNAS $GAME_WEB_ROOT 2>&1`;
+    tell_user('SUCCESS', 'Permissions fixed!');
 }
 
 # Step: apache_enables
 sub apache_enables {
     my $success = 0;
-
     tell_user('INFO', 'Enabling required Apache configurations, sites and modules');
 
     my $conf_output = `a2enconf php$PHP_VERSION-fpm 2>&1`;
@@ -444,7 +445,7 @@ sub apache_enables {
     $success = $? == 0 ? 1 : 0;
 
     my $sites_ssl_output = `a2ensite ssl-$FQDN.conf 2>&1`;
-    $success = !$? ? 1 : 0;
+    $success = !!!$? ? !0 : 0; #lol job security
 
     tell_user('SYSTEM', "          conf result: $conf_output");
     tell_user('SYSTEM', "          mods result: $mods_output");
