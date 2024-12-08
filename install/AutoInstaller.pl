@@ -18,8 +18,7 @@ sub find_temp;
 sub do_delete ($@);
 
 my $os = check_platform();
-my $loc_check;
-($loc_check = $0) =~ s/\/install\/AutoInstaller.pl//;
+chomp(my $loc_check = `pwd`);
 
 # NOCONFIG - Colors #
 my $RED    = "\e[31m";
@@ -77,12 +76,14 @@ $GAME_WEB_ROOT = ask_user($question, $GAME_WEB_ROOT, 'input');
 $GAME_WEB_ROOT =~ s/\/$//;
 
 if ($loc_check ne $GAME_WEB_ROOT) {
-    my $error = "Setup has determined the files are not in the correct place.\n" .
-                "Please move the contents of the legendofaetheria folder to your\n" .
-                "specified webroot directory: $GAME_WEB_ROOT\n" . 
-                "Current location: $loc_check\n";
+    my $error = "Setup has determined the files are not in the correct place,\n" .
+                " or you're not in the correct folder. Please move the contents\n" .
+                "of the legendofaetheria folder to your webroot, and make sure you're\n" .
+                "the 'install' directory when you run this script.\n\n" .
+                "Specified webroot directory: $GAME_WEB_ROOT\n" . 
+                "Current location           : $loc_check\n";
     die $error;
-}    
+}
 
 if (ask_user("Install required software?", 'yes', 'yesno')) {
     install_software() if !$completed{software};
