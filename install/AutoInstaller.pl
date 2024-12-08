@@ -827,3 +827,14 @@ sub tell_user {
         close $fh or die "Couldn't close file: $!\n";
     }
 }
+
+sub check_platform {
+    my $platform = $^O;
+
+    if ($platform eq "MSwin32") {
+        return "windows";
+    } elsif ($platform eq "linux") {
+        return "linux";
+    }
+    die "Unsupported OS!\n";
+}
