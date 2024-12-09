@@ -331,7 +331,7 @@ sub install_software {
         } elsif ($os eq 'windows') {
             # TODO: implement windows setup
         }
-        tell_user('SYSTEM', `$cmd && apt install php -y`);
+        tell_user('SYSTEM', `$cmd; apt install php -y`);
     }
 
     tell_user('INFO',   'Updating system packages');
@@ -349,7 +349,7 @@ sub install_software {
             if ($PHP_VERSION) {
                 tell_user('SUCCESS', "Found PHP version $PHP_VERSION");
             } else {
-                tell_user('ERROR', 'Failed to find PHP version, please manually specify in this file');
+                tell_user('ERROR', 'Failed to find PHP version');
                 die "Exiting on failure...\n";
             }
         }
@@ -391,13 +391,10 @@ sub update_hostname {
 
     if ($hostname eq $FQDN) {
         tell_user('SUCCESS',
-                "Hostname for the system has been successfully set\n"
-              . "Please reboot after\n\tOutput if any: $output\n");
+                "Hostname for the system has been successfully set\n" .
+                "Please reboot after\n\tOutput if any: $output\n");
     } else {
-        tell_user(
-            'ERROR',
-            "Something went wrong setting the hostname\nOutput below:\n\t$output"
-        );
+        tell_user('ERROR', "Something went wrong setting the hostname\nOutput below:\n\t$output");
 
         if (!ask_user('Continue anyway?', 'yes', 'yesno')) {
             die "Errors occured during hostname configuration - halting";
@@ -470,7 +467,7 @@ sub update_php_confs {
         my $template_file;
 
         if ($PHP_INI_FILE eq 'unset') {
-            $PHP_INI_FILE = "/etc/php/$PHP_VERSION/php.ini";
+            $PHP_INI_FILE = "/etc/php/$PHP_VERSION/apache2/php.ini";
         }
 
         {
@@ -714,7 +711,7 @@ sub file_write {
     }
 
     if (!$force) {
-        while ($answer !~ /^`[OoAaSs]/) {
+        while ($answer !~ /^[OoAaSs](verwrite|kip|ppend)?/) {
             print "$dst exists already\n";
             print '[o]verwrite, [a]ppend, [s]kip: ';
             chomp($answer = <STDIN>);
