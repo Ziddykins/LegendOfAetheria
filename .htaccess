@@ -1,3 +1,6 @@
+ErrorDocument 404 /404.php
+
+
 <IfModule mod_rewrite.c>
     RewriteEngine on
     RewriteCond %{REQUEST_FILENAME} !-d

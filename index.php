@@ -232,11 +232,12 @@
         
     </head>
     
-    <body>    
-        <div class="container-sm my-5 shadow" style="width: 35%;">
+    <body>
+    <div class="container" style="min-width: 325px;">
+        <div id="login-container" class="container shadow position-absolute top-50 start-50 translate-middle" style="max-width:500px; width: 100%;">
             <div class="row">
                 <div class="col p-4">
-                    <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" style="width: 100%;"></img>
+                    <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" class="w-100"></img>
                 </div>
             </div>
             <div class="row">
@@ -252,5 +253,6 @@
         </div>
 
         <?php include 'html/footers.html'; ?>
+</div>
     </body>
 </html>
