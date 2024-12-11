@@ -4,12 +4,12 @@
  * then adds the icon 'bi-diamond-fill' to the clicked tab.
  */
 function tgl_active_signup (e) {
-      document.querySelectorAll('i[class$="diamond-fill"]').forEach(function(ce) {
-          ce.classList.remove('bi-diamond-fill');
-          ce.classList.add('bi-diamond');
-      });
-      e.childNodes[1].classList.add('bi-diamond-fill');
-      e.childNodes[1].classList.remove('bi-diamond');
+    document.querySelectorAll('i[class$="diamond-fill"]').forEach(function(ce) {
+        ce.classList.remove('bi-diamond-fill');
+        ce.classList.add('bi-diamond');
+    });
+    e.childNodes[1].classList.add('bi-diamond-fill');
+    e.childNodes[1].classList.remove('bi-diamond');
   };
 
 /*

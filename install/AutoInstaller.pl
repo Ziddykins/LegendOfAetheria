@@ -4,28 +4,100 @@ use warnings;
 use strict;
 use autodie;
 
+use Config::IniFiles;
+use Data::Dumper;
 use File::Path qw(make_path remove_tree);
 use File::Find;
 use File::Copy;
-use Data::Dumper;
-
-# NOCONFIG - Colors #
-my $RED    = "\e[31m";
-my $GREEN  = "\e[32m";
-my $YELLOW = "\e[33m";
-my $BLUE   = "\e[34m";
-my $CYAN   = "\e[36m";
-my $GREY   = "\e[37m";
-my $RESET  = "\e[0m";
-
 
 use vars qw/*name *dir *prune/;
+
+# Steps
+use constant {
+    HOSTS      => 1,
+    SOFTWARE   => 2,
+    HOSTNAME   => 3,
+    APACHE     => 4,
+    ENABLES    => 5,
+    COMPOSER   => 6,
+    TEMPLATES  => 7,
+    PHP        => 8,
+    SQLIMPORT  => 9,
+    CRONS      => 10,
+    CERTS      => 11,
+    SERVICES   => 12,
+    CLEANUP    => 13,
+    PERMS      => 14,
+};
+
+use constant {
+    CFG_R_MAIN   => 1,
+    CFG_R_SQL    => 2,
+    CFG_R_DOMAIN => 3,
+    CFG_W_MAIN   => 4,
+    CFG_W_SQL    => 5,
+    CFG_W_DOMAIN => 6,
+};
+
 *name   = *File::Find::name;
 *dir    = *File::Find::dir;
 *prune  = *File::Find::prune;
 
 sub find_temp;
 sub do_delete ($@);
+
+my %defaults;    # default/example values, used mostly for questioning user
+my %cfg;         # the focused fqdn's config, a tied hash from Config::IniFiles
+my %clr;         # color constants
+my %ini;         # full configuration ini
+my %sql;         # object containing constant sql configurations
+my $fqdn;        # fully qualified domain name to set up
+my $question;    # current question to ask the user
+
+my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
+
+tie %ini, 'Config::IniFiles', (
+    -file => $cfg_file,
+    -default => 'all',
+    -allowempty => 1,
+    -nomultiline => 1,
+);
+
+%clr = %{$ini{colors}};
+
+$question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
+$fqdn     = ask_user($question, '', 'input');
+
+$ini{$fqdn} = {};
+$ini{$fqdn}{fqdn} = $fqdn;
+
+if ($ini{$fqdn}) {
+    %cfg = %{$ini{$fqdn}};
+    tell_user('INFO', "The FQDN '$cfg{$fqdn}' has an existing configuration file");
+
+    if (ask_user("Would you like to load the configurations?")) {
+        %cfg = %{$ini{$fqdn}};
+
+        if ($cfg{step}) {
+            my $step_continue = ask_user("Would you like to continue from step $cfg{step} or start from the beginning?", '[s]tart over/[c]ontinue', 'input');
+            if ($step_continue =~ /[sS](tart)?/) {
+                $cfg{step} = 0;
+            }
+        }
+    } else {
+        if (ask_user("Are you sure? This will wipe the current config for this FQDN", 'yes', 'yesno')) {
+            delete $ini{$fqdn};
+            $ini{$fqdn} = {};
+            %cfg = %{$ini{$fqdn}};
+        } else {
+            tell_user('WARN', "Continuing with loaded configuration");
+        }
+    }
+} else {
+    tell_user('WARN', 'No configuration for this FQDN, creating new entry');
+    $ini{$fqdn} = {};
+    write_config('null', CFG_W_DOMAIN, $fqdn);
+}
 
 my $os = check_platform();
 my $distro;
@@ -40,80 +112,68 @@ if ($os eq 'linux') {
         }
     }
     tell_user('INFO', "$distro found to be the current distribution");
+    %defaults = %{$ini{lin_examples}};
+} else {
+    %defaults = %{$ini{win_examples}};
 }
+
+$cfg{os} = $os;
+$cfg{distro} = $distro;
+
+$ini{$cfg{fqdn}} = %cfg;
+
+tied(%ini)->WriteConfig($cfg_file);
 
 chomp(my $loc_check = `pwd`);
 $loc_check =~ s/\/install//;
 
-# NOCONFIG - The user will be asked to fill these in; the default values
-# are there for convenience, just hit enter at the prompt to accept defaults
-my $GAME_WEB_ROOT;
-my $PHP_BINARY;
-my $SQL_CONFIG_FILE;
-my $FQDN;
-my $APACHE_DIRECTORY;
-my $VIRTHOST_CONF_FILE;
-my $VIRTHOST_CONF_FILE_SSL;
-my $SSL_FULLCER;
-my $SSL_PRIVKEY;
-my $SSL_ENABLED;
-
-my $question;
-my %completed; # Used for checking the current step
-
-$question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
-$FQDN = ask_user($question, '', 'input');
-
 $question = "Enter the location of your webserver's config directory (e.g. /etc/apache2)";
-$APACHE_DIRECTORY = ask_user($question, '/etc/apache2', 'input');
+$cfg{apache_directory} = ask_user($question, '/etc/apache2', 'input');
 
 # NOCONFIG - See above
 if ($os eq "linux") {
-    $GAME_WEB_ROOT      = "/var/www/html";
-    $PHP_BINARY         = "/usr/bin/php";
-    $SQL_CONFIG_FILE    = '/etc/mysql/mariadb.conf.d/50-server.cnf';
-    $APACHE_DIRECTORY   = '/etc/apache2';
-    $VIRTHOST_CONF_FILE = "$APACHE_DIRECTORY/sites-available/${FQDN}.conf";
-    $SSL_FULLCER        = "/etc/letsencrypt/live/$FQDN/fullchain.pem";
-    $SSL_PRIVKEY        = "/etc/letsencrypt/live/$FQDN/privkey.pem";
+    $cfg{game_web_root}      = "/var/www/html";
+    $cfg{php_binary}         = "/usr/bin/php";
+    $cfg{sql_config_file}    = '/etc/mysql/mariadb.conf.d/50-server.cnf';
+    $cfg{apache_directory}   = '/etc/apache2';
 } elsif ($os eq "windows") {
-    #$GAME_WEB_ROOT = "C:\\Program Files\\Apache Software Foundation\\Apache2.4";
-    $GAME_WEB_ROOT      = 'C:\xampp\htdocs';
-    $PHP_BINARY         = 'C:\xampp\php\php.exe';
-    $SQL_CONFIG_FILE    = 'C:\xampp\mysql\bin\my.ini';
-    $APACHE_DIRECTORY   = 'C:\xampp\apache';
-    $VIRTHOST_CONF_FILE = 'C:\xampp\apache\conf\httpd.conf';
-    $SSL_FULLCER        = 'C:\xampp\apache\conf\ssl.crt\server.crt';
-    $SSL_PRIVKEY        = 'C:\xampp\apache\conf\ssl.key\server.key';
+    #$cfg{game_web_root} = "C:\\Program Files\\Apache Software Foundation\\Apache2.4";
+    $cfg{game_web_root}      = 'C:\xampp\htdocs';
+    $cfg{php_binary}         = 'C:\xampp\php\php.exe';
+    $cfg{sql_config_file}    = 'C:\xampp\mysql\bin\my.ini';
+    $cfg{apache_directory}   = 'C:\xampp\apache';
+    $cfg{virthost_conf_file} = 'C:\xampp\apache\conf\httpd.conf';
+    $cfg{ssl_fullcer}        = 'C:\xampp\apache\conf\ssl.crt\server.crt';
+    $cfg{ssl_privkey}        = 'C:\xampp\apache\conf\ssl.key\server.key';
 }
 
 $question = "Please enter the path to where the game will reside (e.g. /var/www/html/example.com/loa)";
-$GAME_WEB_ROOT = ask_user($question, $GAME_WEB_ROOT, 'input');
-$GAME_WEB_ROOT =~ s/\/$//;
+$cfg{game_web_root} = ask_user($question, $cfg{game_web_root}, 'input');
+$cfg{game_web_root} =~ s/\/$//;
 
 my $LOG_TO_FILE = 'setup.log';
-my $GAME_TEMPLATE_DIR = "$GAME_WEB_ROOT/install/templates";
-my $GAME_SCRIPTS_DIR  = "$GAME_WEB_ROOT/install/scripts";
-my $WEB_ADMIN_EMAIL   = "webmaster\@$FQDN";
+my $GAME_TEMPLATE_DIR = $cfg{game_web_root} . "/install/templates";
+my $GAME_SCRIPTS_DIR  = $cfg{game_web_root} . "install/scripts";
+my $WEB_ADMIN_EMAIL   = "webmaster\@$cfg{$fqdn}";
 my $CRONTAB_DIRECTORY = '/var/spool/cron/crontabs';
 
-if ($loc_check ne $GAME_WEB_ROOT) {
+if ($loc_check ne $cfg{game_web_root}) {
     my $error = "Setup has determined the files are not in the correct place,\n" .
                 " or you're not in the correct folder. Please move the contents\n" .
                 "of the legendofaetheria folder to your webroot, and make sure you're\n" .
                 "the 'install' directory when you run this script.\n\n" .
-                "Specified webroot directory: $GAME_WEB_ROOT\n" . 
+                "Specified webroot directory: $cfg{game_web_root}\n" .
                 "Current location           : $loc_check\n";
     die $error;
 }
 
 if (ask_user("Install required software?", 'yes', 'yesno')) {
-    install_software() if !$completed{software};
-    `touch $GAME_WEB_ROOT/.loa-step-software`;
+    install_software() if $cfg{step} < SOFTWARE;
+    $cfg{step} = SOFTWARE;
 }
 
 # CONFIG - SQL Tables / Template Replacements #
-my $SQL_TBL_CHARACTERS = 'tbl_characters';
+$sql{tbl_characters} = 'tbl_characters';
 my $SQL_TBL_FAMILIARS  = 'tbl_familiars';
 my $SQL_TBL_ACCOUNTS   = 'tbl_accounts';
 my $SQL_TBL_FRIENDS    = 'tbl_friends';
@@ -131,7 +191,7 @@ my $SQL_HOST               = '127.0.2.1';
 my $SQL_PORT               = 3306;
 
 $question = "Please enter the location of your MySQL configuration file (e.g. /etc/mysql/mariadb/mariadb.conf.d/50-server.conf)";
-$SQL_CONFIG_FILE = ask_user($question, $SQL_CONFIG_FILE, 'input');
+$cfg{sql_config_file} = ask_user($question, $cfg{sql_config_file}, 'input');
 
 $question = "Please enter the SQL username to be used for the database";
 $SQL_USERNAME = ask_user($question, $SQL_USERNAME, 'input');
@@ -166,12 +226,12 @@ if (`whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/) {
 
     $question = "PHP was found on this system at '$found_location' - is this the correct" .
                 "location to the PHP binary you want to use?";
-    
+
     if (ask_user($question, 'yes', 'yesno')) {
-        $PHP_BINARY = $found_location;
-    } else {    
+        $cfg{php_binary} = $found_location;
+    } else {
         $question = "Please enter the location of your PHP binary (e.g. /usr/bin/php7.4)";
-        $PHP_BINARY = ask_user($question, $PHP_BINARY, 'input');
+        $cfg{php_binary} = ask_user($question, $cfg{php_binary}, 'input');
     }
 }
 
@@ -199,14 +259,14 @@ my $LINUX_HOSTS_FILE = '/etc/hosts';
 
 # NOCONFIG - Replacements for Templates
 my @replacements = (
-    "###REPL_PHP_BINARY###%%%$PHP_BINARY",
+    "###REPL_PHP_BINARY###%%%$cfg{php_binary}",
 
-    "###REPL_WEB_ROOT###%%%$GAME_WEB_ROOT",
+    "###REPL_WEB_ROOT###%%%$cfg{game_web_root}",
     "###REPL_WEB_ADMIN_EMAIL###%%%$WEB_ADMIN_EMAIL",
-    "###REPL_WEB_FQDN###%%%$FQDN",
-    "###REPL_WEB_DOCROOT###%%%$GAME_WEB_ROOT",
-    "###REPL_WEB_SSL_FULLCER###%%%$SSL_FULLCER",
-    "###REPL_WEB_SSL_PRIVKEY###%%%$SSL_PRIVKEY",
+    "###REPL_WEB_FQDN###%%%$cfg{fqdn}",
+    "###REPL_WEB_DOCROOT###%%%$cfg{game_web_root}",
+    "###REPL_WEB_SSL_FULLCER###%%%$cfg{ssl_fullcer}",
+    "###REPL_WEB_SSL_PRIVKEY###%%%$cfg{ssl_privkey}",
 
     "###REPL_SQL_DB###%%%$SQL_DATABASE",
     "###REPL_SQL_USER###%%%$SQL_USERNAME",
@@ -215,7 +275,7 @@ my @replacements = (
     "###REPL_SQL_PORT###%%%$SQL_PORT",
 
     "###REPL_SQL_TBL_ACCOUNTS###%%%$SQL_TBL_ACCOUNTS",
-    "###REPL_SQL_TBL_CHARACTERS###%%%$SQL_TBL_CHARACTERS",
+    "###REPL_SQL_TBL_CHARACTERS###%%%$sql{tbl_characters}",
     "###REPL_SQL_TBL_FAMILIARS###%%%$SQL_TBL_FAMILIARS",
     "###REPL_SQL_TBL_FRIENDS###%%%$SQL_TBL_FRIENDS",
     "###REPL_SQL_TBL_GLOBALS###%%%$SQL_TBL_GLOBALS",
@@ -227,7 +287,7 @@ my @replacements = (
 
     "###REPL_OPENAI_APIKEY###%%%$OPENAI_APIKEY",
 
-    "###REPL_PHP_COOKIEDOMAIN###%%%$FQDN"
+    "###REPL_PHP_COOKIEDOMAIN###%%%$cfg{fqdn}"
 );
 
 ## NO MORE CONFIGURATION BEYOND THIS POINT ##
@@ -236,28 +296,16 @@ if (check_array(\@ARGV, "--revert-system")) {
     clean_up('revert');
 }
 
-my @steps = qw/hosts software hostname apache apache-enables
-               composer templates php sqlimport crons certificate services/;
 
-foreach my $step (@steps) {
-    -e "$GAME_WEB_ROOT/.loa.step.$step"
-      ? ($completed{$step} = 1)
-      : ($completed{$step} = 0);
-}
-
-foreach my $key (keys %completed) {
-    next if !$completed{$key};
-
+if ($cfg{step}) {
     print "It looks like you have ran this script before; do you want to\n";
-    print "[c]ontinue from step '$key' where you left off, or [r]estart from\n";
+    print "[c]ontinue from where you left off, or [r]estart from\n";
     print "the beginning?\n[r]estart/[c]ontinue: ";
-    chomp (my $answer = <STDIN>);
+    chomp(my $answer = <STDIN>);
 
     if ($answer =~ /[rR](estart)?/) {
         clean_up();
-        foreach my $key (keys %completed) {
-            $completed{$key} = 0;
-        }
+        $cfg{step} = 0;
     }
 }
 
@@ -267,51 +315,51 @@ if (ask_user(
         "continuing\nContinue and generate templates?", 'yes', 'yesno'
     )) {
     generate_templates();
-    `touch $GAME_WEB_ROOT/.loa.step.templates.gen`;
+    `touch $cfg{game_web_root}/.loa.step.templates.gen`;
 }
 
 if (ask_user("Process generated templates?", 'yes', 'yesno')) {
     process_templates();
-    `touch $GAME_WEB_ROOT/.loa.step.templates.process`;
+    `touch $cfg{game_web_root}/.loa.step.templates.process`;
 }
 
 #if (ask_user("Update system hostname to match FQDN?")) {
-#    update_hostname() if !$completed{hostname};
-#   `touch $GAME_WEB_ROOT/.loa.step.hostname`;
+#    update_hostname() if !$cfg{step} == hostname;
+#   `touch $cfg{game_web_root}/.loa.step.hostname`;
 #}
 
 if (ask_user("Perform necessary apache updates?", 'yes', 'yesno')) {
-    apache_config() if !$completed{apache};
-    `touch $GAME_WEB_ROOT/.loa.step.apache`;
+    apache_config() if $cfg{step} < APACHE;
+    `touch $cfg{game_web_root}/.loa.step.apache`;
 }
 
 if (ask_user("Enable the required Apache conf/mods/sites?", 'yes', 'yesno')) {
-    apache_enables() if !$completed{apache_enables};
-    `touch $GAME_WEB_ROOT/.loa.step.apache_enables`;
+    apache_enables() if $cfg{step} < ENABLES;
+    `touch $cfg{game_web_root}/.loa.step.apache_enables`;
 }
 
 if (ask_user("Update PHP configurations? (security, performance)", 'yes', 'yesno')) {
-    update_php_confs() if !$completed{php};
-    `touch $GAME_WEB_ROOT/.loa.step.php`;
+    update_php_confs() if $cfg{step} < PHP;
+    `touch $cfg{game_web_root}/.loa.step.php`;
 }
 
 if (ask_user("Run composer to download required dependencies?", 'yes', 'yesno')) {
-    composer_pull() if !$completed{composer};
-    `touch $GAME_WEB_ROOT/.loa.step.composer`;
+    composer_pull() if $cfg{step} < COMPOSER;
+    `touch $cfg{game_web_root}/.loa.step.composer`;
 }
 
 if (ask_user("Start all services?", 'yes', 'yesno')) {
-   start_services();
-   `touch $GAME_WEB_ROOT/.loa.step.services`;
+   start_services() if $cfg{step} < SERVICES;
+   `touch $cfg{game_web_root}/.loa.step.services`;
 }
 
 if (ask_user("Fix all webserver permissions?", 'yes', 'yesno')) {
-    fix_permissions();
-    `touch $GAME_WEB_ROOT/.loa.step.permissions`;
+    fix_permissions() if $cfg{step} < PERMISSIONS;
+    `touch $cfg{game_web_root}/.loa.step.permissions`;
 }
 
 if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
-    clean_up();
+    clean_up() if $cfg{step} < CLEANUP;
 }
 
 #Step: software
@@ -385,11 +433,11 @@ sub install_software {
 
 # Step: hostname
 sub update_hostname {
-    my $output = `hostnamectl set-hostname $FQDN 2>&1 | grep -v Hint`;
-    $output .= `hostnamectl set-hostname $FQDN --pretty 2>&1 | grep -v Hint`;
+    my $output = `hostnamectl set-hostname $cfg{fqdn} 2>&1 | grep -v Hint`;
+    $output .= `hostnamectl set-hostname $cfg{fqdn} --pretty 2>&1 | grep -v Hint`;
     chomp (my $hostname = `hostname -f`);
 
-    if ($hostname eq $FQDN) {
+    if ($hostname eq $cfg{fqdn}) {
         tell_user('SUCCESS',
                 "Hostname for the system has been successfully set\n" .
                 "Please reboot after\n\tOutput if any: $output\n");
@@ -407,23 +455,23 @@ sub apache_config {
     if (ask_user("Do you want to redirect traffic from http:80 to "
         . "https:443? A valid certificate needs to be set in the "
         . "script configuration!\n- Currently set -\n"
-        . "Certificate: $SSL_FULLCER\n"
-        . "Private Key: $SSL_PRIVKEY\n"
+        . "Certificate: $cfg{ssl_fullcer}\n"
+        . "Private Key: $cfg{ssl_privkey}\n"
         , 'yes', 'yesno')) {
 
         tell_user('INFO',   'Enabling mod_rewrite if it isn\'t already');
         tell_user('SYSTEM', `a2enmod rewrite 2>&1`);
 
-        tell_user('INFO', "Enabling rewrite directives in $VIRTHOST_CONF_FILE");
-        `sed -i 's/# REM //' $VIRTHOST_CONF_FILE`;
+        tell_user('INFO', "Enabling rewrite directives in $cfg{virthost_conf_file}");
+        `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
     }
 }
 
 # Step: Fix permissions
 sub fix_permissions {
-    `find $GAME_WEB_ROOT -type f -exec chmod 644 {} + 2>&1`;
-    `find $GAME_WEB_ROOT -type d -exec chmod 755 {} + 2>&1`;
-    `chown -R $APACHE_RUNAS:$APACHE_RUNAS $GAME_WEB_ROOT 2>&1`;
+    `find $cfg{game_web_root} -type f -exec chmod 644 {} + 2>&1`;
+    `find $cfg{game_web_root} -type d -exec chmod 755 {} + 2>&1`;
+    `chown -R $APACHE_RUNAS:$APACHE_RUNAS $cfg{game_web_root} 2>&1`;
     tell_user('SUCCESS', 'Permissions fixed!');
 }
 
@@ -438,10 +486,10 @@ sub apache_enables {
     my $mods_output = `a2enmod php$PHP_VERSION rewrite setenvif ssl 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
-    my $sites_output = `a2ensite $FQDN.conf 2>&1`;
+    my $sites_output = `a2ensite $cfg{fqdn}.conf 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
-    my $sites_ssl_output = `a2ensite ssl-$FQDN.conf 2>&1`;
+    my $sites_ssl_output = `a2ensite ssl-$cfg{fqdn}.conf 2>&1`;
     $success = !!!$? ? !0 : 0; #lol job security
 
     tell_user('SYSTEM', "          conf result: $conf_output");
@@ -498,8 +546,8 @@ sub update_php_confs {
 
 # Step: composer
 sub composer_pull {
-    if (ask_user("Composer is going to download/install these as $COMPOSER_RUNAS - continue?\n")) {
-        my $cmd = "sudo -u $COMPOSER_RUNAS composer --working-dir \"$GAME_WEB_ROOT\" install";
+    if (ask_user("Composer is going to download/install these as $COMPOSER_RUNAS - continue?", 'yes', 'yesno')) {
+        my $cmd = "sudo -u $COMPOSER_RUNAS composer --working-dir \"$cfg{game_web_root}\" install";
         my $cmd_output = `$cmd 2>&1`;
         tell_user('SYSTEM', $cmd_output);
     }
@@ -512,7 +560,7 @@ sub generate_templates {
     my $fh_cron;
     my %templates;
 
-    `sed -i 's/bind-address.*/bind-address = $SQL_HOST/' $SQL_CONFIG_FILE`;
+    `sed -i 's/bind-address.*/bind-address = $SQL_HOST/' $cfg{sql_config_file}`;
 
     # key = in file, value = out file
     $templates{$ENV_TEMPLATE}          = "$ENV_TEMPLATE.ready";
@@ -522,7 +570,7 @@ sub generate_templates {
     $templates{$VIRTHOST_SSL_TEMPLATE} = "$VIRTHOST_SSL_TEMPLATE.ready";
     $templates{$VIRTHOST_TEMPLATE}     = "$VIRTHOST_TEMPLATE.ready";
     $templates{$PHP_TEMPLATE}          = "$PHP_TEMPLATE.ready";
-    
+
     while(my ($key, $val) = each %templates) {
         open my $fh, '<', $key;
         local $/;
@@ -532,7 +580,7 @@ sub generate_templates {
         foreach my $replacement (@replacements) {
             my ($search, $replace) = split '%%%', $replacement;
             $contents =~ s/$search/$replace/gm;
-            file_write($templates{$key}, $contents, 'data', 1);           
+            file_write($templates{$key}, $contents, 'data', 1);
         }
     }
 
@@ -548,30 +596,30 @@ sub process_templates {
     }
 
     tell_user('INFO', "Importing SQL schema, creating user and granting privileges");
-    
+
     my $sql_cmd = "mysql -u root < $SQL_TEMPLATE.ready 2>&1";
     chomp(my $sql_import_result = `$sql_cmd`);
     $sql_import_result //= 'Successfully imported database schema';
 
     # LOL
     tell_user((!!$? ? 'ERROR' : 'SUCCESS'), $sql_import_result);
-    
-    tell_user('INFO', "Copying over $ENV_TEMPLATE.ready to $GAME_WEB_ROOT/.env");
-    file_write("$GAME_WEB_ROOT/.env", "$ENV_TEMPLATE.ready", 'file');
 
-    tell_user('INFO', "Copying over $VIRTHOST_TEMPLATE.ready to $VIRTHOST_CONF_FILE");
-    file_write($VIRTHOST_CONF_FILE, "$VIRTHOST_TEMPLATE.ready", 'file');
+    tell_user('INFO', "Copying over $ENV_TEMPLATE.ready to $cfg{game_web_root}/.env");
+    file_write("$cfg{game_web_root}/.env", "$ENV_TEMPLATE.ready", 'file');
 
-    if ($SSL_ENABLED) {
-        tell_user('INFO', "Copying over $VIRTHOST_SSL_TEMPLATE.ready to $VIRTHOST_CONF_FILE_SSL");
-        file_write($VIRTHOST_CONF_FILE_SSL, "$VIRTHOST_SSL_TEMPLATE.ready", 'file');
+    tell_user('INFO', "Copying over $VIRTHOST_TEMPLATE.ready to $cfg{virthost_conf_file}");
+    file_write($cfg{virthost_conf_file}, "$VIRTHOST_TEMPLATE.ready", 'file');
+
+    if ($cfg{ssl_enabled}) {
+        tell_user('INFO', "Copying over $VIRTHOST_SSL_TEMPLATE.ready to $cfg{virthost_conf_file_ssl}");
+        file_write($cfg{virthost_conf_file_ssl}, "$VIRTHOST_SSL_TEMPLATE.ready", 'file');
     }
 
-    tell_user('INFO', "Copying over $HTACCESS_TEMPLATE.ready to $GAME_WEB_ROOT/.htaccess");
-    file_write("$GAME_WEB_ROOT/.htaccess", "$HTACCESS_TEMPLATE.ready", 'file');
+    tell_user('INFO', "Copying over $HTACCESS_TEMPLATE.ready to $cfg{game_web_root}/.htaccess");
+    file_write("$cfg{game_web_root}/.htaccess", "$HTACCESS_TEMPLATE.ready", 'file');
 
     tell_user('INFO', "Copying over $CRONTAB_TEMPLATE to $CRONTAB_DIRECTORY/$APACHE_RUNAS");
-    
+
     if (!-d $CRONTAB_DIRECTORY) {
         make_path($CRONTAB_DIRECTORY);
     }
@@ -580,10 +628,10 @@ sub process_templates {
         unlink("$CRONTAB_DIRECTORY/$APACHE_RUNAS");
     }
 
-    file_write("$CRONTAB_DIRECTORY/$APACHE_RUNAS", "$CRONTAB_TEMPLATE.ready");    
+    file_write("$CRONTAB_DIRECTORY/$APACHE_RUNAS", "$CRONTAB_TEMPLATE.ready");
     tell_user('INFO', "Updating permissions on new crontab to $APACHE_RUNAS:crontab");
     `chown $APACHE_RUNAS:crontab $CRONTAB_DIRECTORY/$APACHE_RUNAS`;
-    tell_user('SUCCESS', "All template files have been applied");    
+    tell_user('SUCCESS', "All template files have been applied");
 }
 
 #Step: start services
@@ -598,14 +646,14 @@ sub start_services {
 ## INTERNAL SCRIPT FUNCTIONS ##
 sub replace_in_file {
     my ($search, $replace, $file_in, $file_out) = @_;
-    
+
     $file_out //= $file_in;
 
     local $/;
     open my $fh, '<', $file_in;
     my @contents = <$fh>;
     close $fh;
-   
+
     for (my $i=0; $i<scalar @contents - 1; $i++) {
         next if $contents[$i] !~ /$search/;
         my $new;
@@ -615,7 +663,7 @@ sub replace_in_file {
     }
 
     print "[" . substr($file_in, -5, 5) . " -> " . substr($file_out, -5, 5) . "] $search -> $replace\n";
-    
+
     open $fh, '>', $file_out;
     print $fh @contents;
     close $fh;
@@ -625,17 +673,17 @@ sub clean_up {
     my ($mode, $file) = @_;
 
     if ($mode eq 'revert') {
-        tell_user("INFO", "Searching for temporary and generated files to clean up in $GAME_WEB_ROOT");
-        File::Find::find({wanted => \&find_temp}, "$GAME_WEB_ROOT/");
+        tell_user("INFO", "Searching for temporary and generated files to clean up in $cfg{game_web_root}");
+        File::Find::find({wanted => \&find_temp}, "$cfg{game_web_root}/");
 
-        tell_user("INFO", "Searching for temporary and generated files to clean up in $APACHE_DIRECTORY");
-        `a2dissite $VIRTHOST_CONF_FILE`;
-        
-        if ($SSL_ENABLED) {
-            `a2dissite $VIRTHOST_CONF_FILE_SSL`;
+        tell_user("INFO", "Searching for temporary and generated files to clean up in $cfg{apache_directory}");
+        `a2dissite $cfg{virthost_conf_file}`;
+
+        if ($cfg{ssl_enabled}) {
+            `a2dissite $cfg{virthost_conf_file_ssl}`;
         }
 
-        File::Find::find({wanted => \&find_temp}, "$APACHE_DIRECTORY/");
+        File::Find::find({wanted => \&find_temp}, "$cfg{apache_directory}/");
 
         tell_user("INFO", "Dropping sury repos from sources.list.d");
         File::Find::find({wanted => \&find_temp}, '/etc/apt/sources.list.d/');
@@ -659,8 +707,8 @@ sub find_temp {
         '\.env$',
         '^\.loa-step',
         '\.ready$',
-        "ssl-$FQDN.conf\$",
-        "$FQDN.conf\$",
+        "ssl-$cfg{fqdn}.conf\$",
+        "$cfg{fqdn}.conf\$",
         'php.list$'
     );
 
@@ -699,10 +747,11 @@ sub file_write {
         $data = $src;
         tell_user('INFO', "Loaded data directly from passed variable");
     }
-
+%{$ini{$fqdn}} = %cfg;
+tied(%ini)->WriteConfig($cfg_file);
     if (!-e $dst) {
         tell_user('INFO', "File '$dst' doesn't exist already, writing new file");
-        
+
         open $fh, '>', $dst or die "Can't open file '$dst' for write: $@\n";
             print $fh $data;
         close $fh or die "Can't close file '$dst': $@";
@@ -739,11 +788,11 @@ sub file_write {
 sub ask_user {
     my ($prompt, $default, $type) = @_;
     my $date = get_date();
-    
+
     print "$date $prompt\n";
 
     if ($type eq 'yesno') {
-        print "\n\tChoice[${GREEN}y${RESET}/${RED}n${RESET}]: ";
+        print "\n\tChoice[$clr{green}y$clr{reset}/$clr{red}n$clr{reset}]: ";
     } elsif ($type eq 'input') {
         if ($default) {
            print "[$default]> ";
@@ -792,21 +841,21 @@ sub tell_user {
     my $prefix = "$date [";
 
     if ($severity eq 'INFO') {
-        $prefix .= $BLUE . '?';
+        $prefix .= $clr{blue} . '?';
     } elsif ($severity eq 'WARN') {
-        $prefix .= $YELLOW . '!';
+        $prefix .= $clr{yellow} . '!';
     } elsif ($severity eq 'ERROR') {
-        $prefix .= $RED . '-';
+        $prefix .= $clr{red} . '-';
     } elsif ($severity eq 'SUCCESS') {
-        $prefix .= $GREEN . '+';
+        $prefix .= $clr{green} . '+';
     } elsif ($severity eq 'SYSTEM') {
         $message =~ s/[\r\n]/\n\t\t/g;
-        $prefix .= $GREY . '*';
+        $prefix .= $clr{grey} . '*';
     } else {
         print "$message\n";
     }
 
-    $prefix .= "$RESET] ";
+    $prefix .= "$clr{reset}] ";
 
     print "$prefix -> $message\n";
 
@@ -835,3 +884,26 @@ sub check_platform {
     }
     die "Unsupported OS!\n";
 }
+
+sub handle_cfg {
+    my ($href_section, $op, $fqdn) = @_;
+    my %t_hash = %{$href_section};
+
+    if ($op eq CFG_W_DOMAIN) {
+        if (exists($ini{$fqdn})) {
+            %{$ini{$fqdn}} = %t_hash;
+            tied(%ini)->WriteConfig($cfg_file);
+            tell_user('SUCCESS', "Updated domain '$fqdn' config");
+        } else {
+            %{$ini{$fqdn}} = {};
+            %{$ini{$fqdn}} = %t_hash;
+            tied(%ini)->WriteConfig($cfg_file);
+            tell_user('SUCCESS', "Added new webroot '$cfg_file'\n");
+        }
+    }
+}
+
+# TODO:
+# - Remove install folder after
+# - Fix PHP ini not populating on template overwrite
+#@values = $cfg->val('Section', 'Parameter');

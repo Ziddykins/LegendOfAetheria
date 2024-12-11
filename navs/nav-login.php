@@ -44,7 +44,7 @@
                                 </div>
 
                                 <div class="vstack gap-1">                                    
-                                    <button class="btn btn-primary mb-1" id="login-submit" name="login-submit" value="1" onclick=google_login>
+                                    <button class="btn btn-primary mb-1" id="login-submit" name="login-submit" value="1">
                                         <i class="bi bi-door-open-fill"></i> Login
                                     </button>
                                 </div>
@@ -242,10 +242,10 @@
                     <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
                         <div class="container">
                             <div class="row">
-                                <div class="col">
+                                <div class="col border border-success">
                                     <form id="contact-form" name="contact-form" action="/?contact_form_submitted=1" method="POST">
                                         <div class="border">
-                                            <div class="d-flex bg-body-secondary border">
+                                            <div class="d-flex bg-success-subtle bg-gradient">
                                                 <div class="p-2 flex-grow-1"><h6><i class="bi bi-envelope-heart"></i> Contact Me</div>
                                             </div>
                                         </div>
@@ -264,8 +264,10 @@
                                                 <textarea class="form-control" id="contact-message" name="contact-message" placeholder="Message" aria-label="Message" aria-describedby="contact-message" style="height: 200px;" required></textarea>
                                                 <label for="contact-message">Message</label>
                                             </div>
-                                        </div><br>
-                                        <small class="form-text text-danger fw-bold">* Required</small>
+                                        </div>
+                                        <p>
+                                            <small class="form-text text-danger fw-bold" style="font-size: 10px;">* Required</small>
+                                        </p>
 
                                         <button class="btn btn-primary mb-3" id="contact-submit" name="contact-submit" value="1">
                                             🤍 Submit
