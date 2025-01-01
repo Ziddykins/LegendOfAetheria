@@ -1,3 +1,4 @@
+/* stylelint-disable */
 @charset "UTF-8";
 /*!
  * Bootstrap  v5.3.3 (https://getbootstrap.com/)
@@ -12053,5 +12054,5 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
-
+/* stylelint-enable */
 /*# sourceMappingURL=bootstrap.css.map */
