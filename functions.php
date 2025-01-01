@@ -144,7 +144,7 @@
         return date("Y-m-d H:i:s", strtotime("$modifier"));
     }
 
-            /**
+       /**
          * Retrieves data from a specified table based on the given identifier and type.
          *
          * @param string $identifier The unique identifier to search for in the table.

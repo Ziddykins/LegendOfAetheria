@@ -3,6 +3,7 @@
 use warnings;
 use strict;
 use autodie;
+use diagnostics;
 
 use Config::IniFiles;
 use Data::Dumper;
@@ -16,18 +17,18 @@ use vars qw/*name *dir *prune/;
 use constant {
     HOSTS      => 1,
     SOFTWARE   => 2,
-    HOSTNAME   => 3,
-    APACHE     => 4,
-    ENABLES    => 5,
-    COMPOSER   => 6,
-    TEMPLATES  => 7,
-    PHP        => 8,
-    SQLIMPORT  => 9,
-    CRONS      => 10,
-    CERTS      => 11,
-    SERVICES   => 12,
-    CLEANUP    => 13,
-    PERMS      => 14,
+    SERVICES   => 4,
+    APACHE     => 8,
+    ENABLES    => 16,
+    COMPOSER   => 32,
+    TEMPLATES  => 64,
+    PHP        => 128,
+    SQL        => 256,
+    CRONS      => 512,
+    CERTS      => 1024,
+    HOSTNAME   => 2048,
+    CLEANUP    => 4096,
+    PERMS      => 8192,
 };
 
 use constant {
@@ -39,6 +40,8 @@ use constant {
     CFG_W_DOMAIN => 6,
 };
 
+$|++;
+
 *name   = *File::Find::name;
 *dir    = *File::Find::dir;
 *prune  = *File::Find::prune;
@@ -46,11 +49,13 @@ use constant {
 sub find_temp;
 sub do_delete ($@);
 
-my %defaults;    # default/example values, used mostly for questioning user
+my %def;         # default/example values, unless pulled from users' existing cfg
 my %cfg;         # the focused fqdn's config, a tied hash from Config::IniFiles
+my %glb;         # hash which holds all other required config variables
+my %ini;         # full configuration ini, all domains
+my %sql;         # object containing constant sql table names
 my %clr;         # color constants
-my %ini;         # full configuration ini
-my %sql;         # object containing constant sql configurations
+
 my $fqdn;        # fully qualified domain name to set up
 my $question;    # current question to ask the user
 
@@ -64,23 +69,26 @@ tie %ini, 'Config::IniFiles', (
 );
 
 %clr = %{$ini{colors}};
+%sql = %{$ini{sql_tables}};
+
+if ($ENV{'USER'} ne 'root') {
+    die $clr{red} . 'This script must be ran as root, not ',
+        $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
+}
 
 $question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
 $fqdn     = ask_user($question, '', 'input');
 
-$ini{$fqdn} = {};
-$ini{$fqdn}{fqdn} = $fqdn;
-
 if ($ini{$fqdn}) {
     %cfg = %{$ini{$fqdn}};
-    tell_user('INFO', "The FQDN '$cfg{$fqdn}' has an existing configuration file");
 
-    if (ask_user("Would you like to load the configurations?")) {
+    tell_user('INFO', "The FQDN '" . $cfg{fqdn} . "' has an existing configuration file");
+
+    if (ask_user("Would you like to load the configurations?", 'yes', 'yesno')) {
         %cfg = %{$ini{$fqdn}};
 
         if ($cfg{step}) {
-            my $step_continue = ask_user("Would you like to continue from step $cfg{step} or start from the beginning?", '[s]tart over/[c]ontinue', 'input');
-            if ($step_continue =~ /[sS](tart)?/) {
+            if (ask_user("Would you like to continue from step $cfg{step} or start from the beginning?", '[s]tart over/[c]ontinue', 'input')) {
                 $cfg{step} = 0;
             }
         }
@@ -88,39 +96,42 @@ if ($ini{$fqdn}) {
         if (ask_user("Are you sure? This will wipe the current config for this FQDN", 'yes', 'yesno')) {
             delete $ini{$fqdn};
             $ini{$fqdn} = {};
-            %cfg = %{$ini{$fqdn}};
         } else {
             tell_user('WARN', "Continuing with loaded configuration");
         }
+        %cfg = %{$ini{$fqdn}};
     }
 } else {
     tell_user('WARN', 'No configuration for this FQDN, creating new entry');
-    $ini{$fqdn} = {};
-    write_config('null', CFG_W_DOMAIN, $fqdn);
+    handle_cfg({}, CFG_W_DOMAIN, $fqdn);
 }
+
+$cfg{fqdn} = $fqdn;
 
 my $os = check_platform();
 my $distro;
 
 if ($os eq 'linux') {
     my $ver = `uname -v`;
-    if ($ver =~ /(debian|ubuntu)/i) {
+    if ($ver =~ /(debian|ubuntu|kali)/i) {
         $distro = $1;
     } else {
         if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
             die "Unsupported distro, exiting\n";
         }
+        $distro = "unsupported";
     }
     tell_user('INFO', "$distro found to be the current distribution");
-    %defaults = %{$ini{lin_examples}};
+    %def = %{$ini{lin_examples}};
 } else {
-    %defaults = %{$ini{win_examples}};
+    %def = %{$ini{win_examples}};
 }
+
+merge_hashes(\%cfg, \%def);
+merge_hashes(\%cfg, \%glb);
 
 $cfg{os} = $os;
 $cfg{distro} = $distro;
-
-$ini{$cfg{fqdn}} = %cfg;
 
 tied(%ini)->WriteConfig($cfg_file);
 
@@ -130,83 +141,53 @@ $loc_check =~ s/\/install//;
 $question = "Enter the location of your webserver's config directory (e.g. /etc/apache2)";
 $cfg{apache_directory} = ask_user($question, '/etc/apache2', 'input');
 
-# NOCONFIG - See above
-if ($os eq "linux") {
-    $cfg{game_web_root}      = "/var/www/html";
-    $cfg{php_binary}         = "/usr/bin/php";
-    $cfg{sql_config_file}    = '/etc/mysql/mariadb.conf.d/50-server.cnf';
-    $cfg{apache_directory}   = '/etc/apache2';
-} elsif ($os eq "windows") {
-    #$cfg{game_web_root} = "C:\\Program Files\\Apache Software Foundation\\Apache2.4";
-    $cfg{game_web_root}      = 'C:\xampp\htdocs';
-    $cfg{php_binary}         = 'C:\xampp\php\php.exe';
-    $cfg{sql_config_file}    = 'C:\xampp\mysql\bin\my.ini';
-    $cfg{apache_directory}   = 'C:\xampp\apache';
-    $cfg{virthost_conf_file} = 'C:\xampp\apache\conf\httpd.conf';
-    $cfg{ssl_fullcer}        = 'C:\xampp\apache\conf\ssl.crt\server.crt';
-    $cfg{ssl_privkey}        = 'C:\xampp\apache\conf\ssl.key\server.key';
-}
-
 $question = "Please enter the path to where the game will reside (e.g. /var/www/html/example.com/loa)";
-$cfg{game_web_root} = ask_user($question, $cfg{game_web_root}, 'input');
-$cfg{game_web_root} =~ s/\/$//;
+$cfg{web_root} = ask_user($question, $cfg{web_root} ? $cfg{web_root} : '/var/www/html/kali.local/loa', 'input');
+$cfg{web_root} =~ s/\/$//;
 
-my $LOG_TO_FILE = 'setup.log';
-my $GAME_TEMPLATE_DIR = $cfg{game_web_root} . "/install/templates";
-my $GAME_SCRIPTS_DIR  = $cfg{game_web_root} . "install/scripts";
-my $WEB_ADMIN_EMAIL   = "webmaster\@$cfg{$fqdn}";
-my $CRONTAB_DIRECTORY = '/var/spool/cron/crontabs';
+$cfg{template_dir} = $cfg{web_root} . "/install/templates";
+$cfg{scripts_dir}  = $cfg{web_root} . "/install/scripts";
+$cfg{admin_email}  = "webmaster\@$cfg{fqdn}";
 
-if ($loc_check ne $cfg{game_web_root}) {
+
+
+$cfg{setup_log}    = $cfg{web_root} . '/setup.log';
+$cfg{step}         = 1;
+
+$cfg{virthost_conf_file}    = "$cfg{apache_directory}/$cfg{fqdn}.conf";
+$cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/ssl-$cfg{fqdn}.conf";
+
+if ($loc_check ne $cfg{web_root}) {
     my $error = "Setup has determined the files are not in the correct place,\n" .
                 " or you're not in the correct folder. Please move the contents\n" .
                 "of the legendofaetheria folder to your webroot, and make sure you're\n" .
                 "the 'install' directory when you run this script.\n\n" .
-                "Specified webroot directory: $cfg{game_web_root}\n" .
+                "Specified webroot directory: $cfg{web_root}\n" .
                 "Current location           : $loc_check\n";
     die $error;
 }
 
-if (ask_user("Install required software?", 'yes', 'yesno')) {
-    install_software() if $cfg{step} < SOFTWARE;
-    $cfg{step} = SOFTWARE;
+if ($cfg{step} < SOFTWARE) {
+    if (ask_user("Install required software?", 'yes', 'yesno')) {
+        step_install_software();
+        $cfg{step} += SOFTWARE;
+        handle_cfg({}, CFG_W_DOMAIN, $fqdn);
+    }
 }
 
-# CONFIG - SQL Tables / Template Replacements #
-$sql{tbl_characters} = 'tbl_characters';
-my $SQL_TBL_FAMILIARS  = 'tbl_familiars';
-my $SQL_TBL_ACCOUNTS   = 'tbl_accounts';
-my $SQL_TBL_FRIENDS    = 'tbl_friends';
-my $SQL_TBL_GLOBALS    = 'tbl_globals';
-my $SQL_TBL_MAIL       = 'tbl_mail';
-my $SQL_TBL_CHATS      = 'tbl_chats';
-my $SQL_TBL_MONSTERS   = 'tbl_monsters';
-my $SQL_TBL_LOGS       = 'tbl_logs';
+if ($cfg{step} < SERVICES) {
+    if (ask_user("Start all required services now?", 'yes', 'yesno')) {
+        step_start_services();
+        $cfg{step} += SERVICES;
+        handle_cfg({}, CFG_W_DOMAIN, $fqdn);
+    }
+}
 
-# CONFIG - SQL Credentials / Template Replacements #
-my $SQL_USERNAME           = 'user_loa';
-my $SQL_PASSWORD           = gen_random(15);
-my $SQL_DATABASE           = 'db_loa';
-my $SQL_HOST               = '127.0.2.1';
-my $SQL_PORT               = 3306;
-
-$question = "Please enter the location of your MySQL configuration file (e.g. /etc/mysql/mariadb/mariadb.conf.d/50-server.conf)";
-$cfg{sql_config_file} = ask_user($question, $cfg{sql_config_file}, 'input');
-
-$question = "Please enter the SQL username to be used for the database";
-$SQL_USERNAME = ask_user($question, $SQL_USERNAME, 'input');
-
-$question = "Please enter the SQL password to be used for the database";
-$SQL_PASSWORD = ask_user($question, $SQL_PASSWORD, 'input');
-
-$question = "Please enter the SQL database to be used for the game";
-$SQL_DATABASE = ask_user($question, $SQL_DATABASE, 'input');
-
-$question = "Please enter the SQL host to be used for the database";
-$SQL_HOST = ask_user($question, $SQL_HOST, 'input');
-
-$question = "Please enter the SQL port to be used for the database";
-$SQL_PORT = ask_user($question, $SQL_PORT, 'input');
+if ($cfg{step} < SQL) {
+    if (ask_user("Go through SQL configurations?")) {
+        step_sql_configure();
+    }
+}
 
 # CONFIG - XAMPP configuration #
 my $XAMPP_INSTALLER_BIN  = 'https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.3.4/xampp-windows-x64-8.3.4-0-VS16-installer.exe';
@@ -214,12 +195,12 @@ my $XAMPP_INSTALLER_ARGS = '--mode unattended --enabled-components xampp_server,
 my $XAMPP_MARIADB_CHPW   = 'mysqladmin.exe -u root password';
 
 # CONFIG - Composer #
-my $COMPOSER_RUNAS = 'www-data';
-my $APACHE_RUNAS   = 'www-data';
+$cfg{composer_runas} = 'www-data';
+$cfg{apache_runas}   = 'www-data';
+handle_cfg({}, CFG_W_DOMAIN, $fqdn);
 
 # CONFIG - PHP #
-my $PHP_VERSION;
-my $PHP_INI_FILE = 'unset';
+$cfg{php_ini} = 'unset';
 
 if (`whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/) {
     my $found_location = $1;
@@ -243,51 +224,47 @@ if ($OPENAI_ENABLE) {
     $question = "OpenAI configuration is enabled; please enter your OpenAI API key";
     $OPENAI_APIKEY = ask_user($question, '', 'input');
 }
+handle_cfg({}, CFG_W_DOMAIN, $fqdn);
 
 # NOCONFIG - Template Files #
-my $VIRTHOST_SSL_TEMPLATE = "$GAME_TEMPLATE_DIR/virtual_host_ssl.template";
-my $VIRTHOST_TEMPLATE     = "$GAME_TEMPLATE_DIR/virtual_host.template";
-my $HTACCESS_TEMPLATE     = "$GAME_TEMPLATE_DIR/htaccess.template";
-my $CRONTAB_TEMPLATE      = "$GAME_TEMPLATE_DIR/crontab.template";
-my $ENV_TEMPLATE          = "$GAME_TEMPLATE_DIR/env.template";
-my $SQL_TEMPLATE          = "$GAME_TEMPLATE_DIR/sql.template";
-my $PHP_TEMPLATE          = "$GAME_TEMPLATE_DIR/php.template";
-
-# NOCONFIG - Hosts files #
-my $WIN32_HOSTS_FILE = 'c:\windows\system32\drivers\etc\hosts';
-my $LINUX_HOSTS_FILE = '/etc/hosts';
+my $VIRTHOST_SSL_TEMPLATE = "$cfg{template_dir}/virtual_host_ssl.template";
+my $VIRTHOST_TEMPLATE     = "$cfg{template_dir}/virtual_host.template";
+my $HTACCESS_TEMPLATE     = "$cfg{template_dir}/htaccess.template";
+my $CRONTAB_TEMPLATE      = "$cfg{template_dir}/crontab.template";
+my $ENV_TEMPLATE          = "$cfg{template_dir}/env.template";
+my $SQL_TEMPLATE          = "$cfg{template_dir}/sql.template";
+my $PHP_TEMPLATE          = "$cfg{template_dir}/php.template";
 
 # NOCONFIG - Replacements for Templates
 my @replacements = (
     "###REPL_PHP_BINARY###%%%$cfg{php_binary}",
 
-    "###REPL_WEB_ROOT###%%%$cfg{game_web_root}",
-    "###REPL_WEB_ADMIN_EMAIL###%%%$WEB_ADMIN_EMAIL",
+    "###REPL_WEB_ROOT###%%%$cfg{web_root}",
+    "###REPL_WEB_ADMIN_EMAIL###%%%$cfg{admin_email}",
     "###REPL_WEB_FQDN###%%%$cfg{fqdn}",
-    "###REPL_WEB_DOCROOT###%%%$cfg{game_web_root}",
+    "###REPL_WEB_DOCROOT###%%%$cfg{web_root}",
     "###REPL_WEB_SSL_FULLCER###%%%$cfg{ssl_fullcer}",
     "###REPL_WEB_SSL_PRIVKEY###%%%$cfg{ssl_privkey}",
 
-    "###REPL_SQL_DB###%%%$SQL_DATABASE",
-    "###REPL_SQL_USER###%%%$SQL_USERNAME",
-    "###REPL_SQL_PASS###%%%$SQL_PASSWORD",
-    "###REPL_SQL_HOST###%%%$SQL_HOST",
-    "###REPL_SQL_PORT###%%%$SQL_PORT",
+    "###REPL_SQL_DB###%%%$cfg{sql_database}",
+    "###REPL_SQL_USER###%%%$cfg{sql_username}",
+    "###REPL_SQL_PASS###%%%$cfg{sql_password}",
+    "###REPL_SQL_HOST###%%%$cfg{sql_host}",
+    "###REPL_SQL_PORT###%%%$cfg{sql_port}",
 
-    "###REPL_SQL_TBL_ACCOUNTS###%%%$SQL_TBL_ACCOUNTS",
+    "###REPL_SQL_TBL_ACCOUNTS###%%%$sql{tbl_accounts}",
     "###REPL_SQL_TBL_CHARACTERS###%%%$sql{tbl_characters}",
-    "###REPL_SQL_TBL_FAMILIARS###%%%$SQL_TBL_FAMILIARS",
-    "###REPL_SQL_TBL_FRIENDS###%%%$SQL_TBL_FRIENDS",
-    "###REPL_SQL_TBL_GLOBALS###%%%$SQL_TBL_GLOBALS",
-    "###REPL_SQL_TBL_MAIL###%%%$SQL_TBL_MAIL",
-    "###REPL_SQL_TBL_MONSTERS###%%%$SQL_TBL_MONSTERS",
-    "###REPL_SQL_USER###%%%$SQL_USERNAME",
-    "###REPL_SQL_TBL_LOGS###%%%$SQL_TBL_LOGS",
-    "###REPL_SQL_TBL_GLOBALS###%%%$SQL_TBL_GLOBALS",
+    "###REPL_SQL_TBL_FAMILIARS###%%%$sql{tbl_familiars}",
+    "###REPL_SQL_TBL_FRIENDS###%%%$sql{tbl_friends}",
+    "###REPL_SQL_TBL_MAIL###%%%$sql{tbl_mail}",
+    "###REPL_SQL_TBL_MONSTERS###%%%$sql{tbl_monsters}",
+    "###REPL_SQL_USER###%%%$cfg{sql_username}",
+    "###REPL_SQL_TBL_LOGS###%%%$sql{tbl_logs}",
+    "###REPL_SQL_TBL_GLOBALS###%%%$sql{tbl_globals}",
 
     "###REPL_OPENAI_APIKEY###%%%$OPENAI_APIKEY",
 
-    "###REPL_PHP_COOKIEDOMAIN###%%%$cfg{fqdn}"
+    "###REPL_PHP_COOKIEDOMAIN###%%\%$cfg{fqdn}"
 );
 
 ## NO MORE CONFIGURATION BEYOND THIS POINT ##
@@ -297,7 +274,7 @@ if (check_array(\@ARGV, "--revert-system")) {
 }
 
 
-if ($cfg{step}) {
+if ($cfg{step} > 0) {
     print "It looks like you have ran this script before; do you want to\n";
     print "[c]ontinue from where you left off, or [r]estart from\n";
     print "the beginning?\n[r]estart/[c]ontinue: ";
@@ -314,48 +291,39 @@ if (ask_user(
         "'Template Replacements' - Make sure these are filled out properly before " .
         "continuing\nContinue and generate templates?", 'yes', 'yesno'
     )) {
-    generate_templates();
-    `touch $cfg{game_web_root}/.loa.step.templates.gen`;
+    step_generate_templates();
 }
 
 if (ask_user("Process generated templates?", 'yes', 'yesno')) {
-    process_templates();
-    `touch $cfg{game_web_root}/.loa.step.templates.process`;
+    step_process_templates();
 }
 
 #if (ask_user("Update system hostname to match FQDN?")) {
-#    update_hostname() if !$cfg{step} == hostname;
-#   `touch $cfg{game_web_root}/.loa.step.hostname`;
+#    step_update_hostname() if !$cfg{step} == hostname;
 #}
 
 if (ask_user("Perform necessary apache updates?", 'yes', 'yesno')) {
-    apache_config() if $cfg{step} < APACHE;
-    `touch $cfg{game_web_root}/.loa.step.apache`;
+    step_apache_config() if $cfg{step} < APACHE;
 }
 
 if (ask_user("Enable the required Apache conf/mods/sites?", 'yes', 'yesno')) {
-    apache_enables() if $cfg{step} < ENABLES;
-    `touch $cfg{game_web_root}/.loa.step.apache_enables`;
+    step_apache_enables() if $cfg{step} < ENABLES;
 }
 
 if (ask_user("Update PHP configurations? (security, performance)", 'yes', 'yesno')) {
-    update_php_confs() if $cfg{step} < PHP;
-    `touch $cfg{game_web_root}/.loa.step.php`;
-}
-
-if (ask_user("Run composer to download required dependencies?", 'yes', 'yesno')) {
-    composer_pull() if $cfg{step} < COMPOSER;
-    `touch $cfg{game_web_root}/.loa.step.composer`;
-}
-
-if (ask_user("Start all services?", 'yes', 'yesno')) {
-   start_services() if $cfg{step} < SERVICES;
-   `touch $cfg{game_web_root}/.loa.step.services`;
+    step_update_php_confs() if $cfg{step} < PHP;
 }
 
 if (ask_user("Fix all webserver permissions?", 'yes', 'yesno')) {
-    fix_permissions() if $cfg{step} < PERMISSIONS;
-    `touch $cfg{game_web_root}/.loa.step.permissions`;
+    step_fix_permissions() if $cfg{step} < PERMS;
+}
+
+if (ask_user("Run composer to download required dependencies?", 'yes', 'yesno')) {
+    step_composer_pull() if $cfg{step} < COMPOSER;
+}
+
+if (ask_user("Start all services?", 'yes', 'yesno')) {
+   step_start_services() if $cfg{step} < SERVICES;
 }
 
 if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
@@ -363,7 +331,7 @@ if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
 }
 
 #Step: software
-sub install_software {
+sub step_install_software {
     my ($apt_output, $sury_output);
 
     if (-e '/etc/apt/sources.list.d/php.list' || -e '/etc/apt/sources.list.d/ondrej-ubuntu-php-noble.sources') {
@@ -373,66 +341,98 @@ sub install_software {
         tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
 
         if ($distro eq 'ubuntu') {
-            $cmd = "bash $GAME_SCRIPTS_DIR/sury_setup_ubnt.sh";
-        } elsif ($distro eq 'debian') {
-            $cmd = "bash $GAME_SCRIPTS_DIR/sury_setup_deb.sh";
+            $cmd = "sh -c $cfg{scripts_dir}/sury_setup_ubnt.sh";
+        } elsif ($distro =~ /debian|kali/i) {
+            $cmd = "sh -c $cfg{scripts_dir}/sury_setup_deb.sh";
         } elsif ($os eq 'windows') {
             # TODO: implement windows setup
         }
-        tell_user('SYSTEM', `$cmd; apt install php -y`);
+        tell_user('SYSTEM', `$cmd`);
     }
 
     tell_user('INFO',   'Updating system packages');
 
-    if (!$PHP_VERSION) {
+    if (!$cfg{php_version}) {
         tell_user('WARN', "PHP version not specified, attempting to find it...\n");
 
         if ($os eq 'linux') {
+            tell_user('SYSTEM', `apt update`);
             chomp(my $ver_output = `php --version | head -n1`);
 
             if ($ver_output =~ /PHP (\d+\.\d+)/) {
-                $PHP_VERSION = $1;
+                $cfg{php_version} = $1;
             }
 
-            if ($PHP_VERSION) {
-                tell_user('SUCCESS', "Found PHP version $PHP_VERSION");
+            if ($cfg{php_version}) {
+                tell_user('SUCCESS', "Found PHP version $cfg{php_version}");
             } else {
                 tell_user('ERROR', 'Failed to find PHP version');
                 die "Exiting on failure...\n";
             }
         }
     } else {
-        die "Invalid or unsupported PHP version set in the installer\n" .
-            "supported PHP versions: 7.0 - 8.4\n\n";
+        tell_user('ERROR', "Invalid or unsupported PHP version set in the installer\n" .
+                           "supported PHP versions: 7.0 - 8.4\n\n");
+        if (ask_user('Try with version 8.3?', 'yes', 'yesno')) {
+            $cfg{php_version} = "8.3";
+        }
     }
 
     my @packages = (
         "cron",
-        "php$PHP_VERSION",
-        "php$PHP_VERSION-cli",
-        "php$PHP_VERSION-common",
-        "php$PHP_VERSION-curl",
-        "php$PHP_VERSION-dev",
-        "php$PHP_VERSION-fpm",
-        "php$PHP_VERSION-mbstring",
-        "php$PHP_VERSION-mysql",
-        "php$PHP_VERSION-xml",
+        "php$cfg{php_version}",
+        "php$cfg{php_version}-cli",
+        "php$cfg{php_version}-common",
+        "php$cfg{php_version}-curl",
+        "php$cfg{php_version}-dev",
+        "php$cfg{php_version}-fpm",
+        "php$cfg{php_version}-mbstring",
+        "php$cfg{php_version}-mysql",
+        "php$cfg{php_version}-xml",
         "mariadb-server",
         "apache2",
         "letsencrypt",
         "python-is-python3",
         "python3-certbot-apache",
         "libapache2-mod-php",
-        "libapache2-mod-php$PHP_VERSION",
+        "libapache2-mod-php$cfg{php_version}",
         "composer",
     );
 
+    tell_user('INFO', 'Installing ' . @packages . ' packages\n');
     my $apt_cmd = 'apt install -y ' . join (' ', @packages) . ' 2>&1';
     tell_user('SYSTEM', `$apt_cmd` . "\n");
 }
 
+sub step_sql_configure {
+    $cfg{sql_username} = 'user_loa';
+    $cfg{sql_password} = gen_random(15);
+    $cfg{sql_database} = 'db_loa';
+    $cfg{sql_host}     = '127.0.0.1';
+    $cfg{sql_port}     = 3306;
+
+    $question = "Please enter the location of your MySQL configuration file (e.g. /etc/mysql/mariadb/mariadb.conf.d/50-server.conf)";
+    $cfg{sql_config_file} = ask_user($question, $cfg{sql_config_file}, 'input');
+
+    $question = "Please enter the SQL username to be used for the database";
+    $cfg{sql_username} = ask_user($question, $cfg{sql_username}, 'input');
+
+    $question = "Please enter the SQL password to be used for the database";
+    $cfg{sql_password} = ask_user($question, $cfg{sql_password}, 'input');
+
+    $question = "Please enter the SQL database to be used for the game";
+    $cfg{sql_database} = ask_user($question, $cfg{sql_database}, 'input');
+
+    $question = "Please enter the SQL host to be used for the database";
+    $cfg{sql_host} = ask_user($question, $cfg{sql_host}, 'input');
+
+    $question = "Please enter the SQL port to be used for the database";
+    $cfg{sql_port} = ask_user($question, $cfg{sql_port}, 'input');
+    handle_cfg({}, CFG_W_DOMAIN, $fqdn);
+}
+
 # Step: hostname
-sub update_hostname {
+sub step_update_hostname {
     my $output = `hostnamectl set-hostname $cfg{fqdn} 2>&1 | grep -v Hint`;
     $output .= `hostnamectl set-hostname $cfg{fqdn} --pretty 2>&1 | grep -v Hint`;
     chomp (my $hostname = `hostname -f`);
@@ -451,7 +451,7 @@ sub update_hostname {
 }
 
 # Step: apache
-sub apache_config {
+sub step_apache_config {
     if (ask_user("Do you want to redirect traffic from http:80 to "
         . "https:443? A valid certificate needs to be set in the "
         . "script configuration!\n- Currently set -\n"
@@ -468,22 +468,22 @@ sub apache_config {
 }
 
 # Step: Fix permissions
-sub fix_permissions {
-    `find $cfg{game_web_root} -type f -exec chmod 644 {} + 2>&1`;
-    `find $cfg{game_web_root} -type d -exec chmod 755 {} + 2>&1`;
-    `chown -R $APACHE_RUNAS:$APACHE_RUNAS $cfg{game_web_root} 2>&1`;
+sub step_fix_permissions {
+    `find $cfg{web_root} -type f -exec chmod 644 {} + 2>&1`;
+    `find $cfg{web_root} -type d -exec chmod 755 {} + 2>&1`;
+    `chown -R $cfg{apache_runas}:$cfg{apache_runas} $cfg{web_root} 2>&1`;
     tell_user('SUCCESS', 'Permissions fixed!');
 }
 
-# Step: apache_enables
-sub apache_enables {
+# Step: step_apache_enables
+sub step_apache_enables {
     my $success = 0;
     tell_user('INFO', 'Enabling required Apache configurations, sites and modules');
 
-    my $conf_output = `a2enconf php$PHP_VERSION-fpm 2>&1`;
+    my $conf_output = `a2enconf php$cfg{php_version}-fpm 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
-    my $mods_output = `a2enmod php$PHP_VERSION rewrite setenvif ssl 2>&1`;
+    my $mods_output = `a2enmod php$cfg{php_version} rewrite setenvif ssl 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
     my $sites_output = `a2ensite $cfg{fqdn}.conf 2>&1`;
@@ -508,19 +508,19 @@ sub apache_enables {
 }
 
 #Step: PHP configurations
-sub update_php_confs {
+sub step_update_php_confs {
     if ($os eq 'linux') {
         my @keys = qw/expose_php error_reporting display_errors display_startup_errors allow_url_fopen allow_url_include session.gc_maxlifetime disable_functions session.cookie_domain session.use_strict_mode session.use_cookies session.cookie_lifetime session.cookie_secure session.cookie_httponly session.cookie_samesite session.cache_expire/;
         my $ini_contents;
         my $template_file;
 
-        if ($PHP_INI_FILE eq 'unset') {
-            $PHP_INI_FILE = "/etc/php/$PHP_VERSION/apache2/php.ini";
+        if ($cfg{php_ini} eq 'unset') {
+            $cfg{php_ini} = "/etc/php/$cfg{php_version}/apache2/php.ini";
         }
 
         {
             local $/;
-            open my $t_fh, '<', "$GAME_TEMPLATE_DIR/php.template"
+            open my $t_fh, '<', "$cfg{template_dir}/php.template"
 		        or die "Couldn't open template file for read: $!\n";
             $template_file = <$t_fh>;
             close $t_fh;
@@ -528,8 +528,8 @@ sub update_php_confs {
 
         {
             local $/;
-            open my $fh, '<', $PHP_INI_FILE
-                or die "Couldn't open '$PHP_INI_FILE' for read: $!\n";
+            open my $fh, '<', $cfg{php_ini}
+                or die "Couldn't open '$cfg{php_ini}' for read: $!\n";
             $ini_contents = <$fh>;
             close $fh;
         }
@@ -538,29 +538,29 @@ sub update_php_confs {
             $ini_contents =~ s/$key ?=.*?$[\r\n]//;
         }
 
-        file_write('install\templates\php.template', $PHP_INI_FILE, 'file', 1);
+        file_write('install\templates\php.template', $cfg{php_ini}, 'file', 1);
     } else {
-        $PHP_INI_FILE = 'C:\xampp\php\php.ini';
+        $cfg{php_ini} = 'C:\xampp\php\php.ini';
     }
 }
 
 # Step: composer
-sub composer_pull {
-    if (ask_user("Composer is going to download/install these as $COMPOSER_RUNAS - continue?", 'yes', 'yesno')) {
-        my $cmd = "sudo -u $COMPOSER_RUNAS composer --working-dir \"$cfg{game_web_root}\" install";
+sub step_composer_pull {
+    if (ask_user("Composer is going to download/install these as $cfg{composer_runas} - continue?", 'yes', 'yesno')) {
+        my $cmd = "sudo -u $cfg{composer_runas} composer --working-dir \"$cfg{web_root}\" install";
         my $cmd_output = `$cmd 2>&1`;
         tell_user('SYSTEM', $cmd_output);
     }
 }
 
 # Step: Template imports
-sub generate_templates {
+sub step_generate_templates {
     my $copy_output;
     my $cron_contents = '';
     my $fh_cron;
     my %templates;
 
-    `sed -i 's/bind-address.*/bind-address = $SQL_HOST/' $cfg{sql_config_file}`;
+    `sed -i 's/bind-address.*/bind-address = $cfg{sql_host}/' $cfg{sql_config_file}`;
 
     # key = in file, value = out file
     $templates{$ENV_TEMPLATE}          = "$ENV_TEMPLATE.ready";
@@ -587,7 +587,7 @@ sub generate_templates {
     tell_user('SUCCESS', "Replacements have been made in all template files\n");
 }
 
-sub process_templates {
+sub step_process_templates {
     my $cp_cmd;
     if (check_platform() eq 'linux') {
         $cp_cmd = "cp";
@@ -604,41 +604,42 @@ sub process_templates {
     # LOL
     tell_user((!!$? ? 'ERROR' : 'SUCCESS'), $sql_import_result);
 
-    tell_user('INFO', "Copying over $ENV_TEMPLATE.ready to $cfg{game_web_root}/.env");
-    file_write("$cfg{game_web_root}/.env", "$ENV_TEMPLATE.ready", 'file');
+    tell_user('INFO', "Copying over $ENV_TEMPLATE.ready to $cfg{web_root}/.env");
+    file_write("$cfg{web_root}/.env", "$ENV_TEMPLATE.ready", 'file');
 
     tell_user('INFO', "Copying over $VIRTHOST_TEMPLATE.ready to $cfg{virthost_conf_file}");
     file_write($cfg{virthost_conf_file}, "$VIRTHOST_TEMPLATE.ready", 'file');
 
     if ($cfg{ssl_enabled}) {
         tell_user('INFO', "Copying over $VIRTHOST_SSL_TEMPLATE.ready to $cfg{virthost_conf_file_ssl}");
-        file_write($cfg{virthost_conf_file_ssl}, "$VIRTHOST_SSL_TEMPLATE.ready", 'file');
+        file_write($cfg{virthost_conf_file_a}, "$VIRTHOST_SSL_TEMPLATE.ready", 'file');
     }
 
-    tell_user('INFO', "Copying over $HTACCESS_TEMPLATE.ready to $cfg{game_web_root}/.htaccess");
-    file_write("$cfg{game_web_root}/.htaccess", "$HTACCESS_TEMPLATE.ready", 'file');
+    tell_user('INFO', "Copying over $HTACCESS_TEMPLATE.ready to $cfg{web_root}/.htaccess");
+    file_write("$cfg{web_root}/.htaccess", "$HTACCESS_TEMPLATE.ready", 'file');
 
-    tell_user('INFO', "Copying over $CRONTAB_TEMPLATE to $CRONTAB_DIRECTORY/$APACHE_RUNAS");
+    tell_user('INFO', "Copying over $CRONTAB_TEMPLATE to $cfg{crontab_dir}/$cfg{apache_runas}");
 
-    if (!-d $CRONTAB_DIRECTORY) {
-        make_path($CRONTAB_DIRECTORY);
+    if (!-d $cfg{crontab_dir}) {
+        make_path($cfg{crontab_dir});
     }
 
-    if (-e "$CRONTAB_DIRECTORY/$APACHE_RUNAS") {
-        unlink("$CRONTAB_DIRECTORY/$APACHE_RUNAS");
+    if (-e "$cfg{crontab_dir}/$cfg{apache_runas}") {
+        unlink("$cfg{crontab_dir}/$cfg{apache_runas}");
     }
 
-    file_write("$CRONTAB_DIRECTORY/$APACHE_RUNAS", "$CRONTAB_TEMPLATE.ready");
-    tell_user('INFO', "Updating permissions on new crontab to $APACHE_RUNAS:crontab");
-    `chown $APACHE_RUNAS:crontab $CRONTAB_DIRECTORY/$APACHE_RUNAS`;
+    file_write("$cfg{crontab_dir}/$cfg{apache_runas}", "$CRONTAB_TEMPLATE.ready");
+    tell_user('INFO', "Updating permissions on new crontab to $cfg{apache_runas}:crontab");
+    `chown $cfg{apache_runas}:crontab $cfg{crontab_dir}/$cfg{apache_runas}`;
     tell_user('SUCCESS', "All template files have been applied");
 }
 
 #Step: start services
-sub start_services {
-    my @services = qq/mariadb php$PHP_VERSION-fpm apache2/;
+sub step_start_services {
+    my @services = ("mariadb",  "php$cfg{php_version}-fpm",  "apache2");
 
     foreach my $service (@services) {
+        tell_user('INFO', "Starting $service");
         tell_user('SYSTEM', `systemctl restart $service`);
     }
 }
@@ -671,16 +672,22 @@ sub replace_in_file {
 
 sub clean_up {
     my ($mode, $file) = @_;
+    $mode //= "none";
 
     if ($mode eq 'revert') {
-        tell_user("INFO", "Searching for temporary and generated files to clean up in $cfg{game_web_root}");
-        File::Find::find({wanted => \&find_temp}, "$cfg{game_web_root}/");
+        my $cmd;
+
+        tell_user("INFO", "Searching for temporary and generated files to clean up in $cfg{web_root}");
+        File::Find::find({wanted => \&find_temp}, "$cfg{web_root}/");
 
         tell_user("INFO", "Searching for temporary and generated files to clean up in $cfg{apache_directory}");
-        `a2dissite $cfg{virthost_conf_file}`;
+        
+        $cmd = "a2dissite $cfg{virthost_conf_file}";
+        tell_user("SYSTEM", `$cmd`);
 
         if ($cfg{ssl_enabled}) {
-            `a2dissite $cfg{virthost_conf_file_ssl}`;
+            $cmd = "a2dissite $cfg{virthost_conf_file_ssl}";
+            tell_user("SYSTEM", `$cmd`);
         }
 
         File::Find::find({wanted => \&find_temp}, "$cfg{apache_directory}/");
@@ -688,14 +695,13 @@ sub clean_up {
         tell_user("INFO", "Dropping sury repos from sources.list.d");
         File::Find::find({wanted => \&find_temp}, '/etc/apt/sources.list.d/');
 
-        tell_user("INFO", "Dropping database $SQL_DATABASE and dropping user $SQL_USERNAME");
-        `mysql -e 'DROP DATABASE $SQL_DATABASE; DROP USER $SQL_USERNAME;'`;
+        tell_user("INFO", "Dropping database $cfg{sql_database} and dropping user $cfg{sql_username}");
+        $cmd = "mysql -u root -e 'DROP DATABASE $cfg{sql_database}; DROP USER $cfg{sql_username};'";
+        tell_user('SYSTEM', `$cmd`);
 
-        tell_user("INFO", "Removing our crontab at $CRONTAB_DIRECTORY/$APACHE_RUNAS");
-        unlink("$CRONTAB_DIRECTORY/$APACHE_RUNAS");
+        tell_user("INFO", "Removing our crontab at $cfg{crontab_dir}/$cfg{apache_runas}");
+        unlink("$cfg{crontab_dir}/$cfg{apache_runas}");
     }
-
-
 
     tell_user('SUCCESS', 'Cleaned up all of our temp files!');
 }
@@ -734,12 +740,14 @@ sub gen_random {
 sub file_write {
     my ($dst, $src, $type, $force) = @_;
     my ($fh, $data, $answer);
+    $answer //= 'none';
+    $type //= 'none';
 
     if ($type eq 'file') { # essentially 'copy'
         if (-e $src) {
             local $/;
             open my $src_fh, '<', $src or die "Can't open source file '$src': $@\n";
-                $data = <$src_fh>;
+            $data = <$src_fh>;
             close $src_fh or die "Can't close source file '$src': $@\n";
         }
         tell_user('INFO', "Loaded data from file '$src'");
@@ -747,13 +755,12 @@ sub file_write {
         $data = $src;
         tell_user('INFO', "Loaded data directly from passed variable");
     }
-%{$ini{$fqdn}} = %cfg;
-tied(%ini)->WriteConfig($cfg_file);
-    if (!-e $dst) {
+
+   if (!-e $dst) {
         tell_user('INFO', "File '$dst' doesn't exist already, writing new file");
 
         open $fh, '>', $dst or die "Can't open file '$dst' for write: $@\n";
-            print $fh $data;
+        print $fh $data;
         close $fh or die "Can't close file '$dst': $@";
 
         return 0;
@@ -782,7 +789,7 @@ tied(%ini)->WriteConfig($cfg_file);
 
     print $fh $data;
     tell_user('SUCCESS', "Done writing to $dst\n");
-    close $fh;
+    close $fh or die "Couldn't close file: $@\n";
 }
 
 sub ask_user {
@@ -792,12 +799,12 @@ sub ask_user {
     print "$date $prompt\n";
 
     if ($type eq 'yesno') {
-        print "\n\tChoice[$clr{green}y$clr{reset}/$clr{red}n$clr{reset}]: ";
+        print "[$clr{green}y$clr{reset}/$clr{red}n$clr{reset}]> ";
     } elsif ($type eq 'input') {
         if ($default) {
-           print "[$default]> ";
+           print "[$clr{yellow}$default$clr{reset}]> ";
         } else {
-            print "enter> ";
+            print "$clr{yellow}enter$clr{reset}> ";
         }
     }
 
@@ -839,6 +846,7 @@ sub tell_user {
     my ($severity, $message, $result) = @_;
     my $date   = get_date();
     my $prefix = "$date [";
+    $message //= "<$clr{yellow}no message$clr{reset}>";
 
     if ($severity eq 'INFO') {
         $prefix .= $clr{blue} . '?';
@@ -864,9 +872,9 @@ sub tell_user {
         print $result;
     }
 
-    if ($LOG_TO_FILE) {
-        open my $fh, '>>', $LOG_TO_FILE
-          or die "Couldn't open log file for append '$LOG_TO_FILE': $!";
+    if ($cfg{setup_log}) {
+        open my $fh, '>>', $cfg{setup_log}
+          or die "Couldn't open log file for append '$cfg{setup_log}': $!";
 
         print $fh $message;
 
@@ -895,10 +903,24 @@ sub handle_cfg {
             tied(%ini)->WriteConfig($cfg_file);
             tell_user('SUCCESS', "Updated domain '$fqdn' config");
         } else {
-            %{$ini{$fqdn}} = {};
+            $ini{$fqdn} = {};
             %{$ini{$fqdn}} = %t_hash;
             tied(%ini)->WriteConfig($cfg_file);
             tell_user('SUCCESS', "Added new webroot '$cfg_file'\n");
+        }
+    }
+}
+
+sub merge_hashes {
+    my ($hash1, $hash2) = @_;
+
+    foreach my $key (keys %$hash2) {
+        if (exists $hash1->{$key} && ref $hash1->{$key} eq 'HASH' && ref $hash2->{$key} eq 'HASH') {
+            $hash1->{$key} = merge_hashes($hash1->{$key}, $hash2->{$key});
+        } elsif (exists $hash1->{$key} && $hash1->{$key} ne $hash2->{$key}) {
+            next;
+        } else {
+            $hash1->{$key} = $hash2->{$key};
         }
     }
 }
