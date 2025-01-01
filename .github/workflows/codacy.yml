@@ -32,6 +32,7 @@ jobs:
           format: sarif
           gh-code-scanning-compat: true
           max-allowed-issues: 2147483647
+          config-file: ./.github/workflows/codacy-exclude.yml
 
       - name: Upload SARIF results file
         uses: github/codeql-action/upload-sarif@v2
