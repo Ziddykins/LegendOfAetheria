@@ -1,4 +1,4 @@
-paths-ignore:
- - '**/*bootstrap*'
- - '**/*jquery*'
- - '**/*loading-bar*'
+exclude:
+  - "**/bootstrap/**"
+  - "**/jquery/**"
+  - "**/loading-bar/**"
