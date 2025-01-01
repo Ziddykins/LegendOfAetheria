@@ -431,9 +431,6 @@
         if (str_starts_with($result['email_2'], '¿b¿')) {
             return LOAError::MAIL_ALREADY_BLOCKED;
         }
-
-        print_r($result);
-        die();
     }
 
     /**

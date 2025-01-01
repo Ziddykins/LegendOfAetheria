@@ -12,7 +12,7 @@
     require_once 'functions.php';
     
     if (!isset($argv)) {
-        $log->warning('Access to cron.php directly is not allowed!', ['REQUEST' => print_r($_REQUEST, true)]);
+        $log->warning('Access to cron.php directly is not allowed!', ['REQUEST' => $_REQUEST, true)]);
         echo 'Access to cron.php directly is not allowed!';
         exit(LOAError::CRON_HTTP_DIRECT_ACCESS);
     }

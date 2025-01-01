@@ -11,11 +11,8 @@
     require_once 'constants.php';
     require_once 'functions.php';
 
-
-
     global $log;
-    print_r($_REQUEST);
-    exit();
+    
     /*
 
         $data = [

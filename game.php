@@ -27,8 +27,6 @@
     load_monster_sheet($monster_pool);
 
     $account   = table_to_obj($_SESSION['email'], 'account');
-    print_r($_SESSION);
-    exit();
 
     /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
