@@ -30,7 +30,7 @@ use constant {
     CLEANUP    => 4096,
     PERMS      => 8192,
 };
-
+^(a[b[:print:]b]a{85})$
 use constant {
     CFG_R_MAIN   => 1,
     CFG_R_SQL    => 2,
