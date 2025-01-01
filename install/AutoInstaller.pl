@@ -30,7 +30,7 @@ use constant {
     CLEANUP    => 4096,
     PERMS      => 8192,
 };
-^(a[b[:print:]b]a{85})$
+
 use constant {
     CFG_R_MAIN   => 1,
     CFG_R_SQL    => 2,
@@ -103,7 +103,8 @@ if ($ini{$fqdn}) {
     }
 } else {
     tell_user('WARN', 'No configuration for this FQDN, creating new entry');
-    handle_cfg({}, CFG_W_DOMAIN, $fqdn);
+    $ini{$fqdn} = {};
+    handle_cfg({}, CFG_W_MAIN, $fqdn);
 }
 
 $cfg{fqdn} = $fqdn;
@@ -133,7 +134,7 @@ merge_hashes(\%cfg, \%glb);
 $cfg{os} = $os;
 $cfg{distro} = $distro;
 
-tied(%ini)->WriteConfig($cfg_file);
+handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 
 chomp(my $loc_check = `pwd`);
 $loc_check =~ s/\/install//;
@@ -150,12 +151,11 @@ $cfg{scripts_dir}  = $cfg{web_root} . "/install/scripts";
 $cfg{admin_email}  = "webmaster\@$cfg{fqdn}";
 
 
-
 $cfg{setup_log}    = $cfg{web_root} . '/setup.log';
 $cfg{step}         = 1;
 
-$cfg{virthost_conf_file}    = "$cfg{apache_directory}/$cfg{fqdn}.conf";
-$cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/ssl-$cfg{fqdn}.conf";
+$cfg{virthost_conf_file}    = "$cfg{apache_directory}/sites-available/$cfg{fqdn}.conf";
+$cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{fqdn}.conf";
 
 if ($loc_check ne $cfg{web_root}) {
     my $error = "Setup has determined the files are not in the correct place,\n" .
@@ -171,7 +171,7 @@ if ($cfg{step} < SOFTWARE) {
     if (ask_user("Install required software?", 'yes', 'yesno')) {
         step_install_software();
         $cfg{step} += SOFTWARE;
-        handle_cfg({}, CFG_W_DOMAIN, $fqdn);
+        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
 }
 
@@ -179,13 +179,14 @@ if ($cfg{step} < SERVICES) {
     if (ask_user("Start all required services now?", 'yes', 'yesno')) {
         step_start_services();
         $cfg{step} += SERVICES;
-        handle_cfg({}, CFG_W_DOMAIN, $fqdn);
+        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
 }
 
 if ($cfg{step} < SQL) {
-    if (ask_user("Go through SQL configurations?")) {
+    if (ask_user("Go through SQL configurations?", 'yes', 'yesno')) {
         step_sql_configure();
+        $cfg{step} += SQL;
     }
 }
 
@@ -197,7 +198,7 @@ my $XAMPP_MARIADB_CHPW   = 'mysqladmin.exe -u root password';
 # CONFIG - Composer #
 $cfg{composer_runas} = 'www-data';
 $cfg{apache_runas}   = 'www-data';
-handle_cfg({}, CFG_W_DOMAIN, $fqdn);
+handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 
 # CONFIG - PHP #
 $cfg{php_ini} = 'unset';
@@ -224,7 +225,7 @@ if ($OPENAI_ENABLE) {
     $question = "OpenAI configuration is enabled; please enter your OpenAI API key";
     $OPENAI_APIKEY = ask_user($question, '', 'input');
 }
-handle_cfg({}, CFG_W_DOMAIN, $fqdn);
+handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 
 # NOCONFIG - Template Files #
 my $VIRTHOST_SSL_TEMPLATE = "$cfg{template_dir}/virtual_host_ssl.template";
@@ -272,7 +273,6 @@ my @replacements = (
 if (check_array(\@ARGV, "--revert-system")) {
     clean_up('revert');
 }
-
 
 if ($cfg{step} > 0) {
     print "It looks like you have ran this script before; do you want to\n";
@@ -428,7 +428,7 @@ sub step_sql_configure {
 
     $question = "Please enter the SQL port to be used for the database";
     $cfg{sql_port} = ask_user($question, $cfg{sql_port}, 'input');
-    handle_cfg({}, CFG_W_DOMAIN, $fqdn);
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 # Step: hostname
@@ -756,7 +756,7 @@ sub file_write {
         tell_user('INFO', "Loaded data directly from passed variable");
     }
 
-   if (!-e $dst) {
+    if (!-e $dst) {
         tell_user('INFO', "File '$dst' doesn't exist already, writing new file");
 
         open $fh, '>', $dst or die "Can't open file '$dst' for write: $@\n";
@@ -795,7 +795,7 @@ sub file_write {
 sub ask_user {
     my ($prompt, $default, $type) = @_;
     my $date = get_date();
-
+    $type //= 'input';
     print "$date $prompt\n";
 
     if ($type eq 'yesno') {
@@ -908,6 +908,8 @@ sub handle_cfg {
             tied(%ini)->WriteConfig($cfg_file);
             tell_user('SUCCESS', "Added new webroot '$cfg_file'\n");
         }
+    } elsif ($op eq CFG_W_MAIN) {
+        tied(%ini)->WriteConfig($cfg_file);
     }
 }
 
