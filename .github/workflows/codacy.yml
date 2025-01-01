@@ -33,14 +33,14 @@ jobs:
           gh-code-scanning-compat: true
           max-allowed-issues: 2147483647
           config-file: ./.github/workflows/codacy-exclude.yml
-        engines:
-          eslint:
-            enabled: true
-            exclude_paths:
-              - "**/*.css"
-              - "**/*.js"
-          csslint:
-            enabled: false
+          engines:
+            eslint:
+              enabled: true
+              exclude_paths:
+                - "**/*.css"
+                - "**/*.js"
+            csslint:
+              enabled: false
       - name: Upload SARIF results file
         uses: github/codeql-action/upload-sarif@v2
         with:
