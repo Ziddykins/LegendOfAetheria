@@ -17,9 +17,6 @@
                 $familiar->set_name($egg_name);
             }
 
-            echo '<pre>';
-            print_r($familiar);
-            echo '</pre>';
             $familiar->saveFamiliar();
         }
     }
