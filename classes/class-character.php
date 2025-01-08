@@ -8,6 +8,8 @@
 
         protected $stats;
         protected $inventory;
+        
+        protected $pmonster;
 
         use HandlePropsAndCols;
 
@@ -25,8 +27,9 @@
             $serializedCharacter = serialize($character);
             $serializedInventory = serialize($this->inventory);
             $serializedStats     = serialize($this->stats);
-
-            $serializedCompleteCharacter = "$serializedCharacter###$serializedInventory###$serializedStats";
+            $serializedMonster   = serialize($this->pmonster);
+            
+            $serializedCompleteCharacter = "$serializedCharacter###$serializedInventory###$serializedStats###$serializedMonster";
 
             $sqlQuery = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `serialized_character` = ? WHERE `id` = ?";
 
@@ -42,12 +45,12 @@
             $sqlQuery = "SELECT `serialized_character` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
 
             $serializedCompleteCharacter = $db->execute_query($sqlQuery, [$accountID])->fetch_assoc();
-            [$serializedCharacter, $serializedInventory, $serializedStats] = explode('###', $serializedCompleteCharacter);
+            [$serializedCharacter, $serializedInventory, $serializedStats, $serializedMonster] = explode('###', $serializedCompleteCharacter);
 
-            $character = unserialize($serializedCharacter);
+            $character            = unserialize($serializedCharacter);
             $character->inventory = unserialize($serializedInventory);
             $character->stats     = unserialize($serializedStats);
-
+            $character->pmonster  = unserialize($serializedMonster);
             $log->debug(
                 "Loaded character {$character['name']} from account ID $accountID",
                 [
