@@ -3,16 +3,17 @@
     $character = table_to_obj($account['id'], 'character');
     $monster   = null;
     
-    if (!$character['monster']) {
+    if (!$character['pmonster']) {
         $monster   = $monster_pool->random_monster();
-        $name = $monster->get_name();
-        $hp = $monster->get_hp();
-        $maxHP = $monster->get_maxHP();
-        $mp = $monster->get_mp();
-        $maxMP = $monster->get_maxMP();
-        $str = $monster->get_strength();
-        $int = $monster->get_intelligence();
-        $def = $monster->get_defense();
+        $mon_name  = $monster->get_name();
+        $mon_hp    = $monster->get_hp();
+        $mon_maxHP = $monster->get_maxHP();
+        $mon_mp    = $monster->get_mp();
+        $mon_maxMP = $monster->get_maxMP();
+        $mon_str   = $monster->get_strength();
+        $mon_int   = $monster->get_intelligence();
+        $mon_def   = $monster->get_defense();
+        $character['pmonster'] = $monster;
     } else {
         $monster = $character->get_monster();
     }
@@ -25,28 +26,28 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                Name: <?php echo $name; ?>
+                Name: <?php echo $mon_name; ?>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                Health: <?php echo "$hp/$maxHP"; ?>
+                Health: <?php echo "$mon_hp/$mon_maxHP"; ?>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                Magic : <?php echo "$mp/$maxMP"; ?>
+                Magic : <?php echo "$mon_mp/$mon_maxMP"; ?>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                STR: <?php echo $str; ?>
+                STR: <?php echo $mon_str; ?>
             </div>
             <div class="col">
-                DEF: <?php echo $def; ?>
+                DEF: <?php echo $mon_def; ?>
             </div>
             <div class="col">
-                INT: <?php echo $int; ?>
+                INT: <?php echo $mon_int; ?>
             </div>
         </div>
     </div>
@@ -58,6 +59,7 @@
             </div>
         </div>
     </div>
+    
     <div class="col">
         <div class="row">
             <div class="col border border-1 pt-3">
