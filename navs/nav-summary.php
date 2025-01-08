@@ -1,11 +1,11 @@
 <?php
-    $cur_hp       = $character['hp'];
-    $cur_mp       = $character['mp'];
-    $cur_ep       = $character['ep'];
+    $cur_hp       = $character->get_hp();
+    $cur_mp       = $character->get_mp();
+    $cur_ep       = $character->get_ep();
 
-    $max_hp       = $character['max_hp'];
-    $max_mp       = $character['max_mp'];
-    $max_ep       = $character['max_ep'];
+    $max_hp       = $character->get_maxHp();
+    $max_mp       = $character->get_maxMp();
+    $max_ep       = $character->get_maxEp();
 
     $ep_icon  = 'bi-battery-full';
     $ep_color = 'success';
@@ -19,7 +19,7 @@
         $ep_color = 'danger';
     }
 
-    $ap = $character['ap'];
+    $ap = $character->get_ap();
 ?>
 
 <div class="offcanvas offcanvas-end" data-bs-theme="dark" tabindex="-1" id="offcanvas-summary" aria-labelledby="offcanvas-summary-label">
@@ -39,7 +39,7 @@
                                 <i class="bi bi-capslock"></i>
                             <?php endif; ?>
                             <u>
-                                <?php echo $character['name']; ?>
+                                <?php echo $character->get_name(); ?>
                             </u>
                     </div>
                 </div>

@@ -1,9 +1,10 @@
 <?php
-    $account   = new Account($_SESSION['email']);
-    $character = table_to_obj($account['id'], 'character');
+    $account   = new Account($_SESSION['account-id']);
+    $character = new Character($_SESSION['character-id']);
+    #$character = table_    to_obj($account->get_id(), 'character');
     $monster   = null;
     
-    if (!$character['pmonster']) {
+    if (!$character->get_monster()) {
         $monster   = $monster_pool->random_monster();
         $mon_name  = $monster->get_name();
         $mon_hp    = $monster->get_hp();
@@ -13,10 +14,12 @@
         $mon_str   = $monster->get_strength();
         $mon_int   = $monster->get_intelligence();
         $mon_def   = $monster->get_defense();
-        $character['pmonster'] = $monster;
+        $character->setPersonalMonster($monster);
     } else {
         $monster = $character->get_monster();
     }
+
+    $character->get_inventory()->addItem("Rubber Dong", 10, 1);
 ?>
 
 <div class="row row-cols-4 border border-1">

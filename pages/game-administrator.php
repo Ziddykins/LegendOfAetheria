@@ -1,5 +1,5 @@
 <?php
-    $user_privs = UserPrivileges::name_to_enum($account['privileges']);
+    $user_privs = UserPrivileges::name_to_enum($account->get_privileges());
 
     if ($user_privs->value < UserPrivileges::ADMINISTRATOR->value) {
         echo "F O R B I D D E N";
@@ -176,7 +176,7 @@ $dalle_models = [
     'dall-e-2'
 ];
 
-$user_privs = UserPrivileges::name_to_enum($account['privileges']);
+$user_privs = UserPrivileges::name_to_enum($account->get_privileges());
 
 if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) { 
     $count = 0;

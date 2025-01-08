@@ -2,7 +2,7 @@
     $ip_lock_checked = '';
     $ip_hidden       = 'invisible';
 
-    if ($account['ip_lock'] === 'True') {
+    if ($account->get_ipLock() === 'True') {
         $ip_lock_checked = 'checked';
         $ip_hidden = '';
     }
@@ -48,11 +48,11 @@
                                     </div>
                                 </label>
                             </div>
-                            <input id="ip-lock-address" name="ip-lock-address" class="<?php echo $ip_hidden; ?>" type="text" minlength="7" maxlength="15" size="15" pattern="^[0-9]{1,3}\.(?:[0-9]{1,3}\.){2}[0-9]{1,3}$" value="<?php echo $account['ip_lock_addr']; ?>" />
+                            <input id="ip-lock-address" name="ip-lock-address" class="<?php echo $ip_hidden; ?>" type="text" minlength="7" maxlength="15" size="15" pattern="^[0-9]{1,3}\.(?:[0-9]{1,3}\.){2}[0-9]{1,3}$" value="<?php echo $account->get_ipLockAddr(); ?>" />
                         </div>
                         <div class="col">
                             
-                        </div>                           
+                        </div>
                     </div>
                     <div class="row text-center">
                         <button id="save-settings" name="save-settings" class="btn btn-primary" type="button" onclick="save_settings('ip_lock')">Save</button>

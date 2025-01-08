@@ -3,13 +3,13 @@
     $mp_textcolor = 'text-black';
     $ep_textcolor = 'text-black';
 
-    $cur_hp       = $character['hp'];
-    $cur_mp       = $character['mp'];
-    $cur_ep       = $character['ep'];
+    $cur_hp       = $character->get_hp();
+    $cur_mp       = $character->get_mp();
+    $cur_ep       = $character->get_ep();
 
-    $max_hp       = $character['max_hp'];
-    $max_mp       = $character['max_mp'];
-    $max_ep       = $character['max_ep'];
+    $max_hp       = $character->get_maxHp();
+    $max_mp       = $character->get_maxMp();
+    $max_ep       = $character->get_maxEp();
 
     if (50 >= $cur_hp / $max_hp * 100) {
         $hp_textcolor = 'text-white';
@@ -38,12 +38,12 @@
             <div class="card mb-3" style="max-width: 700px;">
                 <div class="row g-0">
                     <div class="col-4">
-                        <img src="img/avatars/<?php echo $character['avatar']; ?>" class="img-fluid rounded m-3" alt="character-avatar">
+                        <img src="img/avatars/<?php echo $character->get_avatar(); ?>" class="img-fluid rounded m-3" alt="character-avatar">
                     </div>
 
                     <div class="col-6">
                         <div class="card-body">
-                            <h5 class="card-title"><?php echo $character['name']; ?></h5>
+                            <h5 class="card-title"><?php echo $character->get_name(); ?></h5>
                             <div class="container">
                                 <div class="row mb-3">
                                     <div class="col-4 truncate">
@@ -60,8 +60,8 @@
                                     <div class="col-4">
                                         <span id="hp" name="hp"   
                                             class="ldBar label-center <?php echo $hp_textcolor; ?>"
-                                            data-value="<?php echo $character['hp']; ?>"
-                                            data-max="<?php echo $character['max_hp']; ?>"
+                                            data-value="<?php echo $character->get_hp(); ?>"
+                                            data-max="<?php echo $character->get_maxHp(); ?>"
                                             data-preset="energy"
                                             data-pattern-size="120"
                                         >
@@ -69,8 +69,8 @@
                                     <div class="col-4">
                                         <span id="mp" name="mp"
                                             class="ldBar label-center <?php echo $mp_textcolor; ?>"
-                                            data-value="<?php echo $character['mp']; ?>"
-                                            data-max="<?php echo $character['max_mp']; ?>"
+                                            data-value="<?php echo $character->get_mp(); ?>"
+                                            data-max="<?php echo $character->get_maxMp(); ?>"
                                             data-preset="energy"
                                             data-pattern-size="120"
                                         >
@@ -78,8 +78,8 @@
                                     <div class="col-4">
                                         <span id="ep" name="ep"   
                                             class="ldBar label-center <?php echo $ep_textcolor; ?>"
-                                            data-value="<?php echo $character['ep']; ?>"
-                                            data-max="<?php echo $character['max_ep']; ?>"
+                                            data-value="<?php echo $character->get_ep(); ?>"
+                                            data-max="<?php echo $character->get_maxEp(); ?>"
                                             data-preset="energy"
                                             data-pattern-size="120"
                                         >
@@ -112,17 +112,17 @@
                                 </div>
                                 <div class="row mb-3 fs-1">
                                     <div class="col-4">
-                                        <?php echo $character['str']; ?>
+                                        <?php echo $character->get_str(); ?>
                                     </div>
                                     <div class="col-4 fs-1">
-                                        <?php echo $character['def']; ?>
+                                        <?php echo $character->get_def(); ?>
                                     </div>
                                     <div class="col-4 fs-1">
-                                        <?php echo $character['int']; ?>
+                                        <?php echo $character->get_int(); ?>
                                     </div>
                                 </div>
                             </div>
-                            <p class="card-text"><small class="text-body-secondary">Character created on <?php echo $account['date_registered']; ?></small></p>
+                            <p class="card-text"><small class="text-body-secondary">Character created on <?php echo $account->get_dateRegistered(); ?></small></p>
                         </div>
                     </div>
                 </div>
