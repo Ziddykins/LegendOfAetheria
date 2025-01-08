@@ -1,7 +1,7 @@
 <?php
     global $db, $log;
     $account         = table_to_obj($_SESSION['email'], 'account');
-    $character       = table_to_obj($account['id'], 'character');
+    $character       = table_to_obj($account->get_id(), 'character');
     $header_charname = $character['name'] . "'s";
         
     $requests = $requested = $friends = $blocked = Array();
@@ -9,7 +9,7 @@
     /* Populate global $requests array with incoming requests */
     $recvreqs = $db->execute_query(
         "SELECT * FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_2` = ? or `email_1` = ?",
-        [ $account['email'], $account['email'] ]
+        [ $account->get_email(), $account->get_email() ]
     );
     
     if ($recvreqs->num_rows) {
@@ -55,14 +55,14 @@
                 if (friend_status($email) === FriendStatus::REQUESTED) {
                     $sql_query = 'DELETE FROM `' . $_ENV['SQL_FRND_TBL'] . '` ' .
                                 "WHERE email_1 = ? AND email_2 = ?";
-                    $db->execute_query($sql_query, [ $account['email'], $email ]);
-                    $log->info("Sent friend request deleted", [ 'To' => $email, 'From' => $account['email'] ]);
+                    $db->execute_query($sql_query, [ $account->get_email(), $email ]);
+                    $log->info("Sent friend request deleted", [ 'To' => $email, 'From' => $account->get_email() ]);
                 }
             } else if ($_REQUEST['action'] == 'accept_request') {
                 // file deepcode ignore Sqli: <please specify a reason of ignoring this>
                 if (isset($_REQUEST['btn-accept']) && $_REQUEST['btn-accept'] == "1") {
                     accept_friend_req($focused_email);
-                    $log->info('Friend request accepted', [ 'email_1' => $account['email'], 'email_2' => $focused_email]);
+                    $log->info('Friend request accepted', [ 'email_1' => $account->get_email(), 'email_2' => $focused_email]);
                 }
             } else if ($_REQUEST['action'] == 'send_request') {
                 if (isset($_REQUEST['friends-send-request']) && $_REQUEST['friends-send-request'] == "1") {
@@ -70,8 +70,8 @@
                         if (friend_status($requested_email) == FriendStatus::NONE) {
                             if (check_valid_email($requested_email)) {
                                 $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
-                                $db->execute_query($sql_query, [ $account['email'], $requested_email ]);
-                                $log->info('Friend request sent', [ 'email_1' => $account['email'], 'email_2' => $requested_email ]);
+                                $db->execute_query($sql_query, [ $account->get_email(), $requested_email ]);
+                                $log->info('Friend request sent', [ 'email_1' => $account->get_email(), 'email_2' => $requested_email ]);
                             }
                         }
                     }
@@ -118,11 +118,11 @@
                     <?php
                         for ($i=0; $i<count($friends); $i++) {
                             $temp_account   = table_to_obj($friends[$i]['email_1'], 'account');
-                            $sender_account = table_to_obj($temp_account['id'], 'character');
+                            $sender_account = table_to_obj($temp_account->get_id(), 'character');
                             clearstatcache();                            
-                            $check_user     = filesize((escapeshellcmd('/var/lib/php/sessions/sess_' . $temp_account['session_id'])));
+                            $check_user     = filesize((escapeshellcmd('/var/lib/php/sessions/sess_' . $temp_account->get_sessionID())));
                             
-                            $log->info('Account online status: ', [ 'email' => $temp_account['email'], 'check_user' => $check_user ]);
+                            $log->info('Account online status: ', [ 'email' => $temp_account->get_email(), 'check_user' => $check_user ]);
                             $online_indicator = '<p class="badge bg-secondary"><i class="bi bi-lightbulb"></i> Offline</p>';
                             $msg_color = 'btn-secondary';
                             
@@ -136,10 +136,10 @@
                                             <div class="row g-0">
                                                 <form id="friend-' . $friends[$i]['id'] . '" name="friend-' . $friends[$i]['id'] . '" action="/game?page=friends&action=block_user" method="POST">
                                                     <div class="col-2 pt-2 pb-2">
-                                                        <img src="/img/avatars/' . $sender_account['avatar'] . '" class="img-fluid rounded" alt="friend-' . $i . '-avatar">
+                                                        <img src="/img/avatars/' . $sender_account->get_avatar() . '" class="img-fluid rounded" alt="friend-' . $i . '-avatar">
                                                     </div>
                                                     <div class="col-md-8">
-                                                        <div class="card-body">' . $online_indicator . ' - ' . $temp_account['email'] . '
+                                                        <div class="card-body">' . $online_indicator . ' - ' . $temp_account->get_email() . '
                                                         <div class="btn-group">
                                                             <button class="btn ' . $msg_color . ' btn-block btn-sm">Message</button>
                                                             <button class="btn btn-warning btn-block btn-sm">Remove</button>
@@ -167,13 +167,13 @@
                     <?php
                         for ($i=0; $i<count($requests); $i++) {
                             $temp_account   = table_to_obj($requests[$i]['email_1'], 'account');
-                            $sender_account = table_to_obj($temp_account['id'], 'character');
-                            echo '<form id="accept-request-' . $sender_account['account_id'] . '" name="accept-request-'. $sender_account['account_id']. '" action="/game?page=friends&action=accept_request" method="POST">';
+                            $sender_account = table_to_obj($temp_account->get_id(), 'character');
+                            echo '<form id="accept-request-' . $sender_account->get_accountID() . '" name="accept-request-'. $sender_account->get_accountID(). '" action="/game?page=friends&action=accept_request" method="POST">';
                             echo '<div class="row mb-3">
                                     <div class="card" style="max-width: 540px;">
                                         <div class="row g-0">
                                             <div class="col-md-4 pt-2 pb-2">
-                                                <img src="/img/avatars/' . $sender_account['avatar'] . '" class="img-fluid rounded" alt="Incoming-request-avatar">
+                                                <img src="/img/avatars/' . $sender_account->get_avatar() . '" class="img-fluid rounded" alt="Incoming-request-avatar">
                                             </div>
                                             <div class="col-md-8">
                                                 <div class="card-body">
@@ -186,7 +186,7 @@
                                                             <button id="btn-accept" name="btn-accept" class="btn btn-primary btn-block rounded" value="1">Accept&nbsp;</button>&nbsp;
                                                             <button id="btn-decline" name="btn-decline" class="btn btn-warning btn-block rounded" value="1">Decline</button>&nbsp;
                                                             <button id="btn-block" name="btn-block" class="btn btn-danger btn-block rounded" value="1">&nbsp;Block&nbsp;</button>                                                            
-                                                            <input type="hidden" id="focused-request" name="focused-request" value="' . $temp_account['email'] . '">
+                                                            <input type="hidden" id="focused-request" name="focused-request" value="' . $temp_account->get_email() . '">
                                                         </div>
                                                     </div>
                                                     <p class="card-text"><small class="text-body-secondary">Sent at ' . $requests[$i]['created'] . '</small></p>

@@ -26,19 +26,19 @@
     $monster_pool = new MonsterPool;    
     load_monster_sheet($monster_pool);
 
-    $account   = table_to_obj($_SESSION['email'], 'account');
-
+    $account   = new Account($_SESSION['account-id']);
+    
     /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
-        $character = table_to_obj($account['id'], 'character');
-        $familiar = new Familiar($character['id'], $_ENV['SQL_FMLR_TBL']);
-        $familiar->loadFamiliar($character['id']);
+        $character = new Character($_SESSION['character-id']);
+        $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
+        $familiar->loadFamiliar($character->get_id());
 
-        $char_menu_icon = $character['hp'] > 0 
+        $char_menu_icon = $character->get_hp() > 0 
             ? 'bi-emoji-laughing-fill' 
             : 'bi-emoji-dizzy-fill';
 
-        $_SESSION['name'] = $character['name'];
+        $_SESSION['name'] = $character->get_name();
 
         /* Check if the user has clicked the apply button on the profile tab */
         if (isset($_REQUEST['profile-apply']) && $_REQUEST['profile-apply'] == 1) {
@@ -48,7 +48,7 @@
             $account_email    = $_SESSION['email'];
 
             /* Old password matches current */
-            if (password_verify($old_password, $account['password'])) {
+            if (password_verify($old_password, $account->get_password())) {
                 if ($new_password === $confirm_password) {
                     $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
                     $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
@@ -205,7 +205,7 @@
                                         <li>
                                             <?php
                                                 $rest_disabled = '';
-                                                if ($character['hp'] === $character['max_hp']) {
+                                                if ($character->get_hp() === $character->get_maxHp()) {
                                                     $rest_disabled = 'disabled';
                                                 }
                                             ?>
@@ -227,7 +227,7 @@
                                         <li>
                                             <a href="?page=" id="menu-sub-floor" name="menu-sub-floor" class="nav-link d-md-inline text-center">
                                                 <span class="material-symbols-sharp">floor</span>
-                                                <span class="d-none d-lg-inline">Floor <?php echo $character['floor']; ?></span>
+                                                <span class="d-none d-lg-inline">Floor <?php echo $character->get_floor(); ?></span>
                                             </a>
                                         </li>
                                         <li>
@@ -243,7 +243,7 @@
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            This will reset your dungeon progress from floor <?php echo $character['floor']; ?> to floor 1 and return your dungeon multiplier back to 1x<br /><br />
+                                                            This will reset your dungeon progress from floor <?php echo $character->get_floor(); ?> to floor 1 and return your dungeon multiplier back to 1x<br /><br />
                                                             <strong>Are you sure? This cannot be reversed!</strong>
                                                         </div>
                                                         <form id="modal-dungeon-reset" name="modal-dungeon-reset" action="?page=dungeon&action=reset" method="POST">
@@ -301,7 +301,7 @@
 
                         <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 fixed-bottom" style="width: 15%;">
                             <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
-                                <span><img src="img/avatars/<?php echo $character['avatar']; ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
+                                <span><img src="img/avatars/<?php echo $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
                             </a>
                             
                             <a href="#" class="text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -333,7 +333,7 @@
                                 <li>
                                     <a class="dropdown-item" href="?page=mail">Mail
                                         <?php
-                                            $unread_mail = check_mail('unread', $account['id']);
+                                            $unread_mail = check_mail('unread', $account->get_id());
                                             $pill_bg = 'bg-danger';
         
                                             if ($unread_mail == 0) {
@@ -350,8 +350,8 @@
                                     <hr class="dropdown-divider">
                                 </li>
                                 <?php
-                                    $privileges = UserPrivileges::name_to_value($account['privileges']);
-                                    
+                                    $privileges = UserPrivileges::name_to_value($account->get_privileges());
+                                            
                                     if ($privileges > UserPrivileges::MODERATOR->value) {
                                         echo "<li>\n\t\t\t\t\t\t\t\t\t";
                                         echo '<a class="dropdown-item" href="?page=administrator">Administrator</a>';
@@ -368,7 +368,7 @@
 
                 <div id="content" name="content" class="container border border-danger" style="flex-shrink: 1;">
                     <?php
-                        $privileges = UserPrivileges::name_to_value($account['privileges']);
+                        $privileges = UserPrivileges::name_to_value($account->get_privileges());
                         
                         if ($privileges == UserPrivileges::UNVERIFIED->value) {
                             include('html/verify.html');
