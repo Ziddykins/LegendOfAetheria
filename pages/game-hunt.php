@@ -1,5 +1,5 @@
 <?php
-    $account   = table_to_obj($_SESSION['email'], 'account');
+    $account   = new Account($_SESSION['email']);
     $character = table_to_obj($account['id'], 'character');
     $monster   = null;
     
