@@ -51,6 +51,7 @@
             $character->inventory = unserialize($serializedInventory);
             $character->stats     = unserialize($serializedStats);
             $character->pmonster  = unserialize($serializedMonster);
+            
             $log->debug(
                 "Loaded character {$character['name']} from account ID $accountID",
                 [
@@ -74,8 +75,6 @@
             } elseif (strncasecmp($method, "set_", 4) === 0) {
                 $sql_query = 'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . ' ';
                 $table_col = $this->clsprop_to_tblcol($prop);
-
-
 
                 if (is_int($params[0])) {
                     $sql_query .= "SET `$table_col` = " . $params[0] . " ";
