@@ -18,8 +18,11 @@
     } else {
         $monster = $character->get_monster();
     }
-
     $character->get_inventory()->addItem("Rubber Dong", 10, 1);
+
+    echo '<pre>';
+    print_r($character);
+    exit();
 ?>
 
 <div class="row row-cols-4 border border-1">
