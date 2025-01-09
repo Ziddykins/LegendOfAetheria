@@ -14,7 +14,7 @@
         $mon_str   = $monster->get_strength();
         $mon_int   = $monster->get_intelligence();
         $mon_def   = $monster->get_defense();
-        $character->setPersonalMonster($monster);
+        $character->set_monster($monster);
     } else {
         $monster = $character->get_monster();
     }
