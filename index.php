@@ -53,13 +53,14 @@
                 'IpAddr'     => $account->get_ipAddress()
             ]);
 
-            $character = table_to_obj($account->get_email(), 'character');
+            $character = table_to_obj($account->get_id(), 'character');
 
             $_SESSION['logged-in']  = 1;
             $_SESSION['email']      = $account->get_email();
             $_SESSION['account-id'] = $account->get_id();
-            
-            $account->set_sessionId(session_id());
+            $_SESSION['character-id'] = $character['id'];
+
+            $account->set_sessionID(session_id());
 
             header('Location: /game');
             exit();

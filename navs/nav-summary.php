@@ -1,11 +1,11 @@
 <?php
-    $cur_hp       = $character['hp'];
-    $cur_mp       = $character['mp'];
-    $cur_ep       = $character['ep'];
+    $cur_hp       = $character->get_hp();
+    $cur_mp       = $character->get_mp();
+    $cur_ep       = $character->get_ep();
 
-    $max_hp       = $character['max_hp'];
-    $max_mp       = $character['max_mp'];
-    $max_ep       = $character['max_ep'];
+    $max_hp       = $character->get_maxHp();
+    $max_mp       = $character->get_maxMp();
+    $max_ep       = $character->get_maxEp();
 
     $ep_icon  = 'bi-battery-full';
     $ep_color = 'success';
@@ -19,18 +19,18 @@
         $ep_color = 'danger';
     }
 
-    $ap = $character['ap'];
+    $ap = $character->get_ap();
 
-    $cur_xp   = $character['exp'];
-    $next_lvl = $character['exp_nextlvl'];
+    $cur_xp   = $character->get_exp();
+    $next_lvl = $character->get_exp_nextlvl();
 
-    $location = $character['location'];
-    $cur_x    = $character['x'];
-    $cur_y    = $character['y'];
+    $location = $character->get_location();
+    $cur_x    = $character->get_x();
+    $cur_y    = $character->get_y();
 
-    $align = $character['alignment'];
+    $align = $character->get_alignment();
 
-    $race = $character['race'];
+    $race = $character->get_race();
 
 ?>
 
@@ -43,6 +43,15 @@
         <div class="container">
             <div class="d-flex justify-items-center align-items-center">
                 <div class="col">
+                    <div class="h3 josefin-slab-text">
+                            <?php if ($ap): ?>
+                                <i class="bi bi-capslock-fill text-success"></i>
+                            <?php else: ?>
+                                <i class="bi bi-capslock"></i>
+                            <?php endif; ?>
+                            <u>
+                                <?php echo $character->get_name(); ?>
+                            </u>
                     <div class="h3">
                         <?php if ($ap): ?>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#ap-spend-modal">

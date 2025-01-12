@@ -196,7 +196,7 @@ class Familiar {
                 return "#FF2501";
                 break;
             default:
-                return "#0000FF";
+                return "#AAAAAA";
                 break;
         }
     }

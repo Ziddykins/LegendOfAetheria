@@ -1,6 +1,6 @@
 <?php
-    $hp = $character['hp'];
-    $max_hp = $character['max_hp'];
+    $hp = $character->get_hp();
+    $max_hp = $character->get_maxHp();
     $icon = 'bi bi-emoji-smile-fill';
     $color = 'text-success';
     
@@ -18,7 +18,7 @@
 
 ?>
                     <div class="row bg-black justify-content-center text-dark-emphasis">
-                        <div class="col"><i class="bi bi-currency-exchange text-warning"></i> <?php echo $character['gold']; ?></div> |
+                        <div class="col"><i class="bi bi-currency-exchange text-warning"></i> <?php echo $character->get_gold(); ?></div> |
                         <?php echo $status_string; ?>
                         <?php echo $weather_string; ?>
                         <div class="col"><i class="bi bi-ladder"></i> 42</div> |
