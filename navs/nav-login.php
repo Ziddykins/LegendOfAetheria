@@ -198,9 +198,11 @@
                                 
                                 <p></p>
                                 
-                                <button class="btn btn-success mb-3" id="register-submit" name="register-submit" value="1">
-                                    <i class="bi bi-clipboard-plus-fill"></i> Register
-                                </button>
+                                <div class="vstack gap-1 mb-3">
+                                    <button class="btn btn-success mb-3" id="register-submit" name="register-submit" value="1">
+                                        <i class="bi bi-clipboard-plus-fill"></i> Register
+                                    </button>
+                                </div>
 
                                 <script>
                                     $("#register-submit").on("click", function (e) {
@@ -237,6 +239,7 @@
                                 </script>
                             </form>
                         </div>
+                        <p>
                     </div>
 
                     <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">

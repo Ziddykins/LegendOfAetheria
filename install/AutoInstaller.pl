@@ -12,34 +12,33 @@ use File::Find;
 use File::Copy;
 
 use vars qw/*name *dir *prune/;
-
-# Steps
+ 
 use constant {
-    HOSTS      => 1,
-    SOFTWARE   => 2,
-    SERVICES   => 4,
-    APACHE     => 8,
-    ENABLES    => 16,
-    COMPOSER   => 32,
-    TEMPLATES  => 64,
-    PHP        => 128,
-    SQL        => 256,
-    CRONS      => 512,
-    CERTS      => 1024,
-    HOSTNAME   => 2048,
-    CLEANUP    => 4096,
-    PERMS      => 8192,
+    FIRSTRUN  => 1,
+    SOFTWARE  => 2,
+    PHP       => 3,
+    SERVICES  => 4,
+    SQL       => 5,
+    OPENAI    => 6,
+    TEMPLATES => 7,
+    APACHE    => 8,
+    PERMS     => 10,
+    HOSTNAME  => 12,
+    CLEANUP   => 13,
+    PERMS     => 14,
+    COMPOSER  => 15,
+
+    CERTS     => 16, #TODO: implement :D
 };
 
 use constant {
     CFG_R_MAIN   => 1,
-    CFG_R_SQL    => 2,
     CFG_R_DOMAIN => 3,
     CFG_W_MAIN   => 4,
-    CFG_W_SQL    => 5,
     CFG_W_DOMAIN => 6,
 };
 
+# Autoflush on
 $|++;
 
 *name   = *File::Find::name;
@@ -76,258 +75,161 @@ if ($ENV{'USER'} ne 'root') {
         $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
 }
 
-$question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
-$fqdn     = ask_user($question, '', 'input');
+step_firstrun();
 
-if ($ini{$fqdn}) {
-    %cfg = %{$ini{$fqdn}};
+if ($cfg{step}) {
+    my $question = "It looks like this isn't the first time the script has ran; would you\n" .
+                   "like to run the steps from the beginning, or continue from step " . const_to_name($cfg{step}) . " off?\n\n" .
+                   "[$clr{red}r$clr{reset}]estart/[$clr{green}c$clr{reset}]ontinue: ";
 
-    tell_user('INFO', "The FQDN '" . $cfg{fqdn} . "' has an existing configuration file");
+    print $question;
+    chomp(my $reply = <STDIN>);
 
-    if (ask_user("Would you like to load the configurations?", 'yes', 'yesno')) {
-        %cfg = %{$ini{$fqdn}};
-
-        if ($cfg{step}) {
-            if (ask_user("Would you like to continue from step $cfg{step} or start from the beginning?", '[s]tart over/[c]ontinue', 'input')) {
-                $cfg{step} = 0;
-            }
-        }
-    } else {
-        if (ask_user("Are you sure? This will wipe the current config for this FQDN", 'yes', 'yesno')) {
-            delete $ini{$fqdn};
-            $ini{$fqdn} = {};
-        } else {
-            tell_user('WARN', "Continuing with loaded configuration");
-        }
-        %cfg = %{$ini{$fqdn}};
+    if ($reply =~ /[Rr]e?s?t?a?r?t?/) {
+        $cfg{step} = FIRSTRUN;
+        clean_up();
     }
-} else {
-    tell_user('WARN', 'No configuration for this FQDN, creating new entry');
-    $ini{$fqdn} = {};
-    handle_cfg({}, CFG_W_MAIN, $fqdn);
 }
 
-$cfg{fqdn} = $fqdn;
-
-my $os = check_platform();
-my $distro;
-
-if ($os eq 'linux') {
-    my $ver = `uname -v`;
-    if ($ver =~ /(debian|ubuntu|kali)/i) {
-        $distro = $1;
-    } else {
-        if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
-            die "Unsupported distro, exiting\n";
-        }
-        $distro = "unsupported";
-    }
-    tell_user('INFO', "$distro found to be the current distribution");
-    %def = %{$ini{lin_examples}};
-} else {
-    %def = %{$ini{win_examples}};
-}
-
-merge_hashes(\%cfg, \%def);
-merge_hashes(\%cfg, \%glb);
-
-$cfg{os} = $os;
-$cfg{distro} = $distro;
-
-handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
-
-chomp(my $loc_check = `pwd`);
-$loc_check =~ s/\/install//;
-
-$question = "Enter the location of your webserver's config directory (e.g. /etc/apache2)";
-$cfg{apache_directory} = ask_user($question, '/etc/apache2', 'input');
-
-$question = "Please enter the path to where the game will reside (e.g. /var/www/html/example.com/loa)";
-$cfg{web_root} = ask_user($question, $cfg{web_root} ? $cfg{web_root} : '/var/www/html/kali.local/loa', 'input');
-$cfg{web_root} =~ s/\/$//;
-
-$cfg{template_dir} = $cfg{web_root} . "/install/templates";
-$cfg{scripts_dir}  = $cfg{web_root} . "/install/scripts";
-$cfg{admin_email}  = "webmaster\@$cfg{fqdn}";
-
-
-$cfg{setup_log}    = $cfg{web_root} . '/setup.log';
-$cfg{step}         = 1;
-
-$cfg{virthost_conf_file}    = "$cfg{apache_directory}/sites-available/$cfg{fqdn}.conf";
-$cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{fqdn}.conf";
-
-if ($loc_check ne $cfg{web_root}) {
-    my $error = "Setup has determined the files are not in the correct place,\n" .
-                " or you're not in the correct folder. Please move the contents\n" .
-                "of the legendofaetheria folder to your webroot, and make sure you're\n" .
-                "the 'install' directory when you run this script.\n\n" .
-                "Specified webroot directory: $cfg{web_root}\n" .
-                "Current location           : $loc_check\n";
-    die $error;
-}
-
-if ($cfg{step} < SOFTWARE) {
+if ($cfg{step} == SOFTWARE) {
     if (ask_user("Install required software?", 'yes', 'yesno')) {
         step_install_software();
-        $cfg{step} += SOFTWARE;
+        $cfg{step}++;
         handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
 }
 
-if ($cfg{step} < SERVICES) {
+if ($cfg{step} == PHP) {
+    if (ask_user("Go through PHP configurations?", 'yes', 'yesno')) {
+        step_php_configure();
+        $cfg{step}++;
+        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+    }
+}
+
+if ($cfg{step} == SERVICES) {
     if (ask_user("Start all required services now?", 'yes', 'yesno')) {
         step_start_services();
-        $cfg{step} += SERVICES;
+        $cfg{step}++;
         handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
 }
 
-if ($cfg{step} < SQL) {
+if ($cfg{step} == SQL) {
     if (ask_user("Go through SQL configurations?", 'yes', 'yesno')) {
         step_sql_configure();
-        $cfg{step} += SQL;
+        $cfg{step}++;
+        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
 }
 
-# CONFIG - XAMPP configuration #
-my $XAMPP_INSTALLER_BIN  = 'https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.3.4/xampp-windows-x64-8.3.4-0-VS16-installer.exe';
-my $XAMPP_INSTALLER_ARGS = '--mode unattended --enabled-components xampp_server,xampp_apache,xampp_mysql,xampp_program_languages,xampp_php,xampp_perl,xampp_tools';
-my $XAMPP_MARIADB_CHPW   = 'mysqladmin.exe -u root password';
+if ($cfg{step} == OPENAI) {
+    $cfg{openai_enable} = ask_user("Enable OpenAI features? API key required", 'no', 'yesno');
+    $cfg{openai_apikey} = 'unset';
 
-# CONFIG - Composer #
-$cfg{composer_runas} = 'www-data';
-$cfg{apache_runas}   = 'www-data';
-handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
-
-# CONFIG - PHP #
-$cfg{php_ini} = 'unset';
-
-if (`whereis php` =~ /php: (\/?.*?\/bin\/.*?\/?php\d?\.?\d?)/) {
-    my $found_location = $1;
-
-    $question = "PHP was found on this system at '$found_location' - is this the correct" .
-                "location to the PHP binary you want to use?";
-
-    if (ask_user($question, 'yes', 'yesno')) {
-        $cfg{php_binary} = $found_location;
-    } else {
-        $question = "Please enter the location of your PHP binary (e.g. /usr/bin/php7.4)";
-        $cfg{php_binary} = ask_user($question, $cfg{php_binary}, 'input');
+    if ($cfg{openai_enable}) {
+        $question = "OpenAI configuration is enabled; please enter your OpenAI API key";
+        $cfg{openai_apikey} = ask_user($question, '', 'input');
     }
+    
+    $cfg{step}++;
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
-# CONFIG - OpenAI #
-my $OPENAI_ENABLE = ask_user("Enable OpenAI features? API key required", 'no', 'yesno');
-my $OPENAI_APIKEY = 'unset';
+if ($cfg{step} == TEMPLATES) {
+    # NOCONFIG - Replacements for Templates
+    my @replacements = (
+        "###REPL_PHP_BINARY###%%%$cfg{php_binary}",
 
-if ($OPENAI_ENABLE) {
-    $question = "OpenAI configuration is enabled; please enter your OpenAI API key";
-    $OPENAI_APIKEY = ask_user($question, '', 'input');
-}
-handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+        "###REPL_WEB_ROOT###%%%$cfg{web_root}",
+        "###REPL_WEB_ADMIN_EMAIL###%%%$cfg{admin_email}",
+        "###REPL_WEB_FQDN###%%%$cfg{fqdn}",
+        "###REPL_WEB_DOCROOT###%%%$cfg{web_root}",
+        "###REPL_WEB_SSL_FULLCER###%%%$cfg{ssl_fullcer}",
+        "###REPL_WEB_SSL_PRIVKEY###%%%$cfg{ssl_privkey}",
 
-# NOCONFIG - Template Files #
-my $VIRTHOST_SSL_TEMPLATE = "$cfg{template_dir}/virtual_host_ssl.template";
-my $VIRTHOST_TEMPLATE     = "$cfg{template_dir}/virtual_host.template";
-my $HTACCESS_TEMPLATE     = "$cfg{template_dir}/htaccess.template";
-my $CRONTAB_TEMPLATE      = "$cfg{template_dir}/crontab.template";
-my $ENV_TEMPLATE          = "$cfg{template_dir}/env.template";
-my $SQL_TEMPLATE          = "$cfg{template_dir}/sql.template";
-my $PHP_TEMPLATE          = "$cfg{template_dir}/php.template";
+        "###REPL_SQL_DB###%%%$cfg{sql_database}",
+        "###REPL_SQL_USER###%%%$cfg{sql_username}",
+        "###REPL_SQL_PASS###%%%$cfg{sql_password}",
+        "###REPL_SQL_HOST###%%%$cfg{sql_host}",
+        "###REPL_SQL_PORT###%%%$cfg{sql_port}",
 
-# NOCONFIG - Replacements for Templates
-my @replacements = (
-    "###REPL_PHP_BINARY###%%%$cfg{php_binary}",
+        "###REPL_SQL_TBL_ACCOUNTS###%%%$sql{tbl_accounts}",
+        "###REPL_SQL_TBL_CHARACTERS###%%%$sql{tbl_characters}",
+        "###REPL_SQL_TBL_FAMILIARS###%%%$sql{tbl_familiars}",
+        "###REPL_SQL_TBL_FRIENDS###%%%$sql{tbl_friends}",
+        "###REPL_SQL_TBL_MAIL###%%%$sql{tbl_mail}",
+        "###REPL_SQL_TBL_MONSTERS###%%%$sql{tbl_monsters}",
+        "###REPL_SQL_USER###%%%$cfg{sql_username}",
+        "###REPL_SQL_TBL_LOGS###%%%$sql{tbl_logs}",
+        "###REPL_SQL_TBL_GLOBALS###%%%$sql{tbl_globals}",
 
-    "###REPL_WEB_ROOT###%%%$cfg{web_root}",
-    "###REPL_WEB_ADMIN_EMAIL###%%%$cfg{admin_email}",
-    "###REPL_WEB_FQDN###%%%$cfg{fqdn}",
-    "###REPL_WEB_DOCROOT###%%%$cfg{web_root}",
-    "###REPL_WEB_SSL_FULLCER###%%%$cfg{ssl_fullcer}",
-    "###REPL_WEB_SSL_PRIVKEY###%%%$cfg{ssl_privkey}",
+        "###REPL_OPENAI_APIKEY###%%%$cfg{openai_apikey}",
 
-    "###REPL_SQL_DB###%%%$cfg{sql_database}",
-    "###REPL_SQL_USER###%%%$cfg{sql_username}",
-    "###REPL_SQL_PASS###%%%$cfg{sql_password}",
-    "###REPL_SQL_HOST###%%%$cfg{sql_host}",
-    "###REPL_SQL_PORT###%%%$cfg{sql_port}",
+        "###REPL_PHP_COOKIEDOMAIN###%%%$cfg{fqdn}"
+    );
 
-    "###REPL_SQL_TBL_ACCOUNTS###%%%$sql{tbl_accounts}",
-    "###REPL_SQL_TBL_CHARACTERS###%%%$sql{tbl_characters}",
-    "###REPL_SQL_TBL_FAMILIARS###%%%$sql{tbl_familiars}",
-    "###REPL_SQL_TBL_FRIENDS###%%%$sql{tbl_friends}",
-    "###REPL_SQL_TBL_MAIL###%%%$sql{tbl_mail}",
-    "###REPL_SQL_TBL_MONSTERS###%%%$sql{tbl_monsters}",
-    "###REPL_SQL_USER###%%%$cfg{sql_username}",
-    "###REPL_SQL_TBL_LOGS###%%%$sql{tbl_logs}",
-    "###REPL_SQL_TBL_GLOBALS###%%%$sql{tbl_globals}",
+    if (ask_user("Generate templates?", 'yes', 'yesno')) {
+        step_generate_templates(\@replacements);
+    }
 
-    "###REPL_OPENAI_APIKEY###%%%$OPENAI_APIKEY",
-
-    "###REPL_PHP_COOKIEDOMAIN###%%\%$cfg{fqdn}"
-);
-
-## NO MORE CONFIGURATION BEYOND THIS POINT ##
-
-if (check_array(\@ARGV, "--revert-system")) {
-    clean_up('revert');
+    if (ask_user("Process generated templates?", 'yes', 'yesno')) {
+        step_process_templates();
+    }
+    $cfg{step}++;
 }
 
-if ($cfg{step} > 0) {
-    print "It looks like you have ran this script before; do you want to\n";
-    print "[c]ontinue from where you left off, or [r]estart from\n";
-    print "the beginning?\n[r]estart/[c]ontinue: ";
-    chomp(my $answer = <STDIN>);
+if ($cfg{step} == APACHE) {
+    if (ask_user("Perform necessary apache updates?", 'yes', 'yesno')) {
+        step_apache_config();
+    }
 
-    if ($answer =~ /[rR](estart)?/) {
+    if (ask_user("Enable the required Apache conf/mods/sites?", 'yes', 'yesno')) {
+        step_apache_enables();
+    }
+    $cfg{step}++;
+}
+
+if ($cfg{step} == PERMS) {
+    if (ask_user("Fix all webserver permissions?", 'yes', 'yesno')) {
+        step_fix_permissions();
+    }
+    $cfg{step}++;
+}
+
+if ($cfg{step} == COMPOSER) {
+    if (ask_user("Run composer to download required dependencies?", 'yes', 'yesno')) {
+        step_composer_pull();
+    }
+    $cfg{step}++
+}
+
+step_start_services();
+
+if ($cfg{step} == CLEANUP) {
+    if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
         clean_up();
-        $cfg{step} = 0;
+        $cfg{step}++;
     }
 }
 
-if (ask_user(
-        "Multiple variables in this script are marked with " .
-        "'Template Replacements' - Make sure these are filled out properly before " .
-        "continuing\nContinue and generate templates?", 'yes', 'yesno'
-    )) {
-    step_generate_templates();
-}
+#Step: Webserver
+sub step_webserver_configure {
+    my $question = "Enter the location of your webserver's config directory (e.g. /etc/apache2)";
+    $cfg{apache_directory} = ask_user($question, '/etc/apache2', 'input');
 
-if (ask_user("Process generated templates?", 'yes', 'yesno')) {
-    step_process_templates();
-}
+    $question = "Please enter the path to where the game will reside (e.g. /var/www/html/example.com/loa)";
+    $cfg{web_root} = ask_user($question, $cfg{web_root} ? $cfg{web_root} : '/var/www/html/kali.local/loa', 'input');
+    $cfg{web_root} =~ s/\/$//;
 
-#if (ask_user("Update system hostname to match FQDN?")) {
-#    step_update_hostname() if !$cfg{step} == hostname;
-#}
+    $cfg{virthost_conf_file}    = "$cfg{apache_directory}/sites-available/$cfg{fqdn}.conf";
+    $cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{fqdn}.conf";
 
-if (ask_user("Perform necessary apache updates?", 'yes', 'yesno')) {
-    step_apache_config() if $cfg{step} < APACHE;
-}
-
-if (ask_user("Enable the required Apache conf/mods/sites?", 'yes', 'yesno')) {
-    step_apache_enables() if $cfg{step} < ENABLES;
-}
-
-if (ask_user("Update PHP configurations? (security, performance)", 'yes', 'yesno')) {
-    step_update_php_confs() if $cfg{step} < PHP;
-}
-
-if (ask_user("Fix all webserver permissions?", 'yes', 'yesno')) {
-    step_fix_permissions() if $cfg{step} < PERMS;
-}
-
-if (ask_user("Run composer to download required dependencies?", 'yes', 'yesno')) {
-    step_composer_pull() if $cfg{step} < COMPOSER;
-}
-
-if (ask_user("Start all services?", 'yes', 'yesno')) {
-   step_start_services() if $cfg{step} < SERVICES;
-}
-
-if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
-    clean_up() if $cfg{step} < CLEANUP;
+    if ($cfg{os} eq 'linux') {
+        $cfg{composer_runas} = 'www-data';
+        $cfg{apache_runas}   = 'www-data';
+        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+    }
 }
 
 #Step: software
@@ -340,11 +242,11 @@ sub step_install_software {
         my $cmd;
         tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
 
-        if ($distro eq 'ubuntu') {
+        if ($cfg{distro} eq 'ubuntu') {
             $cmd = "sh -c $cfg{scripts_dir}/sury_setup_ubnt.sh";
-        } elsif ($distro =~ /debian|kali/i) {
+        } elsif ($cfg{distro} =~ /debian|kali/i) {
             $cmd = "sh -c $cfg{scripts_dir}/sury_setup_deb.sh";
-        } elsif ($os eq 'windows') {
+        } elsif ($cfg{os} eq 'windows') {
             # TODO: implement windows setup
         }
         tell_user('SYSTEM', `$cmd`);
@@ -355,7 +257,7 @@ sub step_install_software {
     if (!$cfg{php_version}) {
         tell_user('WARN', "PHP version not specified, attempting to find it...\n");
 
-        if ($os eq 'linux') {
+        if ($cfg{os} eq 'linux') {
             tell_user('SYSTEM', `apt update`);
             chomp(my $ver_output = `php --version | head -n1`);
 
@@ -366,7 +268,7 @@ sub step_install_software {
             if ($cfg{php_version}) {
                 tell_user('SUCCESS', "Found PHP version $cfg{php_version}");
             } else {
-                tell_user('ERROR', 'Failed to find PHP version');
+                tell_user('ERROR', 'Failed to agree on a PHP version');
                 die "Exiting on failure...\n";
             }
         }
@@ -402,6 +304,95 @@ sub step_install_software {
     tell_user('INFO', 'Installing ' . @packages . ' packages\n');
     my $apt_cmd = 'apt install -y ' . join (' ', @packages) . ' 2>&1';
     tell_user('SYSTEM', `$apt_cmd` . "\n");
+}
+
+sub step_firstrun {
+    my $question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
+    $fqdn        = ask_user($question, '', 'input');
+
+    if ($ini{$fqdn}) {
+        %cfg = %{$ini{$fqdn}};
+
+        tell_user('INFO', "The FQDN '" . $cfg{fqdn} . "' has an existing configuration file");
+
+        if (ask_user("Would you like to load the configurations?", 'yes', 'yesno')) {
+            %cfg = %{$ini{$fqdn}};
+
+            if ($cfg{step}) {
+                if (ask_user("Would you like to continue from step $cfg{step} or start from the beginning?", '[s]tart over/[c]ontinue', 'input')) {
+                    $cfg{step} = 0;
+                }
+            }
+        } else {
+            if (ask_user("Are you sure? This will wipe the current config for this FQDN", 'yes', 'yesno')) {
+                delete $ini{$fqdn};
+                $ini{$fqdn} = {};
+            } else {
+                tell_user('WARN', "Continuing with loaded configuration");
+            }
+            %cfg = %{$ini{$fqdn}};
+        }
+    } else {
+        tell_user('WARN', 'No configuration for this FQDN, creating new entry');
+        $ini{$fqdn} = {};
+        handle_cfg({}, CFG_W_MAIN, $fqdn);
+    }
+
+    $cfg{fqdn} = $fqdn;
+
+    my $os = check_platform();
+    my $distro;
+
+    if ($os eq 'linux') {
+        my $ver = `uname -v`;
+        if ($ver =~ /(debian|ubuntu|kali)/i) {
+            $distro = $1;
+        } else {
+            if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
+                die "Unsupported distro, exiting\n";
+            }
+            $distro = "unsupported";
+        }
+        tell_user('INFO', "$distro found to be the current distribution");
+        %def = %{$ini{lin_examples}};
+    } else {
+        %def = %{$ini{win_examples}};
+    }
+
+    merge_hashes(\%cfg, \%def);
+    merge_hashes(\%cfg, \%glb);
+
+    $cfg{os} = $os;
+    $cfg{distro} = $distro;
+
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+
+    chomp(my $loc_check = `pwd`);
+    $loc_check =~ s/\/install//;
+
+    if ($loc_check ne $cfg{web_root}) {
+        my $error = "Setup has determined the files are not in the correct place,\n" .
+                    " or you're not in the correct folder. Please move the contents\n" .
+                    "of the legendofaetheria folder to your webroot, and make sure you're\n" .
+                    "the 'install' directory when you run this script.\n\n" .
+                    "Specified webroot directory: $cfg{web_root}\n" .
+                    "Current location           : $loc_check\n";
+        die $error;
+    }
+
+    $cfg{template_dir} = $cfg{web_root} . "/install/templates";
+    $cfg{scripts_dir}  = $cfg{web_root} . "/install/scripts";
+    $cfg{admin_email}  = "webmaster\@$cfg{fqdn}";
+    $cfg{setup_log}    = $cfg{web_root} . '/install/setup.log';
+    
+    $cfg{virthost_ssl_template} = "$cfg{template_dir}/virtual_host_ssl.template";
+    $cfg{virthost_template}     = "$cfg{template_dir}/virtual_host.template";
+    $cfg{htaccess_template}     = "$cfg{template_dir}/htaccess.template";
+    $cfg{crontab_template}      = "$cfg{template_dir}/crontab.template";
+    $cfg{env_template}          = "$cfg{template_dir}/env.template";
+    $cfg{sql_template}          = "$cfg{template_dir}/sql.template";
+    $cfg{php_template}          = "$cfg{template_dir}/php.template";
+
 }
 
 sub step_sql_configure {
@@ -508,40 +499,78 @@ sub step_apache_enables {
 }
 
 #Step: PHP configurations
-sub step_update_php_confs {
-    if ($os eq 'linux') {
-        my @keys = qw/expose_php error_reporting display_errors display_startup_errors allow_url_fopen allow_url_include session.gc_maxlifetime disable_functions session.cookie_domain session.use_strict_mode session.use_cookies session.cookie_lifetime session.cookie_secure session.cookie_httponly session.cookie_samesite session.cache_expire/;
-        my $ini_contents;
-        my $template_file;
+sub step_php_configure {
+    my $ini_contents;
+    my $template_file;
+    my %ini_patch = (
+        'expose_php'              => "off",
+	    'error_reporting'         => "E_NONE",
+	    'display_errors'          => "Off",
+	    'display_startup_errors'  => "Off",
+	    'allow_url_fopen'         => "Off",
+	    'allow_url_include'       => "Off",
+	    'session.gc_maxlifetime'  => "600",
+	    'disable_functions'       => "apache_child_terminate, apache_setenv, chdir, chmod, dbase_open, dbmopen, define_syslog_variables, escapeshellarg, escapeshellcmd, eval, exec, filepro, filepro_retrieve, filepro_rowcount, fopen_with_path, fp, fput, ftp_connect, ftp_exec, ftp_get, ftp_login, ftp_nb_fput, ftp_put, ftp_raw, ftp_rawlist, highlight_file, ini_alter, ini_get_all, ini_restore, inject_code, mkdir, move_uploaded_file, mysql_pconnect, openlog, passthru, phpAds_XmlRpc, phpAds_remoteInfo, phpAds_xmlrpcDecode, phpAds_xmlrpcEncode, php_uname, phpinfo, popen, posix_getpwuid, posix_kill, posix_mkfifo posix_mkfifo, posix_setpgid, posix_setsid, posix_setuid, posix_uname, proc_close, proc_get_status, proc_nice, proc_open, proc_terminate, putenv, rename, rmdir, shell_exec, show_source, syslog, system, xmlrpc_entity_decode",
+	    'session.cookie_domain'   => $cfg{fqdn},
+	    'session.use_strict_mode' => "1",
+	    'session.use_cookies'     => "1",
+	    'session.cookie_lifetime' => "14400",
+	    'session.cookie_secure'   => "1",
+	    'session.cookie_httponly' => "1",
+	    'session.cookie_samesite' => "Strict",
+	    'session.cache_expire'    => '30',
+    );
 
-        if ($cfg{php_ini} eq 'unset') {
-            $cfg{php_ini} = "/etc/php/$cfg{php_version}/apache2/php.ini";
-        }
-
-        {
-            local $/;
-            open my $t_fh, '<', "$cfg{template_dir}/php.template"
-		        or die "Couldn't open template file for read: $!\n";
-            $template_file = <$t_fh>;
-            close $t_fh;
-        }
-
-        {
-            local $/;
-            open my $fh, '<', $cfg{php_ini}
-                or die "Couldn't open '$cfg{php_ini}' for read: $!\n";
-            $ini_contents = <$fh>;
-            close $fh;
-        }
-
-        foreach my $key (@keys) {
-            $ini_contents =~ s/$key ?=.*?$[\r\n]//;
-        }
-
-        file_write('install\templates\php.template', $cfg{php_ini}, 'file', 1);
-    } else {
+    if ($cfg{os} eq 'linux') {
+        chomp($cfg{php_binary} = `which php$cfg{php_version}`);
+        $cfg{php_ini} = "/etc/php/$cfg{php_version}/apache2/php.ini";
+    } elsif ($cfg{os} eq 'windows') {
+        $cfg{php_binary} = 'C:\xampp\php\php.exe';
         $cfg{php_ini} = 'C:\xampp\php\php.ini';
     }
+    # Binary
+    if (ask_user("Located PHP binary at $cfg{php_binary} - is this correct?", 'yes', 'yesno')) {
+        tell_user('INFO', "PHP binary set to $cfg{php_binary}");
+    } else {
+        $cfg{php_binary} = ask_user("PHP binary not found. Please enter the path to the PHP binary", '', 'input');
+
+        if (!-e $cfg{php_binary}) {
+            tell_user('ERROR', "PHP binary not found at $cfg{php_binary}");
+            die "Exiting on error\n";
+        }
+    }
+
+    # INI file
+    if (ask_user("PHP ini file is set to $cfg{php_ini} - is this correct?", 'yes', 'yesno')) {
+        tell_user('INFO', "PHP ini file set to $cfg{php_ini}");
+    } else {
+        $cfg{php_ini} = ask_user("Please enter the path to the PHP ini file", $cfg{php_ini}, 'input');
+
+        if (!-e $cfg{php_ini}) {
+            tell_user('ERROR', "PHP ini file not found at $cfg{php_ini}");
+            die "Exiting on error\n";
+        }
+    }
+
+    {
+        local $/;
+        open my $fh, '<', $cfg{php_ini}
+            or die "Couldn't open '$cfg{php_ini}' for read: $!\n";
+        $ini_contents = <$fh>;
+        close $fh;
+    }
+
+    for (my ($key, $value) = each %ini_patch) {
+        if ($ini_contents =~ /^$key ?= ?/m) {
+            $ini_contents =~ s/^$key ?= ?.*/$key=$value/;
+            print "Replaced $key with $value\n";
+        } else {
+            $ini_contents .= "$key=$value\n";
+            print "Key not found, added $key=$value\n";
+        }
+    }
+
+    file_write($cfg{php_ini}, $ini_contents, 'data');
 }
 
 # Step: composer
@@ -555,6 +584,7 @@ sub step_composer_pull {
 
 # Step: Template imports
 sub step_generate_templates {
+    my @replacements = @{$_[0]};
     my $copy_output;
     my $cron_contents = '';
     my $fh_cron;
@@ -563,13 +593,12 @@ sub step_generate_templates {
     `sed -i 's/bind-address.*/bind-address = $cfg{sql_host}/' $cfg{sql_config_file}`;
 
     # key = in file, value = out file
-    $templates{$ENV_TEMPLATE}          = "$ENV_TEMPLATE.ready";
-    $templates{$HTACCESS_TEMPLATE}     = "$HTACCESS_TEMPLATE.ready";
-    $templates{$SQL_TEMPLATE}          = "$SQL_TEMPLATE.ready";
-    $templates{$CRONTAB_TEMPLATE}      = "$CRONTAB_TEMPLATE.ready";
-    $templates{$VIRTHOST_SSL_TEMPLATE} = "$VIRTHOST_SSL_TEMPLATE.ready";
-    $templates{$VIRTHOST_TEMPLATE}     = "$VIRTHOST_TEMPLATE.ready";
-    $templates{$PHP_TEMPLATE}          = "$PHP_TEMPLATE.ready";
+    $templates{$cfg{env_template}}          = "$cfg{env_template}.ready";
+    $templates{$cfg{htaccess_template}}     = "$cfg{htaccess_template}.ready";
+    $templates{$cfg{sql_template}}          = "$cfg{sql_template}.ready";
+    $templates{$cfg{crontab_template}}      = "$cfg{crontab_template}.ready";
+    $templates{$cfg{virthost_ssl_template}} = "$cfg{virthost_ssl_template}.ready";
+    $templates{$cfg{virthost_template}}    = "$cfg{virthost_template}.ready";
 
     while(my ($key, $val) = each %templates) {
         open my $fh, '<', $key;
@@ -597,28 +626,28 @@ sub step_process_templates {
 
     tell_user('INFO', "Importing SQL schema, creating user and granting privileges");
 
-    my $sql_cmd = "mysql -u root < $SQL_TEMPLATE.ready 2>&1";
+    my $sql_cmd = "mysql -u root < $cfg{sql_template}.ready 2>&1";
     chomp(my $sql_import_result = `$sql_cmd`);
     $sql_import_result //= 'Successfully imported database schema';
 
     # LOL
     tell_user((!!$? ? 'ERROR' : 'SUCCESS'), $sql_import_result);
 
-    tell_user('INFO', "Copying over $ENV_TEMPLATE.ready to $cfg{web_root}/.env");
-    file_write("$cfg{web_root}/.env", "$ENV_TEMPLATE.ready", 'file');
+    tell_user('INFO', "Copying over $cfg{env_template}.ready to $cfg{web_root}/.env");
+    file_write("$cfg{web_root}/.env", "$cfg{env_template}.ready", 'file');
 
-    tell_user('INFO', "Copying over $VIRTHOST_TEMPLATE.ready to $cfg{virthost_conf_file}");
-    file_write($cfg{virthost_conf_file}, "$VIRTHOST_TEMPLATE.ready", 'file');
+    tell_user('INFO', "Copying over $cfg{virthost_template}.ready to $cfg{virthost_conf_file}");
+    file_write($cfg{virthost_conf_file}, "$cfg{virthost_template}.ready", 'file');
 
     if ($cfg{ssl_enabled}) {
-        tell_user('INFO', "Copying over $VIRTHOST_SSL_TEMPLATE.ready to $cfg{virthost_conf_file_ssl}");
-        file_write($cfg{virthost_conf_file_a}, "$VIRTHOST_SSL_TEMPLATE.ready", 'file');
+        tell_user('INFO', "Copying over $cfg{virthost_ssl_template}.ready to $cfg{virthost_conf_file_ssl}");
+        file_write($cfg{virthost_conf_file_a}, "$cfg{virthost_ssl_template}.ready", 'file');
     }
 
-    tell_user('INFO', "Copying over $HTACCESS_TEMPLATE.ready to $cfg{web_root}/.htaccess");
-    file_write("$cfg{web_root}/.htaccess", "$HTACCESS_TEMPLATE.ready", 'file');
+    tell_user('INFO', "Copying over $cfg{htaccess_template}.ready to $cfg{web_root}/.htaccess");
+    file_write("$cfg{web_root}/.htaccess", "$cfg{htaccess_template}.ready", 'file');
 
-    tell_user('INFO', "Copying over $CRONTAB_TEMPLATE to $cfg{crontab_dir}/$cfg{apache_runas}");
+    tell_user('INFO', "Copying over $cfg{crontab_template} to $cfg{crontab_dir}/$cfg{apache_runas}");
 
     if (!-d $cfg{crontab_dir}) {
         make_path($cfg{crontab_dir});
@@ -628,7 +657,7 @@ sub step_process_templates {
         unlink("$cfg{crontab_dir}/$cfg{apache_runas}");
     }
 
-    file_write("$cfg{crontab_dir}/$cfg{apache_runas}", "$CRONTAB_TEMPLATE.ready");
+    file_write("$cfg{crontab_dir}/$cfg{apache_runas}", "$cfg{crontab_template}.ready");
     tell_user('INFO', "Updating permissions on new crontab to $cfg{apache_runas}:crontab");
     `chown $cfg{apache_runas}:crontab $cfg{crontab_dir}/$cfg{apache_runas}`;
     tell_user('SUCCESS', "All template files have been applied");
@@ -732,6 +761,7 @@ sub gen_random {
     for (1 .. $length) {
         $password .= chr(int(rand(94)) + 33);
     }
+    $password =~ s/'/#/g;
     $password =~ s/"/\\"/g;
 
     return $password;
@@ -927,7 +957,7 @@ sub merge_hashes {
     }
 }
 
-# TODO:
-# - Remove install folder after
-# - Fix PHP ini not populating on template overwrite
-#@values = $cfg->val('Section', 'Parameter');
+sub const_to_name {
+    my @names = qw/FIRSTRUN SOFTWARE PHP APACHE ENABLES COMPOSER TEMPLATES SERVICES SQL CRONS CERTS HOSTNAME CLEANUP PERMS/;
+    return $names[$_];
+}

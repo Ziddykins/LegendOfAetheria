@@ -235,6 +235,16 @@
                                                 <span class="material-symbols-sharp text-danger">restart_alt</span>
                                                 <span class="d-none d-sm-inline text-danger">Reset</span>
                                             </a>
+
+                                            <?php
+                                                $modal_body = 'This will reset your dungeon progress from floor ' .
+                                                              $character['floor'] . ' to floor 1 and return your ' .
+                                                              'dungeon multiplier back to 1x<br /><br /><strong>' .
+                                                              'Are you sure? This cannot be reversed!</strong>';
+                                                echo generate_modal('reset-dungeon', 'danger', 'Reset Dungeon Progress', $modal_body, ModalButtonType::YesNo);
+
+                                            ?>
+<!--                                            
                                             <div class="modal fade" id="reset-modal" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered">
                                                     <div class="modal-content">
@@ -243,8 +253,8 @@
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            This will reset your dungeon progress from floor <?php echo $character['floor']; ?> to floor 1 and return your dungeon multiplier back to 1x<br /><br />
-                                                            <strong>Are you sure? This cannot be reversed!</strong>
+                                                             
+                                                        
                                                         </div>
                                                         <form id="modal-dungeon-reset" name="modal-dungeon-reset" action="?page=dungeon&action=reset" method="POST">
                                                             <div class="modal-footer">
@@ -254,7 +264,7 @@
                                                         </form>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> -->
                                         </li>
                                     </ul>
                                 </li>

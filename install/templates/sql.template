@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS ###REPL_SQL_DB###;
 CREATE DATABASE IF NOT EXISTS ###REPL_SQL_DB###;
 use ###REPL_SQL_DB###;
 
@@ -19,6 +20,8 @@ CREATE TABLE `###REPL_SQL_TBL_ACCOUNTS###` (
   `serialized_character` longtext DEFAULT NULL,
   `credits` int(9) unsigned NOT NULL DEFAULT 10,
   `session_id` varchar(255) DEFAULT NULL,
+  `ip_lock` varchar(64) DEFAULT NULL,
+  `ip_lock_addr` varchar(64) DEFAULT 'off'
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -50,6 +53,7 @@ CREATE TABLE `###REPL_SQL_TBL_CHARACTERS###` (
   `max_ep` int(9) unsigned NOT NULL DEFAULT 100,
   `floor` int(9) unsigned NOT NULL DEFAULT 1,
   `description` text DEFAULT 'None Provided',
+  `ap` int(9) unsigned 
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `account_id` (`account_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

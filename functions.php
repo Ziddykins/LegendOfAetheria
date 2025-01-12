@@ -2,6 +2,7 @@
     require_once 'vendor/autoload.php';
     require_once 'logger.php';
     require_once 'constants.php';
+    require_once 'classes/class-account.php';
     require_once 'classes/class-monster.php';
 
     /**
@@ -25,7 +26,7 @@
             $table_column = $splits[0] . '_' . strtolower($splits[1]);
 
             if (isset($splits[2])) {
-                $table_column .= strtolower($splits[2]);
+                $table_column .= '_' . strtolower($splits[2]);
             }
 
             return $table_column;
@@ -492,7 +493,7 @@
 
     /**
      * Checks for potential abuse based on the provided type and data.
-     *
+     *global $log;
      * @param AbuseTypes $type The type of abuse to check for (e.g. MULTISIGNUP)
      * @param mixed $data Additional data to use in the abuse check (e.g. IP address)
      *
@@ -521,5 +522,40 @@
         }
         
         return false;
+    }
+
+    function generate_modal($id, $bg_color, $header, $body, ModalButtonType $btn_type) {
+        $btn = null;
+        if ($btn_type === ModalButtonType::YesNo) {
+            $btn  = '<button type="button" class="btn btn-danger"  data-bs-dismiss="modal">No</button>';
+            $btn .= '<button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>'; 
+        } elseif ($btn_type === ModalButtonType::Close) {
+            $btn  = '<button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>';
+        } elseif ($btn_type === ModalButtonType::OKCancel) {
+            $btn   = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>';
+            $btn  .= '<button type="button" class="btn btn-primary"   data-bs-dismiss="modal">Okay</button>';
+        } else {
+            $btn = '<input type="button" value=":(" />';
+        }           
+
+        $html = '<div class="modal fade" id="' . $id . '-modal" tabindex="-1" aria-hidden="true" style="z-index: 1044;">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-' . $bg_color . ' text-bg-' . $bg_color . '">
+                                <h1 class="modal-title fs-5">' . $header . '</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <strong>' . $body . '</strong>
+                            </div>
+
+                            <div class="modal-footer">
+                                ' . $btn . '
+                            </div>
+                        </div>
+                    </div>
+                </div>';
+
+        return $html;
     }
 ?>
