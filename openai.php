@@ -82,7 +82,7 @@
             }
         }
 
-        echo $content;
+        echo htmlentities($content);
     } else {
         echo "Invalid Query";
     }

@@ -53,11 +53,6 @@
 
             $result = $db->execute_query($query, [$id])->fetch_assoc();
 
-            /*if (!$result) {
-                header('Location: /');
-                exit();
-            }*/
-
             foreach ($result as $key => $value) {
                 $key = $this->tblcol_to_clsprop($key);
                 $this->$key = $value;

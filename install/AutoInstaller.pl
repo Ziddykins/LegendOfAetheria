@@ -590,7 +590,12 @@ sub step_generate_templates {
     my $fh_cron;
     my %templates;
 
+    # Dirty-fix SQL bind address
     `sed -i 's/bind-address.*/bind-address = $cfg{sql_host}/' $cfg{sql_config_file}`;
+
+    # Dirty-fix constants.php file TODO: Figure this out
+    # define('ROOT_WEB_DIRECTORY', '/var/www/html/dankaf.ca/loa/');
+    # `sed -i 's/.*ROOT_WEB_DIRECTORY.*//'`;
 
     # key = in file, value = out file
     $templates{$cfg{env_template}}          = "$cfg{env_template}.ready";

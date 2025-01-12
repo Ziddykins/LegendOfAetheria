@@ -59,7 +59,6 @@
 
             return $class_property;
         }
-
         /**
          * Retrieves data from a specified table based on the given identifier and type.
          *
@@ -323,13 +322,13 @@
         global $db, $account, $log;
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
         
-        $sql_query    = 'SELECT * FROM tbl_friends WHERE `email_1` = \'' . $account['email'] . "' AND `email_2` LIKE '%$email%'";
+        $sql_query    = 'SELECT * FROM tbl_friends WHERE `email_1` = \'' . $account->get_email() . "' AND `email_2` LIKE '%$email%'";
         $log->debug('Friend status, "us" sql: {$sql_query}');
         // deepcode ignore Sqli: Email is sanitized
         $results_us   = $db->query($sql_query);
         $count_one    = $results_us->num_rows;
     
-        $sql_query    = 'SELECT * FROM tbl_friends WHERE `email_2` = \'' . $account['email'] . "' AND `email_1` LIKE '%$email%'";
+        $sql_query    = 'SELECT * FROM tbl_friends WHERE `email_2` = \'' . $account->get_email() . "' AND `email_1` LIKE '%$email%'";
         $log->debug('Friend status, "them" sql: {$sql_query}');
         
         // deepcode ignore Sqli: Email is sanitized
@@ -375,9 +374,9 @@
         
         if (friend_status($email) === FriendStatus::REQUEST) {
             $sql_query = 'INSERT INTO tbl_friends (`email_1`, `email_2`) VALUES (?,?)';
-            $db->execute_query($sql_query, [$account['email'], $email]);
+            $db->execute_query($sql_query, [$account->get_email(), $email]);
             
-            $log->info('Friend request accepted', [ 'email_1' => $account['email'], 'email_2' => $email ]);
+            $log->info('Friend request accepted', [ 'email_1' => $account->get_email(), 'email_2' => $email ]);
         }
     }
 
@@ -393,8 +392,8 @@
      * @return int The count of friend requests. If an unsupported value is provided for $which, the function returns 0.
      */
     function get_friend_counts($which, $id = 0) {
-        global $db, $account;
-        $sql_query = 'SELECT DISTINCT email FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE `id` <> ' . $account['id'];
+        global $db, $account, $log;
+        $sql_query = 'SELECT DISTINCT email FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE `id` <> ' . $account->get_id();
         $results = $db->query($sql_query);
 
         switch ($which) {

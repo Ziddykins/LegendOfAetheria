@@ -1,13 +1,13 @@
 <?php
-    $header_charname = $character['name'];
+    $header_charname = $character->get_name();
     
-    if (substr($character['name'], -1, 1) == "s") {
-        $header_charname = $character['name'] . "'";
+    if (substr($character->get_name(), -1, 1) == "s") {
+        $header_charname = $character->get_name() . "'";
     }
-    $header_charname = $character['name'] . "'s";
+    $header_charname = $character->get_name() . "'s";
     
-    if (substr($character['name'], -1, 1) == "s") {
-        $header_charname = $character['name'] . "'";
+    if (substr($character->get_name(), -1, 1) == "s") {
+        $header_charname = $character->get_name() . "'";
     }
 ?>
     <div class="container">
@@ -41,28 +41,28 @@
                         <div class="mb-3 row">
                             <label for="account-email" class="col-form-label fw-bold">Email:</label>
                             <div class="col">
-                                <input type="text" class="form-control" id="account-email" name="account-email" value="<?php echo $account['email'] ?>" disabled>
+                                <input type="text" class="form-control" id="account-email" name="account-email" value="<?php echo $account->get_email() ?>" disabled>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                         <label for="account-registered" class="col-form-label fw-bold">Date Registered:</label>
                             <div class="col">
-                                <input type="text" class="form-control" id="account-registered" name="account-registered" value="<?php echo $account['date_registered']; ?>" disabled>
+                                <input type="text" class="form-control" id="account-registered" name="account-registered" value="<?php echo $account->get_dateRegistered(); ?>" disabled>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <label for="account-privileges" class="col-form-label fw-bold">Privileges:</label>
                             <div class="col">
-                                <input type="text" class="form-control" id="account-privileges" name="account-privileges" value="<?php echo $account['privileges']; ?>" disabled>
+                                <input type="text" class="form-control" id="account-privileges" name="account-privileges" value="<?php echo $account->get_privileges(); ?>" disabled>
                             </div>
                         </div>
 
                         <div class="mb-3 row">
                             <label for="character-race" class="col-form-label fw-bold">LoAI Credits</label>
                             <div class="col">
-                                <input type="text" class="form-control" id="account-credits" name="account-credits" value="<?php echo $account['credits']; ?>" disabled>
+                                <input type="text" class="form-control" id="account-credits" name="account-credits" value="<?php echo $account->get_credits(); ?>" disabled>
                                 <small>Credits can be used for some OpenAI generation, such as your character's description below. Each generation costs 1 credit</small>
                             </div>
                         </div>
@@ -99,20 +99,20 @@
                             <div class="mb-3 row">
                                 <label for="character-name" class="col-form-label fw-bold">Character Name:</label>
                                 <div class="col">
-                                    <input type="text" class="form-control" id="character-name" name="character-name" value="<?php echo $character['name']; ?>" disabled>
+                                    <input type="text" class="form-control" id="character-name" name="character-name" value="<?php echo $character->get_name(); ?>" disabled>
                                 </div>
                             </div>
 
                             <div class="mb-3 row">
                                 <label for="character-race" class="col-form-label fw-bold">Character Race:</label>
                                 <div class="col">
-                                    <input type="text" class="form-control" id="character-race" name="character-race" value="<?php echo $character['race']; ?>" disabled>
+                                    <input type="text" class="form-control" id="character-race" name="character-race" value="<?php echo $character->get_race(); ?>" disabled>
                                 </div>
                             </div>
                             
                             <div class="mb-3">
                                 <label for="character-description" class="form-label fw-bold">Character Description:</label>
-                                <textarea class="form-control" id="character-description" name="character-description" rows="3" width><?php echo $character['description']; ?></textarea>
+                                <textarea class="form-control" id="character-description" name="character-description" rows="3" width><?php echo $character->get_description(); ?></textarea>
                             </div>
 
                             <div class="mb-3">
@@ -145,7 +145,7 @@
 </div>
 
 <script>
-    let original_description = "<?php echo $character['description'];?>";
+    let original_description = "<?php echo $character->get_description();?>";
     let description_changed  = 0;
     let swap_icons = document.querySelectorAll(".swap-icon");
     let id = null;
@@ -183,15 +183,15 @@
                             url = "/game?page=save";
                             data = {
                                 type: 'character',
-                                id: <?php echo $character['id']; ?>,
+                                id: <?php echo $character->get_id(); ?>,
                                 data: JSON.stringify(document.getElementById("character-description").textContent)
                             };
                             do_ajax = 1;
                         } else if (id == "#generate-icon") {
                             url = "openai";
                             data = { 
-                                characterID: <?php echo $character['id']; ?>,
-                                accountID: <?php echo $account['id']; ?>,
+                                characterID: <?php echo $character->get_id(); ?>,
+                                accountID: <?php echo $account->get_id(); ?>,
                                 generate_description: 1
                             };
                             do_ajax = 1;

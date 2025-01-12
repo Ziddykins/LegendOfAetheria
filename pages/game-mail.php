@@ -1,10 +1,10 @@
 <?php
     require 'classes/class-mail.php';
     
-    $account   = table_to_obj($_SESSION['email'], 'account');
-    $character = table_to_obj($account['id'], 'character');
-    
-    $user_mailbox = new MailBox($account['id']);
+    $account   = new Account($_SESSION['account-id']); 
+    $Character = new Character($_SESSION['character-id']); 
+
+    $user_mailbox = new MailBox($account->get_id());
     $user_mailbox->set_focused_folder(MailFolderType::INBOX);
     $user_mailbox->populate_focused_folder();
     $inbox_count = $user_mailbox->focusedFolder->get_message_count();
