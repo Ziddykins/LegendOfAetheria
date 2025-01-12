@@ -4,8 +4,14 @@
     define('MAX_ASSIGNABLE_AP',       40);
     define('REGEN_PER_TICK',           3);
     
-    define('ROOT_WEB_DIRECTORY', '/var/www/html/dankaf.ca/loa/');
+    define('ROOT_WEB_DIRECTORY', '/var/www/html/kali.local/loa/');
     
+    enum ModalButtonType {
+        case YesNo;
+        case Close;
+        case OKCancel;
+    }
+
     enum Races {
         public static function random(): self {
             $count = count(self::cases()) - 1;

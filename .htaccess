@@ -1,3 +1,5 @@
+ErrorDocument 404 /404
+
 <IfModule mod_rewrite.c>
     RewriteEngine on
     RewriteCond %{REQUEST_FILENAME} !-d
@@ -5,8 +7,8 @@
     RewriteRule ^(.*)$ $1.php
 
     # Return 404 if original request is *.php
-    RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.php[? ].*$"
-    RewriteRule .* - [L,R=404]
+    #RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.php[? ].*$"
+    #RewriteRule .* - [L,R=404]
 
     # No reading .txt files!
     RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.txt[? ].*$"

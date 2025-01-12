@@ -59,7 +59,7 @@
             $_SESSION['email']      = $account->get_email();
             $_SESSION['account-id'] = $account->get_id();
             
-            $account->set_sessionID(session_id());
+            $account->set_sessionId(session_id());
 
             header('Location: /game');
             exit();
@@ -234,7 +234,7 @@
     
     <body>
     <div class="container" style="min-width: 325px;">
-        <div id="login-container" class="container shadow position-absolute top-50 start-50 translate-middle" style="max-width:500px; width: 100%;">
+        <div id="login-container" class="container shadow" style="max-width:500px; width: 100%;">
             <div class="row">
                 <div class="col p-4">
                     <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" class="w-100"></img>
