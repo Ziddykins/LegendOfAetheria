@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a83edc2a2969bd7582197a0224e2989a",
+    "content-hash": "cdaac4a31a2ef2cb487f24acf08d8a28",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -171,16 +171,16 @@
         },
         {
             "name": "orhanerday/open-ai",
-            "version": "4.9.1",
+            "version": "5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/orhanerday/open-ai.git",
-                "reference": "2ccdf2f6b4287b9e570a1ddcf33083b7ad9f7e9c"
+                "reference": "d8c78fe2f5fed59e0ba458f90b5589ed9f13a367"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/orhanerday/open-ai/zipball/2ccdf2f6b4287b9e570a1ddcf33083b7ad9f7e9c",
-                "reference": "2ccdf2f6b4287b9e570a1ddcf33083b7ad9f7e9c",
+                "url": "https://api.github.com/repos/orhanerday/open-ai/zipball/d8c78fe2f5fed59e0ba458f90b5589ed9f13a367",
+                "reference": "d8c78fe2f5fed59e0ba458f90b5589ed9f13a367",
                 "shasum": ""
             },
             "require": {
@@ -218,7 +218,7 @@
             ],
             "support": {
                 "issues": "https://github.com/orhanerday/open-ai/issues",
-                "source": "https://github.com/orhanerday/open-ai/tree/4.9.1"
+                "source": "https://github.com/orhanerday/open-ai/tree/5.2"
             },
             "funding": [
                 {
@@ -226,7 +226,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-11-13T04:03:05+00:00"
+            "time": "2024-05-29T12:31:54+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
