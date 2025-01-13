@@ -73,7 +73,8 @@
         $results   = $db->query($sql_query);
         
         while ($player = $results->fetch_assoc()) {
-            $player['hp'] = $player['max_hp'];
+            $character = new Character($player['id']);
+            $character->set_hp($character->get_maxHp());
             $count++;
         }
         
