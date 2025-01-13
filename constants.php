@@ -126,6 +126,8 @@
         case MAIL_ALREADY_BLOCKED      = -4001;
         
         case CRON_HTTP_DIRECT_ACCESS   = -5000;
+
+        case CHAR_MAX_CHAR_COUNT       = -6000;
     }
 
     # Global:

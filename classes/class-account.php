@@ -17,8 +17,9 @@
         private $ipLock;
         private $ipLockAddr;
 
-        private $characterSlots;
-
+        private $charSlot1;
+        private $charSlot2;
+        private $charSlot3;
 
         public function __construct($accountID) {
             $this->id = $accountID;
@@ -60,8 +61,10 @@
 
             return 0;
         }
-    }
+        
+       }
 
+           
     class CharacterSlots {
         /* TODO: implement. */
     }

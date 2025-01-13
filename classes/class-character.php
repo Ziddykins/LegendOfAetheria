@@ -42,30 +42,28 @@ class Character {
             $this->monster = $monster;
         }
 
-        private function saveCharacter($accountID, Character $character, $slot = 0) {
-            global $db, $log;
-    
-            $serializedCharacter = serialize($character);
-            $serializedInventory = serialize($this->inventory);
-            $serializedStats     = serialize($this->stats);
-            $serializedMonster   = serialize($this->pmonster);
-            
-            $serializedCompleteCharacter = "$serializedCharacter###$serializedInventory###$serializedStats###$serializedMonster";
-
-            $sqlQuery = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `serialized_character` = ? WHERE `id` = ?";
-
-            $db->execute_query($sqlQuery, [$serializedCompleteCharacter, $accountID])->fetch_assoc();
-            
-            $log->info('Saving character', ['id' => $accountID, 'character' => $character->name]);
-            $log->debug('Serialized data', ['serialized_character' => $serializedCompleteCharacter]);
-        }
-
+        
         private function newCharacter($id) {
             global $db, $log;
             $query = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
-
             $result = $db->execute_query($query, [$id])->fetch_assoc();
 
+            $sql_query = "SELECT char_slot1, char_slot2, char_slot3 FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
+            $slots = $db->execute_query($sql_query, [$this->accountID])->fetch_assoc();
+
+            $free = 1;
+            foreach ($slots as $slot => $value) {
+                if ($value != NULL) {
+                    $free++;
+                }
+            }
+
+            if ($free > 3) }
+                return LOAError::CHAR_MAX_CHAR_COUNT;
+            } else {
+                $this->slot = $free;
+            }
+            
             foreach ($result as $key => $value) {
                 $key = $this->tblcol_to_clsprop($key);
                 $this->$key = $value;
@@ -73,32 +71,6 @@ class Character {
             }
 
             return 0;
-        }
-
-        private function loadCharacter($accountID) {
-            global $db, $log;
-
-            $sqlQuery = "SELECT `serialized_character` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
-
-            $serializedCompleteCharacter = $db->execute_query($sqlQuery, [$accountID])->fetch_assoc();
-            [$serializedCharacter, $serializedInventory, $serializedStats, $serializedMonster] = explode('###', $serializedCompleteCharacter);
-
-            $character            = unserialize($serializedCharacter);
-            $character->inventory = unserialize($serializedInventory);
-            $character->stats     = unserialize($serializedStats);
-            $character->pmonster  = unserialize($serializedMonster);
-            
-            $log->debug(
-                "Loaded character {$character['name']} from account ID $accountID",
-                [
-                     'full'      => $serializedCompleteCharacter,
-                     'character' => $serializedCharacter,
-                     'inventory' => $serializedInventory,
-                     'stats'     => $serializedStats
-                ]
-            );
-            
-            return $character;
         }
 
         function __call($method, $params) {
