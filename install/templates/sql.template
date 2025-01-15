@@ -17,11 +17,13 @@ CREATE TABLE `###REPL_SQL_TBL_ACCOUNTS###` (
   `logged_in` enum('True','False') NOT NULL DEFAULT 'False',
   `failed_logins` int(10) unsigned NOT NULL DEFAULT 0,
   `ip_address` tinytext DEFAULT NULL,
-  `serialized_character` longtext DEFAULT NULL,
   `credits` int(9) unsigned NOT NULL DEFAULT 10,
   `session_id` varchar(255) DEFAULT NULL,
   `ip_lock` varchar(64) DEFAULT NULL,
-  `ip_lock_addr` varchar(64) DEFAULT 'off'
+  `ip_lock_addr` varchar(64) DEFAULT 'off',
+  `char_slot1` mediumtext DEFAULT NULL,
+  `char_slot2` mediumtext DEFAULT NULL,
+  `char_slot3` mediumtext DEFAULT NULL
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -53,7 +55,7 @@ CREATE TABLE `###REPL_SQL_TBL_CHARACTERS###` (
   `max_ep` int(9) unsigned NOT NULL DEFAULT 100,
   `floor` int(9) unsigned NOT NULL DEFAULT 1,
   `description` text DEFAULT 'None Provided',
-  `ap` int(9) unsigned 
+  `ap` int(9) unsigned DEFAULT 0
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `account_id` (`account_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -77,6 +79,7 @@ CREATE TABLE `###REPL_SQL_TBL_FAMILIARS###` (
   `eggs_seen` int(9) unsigned DEFAULT 0,
   `last_roll` float unsigned DEFAULT 0,
   `avatar` varchar(255) DEFAULT 'img/generated/eggs/egg-unhatched.jpeg',
+  `slot` int(9) unsigned DEFAULT 0
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

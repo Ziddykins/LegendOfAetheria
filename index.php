@@ -5,14 +5,14 @@
     require 'vendor/autoload.php';
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
-    
+
     require_once 'logger.php';
     require_once 'db.php';
     require_once 'constants.php';
     require_once 'functions.php';
     require_once 'mailer.php';
     require_once 'classes/class-account.php';
-
+    require_once 'classes/class-character.php';
 
     if (isset($_REQUEST['login-submit']) && $_REQUEST['login-submit'] == 1) {
         $email    = $_REQUEST['login-email'];
@@ -53,16 +53,14 @@
                 'IpAddr'     => $account->get_ipAddress()
             ]);
 
-            $character = table_to_obj($account->get_id(), 'character');
-
-            $_SESSION['logged-in']  = 1;
-            $_SESSION['email']      = $account->get_email();
-            $_SESSION['account-id'] = $account->get_id();
-            $_SESSION['character-id'] = $character['id'];
+            $_SESSION['logged-in']     = 1;
+            $_SESSION['email']         = $account->get_email();
+            $_SESSION['account-id']    = $account->get_id();
+            $_SESSION['selected-slot'] = -1;
 
             $account->set_sessionID(session_id());
 
-            header('Location: /game');
+            header('Location: /select');
             exit();
         } else {
             $ip = $_SERVER['REMOTE_ADDR'];
@@ -87,7 +85,7 @@
 
                 $db->execute_query($sql_query, [ $sql_datetime, $error_type, $login_error, $_SERVER['REMOTE_ADDR'] ]);
             }
-            
+
             $log->error('Account login FAILED', [
                 'Email'      => $email,
                 'IpAddr'     => $_SERVER['REMOTE_ADDR']
@@ -111,7 +109,7 @@
             header('Location: /?invalid_email');
             exit();
         }
-        
+
         $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $char_name);
 
         $time_sqlformat   = get_mysql_datetime();
@@ -124,18 +122,18 @@
 
         /* Email doesn't exist */
         if (!$row_count) {
-            /* AP assigned properly */            
+            /* AP assigned properly */
             if ($str + $def + $intl === MAX_ASSIGNABLE_AP) {
                 /* Passwords match */
                 if ($password === $password_confirm) {
-                    $verification_code  = strrev(hash('sha256', session_id())); 
+                    $verification_code  = strrev(hash('sha256', session_id()));
                     $verification_code .= substr(hash('sha256', strval(rand(0,100))), 0, 15);
-                    
+
                     $password = password_hash($password, PASSWORD_BCRYPT);
-                    
+
                     //$sql_query = "INSERT INTO {$_ENV['SQL_LOGS_TBL']} (`type`, `message`, `ip`) VALUES (?, ?, ?)";
                     //$db->execute_query($sql_query, [ "AccountCreate", "Account created for user {$account->get_email()}", $ip_address ]);
-                    
+
                     if (check_abuse(AbuseTypes::MULTISIGNUP, $ip_address)) {
                         header('Location: /?abuse_signup');
                         exit();
@@ -149,21 +147,22 @@
                     $db->execute_query($sql_query, [ $email, $password, $time_sqlformat, $verification_code, $new_privs, $ip_address ]);
 
                     $arr_images = scandir('img/avatars');
-                    
+
                     if (!array_search($avatar, $arr_images)) {
                         $avatar_now = 'avatar-unknown.jpg';
                         $log->error(
                             'Avatar wasn\'t found in our ' .
                             'accepted list of avatar choices!',
-                            [ 
+                            [
                                 'Avatar' => $avatar,
                                 'Avatar_now' => $avatar_now,
                             ]
                         );
                         $avatar = $avatar_now;
                     }
-                    
+
                     $valid_race = 0;
+
                     foreach (Races::cases() as $enum_race) {
                         if ($race === $enum_race->name) {
                             $valid_race = 1;
@@ -177,7 +176,7 @@
                             'choosing random enum: ',
                             [ 'Race' => $race ]
                         );
-                    } 
+                    }
 
                     $sql_query  = "SELECT MAX(`id`) AS `account_id` FROM {$_ENV['SQL_ACCT_TBL']}";
                     $result     = $db->execute_query($sql_query)->fetch_assoc();
@@ -187,34 +186,33 @@
                                     "(`account_id`, `avatar`, `name`, `race`, `str`, `def`, `int`) " .
                                  "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-                    
-                    
+
+
                     if (!$db->execute_query($sql_query, [ $account_id, $avatar, $char_name, $race, $str, $def, $intl ])) {
                         $log->critical('Couldn\'t insert user information into character table');
                     }
-    
-/*                    $character = new Character($account_id, $email);
 
-                        $character->setStats('strength',     $str);
-                        $character->setStats('intelligence', $intl);
-                    $character->setStats('defense',      $def);
-                         
-                    $character->setStats('hp',     100);
-                    $character->setStats('maxHp',  100);
-                    $character->setStats('mp',     100);
-                        $character->setStats('maxMp',  100);
-            
-                        $character->setStats('status', 'healthy');
-                    
-                    $serialized_data = serialize($character); 
-                        $log->info("serdata: $serialized_data");
-                    save_character($account_id, $serialized_data);*/
-                    
+                    $character = new Character($account_id, 1);
+                    $character->stats->set_strength($str);
+                    $character->stats->set_intelligence($intl);
+                    $character->stats->set_defense($def);
+
+                    $character->stats->set_hp(100);
+                    $character->stats->set_maxHp(100);
+                    $character->stats->set_mp(100);
+                    $character->stats->set_maxMp(100);
+
+                    $character->stats->set_status(CharacterStatus::HEALTHY);
+
+                    $serialized_data = serialize($character);
+
+                    $character->save_character($account_id, $serialized_data);
+
                     // Verification email
                     $account = table_to_obj($email, 'account');
-                    
+
                     //send_mail($email, $account);
- 
+
                     header('Location: /?register_success');
                     exit();
                 }
@@ -230,30 +228,38 @@
 
     <head>
         <?php include 'html/headers.html'; ?>
-        
+
     </head>
-    
+
     <body>
-    <div class="container" style="min-width: 325px;">
-        <div id="login-container" class="container shadow" style="max-width:500px; width: 100%;">
-            <div class="row">
-                <div class="col p-4">
-                    <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" class="w-100"></img>
-                </div>
+    <div class="btn-group p-3 m-3 invisible" role="group" aria-label="basic outlined example">
+        <button type="button" class="btn btn-sm btn-success bg-gradient text-center text-shadow fw-bolder font-monospace border border-black border-round" style="text-shadow: black 0.45px 0.75px 0.5px; transform: skewX(9deg);">Pass</button>
+        <button type="button" class="btn btn-sm text-bg-dark bg-gradient text-center fw-bolder font-monospace border border-black border-round" style="text-shadow: black 0.45px 0.75px 0.5px; transform: skewX(9deg);">Autoinstaller</button>
+        <button type="button" class="btn btn-sm text-bg-danger bg-gradient text-center font-monospace border border-black border-round" style="transform: skewX(9deg);"></button>
+    <div class="btn-group" role="group" aria-label="basic outlined example">
+</div>
+</div>
+
+<div class="container" style="min-width: 325px;">
+    <div id="login-container" class="container shadow" style="max-width:500px; width: 100%;">
+        <div class="row">
+            <div class="col p-4">
+                <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" class="w-100"></img>
             </div>
-            <div class="row">
-                <div class="col">
-                    <?php require_once 'navs/nav-login.php'; ?>
+        </div>
+        <div class="row">
+            <div class="col">
+                <?php require_once 'navs/nav-login.php'; ?>
 
-                <div aria-live="polite" aria-atomic="true" class="position-relative">
-                    <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
+            <div aria-live="polite" aria-atomic="true" class="position-relative">
+                <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
 
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <?php include 'html/footers.html'; ?>
+    <?php include 'html/footers.html'; ?>
 </div>
     </body>
 </html>
