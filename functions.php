@@ -15,19 +15,27 @@
          * @param string $property The class property.
          * @return string Returns the corresponding table column name.
          */
-        
+
         function clsprop_to_tblcol($property) {
+            global $log;
+
             $splits = preg_split('/(?=[A-Z]{1,2})/', $property);
 
             if (count($splits) === 1) {
                 return $property;
             }
 
-            $table_column = $splits[0] . '_' . strtolower($splits[1]);
+            if ($splits[1] == 'I' && $splits[2] == 'D') {
+                $table_column = strtolower($splits[0] . '_id');
+            } else {
+                $table_column = $splits[0] . '_' . strtolower($splits[1]);
+            }
 
-            if (isset($splits[2])) {
+            if (isset($splits[2]) && $splits[1] != 'I' && $splits[2] != 'D') {
                 $table_column .= '_' . strtolower($splits[2]);
             }
+
+            $log->info("cls->tbl: " . $table_column);
 
             return $table_column;
         }
@@ -41,6 +49,8 @@
          * @throws Exception If the column name does not match the expected format.
          */
         function tblcol_to_clsprop($column) {
+            global $log;
+
             $splits = preg_split('/_/', $column);
 
             if (count($splits) === 1) {
@@ -57,70 +67,61 @@
                 $class_property .= ucfirst($splits[2]);
             }
 
+            $log->info("tbl->cls: " . $class_property);
+
             return $class_property;
         }
-        /**
-         * Retrieves data from a specified table based on the given identifier and type.
-         *
-         * @param string $identifier The unique identifier to search for in the table.
-         * @param string $type The type of data to retrieve ('account', 'character', 'familiar', or 'monster').
-         * @return array|object|null Returns an associative array of the row data for 'account', 'character', and 'familiar' types.
-         *                           Returns a Monster object for 'monster' type.
-         *                           Returns null if an invalid type is provided.
-         *
-         * @global mysqli $db The database connection object.
-         * @global Logger $log The logging object.
-         *
-         * @throws mysqli_sql_exception If there's an error in the SQL query execution.
-         *
-         * @example
-         * $account_data = table_to_obj('user@example.com', 'account');
-         * $monster_obj = table_to_obj(1, 'monster');
-         */
-        /*function table_to_obj($identifier, $type) {
-            global $db, $log;
-            $table = '';
-            $column = '';
-            $obj = null;
+    }
+
+    trait HandlePropSync {
+        function prop_sync($method, $params, $type) {
+            global $db;
+            $table = 'none';
 
             switch ($type) {
-                case 'account':
-                    $column = 'email';
-                    $table  = $_ENV['SQL_ACCT_TBL'];
-                    $obj    = new Account($identifier);
+                case PropSyncType::CHARACTER:
+                    $table = $_ENV['SQL_CHAR_TBL'];
                     break;
-                case 'character':
-                    $column = 'account_id';
-                    $table  = $_ENV['SQL_CHAR_TBL'];
+                case PropSyncType::ACCOUNT:
+                    $table = $_ENV['SQL_ACCT_TBL'];
                     break;
-                case 'familiar':
-                    $column = 'account_id';
-                    $table  = $_ENV['SQL_FMLR_TBL'];
-                    break;
-                case 'monster':
-                    $column = 'id';
-                    $table  = $_ENV['SQL_MNST_TBL'];
-                    $obj    = new Monster;
+                case PropSyncType::FAMILIAR:
+                    $table = $_ENV['SQL_FMLR_TBL'];
                     break;
                 default:
-                    $log->critical("Invalid 'type' provided to " . __FUNCTION__ . ": $type"); 
-                    return null;
-            }
-
-            $sql_query = "SELECT * FROM $table WHERE `$column` = ?";
+                    exit(LOAError::FUNCT_PROPSYNC_TYPE);
+            }                
             
-            $prepped = $db->prepare($sql_query);
-            $prepped->bind_param('s', $identifier);
-            $prepped->execute();
+            $prop = lcfirst(substr($method, 4));
 
-            $result = $prepped->get_result();
-            $row    = $result->fetch_assoc();
+            if (strncasecmp($method, "get_", 4) === 0) {
+                return $this->$prop;
+            } elseif (strncasecmp($method, "set_", 4) === 0) {
+                $sql_query = "UPDATE $table ";
+                $table_col = $this->clsprop_to_tblcol($prop);
 
-            if ($type == 'monster') {
-                return $obj;
+                if (is_int($params[0])) {
+                    $sql_query .= "SET `$table_col` = {$params[0]} ";
+                } else {
+                    $sql_query .= "SET `$table_col` = '{$params[0]}' ";
+                }
+
+                $sql_query .= "WHERE `id` = {$this->id}";
+
+                $db->query($sql_query);
+                $this->$prop = $params[0];
+
+                $log->info("TRAIT",
+                    [
+                        'SQLQuery' => $sql_query,
+                        'params'   => print_r($params, 1),
+                        'method'   => $method,
+                        'prop'     => $prop,
+                        'type'     => $type->name
+                    ]
+                );
             }
-            return $row;
-        }*/
+        }
     }
 
     /**
@@ -188,7 +189,7 @@
                     $obj    = new Monster;
                     break;
                 default:
-                    $log->critical("Invalid 'type' provided to " . __FUNCTION__ . ": $type"); 
+                    $log->critical("Invalid 'type' provided to " . __FUNCTION__ . ": $type");
                     return null;
             }
 
@@ -220,7 +221,7 @@
 
         return $seconds_left;
     }
-    
+
     /**
      * Retrieves a global value from the database based on the provided name.
      *
@@ -237,10 +238,10 @@
         $sql_query = "SELECT `value` FROM {$_ENV['SQL_GLBL_TBL']} WHERE `name` = '$which'";
         $result = $db->query($sql_query);
         $row = $result->fetch_assoc();
-        
+
         return $row['value'];
     }
-    
+
     /**
      * Updates a global value in the database.
      *
@@ -254,11 +255,11 @@
      */
     function set_globals($name, $value) {
         global $db;
-        
+
         $sql_query = "UPDATE {$_ENV['SQL_GLBL_TBL']} SET `value` = '$value' WHERE `name` = '$name'";
         $db->query($sql_query);
     }
-    
+
     /**
      * Generates a random floating-point number within a specified range.
      *
@@ -321,20 +322,20 @@
     function friend_status($email) {
         global $db, $account, $log;
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
-        
+
         $sql_query    = 'SELECT * FROM tbl_friends WHERE `email_1` = \'' . $account->get_email() . "' AND `email_2` LIKE '%$email%'";
         $log->debug('Friend status, "us" sql: {$sql_query}');
         // deepcode ignore Sqli: Email is sanitized
         $results_us   = $db->query($sql_query);
         $count_one    = $results_us->num_rows;
-    
+
         $sql_query    = 'SELECT * FROM tbl_friends WHERE `email_2` = \'' . $account->get_email() . "' AND `email_1` LIKE '%$email%'";
         $log->debug('Friend status, "them" sql: {$sql_query}');
-        
+
         // deepcode ignore Sqli: Email is sanitized
         $results_them = $db->query($sql_query);
         $count_two    = $results_them->num_rows;
-        
+
         $return = FriendStatus::NONE;
 
         switch (true) {
@@ -353,7 +354,7 @@
             default:
                 return FriendStatus::NONE;
         }
-        
+
         $log->info("Checking friend statuses for $email -> " . $return->name);
         return LOAError::FRNDS_FRIEND_STATUS_ERROR;
     }
@@ -371,11 +372,11 @@
      */
     function accept_friend_req($email) {
         global $db, $log, $account;
-        
+
         if (friend_status($email) === FriendStatus::REQUEST) {
             $sql_query = 'INSERT INTO tbl_friends (`email_1`, `email_2`) VALUES (?,?)';
             $db->execute_query($sql_query, [$account->get_email(), $email]);
-            
+
             $log->info('Friend request accepted', [ 'email_1' => $account->get_email(), 'email_2' => $email ]);
         }
     }
@@ -423,9 +424,9 @@
      */
     function block_user($email_1, $email_2) {
         global $db;
-        $sqlQuery = 'SELECT email_2 FROM ' . $_ENV['SQL_FRND_TBL'] . 
-                    "WHERE `email_1` = ? AND `email_2` = ?"; 
-        
+        $sqlQuery = 'SELECT email_2 FROM ' . $_ENV['SQL_FRND_TBL'] .
+                    "WHERE `email_1` = ? AND `email_2` = ?";
+
         $result = $db->execute_query($sqlQuery, [$email_1, $email_2])->fetch_assoc();
 
         if (str_starts_with($result['email_2'], '¿b¿')) {
@@ -457,7 +458,7 @@
 
     function load_monster_sheet(&$monster_pool) {
         global $log;
-        
+
         $monsters_arr = [];
 
         $handle = fopen("monsters.raw", "r");
@@ -471,7 +472,7 @@
         foreach ($monsters_arr as $monster) {
             $temp_monster = new Monster(MonsterScope::PERSONAL, null, $_ENV['SQL_MNST_TBL']);
             $temp_stats_arr = explode(',', $monster);
-            
+
             $temp_monster->set_name($temp_stats_arr[0]);
             $temp_monster->set_hp($temp_stats_arr[1]);
             $temp_monster->set_maxHP($temp_stats_arr[2]);
@@ -505,8 +506,8 @@
             case AbuseTypes::MULTISIGNUP:
                 $sql_query = <<<SQL
                                 SELECT * FROM {$_ENV['SQL_LOGS_TBL']}
-                                WHERE `type` = "AccountCreate" 
-                                    AND `ip` = ? 
+                                WHERE `type` = "AccountCreate"
+                                    AND `ip` = ?
                                     AND `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
                             SQL;
                 $count = $db->execute_query($sql_query, [ $data ])->num_rows;
@@ -519,7 +520,7 @@
             default:
                 $log->error("No type specified for abuse lookup");
         }
-        
+
         return false;
     }
 
@@ -527,7 +528,7 @@
         $btn = null;
         if ($btn_type === ModalButtonType::YesNo) {
             $btn  = '<button type="button" class="btn btn-danger"  data-bs-dismiss="modal">No</button>';
-            $btn .= '<button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>'; 
+            $btn .= '<button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>';
         } elseif ($btn_type === ModalButtonType::Close) {
             $btn  = '<button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>';
         } elseif ($btn_type === ModalButtonType::OKCancel) {
@@ -535,7 +536,7 @@
             $btn  .= '<button type="button" class="btn btn-primary"   data-bs-dismiss="modal">Okay</button>';
         } else {
             $btn = '<input type="button" value=":(" />';
-        }           
+        }
 
         $html = '<div class="modal fade" id="' . $id . '-modal" tabindex="-1" aria-hidden="true" style="z-index: 1044;">
                     <div class="modal-dialog modal-dialog-centered">

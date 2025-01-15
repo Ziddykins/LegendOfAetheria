@@ -27,18 +27,25 @@
     load_monster_sheet($monster_pool);
 
     $account   = new Account($_SESSION['account-id']);
+    $char_menu_icon = 'bi-emoji-laughing-fill';
+    $cur_floor = 1;
+    $avatar = 'avatar-unknown.jpg';
     
     /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
-        $character = new Character($_SESSION['character-id']);
-        $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
-        $familiar->loadFamiliar($character->get_id());
+        if ($_SESSION['selected-slot'] > 1) {
+            $character = new Character($_SESSION['character-id']);
+            $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
+            $familiar->loadFamiliar($character->get_id());
 
-        $char_menu_icon = $character->get_hp() > 0 
-            ? 'bi-emoji-laughing-fill' 
-            : 'bi-emoji-dizzy-fill';
+            $char_menu_icon = $character->get_hp() > 0 
+                ? 'bi-emoji-laughing-fill' 
+                : 'bi-emoji-dizzy-fill';
 
-        $_SESSION['name'] = $character->get_name();
+            $_SESSION['name'] = $character->get_name();
+            $cur_floor = $character->get_floor();
+            $avatar = $character->get_avatar();
+        }
 
         /* Check if the user has clicked the apply button on the profile tab */
         if (isset($_REQUEST['profile-apply']) && $_REQUEST['profile-apply'] == 1) {
@@ -204,9 +211,13 @@
                                         </li>
                                         <li>
                                             <?php
-                                                $rest_disabled = '';
-                                                if ($character->get_hp() === $character->get_maxHp()) {
-                                                    $rest_disabled = 'disabled';
+                                                if ($_SESSION['selected-slot'] > 1) {
+                                                    $rest_disabled = '';
+                                                    if ($character->get_hp() === $character->get_maxHp()) {
+                                                        $rest_disabled = 'disabled';
+                                                    }
+                                                } else {
+                                                    $rest_disabled = '';
                                                 }
                                             ?>
                                             <a href="?page=" id="menu-sub-rest" name="menu-sub-rest" class="nav-link <?php echo $rest_disabled; ?> d-md-inline text-center">
@@ -238,33 +249,12 @@
 
                                             <?php
                                                 $modal_body = 'This will reset your dungeon progress from floor ' .
-                                                              $character['floor'] . ' to floor 1 and return your ' .
+                                                              $cur_floor . ' to floor 1 and return your ' .
                                                               'dungeon multiplier back to 1x<br /><br /><strong>' .
                                                               'Are you sure? This cannot be reversed!</strong>';
                                                 echo generate_modal('reset-dungeon', 'danger', 'Reset Dungeon Progress', $modal_body, ModalButtonType::YesNo);
 
                                             ?>
-<!--                                            
-                                            <div class="modal fade" id="reset-modal" tabindex="-1" aria-hidden="true">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header bg-danger text-bg-danger">
-                                                            <h1 class="modal-title fs-5" id="dungeon-progres-reset">Reset Dungeon Progress</h1>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            This will reset your dungeon progress from floor <?php echo $character->get_floor(); ?> to floor 1 and return your dungeon multiplier back to 1x<br /><br />
-                                                            <strong>Are you sure? This cannot be reversed!</strong>
-                                                        </div>
-                                                        <form id="modal-dungeon-reset" name="modal-dungeon-reset" action="?page=dungeon&action=reset" method="POST">
-                                                            <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                                <input type="submit" class="btn btn-danger" value="Reset">
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div> -->
                                         </li>
                                     </ul>
                                 </li>
@@ -311,7 +301,7 @@
 
                         <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 fixed-bottom" style="width: 15%;">
                             <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
-                                <span><img src="img/avatars/<?php echo $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
+                                <span><img src="img/avatars/<?php echo $avatar; ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
                             </a>
                             
                             <a href="#" class="text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -330,11 +320,16 @@
                                 <li>
                                     <a class="dropdown-item" href="?page=friends">Friends
                                     <?php
-                                        $requests = get_friend_counts('requests');
-                                        $pill_bg  = 'bg-danger';
+                                        $requests = 0;
+                                        $pill_bg = 'bg-primary';
+                                        
+                                        if ($_SESSION['selected-slot'] > 1) {
+                                            $requests = get_friend_counts('requests');
+                                            $pill_bg  = 'bg-danger';
 
-                                        if (!$requests) {
-                                            $pill_bg = 'bg-primary';
+                                            if (!$requests) {
+                                                $pill_bg = 'bg-primary';
+                                            }
                                         }
                                     ?>
     <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $requests; ?></span>
