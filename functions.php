@@ -1,4 +1,6 @@
 <?php
+
+use GrahamCampbell\ResultType\Success;
     require_once 'vendor/autoload.php';
     require_once 'logger.php';
     require_once 'constants.php';
@@ -73,9 +75,10 @@
         }
     }
 
+    
     trait HandlePropSync {
         function prop_sync($method, $params, $type) {
-            global $db;
+            global $db, $log;
             $table = 'none';
 
             switch ($type) {
@@ -90,7 +93,13 @@
                     break;
                 default:
                     exit(LOAError::FUNCT_PROPSYNC_TYPE);
-            }                
+            }
+
+            $log->error("In PropSync", [
+                'Table' => $table,
+                'Method' => $method,
+                'Params' => print_r($params, true)
+            ]);
             
             $prop = lcfirst(substr($method, 4));
 
@@ -107,6 +116,8 @@
                 }
 
                 $sql_query .= "WHERE `id` = {$this->id}";
+
+                $log->error("PropSyncQuery: '$sql_query'");
 
                 $db->query($sql_query);
                 $this->$prop = $params[0];
@@ -319,7 +330,7 @@
      *             - FriendStatus::NONE: There is no friendship relationship between the current user and the specified user.
      *             - LOAError::FRNDS_FRIEND_STATUS_ERROR: An error occurred while determining the friendship status.
      */
-    function friend_status($email) {
+    function friend_status($email): FriendStatus {
         global $db, $account, $log;
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
 
@@ -355,7 +366,7 @@
                 return FriendStatus::NONE;
         }
 
-        $log->info("Checking friend statuses for $email -> " . $return->name);
+        $log->info("Checking friend statuses for $email -> {$return->name}");
         return LOAError::FRNDS_FRIEND_STATUS_ERROR;
     }
 
@@ -406,6 +417,8 @@
                     }
                 }
                 return $requests;
+            default:
+                return -1;
         }
     }
 
@@ -419,10 +432,10 @@
      * @param string $email_1 The email of the current user.
      * @param string $email_2 The email of the user to be blocked.
      *
-     * @return int|null Returns LOAError::MAIL_ALREADY_BLOCKED if the user is already blocked,
+     * @return int|LOA::Error Returns LOAError::MAIL_ALREADY_BLOCKED if the user is already blocked,
      *                  otherwise, it prints the result and stops the script.
      */
-    function block_user($email_1, $email_2) {
+    function block_user($email_1, $email_2): mixed {
         global $db;
         $sqlQuery = 'SELECT email_2 FROM ' . $_ENV['SQL_FRND_TBL'] .
                     "WHERE `email_1` = ? AND `email_2` = ?";
@@ -431,6 +444,13 @@
 
         if (str_starts_with($result['email_2'], '¿b¿')) {
             return LOAError::MAIL_ALREADY_BLOCKED;
+        } else {
+            $sql_query = "UPDATE {$_ENV['SQL_FRND_TBL']} SET `email_2` = ? WHERE `email_1` = ? AND `email_2` = ?";
+            $db->execute_query(
+                $sql_query,
+                [ "¿b¿$email_2", $email_1, $email_2 ]
+            );
+            return 1;
         }
     }
 
