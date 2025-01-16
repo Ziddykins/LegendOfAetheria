@@ -37,12 +37,8 @@
             $this->inventory = new Inventory($this->id, MAX_STARTING_INVSLOTS, MAX_STARTING_INVWEIGHT);
             $this->stats     = new Stats();
 
-            $sql_query = "SELECT MAX(`id`) AS `next_id` FROM {$_ENV['SQL_CHAR_TBL']}";
-            $our_id = $db->execute_query($sql_query)->fetch_assoc()['next_id'] + 1;
-
             if ($new) {
-                $this->slot = 1;
-                $this->id = $our_id;
+                $this->id = $this->getNextID();
                 $this->newCharacter($our_id);
                 $this->saveCharacter($this);
             } else {
@@ -57,12 +53,9 @@
         private function newCharacter($id) {
             global $db, $log;
             $query = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
-            $result = $db->execute_query($query, [$id])->fetch_assoc();
+            $character = $db->execute_query($query, [$id])->fetch_assoc();
 
-            $sql_query = "SELECT char_slot1, char_slot2, char_slot3 FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
-            $slots = $db->execute_query($sql_query, [$this->accountID])->fetch_assoc();
-
-            foreach ($result as $key => $value) {
+            foreach ($character as $key => $value) {
                 $key = $this->tblcol_to_clsprop($key);
                 $this->$key = $value;
                 $log->info("new char key $key vwl $value");
@@ -71,22 +64,26 @@
             return 0;
         }
 
-        private function saveCharacter(Character $character) {
+        private static function saveCharacter(Character $character) {
             global $db, $log;
 
             $charSlot = "char_slot" . $character->slot;
 
             $serializedCharacter = serialize($character);
 
-            $sqlQuery = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET $charSlot = ? WHERE `id` = ?";
+            $sqlQuery = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$charSlot` = ? WHERE `id` = ?";
+            $db->execute_query($sqlQuery,  [$serializedCharacter, $character->get_accountID()]);
 
-            $db->execute_query($sqlQuery,  [$serializedCharacter, $character->id]);
-            $log->info('Saving character', ['id' => $character->id, 'character' => $character->name, 'slot' => $charSlot]);
-            $log->debug('Serialized data', ['serialized_character' => $serializedCharacter]);
+            $log->info('Saving character', [
+                'id' => $character->get_id(),
+                'character' => $character->get_name(),
+                'slot' => $charSlot,
+                'accountID' => $character->get_accountID(),
+                'serialized_character' => $serializedCharacter
+            ]);   
         }
 
-
-        private function loadCharacter($accountID, $slot) {
+        private static function loadCharacter($accountID, $slot) {
             global $db, $log;
 
             $char_slot = "char_slot" . $slot;
@@ -122,8 +119,16 @@
         }
 
 
+        public static function getNextID() {
+            global $db;
+            $sql_query = "SELECT MAX(`id`) + 1 AS `next_id` FROM {$_ENV['SQL_CHAR_TBL']}";
+            return $db->execute_query($sql_query)->fetch_assoc()['next_id'];
+        }
+
         function __call($method, $params) {
+            $log->error("CHARACTER CLASS CALL", ['method' => $method, 'params' => $params]);
             $this->prop_sync($method, $params, PropsyncType::CHARACTER);
+            
         }
     }
 
@@ -137,14 +142,16 @@
         protected $ep;
         protected $maxEp;
 
-        protected $strength;
-        protected $intelligence;
-        protected $defense;
+        protected $str;
+        protected $int;
+        protected $def;
 
         protected $status;
-
+        
         function __call($method, $params) {
+            $log->error("STATS CLASS CALL", ['method' => $method, 'params' => $params]);
             $this->prop_sync($method, $params, PropsyncType::CHARACTER);
+            
         }
 
     }

@@ -103,7 +103,7 @@
         $race             = $_REQUEST['race-select'];
         $str              = $_REQUEST['str-ap'];
         $def              = $_REQUEST['def-ap'];
-        $intl             = $_REQUEST['int-ap'];
+        $int              = $_REQUEST['int-ap'];
 
         if (!check_valid_email($email)) {
             header('Location: /?invalid_email');
@@ -123,7 +123,7 @@
         /* Email doesn't exist */
         if (!$row_count) {
             /* AP assigned properly */
-            if ($str + $def + $intl === MAX_ASSIGNABLE_AP) {
+            if ($str + $def + $int === MAX_ASSIGNABLE_AP) {
                 /* Passwords match */
                 if ($password === $password_confirm) {
                     $verification_code  = strrev(hash('sha256', session_id()));
@@ -182,20 +182,23 @@
                     $result     = $db->execute_query($sql_query)->fetch_assoc();
                     $account_id = $result['account_id'];
 
-                    $sql_query = "INSERT INTO {$_ENV['SQL_CHAR_TBL']} " .
-                                    "(`account_id`, `avatar`, `name`, `race`, `str`, `def`, `int`) " .
-                                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 
 
-                    if (!$db->execute_query($sql_query, [ $account_id, $avatar, $char_name, $race, $str, $def, $intl ])) {
+
+                    if (!$db->execute_query($sql_query, [ $account_id, $avatar, $char_name, $race, $str, $def, $int ])) {
                         $log->critical('Couldn\'t insert user information into character table');
                     }
 
                     $character = new Character($account_id, 1);
-                    $character->stats->set_strength($str);
-                    $character->stats->set_intelligence($intl);
-                    $character->stats->set_defense($def);
+                    $character->set_avatar($avatar);
+                    $character->set_name($char_name);
+                    $character->set_race($race);
+                    $character->set_slot(Character)
+
+                    $character->stats->set_str($str);
+                    $character->stats->set_int($int);
+                    $character->stats->set_def($def);
 
                     $character->stats->set_hp(100);
                     $character->stats->set_maxHp(100);
@@ -204,9 +207,7 @@
 
                     $character->stats->set_status(CharacterStatus::HEALTHY);
 
-                    $serialized_data = serialize($character);
-
-                    $character->save_character($account_id, $serialized_data);
+                    Character::save_character($character);
 
                     // Verification email
                     $account = table_to_obj($email, 'account');

@@ -42,6 +42,29 @@
             }
         }
 
+        public static function getNextID() {
+            global $db;
+            $sql_query = "SELECT MAX(`id`) + 1 AS `next_id` FROM {$_ENV['SQL_ACCT_TBL']}";
+            return $db->execute_query($sql_query)->fetch_assoc()['next_id'];
+        }
+
+        public static function getNextCharSlot($accountID) {
+            global $db;
+
+            $sql_query = <<<SQL
+                SELECT 
+                    IF (`char_slot1` IS NULL, 1,
+                        IF (`char_slot2` IS NULL, 2,
+                            IF (`char_slot3` IS NULL, 3, -1)
+                        )
+                    ) AS `free_slot`
+                FROM {$_ENV['SQL_ACCT_TBL']}
+                WHERE `id` = ?
+            SQL;
+
+            return $db->execute_query($sql_query, [$accountID])->fetch_assoc()['free_slot'];
+        }
+
         /**
          * Load account data from the database and populate the object properties.
          *

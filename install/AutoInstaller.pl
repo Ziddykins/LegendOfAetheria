@@ -23,12 +23,11 @@ use constant {
     TEMPLATES => 7,
     APACHE    => 8,
     PERMS     => 10,
-    HOSTNAME  => 12,
-    CLEANUP   => 13,
-    PERMS     => 14,
-    COMPOSER  => 15,
+    COMPOSER  => 11,
+    CLEANUP   => 12,
+    PERMS     => 13,
 
-    CERTS     => 16, #TODO: implement :D
+    CERTS     => 99, #TODO: implement :D
 };
 
 use constant {
@@ -165,6 +164,7 @@ if ($cfg{step} == TEMPLATES) {
         step_process_templates();
     }
     $cfg{step}++;
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 if ($cfg{step} == APACHE) {
@@ -176,6 +176,7 @@ if ($cfg{step} == APACHE) {
         step_apache_enables();
     }
     $cfg{step}++;
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 if ($cfg{step} == PERMS) {
@@ -183,13 +184,15 @@ if ($cfg{step} == PERMS) {
         step_fix_permissions();
     }
     $cfg{step}++;
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 if ($cfg{step} == COMPOSER) {
     if (ask_user("Run composer to download required dependencies?", 'yes', 'yesno')) {
         step_composer_pull();
     }
-    $cfg{step}++
+    $cfg{step}++;
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 step_start_services();
@@ -198,6 +201,7 @@ if ($cfg{step} == CLEANUP) {
     if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
         clean_up();
         $cfg{step}++;
+        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
 }
 
@@ -210,14 +214,15 @@ sub step_webserver_configure {
     $cfg{web_root} = ask_user($question, $cfg{web_root} ? $cfg{web_root} : '/var/www/html/kali.local/loa', 'input');
     $cfg{web_root} =~ s/\/$//;
 
-    $cfg{virthost_conf_file}    = "$cfg{apache_directory}/sites-available/$cfg{fqdn}.conf";
-    $cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{fqdn}.conf";
+    $cfg{virthost_conf_file}    = "$cfg{apache_directory}/sites-available/$cfg{$fqdn}.conf";
+    $cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{$fqdn}.conf";
 
     if ($cfg{os} eq 'linux') {
         $cfg{composer_runas} = 'www-data';
         $cfg{apache_runas}   = 'www-data';
-        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
+
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 #Step: software
@@ -308,7 +313,7 @@ sub step_firstrun {
 
             if ($cfg{step}) {
                 my $question = "Would you like to continue from step " . const_to_name($cfg{step}) .
-                    "or start from the beginning?";
+                    " or start from the beginning?";
                 if (ask_user($question, '[s]tart over/[c]ontinue', 'input') =~ /[cC]o?n?t?i?n?u?e?/) {
                     tell_user('INFO', 'Continuing script execution from previously ran install');
                     return;
@@ -391,7 +396,6 @@ sub step_firstrun {
     $cfg{env_template}          = "$cfg{template_dir}/env.template";
     $cfg{sql_template}          = "$cfg{template_dir}/sql.template";
     $cfg{php_template}          = "$cfg{template_dir}/php.template";
-    $cfg{step} = SOFTWARE;
 }
 
 sub step_sql_configure {
@@ -426,7 +430,6 @@ sub step_update_hostname {
     my $output = `hostnamectl set-hostname $cfg{fqdn} 2>&1 | grep -v Hint`;
     $output .= `hostnamectl set-hostname $cfg{fqdn} --pretty 2>&1 | grep -v Hint`;
     chomp (my $hostname = `hostname -f`);
-
     if ($hostname eq $cfg{fqdn}) {
         tell_user('SUCCESS',
                 "Hostname for the system has been successfully set\n" .
@@ -560,8 +563,8 @@ sub step_php_configure {
     }
 
     for (my ($key, $value) = each %ini_patch) {
-        if ($ini_contents =~ /^$key ?= ?/m) {
-            $ini_contents =~ s/^$key ?= ?.*/$key=$value/;
+        if ($ini_contents =~ /^$key ?= ?/) {
+            $ini_contents =~ s/^$key ?= ?.*$/$key=$value/;
             print "Replaced $key with $value\n";
         } else {
             $ini_contents .= "$key=$value\n";
@@ -765,8 +768,9 @@ sub gen_random {
     for (1 .. $length) {
         $password .= chr(int(rand(94)) + 33);
     }
-    $password =~ s/'/#/g;
-    $password =~ s/"/\\"/g;
+
+    $password =~ s/\\/\\\\/g;
+    $password =~ s/'/\\'/g;
 
     return $password;
 }
@@ -963,5 +967,5 @@ sub merge_hashes {
 
 sub const_to_name {
     my @names = qw/FIRSTRUN SOFTWARE PHP APACHE ENABLES COMPOSER TEMPLATES SERVICES SQL CRONS CERTS HOSTNAME CLEANUP PERMS/;
-    return $names[$_];
+    return $names[shift];
 }
