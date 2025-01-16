@@ -112,9 +112,11 @@
     #   - FRNDS - Well, friend related issues
     #   - MAIL  - Mail related issues
     #   - CRON  - Cron related issues
+    #   - CHAR  - Character related issues
     enum LOAError: int {
         case FUNCT_DOSQL_INVALIDACTION = -1000;
         case FUNCT_GENCOMP_UNKNOWN     = -1001;
+        case FUNCT_PROPSYNC_TYPE       = -1002;
         
         case SQLDB_NOCONNECTION        = -2000;
         case SQLDB_PREPPED_EXECUTE     = -2001;
@@ -184,6 +186,29 @@
         case CHEATING;    /* General cheating/abuse of game mechanics etc. */
         case AUTOBOTTING; /* Using autoclickers to play for you */
         case MULTISIGNUP; /* Abusing the signup form/multi-characters */
+    }
+
+    enum CharacterStatus: int {
+        case HEALTHY        = 1;
+        case POISONED       = 2;
+        case BLINDED        = 4;
+        case SCARED         = 8;
+        case OVERENCUMBERED = 16;
+        case OVERHEATED     = 32;
+        case STUNNED        = 64;
+        case FROZEN         = 128;
+        case BURNING        = 256;
+        case CONFUSED       = 512;
+        case CHARMED        = 1024;
+        case SLEEPING       = 2048;
+        case DEAD           = 4096;
+        case BLEEDING       = 8192;
+    }
+
+    enum PropSyncType {
+        case ACCOUNT;
+        case CHARACTER;
+        case FAMILIAR;
     }
 
 ?>
