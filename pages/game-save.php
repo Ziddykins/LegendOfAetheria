@@ -34,8 +34,7 @@
         $log->info("Request to Save",
             [
                 "Type" => $data_obj->type,
-                "ID"   => $data_obj->id,
-                "WholeThing" => print_r($data_obj, 1);
+                "ID"   => $data_obj->id
             ]
         );
 
@@ -55,9 +54,9 @@
 
         $sql_query = "UPDATE $table SET ";
 
-        foreach ($kvp as $data->tdata) {
+        foreach ($kvp as $data => $tdata) {
             $column = key($kvp);
-            $value  = value($kvp);
+            //$value  = value($kvp);
             
             if (is_string($value)) {
                 $value = "'$value'";
@@ -67,7 +66,7 @@
         }
         rtrim($sql_query, ',');
         
-        $sql_query .= " WHERE `id` = " . $data->id;
+        $sql_query .= " WHERE `id` = " . 1;
 
         if ($db->query($sql_query)) {
             echo "Error";

@@ -12,7 +12,7 @@ use File::Find;
 use File::Copy;
 
 use vars qw/*name *dir *prune/;
- 
+
 use constant {
     FIRSTRUN  => 1,
     SOFTWARE  => 2,
@@ -37,6 +37,7 @@ use constant {
     CFG_W_MAIN   => 4,
     CFG_W_DOMAIN => 6,
 };
+
 
 # Autoflush on
 $|++;
@@ -76,20 +77,7 @@ if ($ENV{'USER'} ne 'root') {
 }
 
 step_firstrun();
-
-if ($cfg{step}) {
-    my $question = "It looks like this isn't the first time the script has ran; would you\n" .
-                   "like to run the steps from the beginning, or continue from step " . const_to_name($cfg{step}) . " off?\n\n" .
-                   "[$clr{red}r$clr{reset}]estart/[$clr{green}c$clr{reset}]ontinue: ";
-
-    print $question;
-    chomp(my $reply = <STDIN>);
-
-    if ($reply =~ /[Rr]e?s?t?a?r?t?/) {
-        $cfg{step} = FIRSTRUN;
-        clean_up();
-    }
-}
+handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 
 if ($cfg{step} == SOFTWARE) {
     if (ask_user("Install required software?", 'yes', 'yesno')) {
@@ -131,7 +119,7 @@ if ($cfg{step} == OPENAI) {
         $question = "OpenAI configuration is enabled; please enter your OpenAI API key";
         $cfg{openai_apikey} = ask_user($question, '', 'input');
     }
-    
+
     $cfg{step}++;
     handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
@@ -319,8 +307,13 @@ sub step_firstrun {
             %cfg = %{$ini{$fqdn}};
 
             if ($cfg{step}) {
-                if (ask_user("Would you like to continue from step $cfg{step} or start from the beginning?", '[s]tart over/[c]ontinue', 'input')) {
-                    $cfg{step} = 0;
+                my $question = "Would you like to continue from step " . const_to_name($cfg{step}) .
+                    "or start from the beginning?";
+                if (ask_user($question, '[s]tart over/[c]ontinue', 'input') =~ /[cC]o?n?t?i?n?u?e?/) {
+                    tell_user('INFO', 'Continuing script execution from previously ran install');
+                    return;
+                } else {
+                    tell_user('INFO', 'Restarting install from beginning step');
                 }
             }
         } else {
@@ -370,6 +363,12 @@ sub step_firstrun {
     chomp(my $loc_check = `pwd`);
     $loc_check =~ s/\/install//;
 
+    my $web_root;
+    $web_root = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
+    $cfg{web_root} = $web_root;
+
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+
     if ($loc_check ne $cfg{web_root}) {
         my $error = "Setup has determined the files are not in the correct place,\n" .
                     " or you're not in the correct folder. Please move the contents\n" .
@@ -384,7 +383,7 @@ sub step_firstrun {
     $cfg{scripts_dir}  = $cfg{web_root} . "/install/scripts";
     $cfg{admin_email}  = "webmaster\@$cfg{fqdn}";
     $cfg{setup_log}    = $cfg{web_root} . '/install/setup.log';
-    
+
     $cfg{virthost_ssl_template} = "$cfg{template_dir}/virtual_host_ssl.template";
     $cfg{virthost_template}     = "$cfg{template_dir}/virtual_host.template";
     $cfg{htaccess_template}     = "$cfg{template_dir}/htaccess.template";
@@ -392,7 +391,7 @@ sub step_firstrun {
     $cfg{env_template}          = "$cfg{template_dir}/env.template";
     $cfg{sql_template}          = "$cfg{template_dir}/sql.template";
     $cfg{php_template}          = "$cfg{template_dir}/php.template";
-
+    $cfg{step} = SOFTWARE;
 }
 
 sub step_sql_configure {
@@ -715,7 +714,7 @@ sub clean_up {
         File::Find::find({wanted => \&find_temp}, "$cfg{web_root}/");
 
         tell_user("INFO", "Searching for temporary and generated files to clean up in $cfg{apache_directory}");
-        
+
         $cmd = "a2dissite $cfg{virthost_conf_file}";
         tell_user("SYSTEM", `$cmd`);
 
