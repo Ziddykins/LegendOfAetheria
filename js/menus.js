@@ -29,8 +29,14 @@ $('a[id^="menu-anchor"]').on('click', function (e) {
     e.target.classList.add('text-white');
 });
 
-$(document).ready(function(){ 
+$(document).ready(function(){
+    let query =  new URLSearchParams(location.search);
+
     if (document.body.contains(document.getElementById('login-email'))) {
         document.getElementById('login-email').focus();
     };
+
+    if (query.has('do_register') && query.has('email')) {
+        document.getElementById("register-password").focus();
+    }
 });
