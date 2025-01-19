@@ -2,6 +2,9 @@
 
 A browser-based RPG game written in PHP/JS using the Bootstrap 5 framework
 
+> [!CAUTION]
+> The current state is: **Not Working**
+> Take care when cloning this until this banner is gone.
 
 # Getting Started
 

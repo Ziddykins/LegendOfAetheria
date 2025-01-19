@@ -20,6 +20,7 @@ use GrahamCampbell\ResultType\Success;
 
         function clsprop_to_tblcol($property) {
             global $log;
+            $splits = [];
 
             $splits = preg_split('/(?=[A-Z]{1,2})/', $property);
 
@@ -80,6 +81,11 @@ use GrahamCampbell\ResultType\Success;
         function prop_sync($method, $params, $type) {
             global $db, $log;
             $table = 'none';
+            $prop = lcfirst(substr($method, 4));
+
+            if ($method == 'prop_sync') {
+                return;
+            }
 
             switch ($type) {
                 case PropSyncType::CHARACTER:
@@ -94,20 +100,29 @@ use GrahamCampbell\ResultType\Success;
                 default:
                     exit(LOAError::FUNCT_PROPSYNC_TYPE);
             }
-
+            
             $log->error("In PropSync", [
                 'Table' => $table,
                 'Method' => $method,
                 'Params' => print_r($params, true)
             ]);
-            
-            $prop = lcfirst(substr($method, 4));
 
             if (strncasecmp($method, "get_", 4) === 0) {
+                if ($type == PropSyncType::CHARACTER) {
+                    if ($prop == 'inventory') {
+                        return unserialize($this->inventory);
+                    }
+                }
                 return $this->$prop;
             } elseif (strncasecmp($method, "set_", 4) === 0) {
                 $sql_query = "UPDATE $table ";
                 $table_col = $this->clsprop_to_tblcol($prop);
+
+                if ($type == PropSyncType::CHARACTER) {
+                    if ($prop == 'inventory') {
+                        $params[0] = serialize($params[0]);
+                    }
+                }
 
                 if (is_int($params[0])) {
                     $sql_query .= "SET `$table_col` = {$params[0]} ";
@@ -120,9 +135,11 @@ use GrahamCampbell\ResultType\Success;
                 $log->error("PropSyncQuery: '$sql_query'");
 
                 $db->query($sql_query);
+
+                
                 $this->$prop = $params[0];
 
-                $log->info("TRAIT",
+                $log->error("TRAIT",
                     [
                         'SQLQuery' => $sql_query,
                         'params'   => print_r($params, 1),
