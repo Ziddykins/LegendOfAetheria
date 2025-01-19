@@ -1,28 +1,28 @@
 <pre>
-+-------------+---------------------+------+-----+-----------------+----------------+
-| Field       | Type                | Null | Key | Default         | Extra          |
-+-------------+---------------------+------+-----+-----------------+----------------+
-| id          | int(9) unsigned     | NO   | PRI | NULL            | auto_increment |
-| account_id  | int(9)              | NO   | UNI | NULL            |                |
-| name        | varchar(50)         | NO   |     | NULL            |                |
-| race        | varchar(50)         | NO   |     | NULL            |                |
-| avatar      | varchar(50)         | NO   |     | NULL            |                |
-| str         | bigint(20)          | NO   |     | NULL            |                |
-| int         | bigint(20)          | NO   |     | NULL            |                |
-| def         | bigint(20)          | NO   |     | NULL            |                |
-| x           | int(9)              | NO   |     | 0               |                |
-| y           | int(9)              | NO   |     | 0               |                |
-| location    | varchar(50)         | NO   |     | The Shrine      |                |
-| hp          | bigint(20) unsigned | NO   |     | 100             |                |
-| max_hp      | bigint(20) unsigned | NO   |     | 100             |                |
-| mp          | bigint(20) unsigned | NO   |     | 100             |                |
-| max_mp      | bigint(20) unsigned | NO   |     | 100             |                |
-| alignment   | int(9)              | NO   |     | 0               |                |
-| gold        | bigint(20) unsigned | NO   |     | 1000            |                |
-| exp         | bigint(20) unsigned | NO   |     | 0               |                |
-| ep          | int(9) unsigned     | NO   |     | 100             |                |
-| max_ep      | int(9) unsigned     | NO   |     | 100             |                |
-| floor       | int(9) unsigned     | NO   |     | 1               |                |
-| description | text                | YES  |     | 'None Provided' |                |
-| ap          | int(9)              | YES  |     | 5               |                |
-+-------------+---------------------+------+-----+-----------------+----------------+
++-------------+---------------------+------+-----+--------------------+----------------+
+| Field       | Type                | Null | Key | Default            | Extra          |
++-------------+---------------------+------+-----+--------------------+----------------+
+| id          | int(9) unsigned     | NO   | PRI | NULL               | auto_increment |
+| account_id  | int(9) unsigned     | NO   |     | NULL               |                |
+| name        | varchar(50)         | YES  |     | NULL               |                |
+| race        | varchar(50)         | YES  |     | NULL               |                |
+| avatar      | varchar(50)         | YES  |     | avatar-unknown.jpg |                |
+| str         | bigint(20) unsigned | YES  |     | 10                 |                |
+| int         | bigint(20) unsigned | YES  |     | 10                 |                |
+| def         | bigint(20) unsigned | YES  |     | 10                 |                |
+| x           | int(9)              | YES  |     | 0                  |                |
+| y           | int(9)              | YES  |     | 0                  |                |
+| location    | varchar(127)        | YES  |     | The Shrine         |                |
+| hp          | bigint(20) unsigned | YES  |     | 100                |                |
+| max_hp      | bigint(20) unsigned | YES  |     | 100                |                |
+| mp          | bigint(20) unsigned | YES  |     | 100                |                |
+| max_mp      | bigint(20) unsigned | YES  |     | 100                |                |
+| ep          | int(9) unsigned     | YES  |     | 100                |                |
+| max_ep      | int(9) unsigned     | YES  |     | 100                |                |
+| alignment   | int(9)              | YES  |     | 5                  |                |
+| gold        | bigint(20) unsigned | YES  |     | 1000               |                |
+| exp         | bigint(20) unsigned | YES  |     | 0                  |                |
+| floor       | int(9) unsigned     | YES  |     | 1                  |                |
+| description | text                | YES  |     | 'None Provided'    |                |
+| ap          | int(9) unsigned     | YES  |     | 0                  |                |
++-------------+---------------------+------+-----+--------------------+----------------+

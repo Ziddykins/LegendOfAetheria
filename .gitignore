@@ -21,4 +21,4 @@ gamelog.txt
 phpctags.*
 phpctags.ctags
 phpctags.tags
-config.ini
+**/config.ini

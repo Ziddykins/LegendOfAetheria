@@ -1,9 +1,11 @@
 <?php
     class Account {
         use HandlePropsAndCols;
+        use HandlePropSync;
+
         private $id;
         private $email;
-        private $password;
+        public $password;
         private $dateRegistered;
         private $verified;
         private $verificationCode;
@@ -16,53 +18,56 @@
         private $sessionID;
         private $ipLock;
         private $ipLockAddr;
+        private $banned;
+        private $muted;
+        private $loggedIn;
 
         private $charSlot1;
         private $charSlot2;
         private $charSlot3;
 
-        public function __construct($accountID) {
-            $this->id = $accountID;
-            $this->load_account($accountID);
-        }
+        private $inventory;
 
-        function __call($method, $params) {
-            global $db;
-            $var = lcfirst(substr($method, 4));
+        private $focusedSlot;
 
-            if (strncasecmp($method, "get_", 4) === 0) {
-                return $this->$var;
+        public function __construct($email) {
+            global $log;
+            $this->email = $email;
+
+            $foundID = $this->checkIfExists($email);
+
+            if (!$foundID) {
+                $this->createAccount($email);
+                $this->focusedSlot = 0;
             }
 
-            if (strncasecmp($method, "set_", 4) === 0) {
-                $this->$var = $params[0];
-                $table_column = $this->clsprop_to_tblcol($var);
-                $query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET  `$table_column` = ? WHERE `id` = ?";
-                $db->execute_query($query, [$params[0], $this->id]);
+            $this->loadAccount($email);
+        }
+
+        public function __call($method, $params) {
+            global $db, $log;
+
+            if (!count($params)) {
+                $params = null;
             }
+
+            if ($method == 'prop_sync') {
+                return;
+            }
+
+            return $this->prop_sync($method, $params, PropSyncType::ACCOUNT);
         }
 
-        public static function getNextID() {
-            global $db;
-            $sql_query = "SELECT MAX(`id`) + 1 AS `next_id` FROM {$_ENV['SQL_ACCT_TBL']}";
-            return $db->execute_query($sql_query)->fetch_assoc()['next_id'];
-        }
+        private function createAccount($email): int {
+            global $db, $log;
 
-        public static function getNextCharSlot($accountID) {
-            global $db;
+            $new_id = $this->getNextId();
+            $this->email = $email;
+            
+            $sql_query = "INSERT INTO {$_ENV['SQL_ACCT_TBL']} (`id`, `email`) VALUES (?, ?)";
+            $db->execute_query($sql_query, [$new_id, $email]);
 
-            $sql_query = <<<SQL
-                SELECT 
-                    IF (`char_slot1` IS NULL, 1,
-                        IF (`char_slot2` IS NULL, 2,
-                            IF (`char_slot3` IS NULL, 3, -1)
-                        )
-                    ) AS `free_slot`
-                FROM {$_ENV['SQL_ACCT_TBL']}
-                WHERE `id` = ?
-            SQL;
-
-            return $db->execute_query($sql_query, [$accountID])->fetch_assoc()['free_slot'];
+            return $new_id;
         }
 
         /**
@@ -71,24 +76,38 @@
          * @param int $id The unique identifier of the account.
          * @return int Returns 0 if successful, otherwise it will exit the script.
          */
-        private function load_account($id) {
+        private function loadAccount($email): int {
             global $db, $log;
-            $query = "SELECT * FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
 
-            $result = $db->execute_query($query, [$id])->fetch_assoc();
+            $sql_query = "SELECT * FROM {$_ENV['SQL_ACCT_TBL']} WHERE `email` = ?";
+            $result = $db->execute_query($sql_query, [$email])->fetch_assoc();
 
             foreach ($result as $key => $value) {
                 $key = $this->tblcol_to_clsprop($key);
                 $this->$key = $value;
             }
+            $log->info("Load Character completed $email");
+            return 0;
+        }
+
+        public static function checkIfExists($email) {
+            global $db, $log;
+            $sql_query = "SELECT `id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `email` = ?";
+            $result = $db->execute_query($sql_query, [$email])->fetch_assoc();
+
+            if ($result && $result['id'] > 0) {
+                return $result['id'];
+            }
 
             return 0;
         }
-        
-       }
 
-           
-    class CharacterSlots {
-        /* TODO: implement. */
+        private function getNextID() {
+            global $db;
+            $sql_query = "SELECT IF(MAX(id) IS NULL, 1, MAX(id)+1) AS `next_id` FROM {$_ENV['SQL_ACCT_TBL']}";
+            return $db->execute_query($sql_query)->fetch_assoc()['next_id'];
+        }
+
+
     }
 ?>

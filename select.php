@@ -13,7 +13,7 @@
     require_once 'classes/class-character.php';
     require_once 'classes/class-account.php';
 
-    $account = new Account($_SESSION['account-id']);
+    $account = new Account($_SESSION['email']);
 
     $sql_query = "SELECT `char_slot1`, `char_slot2`, `char_slot3` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
     $characters = $db->execute_query($sql_query, [$account->get_id()])->fetch_assoc();

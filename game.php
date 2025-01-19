@@ -17,11 +17,12 @@
         
         if ($file_ext === 'php') {
             $class = "classes/$file_name.php";
-            require_once "$class";
+            require_once (string) $class;
         } else {
             $log->warning("Skipping non-php file in classes folder: $file_name");
         }
     }
+
 
     $monster_pool = new MonsterPool;    
     load_monster_sheet($monster_pool);
@@ -35,6 +36,7 @@
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         if ($_SESSION['selected-slot'] > 1) {
             $character = new Character($_SESSION['character-id']);
+
             $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
             $familiar->loadFamiliar($character->get_id());
 

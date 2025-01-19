@@ -4,23 +4,21 @@
         use HandlePropsAndCols;
         use HandlePropSync;
 
-		protected $id;
-		protected $accountID;
-		protected $name;
-		protected $race;
-		protected $avatar;
-		protected $x;
-		protected $y;
-		protected $location;
-		protected $alignment;
-		protected $gold;
-		protected $exp;
-		protected $ep;
-		protected $maxEp;
-		protected $floor;
-		protected $description;
-		protected $ap;
-        protected $slot;
+		private $id;
+		private $accountID;
+		private $name;
+		private $race;
+		private $avatar;
+		private $x;
+		private $y;
+		private $location;
+		private $alignment;
+		private $gold;
+		private $exp;
+
+		private $floor;
+		private $description;
+		private $ap;
 
         /* class Monster */
 		public $monster;
@@ -31,180 +29,151 @@
         /* class Inventory */
         public $inventory;
 
-        public function __construct($accountID, $new = 0, $slot = 0) {
-            global $db;
-            $this->accountID    = $accountID;
-            $this->inventory = new Inventory($this->id, MAX_STARTING_INVSLOTS, MAX_STARTING_INVWEIGHT);
-            $this->stats     = new Stats();
+        public function __construct($accountID, $new, $slot = 0) {
+            global $db, $log;
+
+            $this->accountID = $accountID;
+            $this->inventory = new Inventory( MAX_STARTING_INVSLOTS, MAX_STARTING_INVWEIGHT);
+            $this->stats     = new Stats($this->id);
 
             if ($new) {
-                $this->id = $this->getNextID();
-                $this->newCharacter($our_id);
-                $this->saveCharacter($this);
+                $this->newCharacter($accountID, $this->getNextCharSlot($accountID));
             } else {
                 $this->loadCharacter($accountID, $slot);
             }
+        }
+
+        public function __call($method, $params) {
+            if ($method == 'prop_sync') {
+                return;
+            }
+            
+            return $this->prop_sync($method, $params, PropsyncType::CHARACTER);
+        }
+
+        private function newCharacter($accountID, $slot) {
+            global $db, $log;
+            $this->id = $this->getNextID();
+            
+            $sql_query = "INSERT INTO {$_ENV['SQL_CHAR_TBL']} (`id`, `account_id`) VALUES (?, ?)";
+            $db->execute_query($sql_query, [$this->id, $accountID]);
+
+            $query = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
+            $character = $db->execute_query($query, [$this->id])->fetch_assoc();
+
+            if ($character) {
+                foreach ($character as $key => $value) {
+                    $stats_props = $this->stats->getProps();
+                    $key = $this->tblcol_to_clsprop($key);
+
+                    if (array_search($key, $stats_props)) {
+                        $this->stats->$key = $value;
+                    } else {
+                        $this->$key = $value;
+                    }
+                    
+                    $log->info("new char key $key vwl $value");
+                }
+            } else {
+                $log->error("Didn't get anything from db for newChar pull: $this->id");
+            }
+
+            $this->inventory->addItem("Floopy Dildo", 100, 0);
+
+            return 0;
+        }
+
+        private function loadCharacter($accountID, $slot) {
+            global $db, $log;
+
+            $char_slot = "char_slot$slot";
+            $sql_query = "SELECT `$char_slot` AS `char_id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
+            $char      = $db->execute_query($sql_query, [$accountID])->fetch_assoc();
+
+            $sql_query = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
+            $tmp_char  = $db->execute_query($sql_query, [$char['char_id']]);
+                
+            foreach ($tmp_char as $key => $value) {
+                $stats_props = get_class_vars("Stats");
+
+                /* Messy way to avoid trying to set characterID in the SQL table */
+                array_shift($stats_props);
+
+                $key = $this->tblcol_to_clsprop($key);
+
+                if (array_search($key, $stats_props)) {
+                    $this->stats->$key = $value;
+                } else {
+                    $this->$key = $value;
+                }
+                
+                $log->error("Loading char key $key vwl $value"); 
+            }
+
+            $this->inventory = unserialize($this->inventory);
         }
 
         private function setPersonalMonster(Monster $monster) {
             $this->monster = $monster;
         }
 
-        private function newCharacter($id) {
-            global $db, $log;
-            $query = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
-            $character = $db->execute_query($query, [$id])->fetch_assoc();
-
-            foreach ($character as $key => $value) {
-                $key = $this->tblcol_to_clsprop($key);
-                $this->$key = $value;
-                $log->info("new char key $key vwl $value");
-            }
-
-            return 0;
-        }
-
-        private static function saveCharacter(Character $character) {
-            global $db, $log;
-
-            $charSlot = "char_slot" . $character->slot;
-
-            $serializedCharacter = serialize($character);
-
-            $sqlQuery = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$charSlot` = ? WHERE `id` = ?";
-            $db->execute_query($sqlQuery,  [$serializedCharacter, $character->get_accountID()]);
-
-            $log->info('Saving character', [
-                'id' => $character->get_id(),
-                'character' => $character->get_name(),
-                'slot' => $charSlot,
-                'accountID' => $character->get_accountID(),
-                'serialized_character' => $serializedCharacter
-            ]);   
-        }
-
-        private static function loadCharacter($accountID, $slot) {
-            global $db, $log;
-
-            $char_slot = "char_slot" . $slot;
-
-            $sql_query = "SELECT $char_slot FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
-            $result = $db->execute_query($sql_query, [$accountID])->fetch_assoc();
-
-            if (!$result) {
-                $this->name('Empty Slot');
-                $this->avatar('avatar-unknown.jpg');
-                $this->slot = -1;
-                $log->error("Empty slot found, passing back empty char", [
-                    'Requested slot' => $slot,
-                    'Account ID'     => $accountID
-                ]);
-            } else {
-                $tmp_char = unserialize($result[$char_slot]);
-
-                
-                $log->error("Character found at requested slot", [
-                    'Requested slot' => $slot,
-                    'Account ID'     => $accountID,
-                    'Character ID'   => $this->id,
-                    'Char slot data' => $result[$char_slot]
-                ]);
-
-                foreach ($tmp_char as $key => $value) {
-                    $key = $this->tblcol_to_clsprop($key);
-                    $this->$key = $value;
-                    $log->error("Loading char key $key vwl $value"); 
-                }
-            }
-        }
-
-
-        public static function getNextID() {
+        private function getNextID() {
             global $db;
-            $sql_query = "SELECT MAX(`id`) + 1 AS `next_id` FROM {$_ENV['SQL_CHAR_TBL']}";
-            return $db->execute_query($sql_query)->fetch_assoc()['next_id'];
+            $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)) + 1 AS `next_id` FROM {$_ENV['SQL_CHAR_TBL']}";
+            $next_id = $db->execute_query($sql_query)->fetch_assoc()['next_id'];
+            
+            return $next_id;
         }
 
-        function __call($method, $params) {
-            $log->error("CHARACTER CLASS CALL", ['method' => $method, 'params' => $params]);
-            $this->prop_sync($method, $params, PropsyncType::CHARACTER);
-            
+        private function getNextCharSlot($accountID) {
+            global $db;
+
+            $sql_query = <<<SQL
+                SELECT 
+                    IF (`char_slot1` IS NULL, 1,
+                        IF (`char_slot2` IS NULL, 2,
+                            IF (`char_slot3` IS NULL, 3, -1)
+                        )
+                    ) AS `free_slot`
+                FROM {$_ENV['SQL_ACCT_TBL']}
+                WHERE `id` = ?
+            SQL;
+
+            return $db->execute_query($sql_query, [ $accountID ])->fetch_assoc()['free_slot'];
         }
     }
 
 	class Stats {
+        /* Trait, functions.php */
+        use HandlePropsAndCols;
         use HandlePropSync;
 
-		protected $hp;
-		protected $maxHp;
-		protected $mp;
-        protected $maxMp;
-        protected $ep;
-        protected $maxEp;
+        private $charactedID;
+		private $hp;
+		private $maxHp;
+		private $mp;
+        private $maxMp;
+        private $ep;
+        private $maxEp;
 
-        protected $str;
-        protected $int;
-        protected $def;
+        private $str;
+        private $int;
+        private $def;
 
-        protected $status;
+        /* Enum CharacterStatus, constants.php */
+        private $status;
         
-        function __call($method, $params) {
+        public function __construct ($characterID) {
+            $this->id = $characterID;
+        }
+        public function __call($method, $params): mixed {
+            global $log;
             $log->error("STATS CLASS CALL", ['method' => $method, 'params' => $params]);
-            $this->prop_sync($method, $params, PropsyncType::CHARACTER);
-            
+            return $this->prop_sync($method, $params, PropsyncType::CHARACTER);
+        }
+
+        public function getProps(): array {
+            return get_class_vars(get_class($this));
         }
 
     }
-
-    class Inventory {
-        public $slots;
-        public $slotCount;
-
-        protected $currentWeight;
-        protected $maxWeight;
-
-        protected $nextAvailableSlot;
-
-        public function __construct($characterID, $slotCount, $maxWeight) {
-            $this->characterID   = $characterID;
-            $this->slotCount     = $slotCount;
-            $this->maxWeight     = $maxWeight;
-            $this->currentWeight = 0;
-
-            $this->nextAvailableSlot = 0;
-
-            for ($i=0; $i<$slotCount; $i++) {
-                $this->slots[$i] = new Slot();
-            }
-
-        }
-
-        public function spacesLeft() {
-            return (count($this->slots) - $this->nextAvailableSlot);
-        }
-
-        public function addItem($name, $weight, $numSockets) {
-            $targetSlot = $this->nextAvailableSlot++;
-            $this->slots[$targetSlot]->itemName       = $name;
-            $this->slots[$targetSlot]->itemWeight     = $weight;
-            $this->slots[$targetSlot]->itemSockets = $numSockets;
-        }
-
-        public function removeItem($slot) {
-            $this->slots[$slot] = new Slot();
-            $this->nextAvailableSlot--;
-        }
-
-        protected function saveInventory() {
-
-        }
-
-
-    }
-
-    class Slot {
-        public $itemName;
-        public  $itemWeight;
-        public $itemSockets;
-    }
-?>
