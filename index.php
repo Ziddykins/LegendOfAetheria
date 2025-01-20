@@ -15,12 +15,6 @@
     require_once 'classes/class-inventory.php';
     require_once 'classes/class-character.php';
 
-    $test = ObjectRarity::EPIC;
-    $a = new ReflectionEnum($test);
-
-    print_r($a); 
-    exit();
-
     if (isset($_REQUEST['login-submit']) && $_REQUEST['login-submit'] == 1) {
         $email = $_REQUEST['login-email'];
         $password = $_REQUEST['login-password'];
@@ -41,7 +35,6 @@
             header("Location: /?do_register&email=$email");
             exit();
         }
-
 
         /* Password for supplied email was correct */
         if (password_verify($password, $account->get_password())) {
@@ -173,12 +166,9 @@
                             [ 'Race' => $race ]
                         );
                     }
-
                     
                     $account   = new Account($email);
                     $character = new Character($account->get_id(), 1);
-
-                    print_r($character);
                     
                     $account->set_password($password);
                     $account->set_dateRegistered($time_sqlformat);
@@ -200,8 +190,7 @@
                     $character->stats->set_mp(100);
                     $character->stats->set_maxMp(100);
 
-
-                    $character->stats->set_status(CharacterStatus::HEALTHY);
+                    //$character->stats->set_status(CharacterStatus::HEALTHY);
 
                     //send_mail($email, $account);
                     header('Location: /?register_success');

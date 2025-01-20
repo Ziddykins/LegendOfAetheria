@@ -78,7 +78,7 @@ use GrahamCampbell\ResultType\Success;
 
     
     trait HandlePropSync {
-        function prop_sync($method, $params, $type) {
+        private function prop_sync($method, $params, $type) {
             global $db, $log;
             $table = 'none';
             $prop = lcfirst(substr($method, 4));
@@ -117,26 +117,30 @@ use GrahamCampbell\ResultType\Success;
             } elseif (strncasecmp($method, "set_", 4) === 0) {
                 $sql_query = "UPDATE $table ";
                 $table_col = $this->clsprop_to_tblcol($prop);
+                $id = null;
 
                 if ($type == PropSyncType::CHARACTER) {
                     if ($prop == 'inventory') {
                         $params[0] = serialize($params[0]);
                     }
+                    
+                    if (get_class($this) === 'Stats' && $prop === 'id') {
+                        $prop = 'characterID';
+                    }
                 }
-
+            
                 if (is_int($params[0])) {
                     $sql_query .= "SET `$table_col` = {$params[0]} ";
                 } else {
                     $sql_query .= "SET `$table_col` = '{$params[0]}' ";
                 }
 
-                $sql_query .= "WHERE `id` = {$this->id}";
+                $sql_query .= "WHERE `id` = ?";
 
                 $log->error("PropSyncQuery: '$sql_query'");
 
-                $db->query($sql_query);
+                $db->execute_query($sql_query, [$id]);
 
-                
                 $this->$prop = $params[0];
 
                 $log->error("TRAIT",
@@ -168,7 +172,7 @@ use GrahamCampbell\ResultType\Success;
 
         $operand  = substr($modifier, 0, 1);
         $amount   = substr($modifier, 1);
-        $modifier = $operand . $amount;
+        $modifier = "$operand$amount";
 
         return date("Y-m-d H:i:s", strtotime("$modifier"));
     }
@@ -183,15 +187,15 @@ use GrahamCampbell\ResultType\Success;
          *                           Returns null if an invalid type is provided.
          *
          * @global mysqli $db The database connection object.
-         * @global Logger $log The logging object.
+         * @global Monolog\Logger $log The logging object.
          *
          * @throws mysqli_sql_exception If there's an error in the SQL query execution.
          *
          * @example
          * $account_data = table_to_obj('user@example.com', 'account');
          * $monster_obj = table_to_obj(1, 'monster');
-         */
-        function table_to_obj($identifier, $type) {
+        */ 
+        /* function table_to_obj($identifier, $type) {
             global $db, $log;
             $table = '';
             $column = '';
@@ -221,7 +225,7 @@ use GrahamCampbell\ResultType\Success;
                     return null;
             }
 
-            $sql_query = "SELECT * FROM $table WHERE `$column` = ?";
+            $sql_query = SELECT * FROM $table WHERE `$column` = ?";
             $result = $db->execute_query($sql_query, [$identifier])->fetch_assoc();
 
             if ($type == 'monster') {
@@ -229,6 +233,7 @@ use GrahamCampbell\ResultType\Success;
             }
             return $result;
         }
+    **/
 
     /**
      * Calculates the difference in seconds between two MySQL datetime strings.
@@ -349,10 +354,12 @@ use GrahamCampbell\ResultType\Success;
      */
     function friend_status($email): FriendStatus {
         global $db, $account, $log;
+
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
 
         $sql_query    = 'SELECT * FROM tbl_friends WHERE `email_1` = \'' . $account->get_email() . "' AND `email_2` LIKE '%$email%'";
         $log->debug('Friend status, "us" sql: {$sql_query}');
+
         // deepcode ignore Sqli: Email is sanitized
         $results_us   = $db->query($sql_query);
         $count_one    = $results_us->num_rows;
@@ -364,27 +371,30 @@ use GrahamCampbell\ResultType\Success;
         $results_them = $db->query($sql_query);
         $count_two    = $results_them->num_rows;
 
-        $return = FriendStatus::NONE;
+        $friend_status = FriendStatus::NONE;
+        $log->info("Checking friend statuses for $email -> {$friend_status->name}");
 
         switch (true) {
             case ($count_one && $count_two):
-                return FriendStatus::MUTUAL;
+                $friend_status = FriendStatus::MUTUAL;
+                break;
             case ($count_one && !$count_two):
                 if (substr($results_us->fetch_assoc()['email_2'], 0, 3) == '¿b¿') {
-                    return FriendStatus::BLOCKED;
+                    $friend_status = FriendStatus::BLOCKED;
                 }
-                return FriendStatus::REQUESTED;
+                $friend_status = FriendStatus::REQUESTED;
+                break;
             case ($count_two && !$count_one):
                 if (substr($results_them->fetch_assoc()['email_2'], 0, 3) == '¿b¿') {
-                    return FriendStatus::BLOCKED_BY;
+                    $friend_status = FriendStatus::BLOCKED_BY;
                 }
-                return FriendStatus::REQUEST;
+                $friend_status = FriendStatus::REQUEST;
+                break;
             default:
-                return FriendStatus::NONE;
+                $friend_status = FriendStatus::NONE;
         }
-
-        $log->info("Checking friend statuses for $email -> {$return->name}");
-        return LOAError::FRNDS_FRIEND_STATUS_ERROR;
+        
+        return $friend_status;
     }
 
     /**

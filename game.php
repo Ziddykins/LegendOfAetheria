@@ -389,8 +389,8 @@
 
                         if (isset($_REQUEST['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_REQUEST['page']);
-                            $page_uri = 'pages/game-' .  $requested_page . '.php';
-                            include "$page_uri";
+                            $page_uri = "pages/game-$requested_page.php";
+                            include (string) $page_uri;
                         } else {
                             $page_uri = 'pages/game-sheet.php';
                             include $page_uri;
