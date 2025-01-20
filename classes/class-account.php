@@ -104,7 +104,7 @@
 
         private function getNextID() {
             global $db;
-            $sql_query = "SELECT IF(MAX(id) IS NULL, 1, MAX(id)+1) AS `next_id` FROM {$_ENV['SQL_ACCT_TBL']}";
+            $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)+1) AS `next_id` FROM {$_ENV['SQL_ACCT_TBL']}";
             return $db->execute_query($sql_query)->fetch_assoc()['next_id'];
         }
 

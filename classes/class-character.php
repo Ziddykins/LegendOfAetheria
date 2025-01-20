@@ -34,7 +34,6 @@
 
             $this->accountID = $accountID;
             $this->inventory = new Inventory( MAX_STARTING_INVSLOTS, MAX_STARTING_INVWEIGHT);
-            $this->stats     = new Stats($this->id);
 
             if ($new) {
                 $this->newCharacter($accountID, $this->getNextCharSlot($accountID));
@@ -53,7 +52,8 @@
 
         private function newCharacter($accountID, $slot) {
             global $db, $log;
-            $this->id = $this->getNextID();
+            $this->id    = $this->getNextID();
+            $this->stats = new Stats($this->id);
             
             $sql_query = "INSERT INTO {$_ENV['SQL_CHAR_TBL']} (`id`, `account_id`) VALUES (?, ?)";
             $db->execute_query($sql_query, [$this->id, $accountID]);
@@ -71,8 +71,6 @@
                     } else {
                         $this->$key = $value;
                     }
-                    
-                    $log->info("new char key $key vwl $value");
                 }
             } else {
                 $log->error("Didn't get anything from db for newChar pull: $this->id");
@@ -117,9 +115,9 @@
             $this->monster = $monster;
         }
 
-        private function getNextID() {
+        private function getNextID(): int {
             global $db;
-            $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)) + 1 AS `next_id` FROM {$_ENV['SQL_CHAR_TBL']}";
+            $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)+1) AS `next_id` FROM {$_ENV['SQL_CHAR_TBL']}";
             $next_id = $db->execute_query($sql_query)->fetch_assoc()['next_id'];
             
             return $next_id;
@@ -148,23 +146,23 @@
         use HandlePropsAndCols;
         use HandlePropSync;
 
-        private $charactedID;
-		private $hp;
-		private $maxHp;
-		private $mp;
-        private $maxMp;
-        private $ep;
-        private $maxEp;
+        private int $characterID;
+		private int $hp;
+		private int $maxHp;
+		private int $mp;
+        private int $maxMp;
+        private int $ep;
+        private int $maxEp;
 
-        private $str;
-        private $int;
-        private $def;
+        private int $str;
+        private int $int;
+        private int $def;
 
         /* Enum CharacterStatus, constants.php */
-        private $status;
+        private CharacterStatus $status;
         
         public function __construct ($characterID) {
-            $this->id = $characterID;
+            $this->characterID = $characterID;
         }
         public function __call($method, $params): mixed {
             global $log;
@@ -175,5 +173,4 @@
         public function getProps(): array {
             return get_class_vars(get_class($this));
         }
-
     }
