@@ -51,8 +51,8 @@
 
         private function getNextCharSlotID($accountID): int {
             global $db;
-            $sql_query = "SELECT IF (`char_slot1` IS NULL, 1, IF (`char_slot2` IS NULL, 2, IF (`char_slot3` IS NULL, 3, -1))) AS `free_slot` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
-            return $db->execute_query($sql_query, [ $accountID ])->fetch_assoc()['free_slot'];
+            $sqlQuery = "SELECT IF (`char_slot1` IS NULL, 1, IF (`char_slot2` IS NULL, 2, IF (`char_slot3` IS NULL, 3, -1))) AS `free_slot` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
+            return $db->execute_query($sqlQuery, [ $accountID ])->fetch_assoc()['free_slot'];
         }
     }
 
