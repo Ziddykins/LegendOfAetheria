@@ -26,70 +26,28 @@
         private $charSlot2;
         private $charSlot3;
 
-        private $inventory;
-
         private $focusedSlot;
 
-        public function __construct($email) {
-            global $log;
+        public function __construct($email = null) {
             $this->email = $email;
-
-            $foundID = $this->checkIfExists($email);
-
-            if (!$foundID) {
-                $this->createAccount($email);
-                $this->focusedSlot = 0;
-            }
-
-            $this->loadAccount($email);
         }
-
+        
         public function __call($method, $params) {
             global $db, $log;
 
+            /* If it's a get, this is true */
             if (!count($params)) {
                 $params = null;
             }
 
+            /* Avoid loops with prop_sync triggering itself */
             if ($method == 'prop_sync') {
                 return;
             }
 
             return $this->prop_sync($method, $params, PropSyncType::ACCOUNT);
         }
-
-        private function createAccount($email): int {
-            global $db, $log;
-
-            $new_id = $this->getNextId();
-            $this->email = $email;
-            
-            $sql_query = "INSERT INTO {$_ENV['SQL_ACCT_TBL']} (`id`, `email`) VALUES (?, ?)";
-            $db->execute_query($sql_query, [$new_id, $email]);
-
-            return $new_id;
-        }
-
-        /**
-         * Load account data from the database and populate the object properties.
-         *
-         * @param int $id The unique identifier of the account.
-         * @return int Returns 0 if successful, otherwise it will exit the script.
-         */
-        private function loadAccount($email): int {
-            global $db, $log;
-
-            $sql_query = "SELECT * FROM {$_ENV['SQL_ACCT_TBL']} WHERE `email` = ?";
-            $result = $db->execute_query($sql_query, [$email])->fetch_assoc();
-
-            foreach ($result as $key => $value) {
-                $key = $this->tblcol_to_clsprop($key);
-                $this->$key = $value;
-            }
-            $log->info("Load Character completed $email");
-            return 0;
-        }
-
+        
         public static function checkIfExists($email) {
             global $db, $log;
             $sql_query = "SELECT `id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `email` = ?";
@@ -108,6 +66,8 @@
             return $db->execute_query($sql_query)->fetch_assoc()['next_id'];
         }
 
-
+        private function getConstructor() {
+            return 'email';
+        }
     }
 ?>

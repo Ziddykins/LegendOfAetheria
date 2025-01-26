@@ -22,3 +22,7 @@ phpctags.*
 phpctags.ctags
 phpctags.tags
 **/config.ini
+phpunit.xml
+/tests/
+.phpunit.result.cache
+/tbl_explore

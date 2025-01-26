@@ -18,9 +18,6 @@
     $sql_query = "SELECT `char_slot1`, `char_slot2`, `char_slot3` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
     $characters = $db->execute_query($sql_query, [$account->get_id()])->fetch_assoc();
 
-    echo '<pre>';
-    print_r($characters);
-    exit();
     
 ?>
 <!-- Button trigger modal -->
@@ -33,14 +30,18 @@
     <div class="modal-dialog">
     <?php
         for ($i=1; $i<4; $i++) {
-            if ($i == 1) {
-                $character = new Character($account->get_id(), 0, $i);
-                if ($character->get_slot() > 1) {
-                    $character->set_name('Empty');
-                    $character->set_avatar('avatar-unknown.jpg');
-                }
+            $char_slot = "get_charSlot$i";
+            $char_id = $account->$char_slot();
+            $character = new Character($account->get_id());
 
-                $modal_html =  '<div class="modal-content">
+            if (is_null($char_id)) {
+                $character->set_avatar('avatar-unknown.jpg');
+                $character->set_name('Empty Slot');
+            } else {
+                $character->load($char_id);
+            }
+
+             $modal_html =  '<div class="modal-content">
                                     <div class="modal-header">
                                         <h1 class="modal-title fs-5" id="char-select-modal-label">Slot ' . $i . '</h1>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -70,9 +71,7 @@
                                 <button type="button" class="btn btn-sm btn-primary">Load</button>
                             </div>
                         </div>';
-            } else {
                 // Handle other cases if needed
-            }
             echo $modal_html;
         }
     ?>

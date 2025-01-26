@@ -66,23 +66,22 @@
     
     function revive_all_players() {
         global $db, $log;
-        $count = 0;
         
-        $sql_query = "SELECT * FROM " . $_ENV['SQL_CHAR_TBL'] . " WHERE hp = 0;";
-        $results   = $db->query($sql_query);
-        
-        while ($player = $results->fetch_assoc()) {
-            $character = new Character($player['id']);
-            $character->set_hp($character->get_maxHp());
-            $count++;
+        $sql_query  = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']} WHERE hp = 0";
+        $characters = $db->execute_query($sql_query)->fetch_all();
+
+        foreach ($characters as $character) {
+            $character->stats->set_hp(
+                $character->stats->get_maxHP()
+            );
         }
-        
-        $log->info("$count players revived during daily cronrun");
+
+        $log->info(count($characters) . " players revived during daily cronrun");
     }
     
     function regenerate() {
         global $db, $log;
-        $sql_query = 'SELECT * FROM ' . $_ENV['SQL_CHAR_TBL'] . ' WHERE ep <> max_ep OR hp <> max_hp OR mp <> max_mp';
+        $sql_query = "SELECT * FROM  {$_ENV['SQL_CHAR_TBL']} WHERE `ep` <> `max_ep` OR `hp` <> `max_hp` OR `mp` <> `max_mp`";
         $results = $db->query($sql_query);
     
         while ($player = $results->fetch_assoc()) {

@@ -1,160 +1,11 @@
 <?php
-
-use GrahamCampbell\ResultType\Success;
     require_once 'vendor/autoload.php';
     require_once 'logger.php';
     require_once 'constants.php';
+    require_once 'traits/trait-HandlePropsAndCols.php';
+    require_once 'traits/trait-HandlePropSync.php';
     require_once 'classes/class-account.php';
     require_once 'classes/class-monster.php';
-
-    /**
-     * Trait to handle conversions between class properties <=> SQL table columns.
-     */
-    trait HandlePropsAndCols {
-        /**
-         * Convert a class property to a table column name.
-         *
-         * @param string $property The class property.
-         * @return string Returns the corresponding table column name.
-         */
-
-        function clsprop_to_tblcol($property) {
-            global $log;
-            $splits = [];
-
-            $splits = preg_split('/(?=[A-Z]{1,2})/', $property);
-
-            if (count($splits) === 1) {
-                return $property;
-            }
-
-            if ($splits[1] == 'I' && $splits[2] == 'D') {
-                $table_column = strtolower($splits[0] . '_id');
-            } else {
-                $table_column = $splits[0] . '_' . strtolower($splits[1]);
-            }
-
-            if (isset($splits[2]) && $splits[1] != 'I' && $splits[2] != 'D') {
-                $table_column .= '_' . strtolower($splits[2]);
-            }
-
-            $log->info("cls->tbl: " . $table_column);
-
-            return $table_column;
-        }
-
-        /**
-         * Converts a table column name to a class property.
-         *
-         * @param string $column The table column name.
-         * @return string Returns the corresponding class property.
-         *
-         * @throws Exception If the column name does not match the expected format.
-         */
-        function tblcol_to_clsprop($column) {
-            global $log;
-
-            $splits = preg_split('/_/', $column);
-
-            if (count($splits) === 1) {
-                return $column;
-            }
-
-            if ($splits[1] === 'id') {
-                $class_property = $splits[0]. strtoupper($splits[1]);
-            } else {
-                $class_property = $splits[0] . ucfirst($splits[1]);
-            }
-
-            if (isset($splits[2])) {
-                $class_property .= ucfirst($splits[2]);
-            }
-
-            $log->info("tbl->cls: " . $class_property);
-
-            return $class_property;
-        }
-    }
-
-    
-    trait HandlePropSync {
-        private function prop_sync($method, $params, $type) {
-            global $db, $log;
-            $table = 'none';
-            $prop = lcfirst(substr($method, 4));
-
-            if ($method == 'prop_sync') {
-                return;
-            }
-
-            switch ($type) {
-                case PropSyncType::CHARACTER:
-                    $table = $_ENV['SQL_CHAR_TBL'];
-                    break;
-                case PropSyncType::ACCOUNT:
-                    $table = $_ENV['SQL_ACCT_TBL'];
-                    break;
-                case PropSyncType::FAMILIAR:
-                    $table = $_ENV['SQL_FMLR_TBL'];
-                    break;
-                default:
-                    exit(LOAError::FUNCT_PROPSYNC_TYPE);
-            }
-            
-            $log->error("In PropSync", [
-                'Table' => $table,
-                'Method' => $method,
-                'Params' => print_r($params, true)
-            ]);
-
-            if (strncasecmp($method, "get_", 4) === 0) {
-                if ($type == PropSyncType::CHARACTER) {
-                    if ($prop == 'inventory') {
-                        return unserialize($this->inventory);
-                    }
-                }
-                return $this->$prop;
-            } elseif (strncasecmp($method, "set_", 4) === 0) {
-                $sql_query = "UPDATE $table ";
-                $table_col = $this->clsprop_to_tblcol($prop);
-                $id = null;
-
-                if ($type == PropSyncType::CHARACTER) {
-                    if ($prop == 'inventory') {
-                        $params[0] = serialize($params[0]);
-                    }
-                    
-                    if (get_class($this) === 'Stats' && $prop === 'id') {
-                        $prop = 'characterID';
-                    }
-                }
-            
-                if (is_int($params[0])) {
-                    $sql_query .= "SET `$table_col` = {$params[0]} ";
-                } else {
-                    $sql_query .= "SET `$table_col` = '{$params[0]}' ";
-                }
-
-                $sql_query .= "WHERE `id` = ?";
-
-                $log->error("PropSyncQuery: '$sql_query'");
-
-                $db->execute_query($sql_query, [$id]);
-
-                $this->$prop = $params[0];
-
-                $log->error("TRAIT",
-                    [
-                        'SQLQuery' => $sql_query,
-                        'params'   => print_r($params, 1),
-                        'method'   => $method,
-                        'prop'     => $prop,
-                        'type'     => $type->name
-                    ]
-                );
-            }
-        }
-    }
 
     /**
      * Retrieves a MySQL datetime string based on the provided modifier.
@@ -605,4 +456,14 @@ use GrahamCampbell\ResultType\Success;
 
         return $html;
     }
+
+    function getNextTableID($table): int {
+        global $db;
+        $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)+1) AS `next_id` FROM $table";
+        $next_id = $db->execute_query($sql_query)->fetch_assoc()['next_id'];
+        
+        return $next_id;
+    }
+
+    
 ?>

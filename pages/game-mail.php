@@ -1,7 +1,7 @@
 <?php
     require 'classes/class-mail.php';
     
-    $account   = new Account($_SESSION['account-id']); 
+    $account   = new Account($_SESSION['email']); 
     $Character = new Character($_SESSION['character-id']); 
 
     $user_mailbox = new MailBox($account->get_id());

@@ -11,6 +11,8 @@
     require_once 'constants.php';
     require_once 'functions.php';
     require_once 'mailer.php';
+    require_once 'traits/trait-HandlePropsAndCols.php';
+    require_once 'traits/trait-HandlePropSync.php';
     require_once 'classes/class-account.php';
     require_once 'classes/class-inventory.php';
     require_once 'classes/class-character.php';
@@ -30,6 +32,7 @@
 
         if ($account_id > 0) {
             $account = new Account($email);
+            $account->load($account_id);
         } else {
             $log->error('Attempted login with a non-existing account', [ 'Email' => $email ]);
             header("Location: /?do_register&email=$email");
@@ -60,7 +63,7 @@
             $_SESSION['selected-slot'] = -1;
 
             $account->set_sessionID(session_id());
-
+                        
             header('Location: /select');
             exit();
         } else {
@@ -167,9 +170,9 @@
                         );
                     }
                     
-                    $account   = new Account($email);
-                    $character = new Character($account->get_id(), 1);
-                    
+                    $account = new Account($email);
+                    $account->new();
+
                     $account->set_password($password);
                     $account->set_dateRegistered($time_sqlformat);
                     $account->set_privileges($new_privs);
@@ -177,19 +180,22 @@
                     $account->set_loggedIn('False');
                     $account->set_verificationCode($verification_code);
 
+                    $character = new Character($account->get_id());
+                    $character->new();
+
                     $character->set_avatar($avatar);
                     $character->set_name($char_name);
                     $character->set_race($race);
 
-                    $character->stats->set_str($str);
-                    $character->stats->set_int($int);
-                    $character->stats->set_def($def);
+                    $character->stats->set_str((int) $str);
+                    $character->stats->set_int((int) $int);
+                    $character->stats->set_def((int) $def);
 
                     $character->stats->set_hp(100);
                     $character->stats->set_maxHp(100);
                     $character->stats->set_mp(100);
                     $character->stats->set_maxMp(100);
-
+ 
                     //$character->stats->set_status(CharacterStatus::HEALTHY);
 
                     //send_mail($email, $account);
@@ -211,35 +217,30 @@
 
     </head>
 
-    <body>
-    <div class="btn-group p-3 m-3 invisible" role="group" aria-label="basic outlined example">
-        <button type="button" class="btn btn-sm btn-success bg-gradient text-center text-shadow fw-bolder font-monospace border border-black border-round" style="text-shadow: black 0.45px 0.75px 0.5px; transform: skewX(9deg);">Pass</button>
-        <button type="button" class="btn btn-sm text-bg-dark bg-gradient text-center fw-bolder font-monospace border border-black border-round" style="text-shadow: black 0.45px 0.75px 0.5px; transform: skewX(9deg);">Autoinstaller</button>
-        <button type="button" class="btn btn-sm text-bg-danger bg-gradient text-center font-monospace border border-black border-round" style="transform: skewX(9deg);"></button>
-    <div class="btn-group" role="group" aria-label="basic outlined example">
-</div>
-</div>
+    <body data-bs-theme="dark">
 
-<div class="container" style="min-width: 325px;">
-    <div id="login-container" class="container shadow" style="max-width:500px; width: 100%;">
-        <div class="row">
-            <div class="col p-4">
-                <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" class="w-100"></img>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <?php require_once 'navs/nav-login.php'; ?>
+        <div class="container" style="min-width: 325px;">
+            <div id="login-container" class="container shadow border border-secondary" style="max-width:550px; width: 100%;">
+                <div class="row">
+                    <div class="col p-4">
+                        <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" class="w-100" #a/>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col">
+                        <?php require_once 'navs/nav-login.php'; ?>
+                    </div>
+                </div>
 
-            <div aria-live="polite" aria-atomic="true" class="position-relative">
-                <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
-
+                <div aria-live="polite" aria-atomic="true" class="position-relative">
+                    <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <?php include 'html/footers.html'; ?>
-</div>
+        <?php include 'html/footers.html'; ?>
+
     </body>
 </html>
