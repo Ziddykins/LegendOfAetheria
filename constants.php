@@ -209,4 +209,63 @@
         case ACCOUNT;
         case CHARACTER;
         case FAMILIAR;
+        case INVENTORY;
+        case STATS;
+    }
+
+    enum GEMSTONE {
+        /* Red-ish,    focus: health, str               */
+        case BLOODSTONE;
+        case CARNELIAN;
+        case RUBY;
+
+        /* Blue-ish,   focus: defense, mp               */
+        case SAPPHIRE;
+        case AQUAMARINE;
+        case TANZANITE;
+
+        /* Black-ish,  focus: defense, shields, summons */
+        case ONYX;
+        case OBSIDIAN;
+
+        /* Green-ish,  focus: currency, luck, exp       */
+        case JADE;
+        case MALACHITE;
+        case EMERALD;
+        case PERIDOT;
+
+        /* Yellow-ish, focus: currency, int, ep         */
+        case TOPAZ;
+        case CITRINE;
+
+        /* Purple-ish, focus: mp, mhp, int              */
+        case IOLITE;
+        case AMETHYST;
+
+        /* White-ish, focus: purity, clarity            */
+        case DIAMOND;
+        case PEARL;
+        case MOONSTONE;
+        case ZIRCON;
+
+        /* Brown-ish, focus: grounding, stability       */
+        case AGATE;
+        case JASPER;
+        case SUNSTONE;
+
+        /* Pink-ish, focus: love, compassion            */
+        case MORGANITE;
+        case TOURMALINE;
+
+        /* Multi-colored, focus: versatility, adaptability */
+        case OPAL;
+        case ALEXANDRITE;
+
+        /* Other gemstones */
+        case CHRYSOLITE;
+        case TURQUOISE;
+
+        public static function getRandom(): GEMSTONE {
+            return self::cases()[random_int(0, count(self::cases()) - 1)];
+        }
     }

@@ -9,16 +9,16 @@
 		private $name;
 		private $race;
 		private $avatar;
-		private $x;
-		private $y;
-		private $location;
-		private $alignment;
-		private $gold;
-		private $exp;
+		private $x = 0;
+		private $y = 0;
+		private $location = 'The Shrine';
+		private $alignment = 0;
+		private $gold = 1000;
+		private $exp = 0;
 
-		private $floor;
-		private $description;
-		private $ap;
+		private $floor = 1;
+		private $description = 'None Provided';
+		private $ap = 0;
 
         /* class Monster */
 		public $monster;
@@ -29,17 +29,8 @@
         /* class Inventory */
         public $inventory;
 
-        public function __construct($accountID, $new, $slot = 0) {
-            global $db, $log;
-
+        public function __construct($accountID) {
             $this->accountID = $accountID;
-            $this->inventory = new Inventory( MAX_STARTING_INVSLOTS, MAX_STARTING_INVWEIGHT);
-
-            if ($new) {
-                $this->newCharacter($accountID, $this->getNextCharSlot($accountID));
-            } else {
-                $this->loadCharacter($accountID, $slot);
-            }
         }
 
         public function __call($method, $params) {
@@ -50,93 +41,17 @@
             return $this->prop_sync($method, $params, PropsyncType::CHARACTER);
         }
 
-        private function newCharacter($accountID, $slot) {
-            global $db, $log;
-            $this->id    = $this->getNextID();
-            $this->stats = new Stats($this->id);
-            
-            $sql_query = "INSERT INTO {$_ENV['SQL_CHAR_TBL']} (`id`, `account_id`) VALUES (?, ?)";
-            $db->execute_query($sql_query, [$this->id, $accountID]);
-
-            $query = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
-            $character = $db->execute_query($query, [$this->id])->fetch_assoc();
-
-            if ($character) {
-                foreach ($character as $key => $value) {
-                    $stats_props = $this->stats->getProps();
-                    $key = $this->tblcol_to_clsprop($key);
-
-                    if (array_search($key, $stats_props)) {
-                        $this->stats->$key = $value;
-                    } else {
-                        $this->$key = $value;
-                    }
-                }
-            } else {
-                $log->error("Didn't get anything from db for newChar pull: $this->id");
-            }
-
-            $this->inventory->addItem("Floopy Dildo", 100, 0);
-
-            return 0;
+        private function getProps(): array {
+            return get_class_vars(get_class($this));
         }
 
-        private function loadCharacter($accountID, $slot) {
-            global $db, $log;
-
-            $char_slot = "char_slot$slot";
-            $sql_query = "SELECT `$char_slot` AS `char_id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
-            $char      = $db->execute_query($sql_query, [$accountID])->fetch_assoc();
-
-            $sql_query = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
-            $tmp_char  = $db->execute_query($sql_query, [$char['char_id']]);
-                
-            foreach ($tmp_char as $key => $value) {
-                $stats_props = get_class_vars("Stats");
-
-                /* Messy way to avoid trying to set characterID in the SQL table */
-                array_shift($stats_props);
-
-                $key = $this->tblcol_to_clsprop($key);
-
-                if (array_search($key, $stats_props)) {
-                    $this->stats->$key = $value;
-                } else {
-                    $this->$key = $value;
-                }
-                
-                $log->error("Loading char key $key vwl $value"); 
-            }
-
-            $this->inventory = unserialize($this->inventory);
+        private function getConstructor() {
+            return 'accountID';
         }
 
-        private function setPersonalMonster(Monster $monster) {
-            $this->monster = $monster;
-        }
-
-        private function getNextID(): int {
+        private function getNextCharSlotID($accountID): int {
             global $db;
-            $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)+1) AS `next_id` FROM {$_ENV['SQL_CHAR_TBL']}";
-            $next_id = $db->execute_query($sql_query)->fetch_assoc()['next_id'];
-            
-            return $next_id;
-        }
-
-        private function getNextCharSlot($accountID) {
-            global $db;
-
-            $sql_query = <<<SQL
-                SELECT 
-                    IF (`char_slot1` IS NULL, 1,
-                        IF (`char_slot2` IS NULL, 2,
-                            IF (`char_slot3` IS NULL, 3, -1)
-                        )
-                    ) AS `free_slot`
-                FROM {$_ENV['SQL_ACCT_TBL']}
-                WHERE `id` = ?
-            SQL;
-
+            $sql_query = "SELECT IF (`char_slot1` IS NULL, 1, IF (`char_slot2` IS NULL, 2, IF (`char_slot3` IS NULL, 3, -1))) AS `free_slot` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
             return $db->execute_query($sql_query, [ $accountID ])->fetch_assoc()['free_slot'];
         }
     }
@@ -146,31 +61,35 @@
         use HandlePropsAndCols;
         use HandlePropSync;
 
-        private int $characterID;
-		private int $hp;
-		private int $maxHp;
-		private int $mp;
-        private int $maxMp;
-        private int $ep;
-        private int $maxEp;
+        private int $id;
+		private int $hp = 100;
+		private int $maxHp = 100;
+		private int $mp = 100;
+        private int $maxMp = 100;
+        private int $ep = 100;
+        private int $maxEp = 100;
 
-        private int $str;
-        private int $int;
-        private int $def;
+        private int $str = 10;
+        private int $int = 10;
+        private int $def = 10;
 
         /* Enum CharacterStatus, constants.php */
-        private CharacterStatus $status;
+        //private CharacterStatus $status;
         
-        public function __construct ($characterID) {
-            $this->characterID = $characterID;
+        public function __construct ($characterID = 0) {
+            $this->id = $characterID;
         }
         public function __call($method, $params): mixed {
             global $log;
             $log->error("STATS CLASS CALL", ['method' => $method, 'params' => $params]);
-            return $this->prop_sync($method, $params, PropsyncType::CHARACTER);
+            return $this->prop_sync($method, $params, PropsyncType::STATS);
         }
 
-        public function getProps(): array {
+        private function getProps(): array {
             return get_class_vars(get_class($this));
+        }
+
+        private function getConstructor() {
+            return 'id';
         }
     }

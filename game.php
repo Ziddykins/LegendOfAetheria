@@ -27,7 +27,7 @@
     $monster_pool = new MonsterPool;    
     load_monster_sheet($monster_pool);
 
-    $account   = new Account($_SESSION['account-id']);
+    $account   = new Account($_SESSION['email']);
     $char_menu_icon = 'bi-emoji-laughing-fill';
     $cur_floor = 1;
     $avatar = 'avatar-unknown.jpg';
@@ -35,7 +35,7 @@
     /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         if ($_SESSION['selected-slot'] > 1) {
-            $character = new Character($_SESSION['character-id']);
+            $character = new Character($_SESSION['account-id'], $_SESSION['focused-slot']);
 
             $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
             $familiar->loadFamiliar($character->get_id());
@@ -381,11 +381,8 @@
                             include('html/verify.html');
                             exit();
                         }
-                            
                         
                         include('navs/nav-summary.php');
-
-
 
                         if (isset($_REQUEST['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_REQUEST['page']);

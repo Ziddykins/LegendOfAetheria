@@ -1,7 +1,7 @@
 <?php
 class Monster {
     use HandlePropsAndCols;
-
+    use HandlePropSync;
     protected $id;
     protected $accountID;
     protected $name;
@@ -90,16 +90,6 @@ class MonsterPool {
 
     public function random_monster() {
         return $this->monsters[rand(0,$this->get_monster_count()-1)];
-    }
-
-    public function get_monster($character_id, $monster_id) {
-        global $db;
-        $monster = $this->tbl_to_obj($monster_id, 'monster');
-        
-        
-
-
-        return $monster;
     }
 }
 

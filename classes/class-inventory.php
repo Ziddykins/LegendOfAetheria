@@ -50,53 +50,65 @@
     }
 
     class Item {
-        private ?string $name;
+        private string $name;
         private int $weight;
-        private int $socketCount;
         /* Array of Class ItemSockets */
         private array $sockets;
+        private array $modifiers;
 
-        public function __construct($name = null, $weight = 0, $socketCount = 1) {
+        public function __construct($name = "None", $weight = 0, $socketCount = 1) {
             $this->name   = $name;
             $this->weight = $weight;
             
             for ($i=0; $i<$socketCount; $i++) {
-                $this->sockets[$i] = new ItemSocket();
+                $this->sockets[$i] = new ItemSocket($i);
             }
         }
     }
 
     class ItemSocket {
+        private int $socketID;
+        private int $itemID;
         private Gem $gem;
         private ItemModifiers $modifiers;
 
-        public function _construct($modifiers = null) {
-            $this->modifiers = $modifiers;
+        public function __construct($socketID = 0) {
+            $this->socketID    = $socketID;
         }
     }
 
     class ItemModifiers {
-        private array $modifiers;
+        private int $itemID;
+        private string $target;
+        private array $effects;
+        
 
-        public function _construct($modifiers) {
-            $properties = get_class_vars("Character");
-
-            foreach ($properties as $property) {
-                if ($modifiers[$property]) {
-                    
-                }
-            }
+        public function __construct($itemID = 0) {
+            $this->itemID = $itemID;
         }
     }
 
     class Gem {
         private int $itemID;
+        private int $socketID;
         private $color;
         private $quality;
         private ObjectRarity $rarity;
-        private ?string $name;
+        private string $name;
+        private GemModifiers $modifiers;
 
-        public function __construct($itemID) {
+        public function __construct($socketID = 0) {
             $this->rarity = ObjectRarity::getObjectRarity(random_int(0,100));
         }
+    }
+
+    class GemModifiers {
+        private int $gemID;
+        private string $target;
+        private int $effect;
+
+        public function __construct($gemID = 0) {
+            $this->gemID = $gemID;
+        }
+
     }
