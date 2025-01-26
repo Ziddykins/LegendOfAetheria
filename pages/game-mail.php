@@ -5,9 +5,9 @@
     $Character = new Character($_SESSION['character-id']); 
 
     $user_mailbox = new MailBox($account->get_id());
-    $user_mailbox->set_focused_folder(MailFolderType::INBOX);
-    $user_mailbox->populate_focused_folder();
-    $inbox_count = $user_mailbox->focusedFolder->get_message_count();
+    $user_mailbox->setFocusedFolder(MailFolderType::INBOX);
+    $user_mailbox->populateFocusedFolder();
+    $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
 ?>
 
 <div class="container text-white">

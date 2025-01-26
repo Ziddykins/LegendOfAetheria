@@ -50,17 +50,14 @@ class Familiar {
     public function registerFamiliar() {
         global $db;
 
-        //$sql_time   = get_mysql_datetime();
-        //$hatch_time = get_mysql_datetime('+8 hours');
-
-        $sql_query = "INSERT INTO " . $this->table . "(`character_id`) VALUES ($this->characterID)";
+        $sqlQuery = "INSERT INTO " . $this->table . "(`character_id`) VALUES ($this->characterID)";
         
-        $db->query($sql_query);
+        $db->query($sqlQuery);
 
-        $sql_query = 'SELECT `id` FROM ' . $this->table . 
+        $sqlQuery = 'SELECT `id` FROM ' . $this->table . 
             " WHERE `character_id` = $this->characterID";
         
-        $result = $db->query($sql_query);
+        $result = $db->query($sqlQuery);
 
         $familiar_id  = $result->fetch_assoc();
 
@@ -83,7 +80,7 @@ class Familiar {
     public function saveFamiliar() {
         global $db;
 
-        $sql_query = 'UPDATE ' . $this->table .' SET ';
+        $sqlQuery = 'UPDATE ' . $this->table .' SET ';
 
         foreach ((Array)$this as $key => $val) {
             if ($key !== 'id' && $key !== 'table') {
@@ -91,23 +88,23 @@ class Familiar {
                     preg_replace("/[^a-zA-Z_]+/", '', $key)
                 );
                 
-                $sql_query .= "$column = ";
+                $sqlQuery .= "$column = ";
                 
                 if (is_numeric($val)) {
-                    $sql_query .= $val;
+                    $sqlQuery .= $val;
                 } else if (!isset($val)) {
-                    $sql_query .= 'null';
+                    $sqlQuery .= 'null';
                 } else {
-                    $sql_query .= "'$val'";
+                    $sqlQuery .= "'$val'";
                 }
                 
-                $sql_query .= ', ';
+                $sqlQuery .= ', ';
             }
         }
         
-        $sql_query = rtrim($sql_query, ', ');
-        $sql_query .= " WHERE `id` = ?";
-        $db->execute_query($sql_query, [ $this->id ]);
+        $sqlQuery = rtrim($sqlQuery, ', ');
+        $sqlQuery .= " WHERE `id` = ?";
+        $db->execute_query($sqlQuery, [ $this->id ]);
 
     }
 
@@ -137,8 +134,8 @@ class Familiar {
     public function loadFamiliar($characterID) {
         global $db, $log;
 
-        $sql_query = "SELECT * FROM " . $this->table . " WHERE `character_id` = ?";
-        $result = $db->execute_query($sql_query, [ $characterID ]);
+        $sqlQuery = "SELECT * FROM " . $this->table . " WHERE `character_id` = ?";
+        $result = $db->execute_query($sqlQuery, [ $characterID ]);
 
         if ($result->num_rows === 0) {
             $log->warning('Attempted to load familiar but no ' .
@@ -160,52 +157,56 @@ class Familiar {
         }
     }
 
-    public function get_rarity_color($rarity) {
+    public function getRarityColor($rarity) {
+        $color = null;
+        
         switch($rarity->name) {
             case "WORTHLESS":
-                return "#FACEF0";
+                $color = "#FACEF0";
                 break;
             case "TARNISHED":
-                return "#779988";
+                $color = "#779988";
                 break;
             case "COMMON":
-                return "#ADD8D7";
+                $color = "#ADD8D7";
                 break;
             case "ENCHANTED":
-                return "#A6D9F8";
+                $color = "#A6D9F8";
                 break;
             case "MAGICAL":
-                return "#08E71C";
+                $color = "#08E71C";
                 break;
             case "LEGENDARY":
-                return "#F8C81C";
+                $color = "#F8C81C";
                 break;
             case "EPIC":
-                return "#CAB51F";
+                $color = "#CAB51F";
                 break;
             case "MYSTIC":
-                return "#01CBF6";
+                $color = "#01CBF6";
                 break;
             case "HEROIC":
-                return "#1C4F2C";
+                $color = "#1C4F2C";
                 break;
             case "INFAMOUS":
-                return "#CB20EE";
+                $color = "#CB20EE";
                 break;
             case "GODLY":
-                return "#FF2501";
+                $color = "#FF2501";
                 break;
             default:
-                return "#AAAAAA";
+                $color = "#AAAAAA";
                 break;
         }
+        
+        return $color;
     }
 
-    public function generate_egg($familiar, $rarity_roll) {
+    public function generateEgg($familiar, $rarity_roll) {
         global $log;
         
         $rarity       = ObjectRarity::getObjectRarity($rarity_roll);
-        $rarity_color = $this->get_rarity_color($rarity);
+        $rarity_color = $this->getRarityColor($rarity);
 
         $familiar->set_level(1);
         
@@ -233,19 +234,19 @@ class Familiar {
         }
 
         if (strncasecmp($method, "set_", 4) === 0) {
-            $sql_query =  'UPDATE ' . $this->table . ' ';
+            $sqlQuery =  'UPDATE ' . $this->table . ' ';
             $table_col = $this->clsprop_to_tblcol($var);
 
             if (is_int($params[0])) {
-                $sql_query .= "SET `$table_col` = " . $params[0] . " ";
+                $sqlQuery .= "SET `$table_col` = " . $params[0] . " ";
             } else {
-                $sql_query .= "SET `$table_col` = '" . $params[0] . "' ";
+                $sqlQuery .= "SET `$table_col` = '" . $params[0] . "' ";
             }
 
-            $sql_query .= 'WHERE `id` = ' . $this->id;
+            $sqlQuery .= 'WHERE `id` = ' . $this->id;
 
             // file deepcode ignore Sqli:
-            $db->query($sql_query);
+            $db->query($sqlQuery);
             $this->$var = $params[0];
         }
     }
@@ -286,18 +287,18 @@ class Familiar {
 //            }
 //
 //            if (strncasecmp($method, "set_", 4) === 0) {
-//                $sql_query =  'UPDATE ' . $this->table . ' ';
+//                $sqlQuery =  'UPDATE ' . $this->table . ' ';
 //                $this->table_col = clsprop_to_tblcol($var);
 //
 //                if (is_int($params[0])) {
-//                    $sql_query .= "SET `$this->table_col` = " . $params[0] . " ";
+//                    $sqlQuery .= "SET `$this->table_col` = " . $params[0] . " ";
 //                } else {
-//                    $sql_query .= "SET `$this->table_col` = '" . $params[0] . "' ";
+//                    $sqlQuery .= "SET `$this->table_col` = '" . $params[0] . "' ";
 //                }
 //
-//                $sql_query .= 'WHERE `id` = ' . $this->id;
+//                $sqlQuery .= 'WHERE `id` = ' . $this->id;
 //
-//                $db->query($sql_query);
+//                $db->query($sqlQuery);
 //                $this->$var = $params[0];
 //            }
 //        }

@@ -21,17 +21,17 @@
          *
          * @param MailFolderType $folder The type of the folder to set as focused.
          */
-        public function set_focused_folder(MailFolderType $folder) {
+        public function setFocusedFolder(MailFolderType $folder) {
             $this->focusedFolder = new MailFolder($this->accountID, $folder);
         }
 
         /**
          * Populates the focused folder with messages from the database.
          */
-        public function populate_focused_folder() {
+        public function populateFocusedFolder() {
             global $log;
             if (isset($this->focusedFolder)) {
-                $this->focusedFolder->get_messages();
+                $this->focusedFolder->getMessages();
             } else {
                 $log->warning('Focused folder not yet populated in ', 
                     [ 'File' => __FILE__, 'Line' => __LINE__ - 2 ]); // lol?
@@ -65,14 +65,14 @@
          *
          * @throws Exception If there is an error while counting the messages.
          */
-        public function get_message_count() {
+        public function getMessageCount() {
             return count($this->envelopes);
         }
 
         /**
          * Retrieves messages from the database and populates the envelopes array.
          */
-        public function get_messages() {
+        public function getMessages() {
             global $db;
             $sql_query = 'SELECT * FROM '. $_ENV['SQL_MAIL_TBL']. 
                         'WHERE account_id = '. $this->accountID. 
@@ -123,4 +123,3 @@
         case OUTBOX;
         case DELETED;
     }
-?>

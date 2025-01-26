@@ -31,7 +31,7 @@
         public function __construct($email = null) {
             $this->email = $email;
         }
-        
+
         public function __call($method, $params) {
             global $db, $log;
 
@@ -50,8 +50,8 @@
         
         public static function checkIfExists($email) {
             global $db, $log;
-            $sql_query = "SELECT `id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `email` = ?";
-            $result = $db->execute_query($sql_query, [$email])->fetch_assoc();
+            $sqlQuery = "SELECT `id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `email` = ?";
+            $result = $db->execute_query($sqlQuery, [$email])->fetch_assoc();
 
             if ($result && $result['id'] > 0) {
                 return $result['id'];
@@ -62,8 +62,8 @@
 
         private function getNextID() {
             global $db;
-            $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)+1) AS `next_id` FROM {$_ENV['SQL_ACCT_TBL']}";
-            return $db->execute_query($sql_query)->fetch_assoc()['next_id'];
+            $sqlQuery = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)+1) AS `next_id` FROM {$_ENV['SQL_ACCT_TBL']}";
+            return $db->execute_query($sqlQuery)->fetch_assoc()['next_id'];
         }
 
         private function getConstructor() {

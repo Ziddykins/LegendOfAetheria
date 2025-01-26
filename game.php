@@ -35,7 +35,7 @@
     /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         if ($_SESSION['selected-slot'] > 1) {
-            $character = new Character($_SESSION['account-id'], $_SESSION['focused-slot']);
+            $character = new Character($_SESSION['account-id']);
 
             $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
             $familiar->loadFamiliar($character->get_id());
