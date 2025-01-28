@@ -29,7 +29,14 @@
         private $focusedSlot;
 
         public function __construct($email = null) {
-            $this->email = $email;
+            if ($email) {
+                $this->email = $email;
+                $id = $this->checkIfExists($email);
+                
+                if ($id) {
+                    $this->id = $id;
+                }
+            }
         }
 
         public function __call($method, $params) {

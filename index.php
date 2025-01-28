@@ -110,15 +110,17 @@
         $verification_code .= substr(hash('sha256', strval(rand(0,100))), 0, 15);
 
         /* Character information */
-        $char_name        = preg_replace(
-            '/[^a-zA-Z0-9_-]+/', '', $_REQUEST['register-character-name']
+        $char_name = preg_replace(
+            '/[^a-zA-Z0-9_-]+/',
+        '',
+            $_REQUEST['register-character-name']
         );
 
-        $avatar           = 'avatar-' . $_REQUEST['avatar-select'] . '.webp';
-        $race             = $_REQUEST['race-select'];
-        $str              = $_REQUEST['str-ap'];
-        $def              = $_REQUEST['def-ap'];
-        $int              = $_REQUEST['int-ap'];        
+        $avatar = 'avatar-' . $_REQUEST['avatar-select'] . '.webp';
+        $race   = $_REQUEST['race-select'];
+        $str    = $_REQUEST['str-ap'];
+        $def    = $_REQUEST['def-ap'];
+        $int    = $_REQUEST['int-ap'];
 
         if (!check_valid_email($email)) {
             header('Location: /?invalid_email');

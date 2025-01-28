@@ -1,36 +1,5 @@
 <?php
-    $cur_hp       = $character->get_hp();
-    $cur_mp       = $character->get_mp();
-    $cur_ep       = $character->get_ep();
-
-    $max_hp       = $character->get_maxHp();
-    $max_mp       = $character->get_maxMp();
-    $max_ep       = $character->get_maxEp();
-
-    $ep_icon  = 'bi-battery-full';
-    $ep_color = 'success';
-    $ep_percent_full = ($cur_ep / $max_ep) * 100;
-    
-    if ($ep_percent_full > 25 && $ep_percent_full < 75) {
-        $ep_icon  = 'bi-battery-half';
-        $ep_color = 'warning';
-    } elseif ($ep_percent_full >= 0 && $ep_percent_full <= 25) {
-        $ep_icon  = 'bi-battery';
-        $ep_color = 'danger';
-    }
-
-    $ap = $character->get_ap();
-
-    $cur_xp   = $character->get_exp();
-    $next_lvl = $character->get_exp_nextlvl();
-
-    $location = $character->get_location();
-    $cur_x    = $character->get_x();
-    $cur_y    = $character->get_y();
-
-    $align = $character->get_alignment();
-
-    $race = $character->get_race();
+    include "snippets/snip-charstats.php";
 
 ?>
 
