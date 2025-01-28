@@ -124,31 +124,9 @@ trait HandlePropSync {
                     $db->execute_query($act_query, [$this->id, $this->accountID]);
                     break;
             }
-            //$this->init($focused_id);
-        } elseif (strcmp($action, 'init') === 0) { /*INIT*/
-            $id = $params[0];
-            $sql_query = "SELECT * FROM $table WHERE `id` = ?";
-            $row = $db->execute_query($sql_query, [$id])->fetch_assoc();
-
-            foreach ($row as $key => $value) {
-                $key = $this->tblcol_to_clsprop($key);
-
-                if (!is_null($value) && $this->$key == null) {
-                    $this->$key = $value;
-
-                    $log->info("In propsync INIT",
-                        [
-                            'Table' => $table,
-                            'Key' => $key,
-                            'Value' => $value
-                        ]
-                    );
-                }
-            }
-
         } elseif (strcmp($action, 'load') === 0) { /*LOAD*/
             $sql_query = "SELECT * FROM $table WHERE `id` = ?";
-            $tmp_char = $db->execute_query($sql_query, [$params[0]])->fetch_assoc();
+            $tmp_char = $db->execute_query($sql_query, [$this->id])->fetch_assoc();
 
             foreach ($tmp_char as $key => $value) {
                 $key = $this->tblcol_to_clsprop($key);

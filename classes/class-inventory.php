@@ -48,7 +48,7 @@
             $this->nextAvailableSlot--;
         }
     }
-
+    
     class Item {
         private string $name;
         private int $weight;

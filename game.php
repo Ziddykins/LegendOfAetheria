@@ -27,27 +27,25 @@
     $monster_pool = new MonsterPool;    
     load_monster_sheet($monster_pool);
 
-    $account   = new Account($_SESSION['email']);
-    $char_menu_icon = 'bi-emoji-laughing-fill';
-    $cur_floor = 1;
-    $avatar = 'avatar-unknown.jpg';
-    
-    /* First make sure the user is logged in before doing anything */
+        /* First make sure the user is logged in before doing anything */
     if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
-        if ($_SESSION['selected-slot'] > 1) {
-            $character = new Character($_SESSION['account-id']);
+        $account = new Account($_SESSION['email']);
+        $account->load();
 
-            $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
-            $familiar->loadFamiliar($character->get_id());
+        $character = new Character($account->get_id());
+        $character->set_id($_SESSION['character-id']);
+        $character->load();
 
-            $char_menu_icon = $character->get_hp() > 0 
-                ? 'bi-emoji-laughing-fill' 
-                : 'bi-emoji-dizzy-fill';
+      //  $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
+      //  $familiar->loadFamiliar($character->get_id());
 
-            $_SESSION['name'] = $character->get_name();
-            $cur_floor = $character->get_floor();
-            $avatar = $character->get_avatar();
-        }
+        $char_menu_icon = $character->stats->get_hp() > 0 
+            ? 'bi-emoji-laughing-fill' 
+            : 'bi-emoji-dizzy-fill';
+
+        $_SESSION['name'] = $character->get_name();
+        $cur_floor        = $character->get_floor();
+        $avatar           = $character->get_avatar();
 
         /* Check if the user has clicked the apply button on the profile tab */
         if (isset($_REQUEST['profile-apply']) && $_REQUEST['profile-apply'] == 1) {
@@ -87,7 +85,7 @@
         
     </head>
         
-    <body class="main-font"> 
+    <body class="main-font" data-bs-theme="dark"> 
         <div class="container-fluid border">
             <div class="row flex-nowrap" style="min-height: 99.5vh!important;">
                 <div class="col-2 px-3 border border-grey">
@@ -96,12 +94,12 @@
                             <img src="img/logos/logo-banner-no-bg.webp" class="mt-2 w-100">
                         </a>
 
-                        <hr style="width: 35%; opacity: .25; align-self: center;">
+                        <hr style="width: 35%; opacity: .25; align-self: center;" />
 
                         <div class="d-flex flex-column">
                             <ul class="nav nav-flush flex-column mb-auto" id="menu">
                                 <li class="border rounded w-100">
-                                <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary text-white" data-bs-toggle="collapse" aria-expanded="true">
+                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary text-white" data-bs-toggle="collapse" aria-expanded="true">
                                         <i class="fs-5 bi <?php echo $char_menu_icon; ?> d-md-inline text-center"></i>
                                         <span class="d-none d-md-inline">Character</span>
                                     </a>
@@ -113,24 +111,28 @@
                                                 <span class="d-none d-md-inline"> Sheet</span>
                                             </a>
                                         </li>
+                                        
                                         <li>
                                             <a href="?page=inventory" id="menu-sub-inventory" name="menu-sub-inventory" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">deployed_code</span>
                                                 <span class="d-none d-md-inline"> Inventory</span>
                                             </a>
                                         </li>
+                                        
                                         <li>
                                             <a href="?page=" id="menu-sub-skills" name="menu-sub-skills" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">book_2</span>
                                                 <span class="d-none d-md-inline">Skills</span>
                                             </a>
                                         </li>
+                                        
                                         <li>
                                             <a href="?page=" id="menu-sub-spells" name="menu-sub-spells" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">book</span>
                                                 <span class="d-none d-lg-inline">Spells</span>
                                             </a>
                                         </li>
+                                        
                                         <li>
                                             <a href="?page=" id="menu-sub-train" name="menu-sub-trail" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">fitness_center</span>
@@ -151,8 +153,6 @@
                                                 );
                                             }
                                         </script>
-
-
 
                                         <li>
                                             <a href="#" id="menu-sub-save" name="menu-sub-save" class="nav-link d-md-inline text-center" onclick=saveChar()>
@@ -213,11 +213,9 @@
                                         </li>
                                         <li>
                                             <?php
-                                                if ($_SESSION['selected-slot'] > 1) {
-                                                    $rest_disabled = '';
-                                                    if ($character->get_hp() === $character->get_maxHp()) {
-                                                        $rest_disabled = 'disabled';
-                                                    }
+                                                $rest_disabled = '';
+                                                if ($character->stats->get_hp() === $character->stats->get_maxHp()) {
+                                                    $rest_disabled = 'disabled';
                                                 } else {
                                                     $rest_disabled = '';
                                                 }
@@ -303,7 +301,7 @@
 
                         <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 fixed-bottom" style="width: 15%;">
                             <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
-                                <span><img src="img/avatars/<?php echo $avatar; ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
+                                <span><img src="img/avatars/<?php $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
                             </a>
                             
                             <a href="#" class="text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -323,15 +321,11 @@
                                     <a class="dropdown-item" href="?page=friends">Friends
                                     <?php
                                         $requests = 0;
-                                        $pill_bg = 'bg-primary';
-                                        
-                                        if ($_SESSION['selected-slot'] > 1) {
-                                            $requests = get_friend_counts('requests');
-                                            $pill_bg  = 'bg-danger';
+                                        $requests = get_friend_counts('requests');
+                                        $pill_bg  = 'bg-danger';
 
-                                            if (!$requests) {
-                                                $pill_bg = 'bg-primary';
-                                            }
+                                        if (!$requests) {
+                                            $pill_bg = 'bg-primary';
                                         }
                                     ?>
     <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $requests; ?></span>
