@@ -301,7 +301,7 @@
 
                         <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 fixed-bottom" style="width: 15%;">
                             <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
-                                <span><img src="img/avatars/<?php $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
+                                <span><img src="img/avatars/<?php echo $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
                             </a>
                             
                             <a href="#" class="text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -376,7 +376,7 @@
                             exit();
                         }
                         
-                        include('navs/nav-summary.php');
+                        //include('navs/nav-summary.php');
 
                         if (isset($_REQUEST['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_REQUEST['page']);
@@ -396,6 +396,8 @@
 
             <div aria-live="polite" aria-atomic="true" class="position-relative">
                 <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
+                    <!-- Toast placeholder -->
+                </div>
             </div>
         </div>
     </body>

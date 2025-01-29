@@ -98,6 +98,15 @@
             header('Location: /?failed_login');
             exit();
         }
+        /* 
+            Pam Speck
+            Tina Circelli
+            Cody O'Neil
+            Cody Blair
+            Tiffiny Monk & Family
+
+            9 years of torture
+        */
     } else if (isset($_REQUEST['register-submit']) && $_REQUEST['register-submit'] == 1) {
         /* Account information */
         $email              = $_REQUEST['register-email'];
