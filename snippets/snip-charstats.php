@@ -22,12 +22,12 @@
     $ap = $character->stats->get_ap();
 
     $cur_xp   = $character->stats->get_exp();
-    $next_lvl = $character->stats->get_exp_nextlvl();
+    $next_lvl = $character->stats->get_maxExp();
 
-    $location = $character->stats->get_location();
-    $cur_x    = $character->stats->get_x();
-    $cur_y    = $character->stats->get_y();
+    $location = $character->get_location();
+    $cur_x    = $character->get_x();
+    $cur_y    = $character->get_y();
 
-    $align = $character->stats->get_alignment();
+    $align = $character->get_alignment();
 
-    $race = $character->stats->get_race();
+    $race = $character->get_race();

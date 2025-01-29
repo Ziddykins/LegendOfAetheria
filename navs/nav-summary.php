@@ -34,7 +34,7 @@
                         <?php else: ?>
                             <i class="bi bi-capslock"></i>
                         <?php endif; ?>
-                        <u><?php echo $character['name']; ?></u>
+                        <u><?php echo $character->get_name(); ?></u>
                     </div>
                 </div>
                 <div class="row float-right">

@@ -3,13 +3,13 @@
     $mp_textcolor = 'text-black';
     $ep_textcolor = 'text-black';
 
-    $cur_hp       = $character->get_hp();
-    $cur_mp       = $character->get_mp();
-    $cur_ep       = $character->get_ep();
+    $cur_hp       = $character->stats->get_hp();
+    $cur_mp       = $character->stats->get_mp();
+    $cur_ep       = $character->stats->get_ep();
 
-    $max_hp       = $character->get_maxHp();
-    $max_mp       = $character->get_maxMp();
-    $max_ep       = $character->get_maxEp();
+    $max_hp       = $character->stats->get_maxHp();
+    $max_mp       = $character->stats->get_maxMp();
+    $max_ep       = $character->stats->get_maxEp();
 
     if (50 >= $cur_hp / $max_hp * 100) {
         $hp_textcolor = 'text-white';
@@ -60,8 +60,8 @@
                                     <div class="col-4">
                                         <span id="hp" name="hp"   
                                             class="ldBar label-center <?php echo $hp_textcolor; ?>"
-                                            data-value="<?php echo $character->get_hp(); ?>"
-                                            data-max="<?php echo $character->get_maxHp(); ?>"
+                                            data-value="<?php echo $character->stats->get_hp(); ?>"
+                                            data-max="<?php echo $character->stats->get_maxHp(); ?>"
                                             data-preset="energy"
                                             data-pattern-size="120"
                                         >
@@ -69,8 +69,8 @@
                                     <div class="col-4">
                                         <span id="mp" name="mp"
                                             class="ldBar label-center <?php echo $mp_textcolor; ?>"
-                                            data-value="<?php echo $character->get_mp(); ?>"
-                                            data-max="<?php echo $character->get_maxMp(); ?>"
+                                            data-value="<?php echo $character->stats->get_mp(); ?>"
+                                            data-max="<?php echo $character->stats->get_maxMp(); ?>"
                                             data-preset="energy"
                                             data-pattern-size="120"
                                         >
@@ -78,8 +78,8 @@
                                     <div class="col-4">
                                         <span id="ep" name="ep"   
                                             class="ldBar label-center <?php echo $ep_textcolor; ?>"
-                                            data-value="<?php echo $character->get_ep(); ?>"
-                                            data-max="<?php echo $character->get_maxEp(); ?>"
+                                            data-value="<?php echo $character->stats->get_ep(); ?>"
+                                            data-max="<?php echo $character->stats->get_maxEp(); ?>"
                                             data-preset="energy"
                                             data-pattern-size="120"
                                         >
@@ -112,13 +112,13 @@
                                 </div>
                                 <div class="row mb-3 fs-1">
                                     <div class="col-4">
-                                        <?php echo $character->get_str(); ?>
+                                        <?php echo $character->stats->get_str(); ?>
                                     </div>
                                     <div class="col-4 fs-1">
-                                        <?php echo $character->get_def(); ?>
+                                        <?php echo $character->stats->get_def(); ?>
                                     </div>
                                     <div class="col-4 fs-1">
-                                        <?php echo $character->get_int(); ?>
+                                        <?php echo $character->stats->get_int(); ?>
                                     </div>
                                 </div>
                             </div>
