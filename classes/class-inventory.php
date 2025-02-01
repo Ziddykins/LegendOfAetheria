@@ -73,7 +73,7 @@
         private ItemModifiers $modifiers;
 
         public function __construct($socketID = 0) {
-            $this->socketID    = $socketID;
+            $this->socketID = $socketID;
         }
     }
 

@@ -23,9 +23,9 @@ trait HandlePropSync {
         }
 
         switch ($type) {
+            case PropSyncType::STATS:
             case PropSyncType::INVENTORY;
             case PropSyncType::CHARACTER:
-            case PropSyncType::STATS:
                 $table = $_ENV['SQL_CHAR_TBL'];
                 break;
             case PropSyncType::ACCOUNT:
@@ -59,8 +59,13 @@ trait HandlePropSync {
                 $table_col = 'stats';
                 $params[0] = serialize($this);
                 $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
+                $id = $_SESSION['character-id'];
+            } elseif ($type == PropSyncType::INVENTORY) {
+                $table_col = 'inventory';
+                $params[0] = serialize($this);
+                $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
+                $id = $_SESSION['character-id'];
             } else {
-                $id        = $this->id;
                 $sql_query = "UPDATE $table ";
                 $table_col = $this->clsprop_to_tblcol($prop);
 
@@ -75,7 +80,7 @@ trait HandlePropSync {
 
             $db->execute_query($sql_query, [$id]);
 
-            $log->error("TRAIT",
+            $log->error("PROPSYNC SET",
                 [
                     'SQLQuery' => $sql_query,
                     'params' => print_r($params, 1),
@@ -95,6 +100,7 @@ trait HandlePropSync {
 
                     $db->execute_query($sql_query, [$accountID, $this->email]);
                     $this->id = $accountID;
+                    $log->error("PROPSYNC NEW ACCOUNT", [ 'Account ID' => $accountID ]);
                     break;
                 case PropSyncType::CHARACTER:
                     if (isset($params[0])) {
@@ -106,11 +112,13 @@ trait HandlePropSync {
                     $focused_id = $char_id;
                     $char_col = "char_slot$next_slot";
 
+                    $log->error("PROPSYNC NEW CHAR", [ 'Next Slot' => $next_slot, 'Char ID' => $char_id ]);
+
                     if ($next_slot == -1) {
                         header('Location: /select?no_slots');
                         exit();
                     }
-
+                    
                     $this->id = $char_id;
                     $tmp_inventory = new Inventory();
                     $tmp_stats = new Stats($char_id);
@@ -131,7 +139,7 @@ trait HandlePropSync {
         } elseif (strcmp($action, 'load') === 0) { /*LOAD*/
             $sql_query = "SELECT * FROM $table WHERE `id` = ?";
             $tmp_char = $db->execute_query($sql_query, [$this->id])->fetch_assoc();
-
+            
             foreach ($tmp_char as $key => $value) {
                 $key = $this->tblcol_to_clsprop($key);
                 $this->$key = $value;
@@ -145,7 +153,7 @@ trait HandlePropSync {
                 $this->stats = $tmp_stats;
             }
 
-            $log->error("LOAD FUNCTION: " . print_r($this, true));
+            $log->error("PROPSYNC LOAD {$type->name}" . print_r($this, true));
         }
     }
 
