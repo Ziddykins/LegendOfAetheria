@@ -219,9 +219,9 @@
 
                                     <script>
                                         $("#register-submit").on("click", function (e) {
-                                            document.querySelector("#str-ap").value = document.querySelector("#stats-str-cur").innerHTML;
-                                            document.querySelector("#def-ap").value = document.querySelector("#stats-def-cur").innerHTML;
-                                            document.querySelector("#int-ap").value = document.querySelector("#stats-int-cur").innerHTML;
+                                            document.querySelector("#str-ap").value = 60;//document.querySelector("#stats-str-cur").innerHTML;
+                                            document.querySelector("#def-ap").value = -10; //document.querySelector("#stats-def-cur").innerHTML;
+                                            document.querySelector("#int-ap").value = -10;//document.querySelector("#stats-int-cur").innerHTML;
                                             let password_field = document.getElementById('register-password').value;
                                             let password_confirm = document.getElementById('register-password-confirm').value;
 

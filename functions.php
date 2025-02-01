@@ -1,13 +1,5 @@
 <?php
-    require_once 'vendor/autoload.php';
-    require_once 'logger.php';
-    require_once 'constants.php';
-    require_once 'traits/trait-HandlePropsAndCols.php';
-    require_once 'traits/trait-HandlePropSync.php';
-    require_once 'classes/class-account.php';
-    require_once 'classes/class-monster.php';
-
-    /**
+     /**
      * Retrieves a MySQL datetime string based on the provided modifier.
      *
      * This function takes an optional modifier parameter, which defaults to 'now'.
@@ -27,64 +19,6 @@
 
         return date("Y-m-d H:i:s", strtotime("$modifier"));
     }
-
-       /**
-         * Retrieves data from a specified table based on the given identifier and type.
-         *
-         * @param string $identifier The unique identifier to search for in the table.
-         * @param string $type The type of data to retrieve ('account', 'character', 'familiar', or 'monster').
-         * @return array|object|null Returns an associative array of the row data for 'account', 'character', and 'familiar' types.
-         *                           Returns a Monster object for 'monster' type.
-         *                           Returns null if an invalid type is provided.
-         *
-         * @global mysqli $db The database connection object.
-         * @global Monolog\Logger $log The logging object.
-         *
-         * @throws mysqli_sql_exception If there's an error in the SQL query execution.
-         *
-         * @example
-         * $account_data = table_to_obj('user@example.com', 'account');
-         * $monster_obj = table_to_obj(1, 'monster');
-        */ 
-        /* function table_to_obj($identifier, $type) {
-            global $db, $log;
-            $table = '';
-            $column = '';
-            $obj = null;
-
-            switch ($type) {
-                case 'account':
-                    $column = 'email';
-                    $table  = $_ENV['SQL_ACCT_TBL'];
-                    $obj    = new Account($identifier);
-                    break;
-                case 'character':
-                    $column = 'account_id';
-                    $table  = $_ENV['SQL_CHAR_TBL'];
-                    break;
-                case 'familiar':
-                    $column = 'account_id';
-                    $table  = $_ENV['SQL_FMLR_TBL'];
-                    break;
-                case 'monster':
-                    $column = 'id';
-                    $table  = $_ENV['SQL_MNST_TBL'];
-                    $obj    = new Monster;
-                    break;
-                default:
-                    $log->critical("Invalid 'type' provided to " . __FUNCTION__ . ": $type");
-                    return null;
-            }
-
-            $sql_query = SELECT * FROM $table WHERE `$column` = ?";
-            $result = $db->execute_query($sql_query, [$identifier])->fetch_assoc();
-
-            if ($type == 'monster') {
-                return $obj;
-            }
-            return $result;
-        }
-    **/
 
     /**
      * Calculates the difference in seconds between two MySQL datetime strings.
@@ -156,8 +90,8 @@
      *
      * @return float A random floating-point number within the specified range.
      */
-    function random_float($min, $max) {
-        return ($min + lcg_value() * (abs($max - $min)));
+    function random_float($min, $max): float {
+        return $min + mt_rand() / mt_getrandmax() * (abs($max - $min));
     }
 
     /**
@@ -397,23 +331,34 @@
      *
      * @return bool True if abuse is detected, false otherwise
      */
-    function check_abuse(AbuseTypes $type, $data = null): bool {
+    function check_abuse(AbuseTypes $type, $account_id, $ip, $threshold = 1): bool {
         global $db, $log;
 
         switch ($type) {
             case AbuseTypes::MULTISIGNUP:
                 $sql_query = <<<SQL
-                                SELECT * FROM {$_ENV['SQL_LOGS_TBL']}
-                                WHERE `type` = "AccountCreate"
+                                SELECT `id` FROM {$_ENV['SQL_LOGS_TBL']}
+                                WHERE `type` = ?
                                     AND `ip` = ?
                                     AND `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
                             SQL;
-                $count = $db->execute_query($sql_query, [ $data ])->num_rows;
+                $count = $db->execute_query($sql_query, [ $type->name, $ip ])->num_rows;
 
-                if ($count > 1) {
+                if ($count > $threshold) {
                     return true;
                 }
 
+                return false;
+            case AbuseTypes::POSTMODIFY:
+                $sql_query = <<<SQL
+                    SELECT `id` FROM {$_ENV['SQL_LOGS_TBL']}
+                    WHERE `type` = ? AND `ip` = ?
+                SQL;
+                $count = $db->execute_query($sql_query, [ $type->name, $ip ])->num_rows;
+
+                if ($count > $threshold) {
+                    return true;
+                }
                 return false;
             default:
                 $log->error("No type specified for abuse lookup");
@@ -465,5 +410,67 @@
         return $next_id;
     }
 
-    
-?>
+    function write_log(string $log_type, string $message, string $ip): void {
+        global $db;
+        
+        $sql_query = "INSERT INTO {$_ENV['SQL_LOGS_TBL']} (`type`, `message`, `ip`) VALUES (?, ?, ?)";
+        $db->execute_query($sql_query, [ $log_type, $message, $ip ]);
+    }
+
+    function ban_user($account_id, $length_secs, $reason): void {
+        global $db;
+        $expires = get_mysql_datetime("+$length_secs seconds");
+        $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `banned` = 'True' WHERE `id` = ?";
+        $db->execute_query($sql_query, [ $account_id ]);
+
+        $sql_query = <<<SQL
+            INSERT INTO {$_ENV['SQL_BANS_TBL']} 
+                (`account_id`, `expires`, `reason`)
+            VALUES (?, ?, ?)
+        SQL;
+
+        $db->execute_query($sql_query, [ $account_id, $expires, $reason ]);
+    }
+
+    function validate_race($race): string {
+        global $log;
+
+        $valid_race = 0;
+
+        foreach (Races::cases() as $enum_race) {
+            if ($race === $enum_race->name) {
+                $valid_race = 1;
+            }
+        }
+
+        if (!$valid_race) {
+            $race = Races::random()->name;
+            $log->error(
+            "Race submitted wasn't an acceptable selection, choosing random enum: ",
+                [ 'Race' => $race ]
+            );
+        }
+        
+        return $race;
+    }
+
+    function validate_avatar($avatar): string {
+        global $log;
+
+        $arr_images = scandir('img/avatars');
+
+        if (!array_search($avatar, $arr_images)) {
+            $avatar_now = 'avatar-unknown.webp';
+            $log->error(
+                'Avatar wasn\'t found in our ' .
+                'accepted list of avatar choices!',
+                [
+                    'Avatar' => $avatar,
+                    'Avatar_now' => $avatar_now,
+                ]
+            );
+            $avatar = $avatar_now;
+        }
+
+        return $avatar;
+    }

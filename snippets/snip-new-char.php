@@ -9,7 +9,7 @@
             </div>
 
             <div class="modal-body">
-                <form id="create-form" name="create-form" action="/" method="POST">
+                <form id="create-form" name="create-form" action="/select" method="POST">
                     <div class="d-flex bg-body-secondary border">
                         <div class="p-2 flex-grow-1">
                             <h6>
@@ -91,34 +91,35 @@
                 
                     <div class="d-flex border">
                         <div class="p-2 fw-bold font-monospace flex-grow-1"><i class="bi bi-heart-arrow"></i> str:</div>
-                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-danger" onclick="stat_adjust("str-minus");">&minus;</a></div>
+                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-danger" onclick='stat_adjust("str-minus")'>&minus;</a></div>
                         <div class="p-2" id="stats-str-cur">10</div>                                        
-                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-success" onclick="stat_adjust("str-plus");">&plus;</a>
+                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-success" onclick='stat_adjust("str-plus")'>&plus;</a>
                         </div>
                     </div>
                     
                     <div class="d-flex border">
                         <div class="p-2 fw-bold font-monospace flex-grow-1"><i class="bi bi-shield"></i> def:</div>
-                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-danger" onclick="stat_adjust("def-minus");">&minus;</a></div>
+                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-danger" onclick='stat_adjust("def-minus")'>&minus;</a></div>
                         <div class="p-2" id="stats-def-cur">10</div>
-                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-success" onclick="stat_adjust("def-plus");">&plus;</a></div>
+                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-success" onclick='stat_adjust("def-plus")'>&plus;</a></div>
                     </div>
                 
                     <div class="d-flex border">
                         <div class="p-2 fw-bold font-monospace flex-grow-1"><i class="bi bi-stars"></i> int:</div>
-                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-danger" onclick="stat_adjust("int-minus");">&minus;</a></div>
+                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-danger" onclick='stat_adjust("int-minus")'>&minus;</a></div>
                         <div class="p-2" id="stats-int-cur">10</div>
-                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-success" onclick="stat_adjust("int-plus");">&plus;</a></div>
+                        <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-success" onclick='stat_adjust("int-plus")'>&plus;</a></div>
                     </div>
                     
                     <input type="text" id="str-ap" name="str-ap" hidden />
                     <input type="text" id="def-ap" name="def-ap" hidden />
                     <input type="text" id="int-ap" name="int-ap" hidden />
+                    <input type="text" id="slot"   name="slot"   hidden />
                     
                     <p></p>
                     
                     
-                </form>
+                
             </div>
 
             <div class="modal-footer">
@@ -127,7 +128,7 @@
                         <i class="bi bi-clipboard-plus-fill"></i> Create
                     </button>
                 </div>
-            
+                
                 <script>
                     $("#create-submit").on("click", function (e) {
                         document.querySelector("#str-ap").value = document.querySelector("#stats-str-cur").innerHTML;
@@ -153,11 +154,8 @@
                         };
                     });
                 </script>
+            </form>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    const myModal = new bootstrap.Modal(document.getElementById("create-character-modal"));
-</script>

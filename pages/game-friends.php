@@ -1,8 +1,13 @@
 <?php
     global $db, $log;
-    $account         = table_to_obj($_SESSION['email'], 'account');
-    $character       = table_to_obj($account->get_id(), 'character');
-    $header_charname = $character['name'] . "'s";
+    $account = new Account($_SESSION['email']);
+    $account->load();
+
+    $character = new Character($account->get_id());
+    $character->set_id($_SESSION['character-id']);
+    $character->load();
+
+    $header_charname = $character->get_name() . "'s";
         
     $requests = $requested = $friends = $blocked = Array();
     
@@ -27,8 +32,8 @@
         }
     }
 
-    if (substr($character['name'], -1, 1) == "s") {
-        $header_charname = $character['name'] . "'";
+    if (substr($character->get_name(), -1, 1) == "s") {
+        $header_charname = $character->get_name() . "'";
     }
     
     if ($_REQUEST['page'] == 'friends') {
