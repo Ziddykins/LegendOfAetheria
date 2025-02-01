@@ -81,28 +81,20 @@ if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
                 $character->stats->set_str($str);
                 $character->stats->set_def($def);
 
-                break;
+                header('Location: /select');
+                exit();
             case 'delete':
                 /* Get character ID in that slot */
                 $sql_query = "SELECT `$char_slot` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
-                $char_id = $db->execute_query(
-                    $sql_query,
-                    [$_SESSION['account-id']]
-                )->fetch_assoc()["$char_slot"];
+                $char_id = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc()["$char_slot"];
 
                 /* Clear that slot */
                 $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$char_slot` = NULL WHERE `id` = ?";
-                $db->execute_query(
-                    $sql_query,
-                    [$_SESSION['account-id']]
-                );
+                $db->execute_query($sql_query, [ $_SESSION['account-id'] ]);
 
                 /* Delete that character */
                 $sql_query = "DELETE FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
-                $db->execute_query(
-                    $sql_query,
-                    [$char_id]
-                );
+                $db->execute_query($sql_query, [ $char_id ]);
 
                 $log->warning(
                     "Character Deleted",
@@ -112,7 +104,9 @@ if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
                         'Slot'        => $slot
                     ]
                 );
-                break;
+
+                header('Location: /select');
+                exit();
         }
     }
 } else {

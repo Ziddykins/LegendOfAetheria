@@ -62,7 +62,7 @@
                                             class="ldBar label-center <?php echo $hp_textcolor; ?>"
                                             data-value="<?php echo $character->stats->get_hp(); ?>"
                                             data-max="<?php echo $character->stats->get_maxHp(); ?>"
-                                            data-preset="energy"
+                                            data-preset="bubble"
                                             data-pattern-size="120"
                                         >
                                     </div>
@@ -71,7 +71,7 @@
                                             class="ldBar label-center <?php echo $mp_textcolor; ?>"
                                             data-value="<?php echo $character->stats->get_mp(); ?>"
                                             data-max="<?php echo $character->stats->get_maxMp(); ?>"
-                                            data-preset="energy"
+                                            data-preset="stripe"
                                             data-pattern-size="120"
                                         >
                                     </div>
@@ -130,3 +130,4 @@
         </div>
     </div>
 </div>
+<script src="/js/loading-bar.js"></script>

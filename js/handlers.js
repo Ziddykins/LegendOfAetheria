@@ -23,15 +23,35 @@ function save_settings(which) {
     let toggle_sw  = document.getElementById("ip-lock-switch").checked == true ? 'on' : 'off';    
 
     if (which == 'ip_lock') {
-        $.ajax({
-            type: "POST",
-            url: "/save",
-            data: `save=ip_lock&ip=${ip_address}&status=${toggle_sw}`,
-            success: function(ret) {
+        fetch('/save', {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'text/plain'
+                },
+                method: 'POST',
+                body: `save=ip_lock&ip=${ip_address}&status=${toggle_sw}`})
+            .then((response) => {
+                if (!response.ok) {
+                    return response.text().then((data) => {
+                        throw new Error(data);
+                    });
+                } else {
+                    return response.text();
+                }
+            })
+            .then((data) => {
+                $("#status-msg").removeClass('text-danger');
+                $("#status-msg").addClass('text-success');
                 $("#status-msg").fadeIn(1000);
-                $("#status-msg").text(ret);
-                $("#status-msg").fadeOut(1000);
-            }
-        });
+                $("#status-msg").text(data);
+                $("#status-msg").fadeOut(5000);
+            })
+            .catch((error) => {
+                $("#status-msg").removeClass('text-success');
+                $("#status-msg").addClass('text-danger');
+                $("#status-msg").fadeIn(1000);
+                $("#status-msg").text(error);
+                $("#status-msg").fadeOut(5000);
+            });
+        }
     }
-}
