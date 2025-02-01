@@ -97,7 +97,11 @@ trait HandlePropSync {
                     $this->id = $accountID;
                     break;
                 case PropSyncType::CHARACTER:
-                    $next_slot = $this->getNextCharSlotID($this->accountID);
+                    if (isset($params[0])) {
+                        $next_slot = $params[0];
+                    } else {
+                        $next_slot = $this->getNextCharSlotID($this->accountID);
+                    }
                     $char_id = getNextTableId($_ENV['SQL_CHAR_TBL']);
                     $focused_id = $char_id;
                     $char_col = "char_slot$next_slot";

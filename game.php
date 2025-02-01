@@ -5,10 +5,7 @@
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 
-    require_once 'logger.php';
-    require_once 'db.php';
-    require_once 'constants.php';
-    require_once 'functions.php';
+    require_once "bootstrap.php";
     
     $classes = scandir('classes/');
 
@@ -359,6 +356,13 @@
                                         echo "\n\t\t\t\t\t\t\t\t</li>\n";
                                     }
                                 ?>
+                                
+                                <li>
+                                    <a class="dropdown-item" href="/select">Select Character</a>
+                                    <?php $_SESSION['focused-slot'] = 0; ?>
+                                </li>
+                                        
+                                </li>
 <li>
                                     <a class="dropdown-item" href="/logout">Sign out</a>
                                 </li>

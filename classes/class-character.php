@@ -99,8 +99,8 @@
                     
                     <div class="card-footer d-grid gap-2">
                         <form id="select-char-' . $slot . '" action="/select" method="POST">
-                            <button id="select-delete-' . $slot . '" name="select-delete-' . $slot . '" class="btn btn-sm btn-outline-danger pe-3" value="' . $slot . '">Delete</a>
-                            <button id="select-load-' . $slot . '" name="select-load-' . $slot . '" class="btn btn-sm btn-primary" value="' . $slot . '">Load</a>
+                            <button id="select-delete-' . $slot . '" name="select-delete-' . $slot . '" class="btn btn-sm btn-outline-danger pe-3" value="' . $slot . '">Delete</button>
+                            <button id="select-load-' . $slot . '" name="select-load-' . $slot . '" class="btn btn-sm btn-primary" value="' . $slot . '">Load</button>
                         </form>
                     </div>
                 </div>';
