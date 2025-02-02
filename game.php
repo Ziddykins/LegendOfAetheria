@@ -16,7 +16,7 @@
             $class = "classes/$file_name.php";
             require_once (string) $class;
         } else {
-            $log->warning("Skipping non-php file in classes folder: $file_name");
+            $log->info("Skipping non-php file in classes folder: $file_name");
         }
     }
 
@@ -55,11 +55,8 @@
             if (password_verify($old_password, $account->get_password())) {
                 if ($new_password === $confirm_password) {
                     $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-                    $sql_query = 'UPDATE ' . $_ENV['SQL_ACCT_TBL'] . ' ' .
-                                 'SET `password` = ? WHERE `email` = ?';
-                    $prepped   = $db->prepare($sql_query);
-                    $prepped->bind_param('ss', $hashed_password, $account_email);
-                    $prepped->execute();
+                    $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `password` = ? WHERE `email` = ?";
+                    $db->execute_query($sql_query);
          
                     session_regenerate_id();
                     header('Location: /logout?action=pw_reset&result=pass');

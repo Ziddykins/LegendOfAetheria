@@ -152,7 +152,7 @@ class Familiar {
             }
             $key = preg_replace("/[^a-zA-Z_]/", '', $key);
             $table_column = $this->clsprop_to_tblcol($key);
-            $log->error("key: $key tblcol: $table_column");
+            $log->debug("key: $key tblcol: $table_column");
             $this->$key = $familiar[$table_column];
         }
     }

@@ -1,0 +1,36 @@
+<style>
+.logo-container {
+    position: relative;
+    width: 100%;
+}
+
+.ee-dot {
+    position: absolute;
+    top: 0%;
+    left: 91%;
+    width: 7px;
+    height: 7px;
+    cursor: zoom-in;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+
+.ee-dot:hover {
+    transform: scale(1.2);
+}
+</style>
+
+<script>
+let clickCount = 0;
+
+function handleEasterEgg() {
+    clickCount++;
+    const dot = document.querySelector('.ee-dot');
+    
+    if (clickCount === parseInt(Math.random(100)*100)) {
+        dot.style.backgroundColor = 'rgba(255, 0, 0, 0.5)';
+        console.log("Easter egg activated!");
+        
+    }
+}
+</script>

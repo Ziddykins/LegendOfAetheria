@@ -35,7 +35,7 @@
             $account = new Account($email);
             $account->load($account_id);
         } else {
-            $log->error('Attempted login with a non-existing account', [ 'Email' => $email ]);
+            $log->warning('Attempted login with a non-existing account', [ 'Email' => $email ]);
             header("Location: /?do_register&email=$email");
             exit();
         }
@@ -45,7 +45,7 @@
             /* Check if account is IP locked and verify IP logging in matches stored IP lock address */
             if ($account->get_ipLock() == 'True') {
                 if ($account->get_ipLockAddr() != $_SERVER['REMOTE_ADDR']) {
-                    $log->info("User tried to login from non-matching IP address on IP locked account",
+                    $log->warning("User tried to login from non-matching IP address on IP locked account",
                         [ "On File" => $account->get_ipLockAddr(), "Current" => $_SERVER['REMOTE_ADDR'] ]);
                     header('Location: /?ip_locked');
                     exit();
@@ -70,8 +70,7 @@
         } else {
             $ip = $_SERVER['REMOTE_ADDR'];
             $sql_query_get_count = <<<SQL
-                SELECT COUNT(*) AS `count` FROM {$_ENV['SQL_LOGS_TBL']} WHERE
-                    `ip` = ? AND
+                SELECT COUNT(*) AS `cound` FROM {$_ENV['SQL_LOGS_TBL']} WHERE        `ip` = ? AND
                     `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW() AND
                     `type` = 'MULTISIGNUP'
                 SQL;
@@ -130,7 +129,7 @@
                     
                     /* Hasn't been found creating multiple accounts */
                     if (check_abuse(AbuseTypes::MULTISIGNUP, $account->get_id(), $ip_address, 3)) {
-                        header('Location: /?abuse_signup');
+                        ban_user($account->get_id(), 3600, "Multiple accounts within allotted time frame");
                         exit();
                     }
 
@@ -191,7 +190,10 @@
             <div id="login-container" class="container shadow border border-secondary" style="max-width:550px; width: 100%;">
                 <div class="row">
                     <div class="col p-4">
-                        <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" class="w-100" #a/>
+                        <div class="logo-container">
+                            <img src="img/logos/logo-banner-no-bg.webp" alt="main-logo" class="w-100" />
+                            <div class="ee-dot" onclick="handleEasterEgg()"></div>
+                        </div>
                     </div>
                 </div>
                 

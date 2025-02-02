@@ -142,6 +142,7 @@
         case GLOBAL;
         case ZONE;
         case PERSONAL;
+        case NONE;
     }
     
     enum MonsterClass {
@@ -212,6 +213,7 @@
         case FAMILIAR;
         case INVENTORY;
         case STATS;
+        case MONSTER;
     }
 
     enum GEMSTONE {

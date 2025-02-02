@@ -302,22 +302,21 @@
         }
 
         foreach ($monsters_arr as $monster) {
-            $temp_monster = new Monster(MonsterScope::PERSONAL, null, $_ENV['SQL_MNST_TBL']);
+            $temp_monster = new Monster(MonsterScope::NONE, 0);
             $temp_stats_arr = explode(',', $monster);
 
-            $temp_monster->set_name($temp_stats_arr[0]);
-            $temp_monster->set_hp($temp_stats_arr[1]);
-            $temp_monster->set_maxHP($temp_stats_arr[2]);
-            $temp_monster->set_mp($temp_stats_arr[3]);
-            $temp_monster->set_maxMP($temp_stats_arr[4]);
-            $temp_monster->set_strength($temp_stats_arr[5]);
-            $temp_monster->set_intelligence($temp_stats_arr[6]);
-            $temp_monster->set_defense($temp_stats_arr[7]);
-            $temp_monster->set_dropLevel($temp_stats_arr[8]);
-            $temp_monster->set_expAwarded($temp_stats_arr[9]);
-            $temp_monster->set_goldAwarded($temp_stats_arr[10]);
-            $temp_monster->set_monsterClass($temp_stats_arr[11]);
-            $temp_monster->set_seed(rand(0, time()));
+            $temp_monster->set_name($temp_stats_arr[0], false);
+            $temp_monster->set_hp((int)$temp_stats_arr[1], false);
+            $temp_monster->set_maxHP((int)$temp_stats_arr[2], false);
+            $temp_monster->set_mp((int)$temp_stats_arr[3], false);
+            $temp_monster->set_maxMP((int)$temp_stats_arr[4], false);
+            $temp_monster->set_strength((int)$temp_stats_arr[5], false);
+            $temp_monster->set_intelligence((int)$temp_stats_arr[6], false);
+            $temp_monster->set_defense((int)$temp_stats_arr[7], false);
+            $temp_monster->set_dropLevel((int)$temp_stats_arr[8], false);
+            $temp_monster->set_expAwarded((int)$temp_stats_arr[9], false);
+            $temp_monster->set_goldAwarded((int)$temp_stats_arr[10], false);
+            $temp_monster->set_monsterClass($temp_stats_arr[11], false);
             array_push($monster_pool->monsters, $temp_monster);
         }
         $log->info(count($monster_pool->monsters) . " monsters loaded into pool");
@@ -445,7 +444,7 @@
 
         if (!$valid_race) {
             $race = Races::random()->name;
-            $log->error(
+            $log->critical(
             "Race submitted wasn't an acceptable selection, choosing random enum: ",
                 [ 'Race' => $race ]
             );
@@ -461,7 +460,7 @@
 
         if (!array_search($avatar, $arr_images)) {
             $avatar_now = 'avatar-unknown.webp';
-            $log->error(
+            $log->critical(
                 'Avatar wasn\'t found in our ' .
                 'accepted list of avatar choices!',
                 [

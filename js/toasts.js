@@ -73,6 +73,16 @@ $(document).ready(function() {
         gen_toast('abuse-signup', 'danger', 'bi-slash-circle', 'Sign-Up Abuse', 'Throttled; too many account creations!');
     } else if (query.has('ip_locked')) {
         gen_toast('ip-locked-fail', 'danger', 'bi-exclamation-octagon-fill', 'IP Locked', 'IP Locked Account - Non-matching IP address');
+    } else if (query.has('page') && query.has('error')) {
+        if (query.get('page') == 'friends') {
+            if (query.get('error') == 'self_add') {
+                gen_toast('self-add', 'danger', 'bi-slash-circle', 'Adding Self', 'Cannot add yourself to friends list!');
+            } else if (query.get('error') == 'invalid_email') {
+                gen_toast('invalid-email', 'danger', 'bi-slash-circle', 'Invalid Email', 'Email supplied does not exist or you have been blocked');
+            } else if (query.get('error') == 'already_friend') {
+                gen_toast('already-friend', 'danger', 'bi-slash-circle', 'Already Friended', 'User already added as a friend!');
+            }
+        }
     }
 
 });
