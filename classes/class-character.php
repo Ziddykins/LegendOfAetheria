@@ -57,7 +57,7 @@
         public static function genSelectCard($characterID, $slot): string {
             global $db, $log;
             $cardHtml = null;
-            $log->error("Generating card", [ 'ID' => $characterID, 'Slot' => $slot]);
+            $log->debug("Generating card", [ 'ID' => $characterID, 'Slot' => $slot]);
 
             if ($characterID) {
                 $sqlQuery = "SELECT `name`, `avatar`, `race`, `stats` FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
@@ -192,7 +192,7 @@
         }
         public function __call($method, $params): mixed {
             global $log;
-            $log->error(		"STATS CLASS CALL", ['method' => $method, 'params' => $params]);
+            $log->debug(		"STATS CLASS CALL", ['method' => $method, 'params' => $params]);
             return $this->prop_sync($method, $params, PropsyncType::STATS);
         }
 

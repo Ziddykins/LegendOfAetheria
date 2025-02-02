@@ -74,10 +74,21 @@
                     if (isset($_REQUEST['friends-request-send'])) {
                         if (friend_status($requested_email) == FriendStatus::NONE) {
                             if (check_valid_email($requested_email)) {
-                                $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
-                                $db->execute_query($sql_query, [ $account->get_email(), $requested_email ]);
-                                $log->info('Friend request sent', [ 'email_1' => $account->get_email(), 'email_2' => $requested_email ]);
+                                if ($requested_email != $account->get_email()) {
+                                    $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
+                                    $db->execute_query($sql_query, [ $account->get_email(), $requested_email ]);
+                                    $log->info('Friend request sent', [ 'email_1' => $account->get_email(), 'email_2' => $requested_email ]);
+                                } else {
+                                    header('Location: /game?page=friends&error=self_add');
+                                    exit();
+                                }
+                            } else {
+                                header('Location: /game?page=friends&error=invalid_email');
+                                exit();
                             }
+                        } else {
+                            header('Location: /game?page=friends&error=already_friend');
+                            exit();
                         }
                     }
                 }
@@ -122,16 +133,18 @@
                     </div>
                     <?php
                         for ($i=0; $i<count($friends); $i++) {
-                            $temp_account   = table_to_obj($friends[$i]['email_1'], 'account');
-                            $sender_account = table_to_obj($temp_account->get_id(), 'character');
-                            clearstatcache();                            
-                            $check_user     = filesize((escapeshellcmd('/var/lib/php/sessions/sess_' . $temp_account->get_sessionID())));
+                            $temp_account   = new Account($friends[$i]['email_1']);
+                            $temp_account->load();
+                            $online = $temp_account->get_sessionID();
+                            $sender_account = new Character($temp_account->get_id());
+                            $sender_account->set_id($temp_account->get_charSlot1());
+                            $sender_account->load();
                             
-                            $log->info('Account online status: ', [ 'email' => $temp_account->get_email(), 'check_user' => $check_user ]);
+                          
                             $online_indicator = '<p class="badge bg-secondary"><i class="bi bi-lightbulb"></i> Offline</p>';
                             $msg_color = 'btn-secondary';
                             
-                            if ($check_user) {
+                            if ($online) {
                                 $online_indicator = '<p class="badge bg-success"><i class="bi bi-lightbulb-fill"></i> Online</p>';
                                 $msg_color = 'btn-success';
                             }
@@ -171,8 +184,12 @@
 
                     <?php
                         for ($i=0; $i<count($requests); $i++) {
-                            $temp_account   = table_to_obj($requests[$i]['email_1'], 'account');
-                            $sender_account = table_to_obj($temp_account->get_id(), 'character');
+                            $temp_account   = new Account($requests[$i]['email_1']);
+                            $temp_account->load();
+                            $sender_account = new Character($temp_account->get_id());
+                            $sender_account->set_id($temp_account->get_charSlot1());
+                            $sender_account->load();
+                            
                             echo '<form id="accept-request-' . $sender_account->get_accountID() . '" name="accept-request-'. $sender_account->get_accountID(). '" action="/game?page=friends&action=accept_request" method="POST">';
                             echo '<div class="row mb-3">
                                     <div class="card" style="max-width: 540px;">

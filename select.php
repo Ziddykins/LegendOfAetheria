@@ -96,7 +96,7 @@ if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
                 $sql_query = "DELETE FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
                 $db->execute_query($sql_query, [ $char_id ]);
 
-                $log->warning(
+                $log->info(
                     "Character Deleted",
                     [
                         'AccountID'   => $_SESSION['account-id'],

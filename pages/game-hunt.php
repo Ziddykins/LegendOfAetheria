@@ -14,7 +14,7 @@
         $mon_str   = $monster->get_strength();
         $mon_int   = $monster->get_intelligence();
         $mon_def   = $monster->get_defense();
-        $character->set_monster($monster);
+        $character->set_monster(serialize($monster));
     } else {
         $monster = $character->get_monster();
     }

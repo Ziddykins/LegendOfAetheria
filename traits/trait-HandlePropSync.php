@@ -35,18 +35,21 @@ trait HandlePropSync {
             case PropSyncType::FAMILIAR:
                 $table = $_ENV['SQL_FMLR_TBL'];
                 break;
+            case PropSyncType::MONSTER:
+                $table = $_ENV['SQL_MNST_TBL'];
+                break;
             default:
                 exit(LOAError::FUNCT_PROPSYNC_TYPE);
         }
 
-        $log->error("In PropSync", [
+        $log->debug("In PropSync", [
             'Table' => $table,
             'Method' => $method,
             'Params' => print_r($params, true)
         ]);
 
         if (strcmp($action, "get") === 0) { /* GET */
-            $log->error("PROPSYNC GET", [ 'Type' => $type, 'Prop' => $prop, 'Return' => $this->$prop ]);
+            $log->debug("PROPSYNC GET", [ 'Type' => $type, 'Prop' => $prop, 'Return' => $this->$prop ]);
             return $this->$prop;
         } elseif (strcmp($action, 'set') === 0) { /* SET */
             $id = $this->id;
@@ -65,6 +68,10 @@ trait HandlePropSync {
                 $params[0] = serialize($this);
                 $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
                 $id = $_SESSION['character-id'];
+            } elseif ($type == PropSyncType::MONSTER) {
+                if ($params[1] === false) {
+                    return;
+                }
             } else {
                 $sql_query = "UPDATE $table ";
                 $table_col = $this->clsprop_to_tblcol($prop);
@@ -80,7 +87,7 @@ trait HandlePropSync {
 
             $db->execute_query($sql_query, [$id]);
 
-            $log->error("PROPSYNC SET",
+            $log->debug("PROPSYNC SET",
                 [
                     'SQLQuery' => $sql_query,
                     'params' => print_r($params, 1),
@@ -100,7 +107,7 @@ trait HandlePropSync {
 
                     $db->execute_query($sql_query, [$accountID, $this->email]);
                     $this->id = $accountID;
-                    $log->error("PROPSYNC NEW ACCOUNT", [ 'Account ID' => $accountID ]);
+                    $log->debug("PROPSYNC NEW ACCOUNT", [ 'Account ID' => $accountID ]);
                     break;
                 case PropSyncType::CHARACTER:
                     if (isset($params[0])) {
@@ -112,7 +119,7 @@ trait HandlePropSync {
                     $focused_id = $char_id;
                     $char_col = "char_slot$next_slot";
 
-                    $log->error("PROPSYNC NEW CHAR", [ 'Next Slot' => $next_slot, 'Char ID' => $char_id ]);
+                    $log->debug("PROPSYNC NEW CHAR", [ 'Next Slot' => $next_slot, 'Char ID' => $char_id ]);
 
                     if ($next_slot == -1) {
                         header('Location: /select?no_slots');
@@ -153,7 +160,7 @@ trait HandlePropSync {
                 $this->stats = $tmp_stats;
             }
 
-            $log->error("PROPSYNC LOAD {$type->name}" . print_r($this, true));
+            $log->debug("PROPSYNC LOAD {$type->name}" . print_r($this, true));
         }
     }
 
