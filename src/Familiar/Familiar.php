@@ -1,7 +1,13 @@
 <?php
-class Familiar {
-    use HandlePropsAndCols;
+namespace Game\Familiar;
 
+use Game\Inventory\Enums\ObjectRarity;
+use Game\Traits\PropConvert;
+use Game\Traits\PropSync;
+
+class Familiar {
+    use PropConvert;
+    use Propsync;
     protected $id;
     protected $characterID;
     protected $level;

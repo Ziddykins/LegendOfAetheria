@@ -1,7 +1,10 @@
 <?php
+    use Game\Account\Account;
+    use Game\Character\Character;
+    require_once "functions.php";
+
     $account   = new Account($_SESSION['email']);
     $character = new Character($_SESSION['character-id']);
-    #$character = table_    to_obj($account->get_id(), 'character');
     $monster   = null;
     
     if (!$character->get_monster()) {
@@ -14,7 +17,7 @@
         $mon_str   = $monster->get_strength();
         $mon_int   = $monster->get_intelligence();
         $mon_def   = $monster->get_defense();
-        $character->set_monster(serialize($monster));
+        $character->set_monster(safe_serialize($monster));
     } else {
         $monster = $character->get_monster();
     }
@@ -22,7 +25,6 @@
 
     echo '<pre>';
     print_r($character);
-    exit();
 ?>
 
 <div class="row row-cols-4 border border-1">

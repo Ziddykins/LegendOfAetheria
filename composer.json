@@ -4,5 +4,13 @@
         "monolog/monolog": "^3.8.1",
         "phpmailer/phpmailer": "^6.9.3",
         "orhanerday/open-ai": "^5.2"
+    },
+    "require-dev": {
+        "phpmd/phpmd" : "@stable"
+    },
+    "autoload": {
+        "psr-4": {
+            "Game\\": "src/"
+        }
     }
 }

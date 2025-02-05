@@ -1,26 +1,13 @@
 <?php
     declare(strict_types = 1);
+    use Game\Account\Account;
+    use Game\Account\Enums\Privileges;
+    use Game\Character\Character;
+    use Game\Monster\MonsterPool;
     session_start();
-    require 'vendor/autoload.php';
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-    $dotenv->safeLoad();
 
     require_once "bootstrap.php";
     
-    $classes = scandir('classes/');
-
-    for ($i=2; $i<count($classes); $i++) {
-        [$file_name, $file_ext] = explode('.', $classes[$i]);
-        
-        if ($file_ext === 'php') {
-            $class = "classes/$file_name.php";
-            require_once (string) $class;
-        } else {
-            $log->info("Skipping non-php file in classes folder: $file_name");
-        }
-    }
-
-
     $monster_pool = new MonsterPool;    
     load_monster_sheet($monster_pool);
 
@@ -345,9 +332,9 @@
                                     <hr class="dropdown-divider">
                                 </li>
                                 <?php
-                                    $privileges = UserPrivileges::name_to_value($account->get_privileges());
+                                    $privileges = Privileges::name_to_value($account->get_privileges());
                                             
-                                    if ($privileges > UserPrivileges::MODERATOR->value) {
+                                    if ($privileges > Privileges::MODERATOR->value) {
                                         echo "<li>\n\t\t\t\t\t\t\t\t\t";
                                         echo '<a class="dropdown-item" href="?page=administrator">Administrator</a>';
                                         echo "\n\t\t\t\t\t\t\t\t</li>\n";
@@ -370,9 +357,9 @@
 
                 <div id="content" name="content" class="container border border-danger" style="flex-shrink: 1;">
                     <?php
-                        $privileges = UserPrivileges::name_to_value($account->get_privileges());
+                        $privileges = Privileges::name_to_value($account->get_privileges());
                         
-                        if ($privileges == UserPrivileges::UNVERIFIED->value) {
+                        if ($privileges == Privileges::UNVERIFIED->value) {
                             include('html/verify.html');
                             exit();
                         }

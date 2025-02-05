@@ -37,6 +37,7 @@
                         <select class="form-select form-select form-control" style="font-size: 1.00rem;" aria-label=".form-select" id="race-select" name="race-select" required>
                             <option value="Select a Race" disabled selected>Select a Race</option>
                             <?php
+                                use Game\Character\Enums\Races;
                                 foreach (Races::cases() as $race_sel) {
                                     if ($race_sel->name == "Default") {
                                         continue;

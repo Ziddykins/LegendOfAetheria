@@ -1,13 +1,19 @@
 <?php
-    require 'classes/class-mail.php';
-    
-    $account   = new Account($_SESSION['email']); 
-    $Character = new Character($_SESSION['character-id']); 
 
-    $user_mailbox = new MailBox($account->get_id());
-    $user_mailbox->setFocusedFolder(MailFolderType::INBOX);
-    $user_mailbox->populateFocusedFolder();
-    $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
+use Game\Account\Account;
+use Game\Character\Character;
+use Game\Mail\MailBox;
+use Game\Mail\Enums\Type;
+
+
+$account   = new Account($_SESSION['email']); 
+$Character = new Character($_SESSION['character-id']); 
+
+$user_mailbox = new MailBox($account->get_id());
+$user_mailbox->setFocusedFolder(Type::INBOX);
+$user_mailbox->populateFocusedFolder();
+$inbox_count = $user_mailbox->focusedFolder->getMessageCount();
+
 ?>
 
 <div class="container text-white">
