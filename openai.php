@@ -1,20 +1,22 @@
 <?php
     declare(strict_types = 1);
     session_start();
-    require '../vendor/autoload.php';
-    require_once 'classes/class-openai.php';  
-    require_once 'logger.php';
-    require_once 'db.php';
-    require_once 'constants.php';
-    require_once 'functions.php';
+    
+    require_once "bootstrap.php";
+    use Game\Account\Account;
+    use Game\Character\Character;
+    use Game\OpenAI\OpenAI;
+    use Game\OpenAI\Enums\HttpMethod;
 
 
 
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 
-    $account   = table_to_obj($_SESSION['email'], 'account');
-    $character = table_to_obj($account['id'], 'character');
+    $account   = new Account($_SESSION['email']);
+    $character = new Character($account->get_id());
+    $character->set_id($_SESSION['character-id']);
+    $character->load();
 
   
     if (isset($_REQUEST['generate_description']) 
@@ -22,21 +24,30 @@
             && isset($_REQUEST['characterID'])) {
 
         
-        $credits = $account['credits'];
+        $credits = $account->get_credits();
 
     
         if ($credits < 1) {
             echo "Not Enough Credits\n";
             exit();
         } else {
-            $sql_query = 'UPDATE tbl_accounts SET credits = credits - 1 WHERE id = ?';
-            $account['credits']--;
-            $db->execute_query($sql_query, [ $account['id'] ]);
+            $credits--;
+            $account->set_credits($credits);
         }
 
-        $sql_query = "SELECT ch.`name`, ch.`race`, ch.`account_id`, ac.`credits` FROM {$_ENV['SQL_CHAR_TBL']} AS `ch` JOIN {$_ENV['SQL_ACCT_TBL']} AS `ac` ON (ch.`account_id` = ac.`id`) WHERE ac.`id` = ?;";
+        $sql_query = <<<SQL
+            SELECT
+                ch.`name`,
+                ch.`race`,
+                ch.`account_id`,
+                ac.`credits`
+            FROM {$_ENV['SQL_CHAR_TBL']} AS `ch`
+                JOIN {$_ENV['SQL_ACCT_TBL']} AS `ac`
+                    ON ch.`account_id` = ac.`id`
+            WHERE ac.`id` = ?
+        SQL;
 
-        $db->execute_query($sql_query, [ $account['id'] ]);
+        $db->execute_query($sql_query, [ $account->get_id() ]);
 
         $api_endpoint = 'https://api.openai.com/v1/chat/completions';
         
@@ -48,7 +59,7 @@
         $chatbot->set_model('gpt-3.5-turbo-1106');
         $chatbot->set_maxTokens(200);
 
-        $prompt = "Generate a character description for a(n) " . $character['race'] . " named " . $character['name'];
+        $prompt = "Generate a character description for a(n) " . $character->get_race() . " named " . $character->get_name();
 
         $data = [
             "model" => $chatbot->get_model(),

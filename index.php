@@ -1,28 +1,19 @@
 <?php
     declare(strict_types = 1);
+    use Game\Abuse\Enums\Type;
+    use Game\Account\Account;
+    use Game\Account\Enums\Privileges;
+    use Game\Character\Character;
+
+    require_once 'bootstrap.php';
+
     session_start();
-
-    require 'vendor/autoload.php';
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-    $dotenv->safeLoad();
-
-    require_once 'logger.php';
-    require_once 'db.php';
-    require_once 'constants.php';
-    require_once 'traits/trait-HandlePropsAndCols.php';
-    require_once 'traits/trait-HandlePropSync.php';
-    require_once 'functions.php';
-    require_once 'mailer.php';
-    
-    require_once 'classes/class-account.php';
-    require_once 'classes/class-inventory.php';
-    require_once 'classes/class-character.php';
 
     if (isset($_REQUEST['login-submit']) && $_REQUEST['login-submit'] == 1) {
         $email = $_REQUEST['login-email'];
         $password = $_REQUEST['login-password'];
 
-        $account  = null;
+        $account   = null;
 
         if (!check_valid_email($email)) {
             header('Location: /?invalid_email');
@@ -70,7 +61,7 @@
         } else {
             $ip = $_SERVER['REMOTE_ADDR'];
             $sql_query_get_count = <<<SQL
-                SELECT COUNT(*) AS `cound` FROM {$_ENV['SQL_LOGS_TBL']} WHERE        `ip` = ? AND
+                SELECT COUNT(*) AS `count` FROM {$_ENV['SQL_LOGS_TBL']} WHERE`ip` = ? AND
                     `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW() AND
                     `type` = 'MULTISIGNUP'
                 SQL;
@@ -95,7 +86,7 @@
         $password_confirm   = $_REQUEST['register-password-confirm'];
         $time_sqlformat     = get_mysql_datetime();
         $ip_address         = $_SERVER['REMOTE_ADDR'];
-        $new_privs          = UserPrivileges::UNVERIFIED->value;
+        $new_privs          = Privileges::UNVERIFIED->value;
         $verification_code  = strrev(hash('sha256', session_id()));
         $verification_code .= substr(hash('sha256', strval(rand(0,100))), 0, 15);
 
@@ -128,15 +119,15 @@
                     $account->new();
                     
                     /* Hasn't been found creating multiple accounts */
-                    if (check_abuse(AbuseTypes::MULTISIGNUP, $account->get_id(), $ip_address, 3)) {
+                    if (check_abuse(Type::MULTISIGNUP, $account->get_id(), $ip_address, 3)) {
                         ban_user($account->get_id(), 3600, "Multiple accounts within allotted time frame");
                         exit();
                     }
 
                     if (($str < 10 || $def < 10 || $int < 10)) {
                         $ip = $_SERVER['REMOTE_ADDR'];
-                        write_log(AbuseTypes::POSTMODIFY->name, "Sign-up attributes modified", $ip);
-                        check_abuse(AbuseTypes::POSTMODIFY, $account->get_id(), $ip, 2);
+                        write_log(Type::POSTMODIFY->name, "Sign-up attributes modified", $ip);
+                        check_abuse(Type::POSTMODIFY, $account->get_id(), $ip, 2);
                     }
 
                     $account->set_password($password);

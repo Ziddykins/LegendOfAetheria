@@ -1,6 +1,14 @@
 <?php
-trait HandlePropSync {
-    private function prop_sync($method, $params, $type) {
+namespace Game\Traits;
+
+use Game\Character\Stats;
+use Game\Inventory\Inventory;
+use Game\System\Enums\LOAError;
+use Game\Traits\Enums\Type;
+use Game\Traits\PropConvert;
+
+trait PropSync {
+    private function propSync($method, $params, Type $type) {
         global $db, $log;
         $table = 'none';
 
@@ -18,24 +26,23 @@ trait HandlePropSync {
             $prop = lcfirst(substr($method, $offset + 1));
         }
 
-        if ($method == 'prop_sync') {
+        if ($method == 'propSync') {
             return;
         }
 
         switch ($type) {
-            case PropSyncType::STATS:
-            case PropSyncType::INVENTORY;
-            case PropSyncType::CHARACTER:
+            case Type::STATS;
+            case Type::CHARACTER:
+            case Type::INVENTORY;
                 $table = $_ENV['SQL_CHAR_TBL'];
                 break;
-            case PropSyncType::ACCOUNT:
+            case Type::ACCOUNT;
                 $table = $_ENV['SQL_ACCT_TBL'];
-                $identifier = 'email';
                 break;
-            case PropSyncType::FAMILIAR:
+            case Type::FAMILIAR:
                 $table = $_ENV['SQL_FMLR_TBL'];
                 break;
-            case PropSyncType::MONSTER:
+            case Type::MONSTER:
                 $table = $_ENV['SQL_MNST_TBL'];
                 break;
             default:
@@ -58,31 +65,36 @@ trait HandlePropSync {
 
             $this->$prop = $params[0];
 
-            if ($type == PropSyncType::STATS) {
-                $table_col = 'stats';
-                $params[0] = serialize($this);
-                $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
-                $id = $_SESSION['character-id'];
-            } elseif ($type == PropSyncType::INVENTORY) {
-                $table_col = 'inventory';
-                $params[0] = serialize($this);
-                $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
-                $id = $_SESSION['character-id'];
-            } elseif ($type == PropSyncType::MONSTER) {
-                if ($params[1] === false) {
-                    return;
-                }
-            } else {
-                $sql_query = "UPDATE $table ";
-                $table_col = $this->clsprop_to_tblcol($prop);
+            switch ($type) {
+                case Type::STATS:
+                    $table_col = 'stats';
+                    $params[0] = safe_serialize($this);
+                    $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
+                    $id = $this->id;
+                    break;
+                case Type::INVENTORY:
+                    $table_col = 'inventory';
+                    $params[0] = safe_serialize($this);
+                    $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
+                    $id = $_SESSION['character-id'];
+                    break;
+                case Type::MONSTER:
+                    if ($params[1] === false) {
+                        return;
+                    }
+                    break;
+                default:
+                    $sql_query = "UPDATE $table ";
+                    $table_col = $this->clsprop_to_tblcol($prop);
 
-                if (is_int($params[0])) {
-                    $sql_query .= "SET `$table_col` = {$params[0]} ";
-                } else {
-                    $sql_query .= "SET `$table_col` = '{$params[0]}' ";
-                }
+                    if (is_int($params[0])) {
+                        $sql_query .= "SET `$table_col` = {$params[0]} ";
+                    } else {
+                        $sql_query .= "SET `$table_col` = '{$params[0]}' ";
+                    }
 
-                $sql_query .= "WHERE `id` = ?";
+                    $sql_query .= "WHERE `id` = ?";
+                    break;
             }
 
             $db->execute_query($sql_query, [$id]);
@@ -100,7 +112,7 @@ trait HandlePropSync {
             $focused_id = null;
 
             switch ($type) {
-                case PropSyncType::ACCOUNT:
+                case Type::ACCOUNT:
                     $accountID = getNextTableID($_ENV['SQL_ACCT_TBL']);
                     $focused_id = $accountID;
                     $sql_query = "INSERT INTO $table (id, email) VALUES (?, ?)";
@@ -109,7 +121,7 @@ trait HandlePropSync {
                     $this->id = $accountID;
                     $log->debug("PROPSYNC NEW ACCOUNT", [ 'Account ID' => $accountID ]);
                     break;
-                case PropSyncType::CHARACTER:
+                case Type::CHARACTER:
                     if (isset($params[0])) {
                         $next_slot = $params[0];
                     } else {
@@ -130,8 +142,8 @@ trait HandlePropSync {
                     $tmp_inventory = new Inventory();
                     $tmp_stats = new Stats($char_id);
                     
-                    $srl_inventory = serialize($tmp_inventory);
-                    $srl_stats = serialize($tmp_stats);
+                    $srl_inventory = safe_serialize($tmp_inventory);
+                    $srl_stats = safe_serialize($tmp_stats);
 
                     $this->inventory = $tmp_inventory;
                     $this->stats = $tmp_stats;
@@ -152,9 +164,9 @@ trait HandlePropSync {
                 $this->$key = $value;
             }
 
-            if ($type == PropSyncType::CHARACTER) {
-                $tmp_inv = unserialize($tmp_char['inventory']);
-                $tmp_stats = unserialize($tmp_char['stats']);
+            if ($type == Type::CHARACTER) {
+                $tmp_inv = safe_serialize($tmp_char['inventory'], true);
+                $tmp_stats = safe_serialize($tmp_char['stats'], true);
 
                 $this->inventory = $tmp_inv;
                 $this->stats = $tmp_stats;
@@ -162,32 +174,5 @@ trait HandlePropSync {
 
             $log->debug("PROPSYNC LOAD {$type->name}" . print_r($this, true));
         }
-    }
-
-    private function assoc_to_object(array &$assoc, string $class) {
-        $new_obj = new $class();
-
-        foreach ($assoc as $key => $value) {
-            switch ($key) {
-                case 'inventory':
-                    $new_obj->set_inventory(unserialize($value));
-                    break;
-                case 'stats':
-                    $new_obj->set_stats(unserialize($value));
-                    break;
-                case 'monster':
-                    $new_obj->set_monster(unserialize($value));
-                    break;
-                default:
-                    $new_obj->$key = $value;
-                    break;
-            }
-        }
-
-        return $new_obj;
-    }
-
-    public static function getProps($obj_type_str): array {
-        return get_class_vars($obj_type_str);
     }
 }

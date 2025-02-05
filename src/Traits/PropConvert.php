@@ -1,5 +1,7 @@
 <?php
-trait HandlePropsAndCols {
+namespace Game\Traits;
+
+trait PropConvert {
     private function clsprop_to_tblcol($property) {
         global $log;
         $splits = [];

@@ -1,5 +1,7 @@
 <?php
     declare(strict_types = 1);
+    use Game\Account\Account;
+    use Game\Account\Enums\Privileges;
     session_start();
     require 'vendor/autoload.php';
 
@@ -27,15 +29,15 @@
             set privileges to a registered user
         */
         if ($results->num_rows) {
-            $current_privs = UserPrivileges::name_to_value($account->get_privileges());
+            $current_privs = Privileges::name_to_value($account->get_privileges());
             
-            if ($account->get_verified() === 'True' || $current_privs >= UserPrivileges::USER) {
+            if ($account->get_verified() === 'True' || $current_privs >= Privileges::USER) {
                 $query_path = "/game?already_verified=1&email={$account->get_email()}";
                 header("Location: $query_path");
                 exit();
             }
 
-            $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `privileges` = '" . UserPrivileges::USER->name . "', `verified` = 'True' WHERE `id` = {$account->get_id()}";
+            $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `privileges` = '" . Privileges::USER->name . "', `verified` = 'True' WHERE `id` = {$account->get_id()}";
             $db->execute_query($sql_query);
 
             $log->info("User verification successful", [

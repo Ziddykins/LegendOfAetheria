@@ -1,4 +1,6 @@
 <?php
+
+use Game\System\Enums\LOAError;
     require 'vendor/autoload.php';
     include('logger.php');
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);

@@ -1,7 +1,13 @@
 <?php
+namespace Game\Monster;
+use Game\Traits\PropConvert;
+use Game\Traits\PropSync;
+use Game\Traits\Enums\Type;
+use Game\Monster\Enums\Scope;
+
 class Monster {
-    use HandlePropsAndCols;
-    use HandlePropSync;
+    use PropConvert;
+    use Propsync;
     private $id;
     private $accountID;
     private $characterID;
@@ -34,18 +40,18 @@ class Monster {
     * @return mixed The value of the property if a getter is called, or void if a setter is called.
     */
     public function __call($method, $params) {
-        if ($method == 'prop_sync') {
+        if ($method == 'propSync') {
             return;
         }
         
-        return $this->prop_sync($method, $params, PropsyncType::MONSTER);
+        return $this->propSync($method, $params, Type::MONSTER);
     }
 
-    public function __construct(MonsterScope $scope, $character_id) {
+    public function __construct(Scope $scope, $character_id) {
         $this->scope = $scope;
         $this->seed  = bin2hex(random_bytes(8));
 
-        if ($scope == MonsterScope::PERSONAL) {
+        if ($scope == Scope::PERSONAL) {
             $this->characterID = $character_id;
             $this->summondBy = -1;
         } else {

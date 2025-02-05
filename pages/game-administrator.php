@@ -1,7 +1,11 @@
 <?php
-    $user_privs = UserPrivileges::name_to_enum($account->get_privileges());
+    use Game\Account\Enums\Privileges;
+    use Game\OpenAI\OpenAI;
+    use Game\OpenAI\Enums\HttpMethod;
 
-    if ($user_privs->value < UserPrivileges::ADMINISTRATOR->value) {
+    $user_privs = Privileges::name_to_enum($account->get_privileges());
+
+    if ($user_privs->value < Privileges::ADMINISTRATOR->value) {
         echo "F O R B I D D E N";
         exit();
     }
@@ -176,7 +180,7 @@ $dalle_models = [
     'dall-e-2'
 ];
 
-$user_privs = UserPrivileges::name_to_enum($account->get_privileges());
+$user_privs = Privileges::name_to_enum($account->get_privileges());
 
 if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) { 
     $count = 0;
@@ -236,7 +240,7 @@ if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) {
     }
     exit();
     
-    echo '<div class="d-flex container">';
+    //echo '<div class="d-flex container">';
   /*  foreach ($json_obj->data as $image) {
         foreach ($image as $property) {   
                     echo '<div class="row-cols-3">

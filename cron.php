@@ -1,16 +1,11 @@
 <?php
     declare(strict_types = 1);
-    session_start();
-    require 'vendor/autoload.php';
-    
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-    $dotenv->safeLoad();  
+    require_once "bootstrap.php";
 
-    require_once 'logger.php';
-    require_once 'db.php';
-    require_once 'constants.php';
-    require_once 'functions.php';
-    
+    use Game\System\Enums\LOAError;
+    use Game\System\Enums\Weather;
+    session_start();
+
     if (!isset($argv)) {
         echo 'Access to cron.php directly is not allowed!';
         exit(LOAError::CRON_HTTP_DIRECT_ACCESS);
@@ -103,19 +98,29 @@
     function check_eggs() {
         global $db, $log;
 
-        $sql_query = 'SELECT `id`, `character_id`, `hatch_time`, `hatched`, `date_acquired` FROM ' . $_ENV['SQL_FMLR_TBL'] . ' WHERE `hatched` = "False"';
-        $results = $db->query($sql_query);
+        $sql_query = <<<SQL
+            SELECT 
+                `id`,
+                `character_id`,
+                `hatch_time`,
+                `hatched`,
+                `date_acquired`
+            FROM {$_ENV['SQL_FMLR_TBL']}
+            WHERE `hatched` = 'False'
+        SQL;
 
-        while ($player = $results->fetch_assoc()) {
+        $results = $db->query($sql_query);
+        $players = $results->fetch_all();
+
+        foreach ($players as $player) {
             $hatch_time    = $player['hatch_time'];
             $date_acquired = $player['date_acquired'];
             
             $time_remaining = sub_mysql_datetime($date_acquired, $hatch_time);
 
             if (!$time_remaining) {
-                $sql_query = 'UPDATE ' . $_ENV['SQL_FMLR_TBL'] . ' SET `hatched` = ? WHERE `character_id` = ?';
+                $sql_query = "UPDATE {$_ENV['SQL_FMLR_TBL']} SET `hatched` = ? WHERE `character_id` = ?";
                 $db->execute_query($sql_query, [ 'True', $player['character_id'] ]);
             }
         }
     }
-?>

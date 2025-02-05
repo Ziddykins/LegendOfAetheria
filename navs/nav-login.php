@@ -130,6 +130,7 @@
                                             <select class="form-select form-select form-control" style="font-size: 1.00rem;" aria-label=".form-select" id="race-select" name="race-select" required>
                                                 <option value="Select a Race" disabled selected>Select a Race</option>
                                                 <?php
+                                                    use Game\Character\Enums\Races;
                                                     foreach (Races::cases() as $race_sel) {
                                                         if ($race_sel->name == 'Default') {
                                                             continue;
@@ -219,9 +220,9 @@
 
                                     <script>
                                         $("#register-submit").on("click", function (e) {
-                                            document.querySelector("#str-ap").value = 60;//document.querySelector("#stats-str-cur").innerHTML;
-                                            document.querySelector("#def-ap").value = -10; //document.querySelector("#stats-def-cur").innerHTML;
-                                            document.querySelector("#int-ap").value = -10;//document.querySelector("#stats-int-cur").innerHTML;
+                                            document.querySelector("#str-ap").value = document.querySelector("#stats-str-cur").innerHTML;
+                                            document.querySelector("#def-ap").value = document.querySelector("#stats-def-cur").innerHTML;
+                                            document.querySelector("#int-ap").value = document.querySelector("#stats-int-cur").innerHTML;
                                             let password_field = document.getElementById('register-password').value;
                                             let password_confirm = document.getElementById('register-password-confirm').value;
 
@@ -293,7 +294,7 @@
                             </div>
                             
                             <div class="tab-pane fade text-center" id="status-tab-pane" role="tabpanel" aria-labelledby="status-tab" tabindex="3">
-                                <a href="<?php echo "https://" . $_SERVER['HTTP_HOST'] . "/";?>">
+                                <a href="<?php echo "https://" . htmlentities($_SERVER['HTTP_HOST']) . "/";?>">
                                     <div class="btn-group ms-3" role="group" aria-label="basic outlined example">
                                         <button type="button" class="btn btn-sm btn-secondary bg-gradient text-center text-white text-shadow fw-bolder font-monospace border border-black border-round">Almost</button>
                                         <button type="button" class="btn btn-sm text-bg-dark bg-gradient text-center fw-bolder font-monospace border border-black border-round" style="text-shadow: black 0.45px 0.75px 0.5px;">&nbsp;&nbsp;Main Game&nbsp;&nbsp;</button>

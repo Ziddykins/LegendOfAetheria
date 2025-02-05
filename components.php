@@ -1,5 +1,5 @@
 <?php
-
+/*
     require_once 'constants.php';
 
     function generate(Components $which, $data_object) {
@@ -62,3 +62,4 @@
         return $produced_html;
     }
 ?>
+*/

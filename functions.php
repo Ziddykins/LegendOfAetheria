@@ -1,4 +1,12 @@
 <?php
+
+use Game\Abuse\Enums\Type;
+use Game\Character\Enums\FriendStatus;
+use Game\Character\Enums\Races;
+use Game\Monster\Monster;
+use Game\Monster\Enums\Scope;
+use Game\System\Enums\LOAError;
+
      /**
      * Retrieves a MySQL datetime string based on the provided modifier.
      *
@@ -302,7 +310,7 @@
         }
 
         foreach ($monsters_arr as $monster) {
-            $temp_monster = new Monster(MonsterScope::NONE, 0);
+            $temp_monster = new Monster(Scope::NONE, 0);
             $temp_stats_arr = explode(',', $monster);
 
             $temp_monster->set_name($temp_stats_arr[0], false);
@@ -325,16 +333,16 @@
     /**
      * Checks for potential abuse based on the provided type and data.
      *global $log;
-     * @param AbuseTypes $type The type of abuse to check for (e.g. MULTISIGNUP)
+     * @param Game\Abuse\Enums\Type $type The type of abuse to check for (e.g. MULTISIGNUP)
      * @param mixed $data Additional data to use in the abuse check (e.g. IP address)
      *
      * @return bool True if abuse is detected, false otherwise
      */
-    function check_abuse(AbuseTypes $type, $account_id, $ip, $threshold = 1): bool {
+    function check_abuse(Type $type, $account_id, $ip, $threshold = 1): bool {
         global $db, $log;
 
         switch ($type) {
-            case AbuseTypes::MULTISIGNUP:
+            case Type::MULTISIGNUP:
                 $sql_query = <<<SQL
                                 SELECT `id` FROM {$_ENV['SQL_LOGS_TBL']}
                                 WHERE `type` = ?
@@ -348,7 +356,7 @@
                 }
 
                 return false;
-            case AbuseTypes::POSTMODIFY:
+            case Type::POSTMODIFY:
                 $sql_query = <<<SQL
                     SELECT `id` FROM {$_ENV['SQL_LOGS_TBL']}
                     WHERE `type` = ? AND `ip` = ?
@@ -472,4 +480,12 @@
         }
 
         return $avatar;
+    }
+
+    function safe_serialize($data, ?bool $unserialize=null) {
+        if ($unserialize === true) {
+            return unserialize(base64_decode($data));
+        } else {
+            return base64_encode(serialize($data));
+        }
     }
