@@ -23,15 +23,9 @@
         $ep_textcolor = 'text-white';
     }
 ?>
-<script>
-    $(document).ready(
-        function() {
-            $("head").append("<!-- Dynamically loaded content -->");
-            $("head").append("<link rel='stylesheet' href='../css/refracted-text.css'>");
-        }
-    );
-</script>
+
 <p></p>
+
 <div class="container text-center d-flex justify-content-center align-items-center">
     <div class="row">
         <div class="col">

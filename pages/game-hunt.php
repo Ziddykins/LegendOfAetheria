@@ -1,35 +1,36 @@
 <?php
     use Game\Account\Account;
     use Game\Character\Character;
+    use Game\Monster\Enums\Scope;
+    use Game\Monster\Pool;
     require_once "functions.php";
 
-    $account   = new Account($_SESSION['email']);
-    $character = new Character($_SESSION['character-id']);
-    $monster   = null;
-    
-    if (!$character->get_monster()) {
-        $monster   = $monster_pool->random_monster();
+    [$mon_name, $mon_hp, $mon_maxHP, $mon_mp, $mon_maxMP, $mon_str, $mon_int, $mon_def] = [null, null, null, null, null, null, null, null];
+    $monster = null;
+
+    if (!$character->monster) {
+        $monster   = $monster_pool->random_monster(Scope::PERSONAL, $character->get_id());
         $mon_name  = $monster->get_name();
         $mon_hp    = $monster->get_hp();
         $mon_maxHP = $monster->get_maxHP();
         $mon_mp    = $monster->get_mp();
         $mon_maxMP = $monster->get_maxMP();
-        $mon_str   = $monster->get_strength();
-        $mon_int   = $monster->get_intelligence();
-        $mon_def   = $monster->get_defense();
-        $character->set_monster(safe_serialize($monster));
+        $mon_str   = $monster->get_str();
+        $mon_int   = $monster->get_int();
+        $mon_def   = $monster->get_def();
+        $mon_avatar = 'img/enemies/' . $monster->get_name() . '.webp';
+        $character->monster = $monster;
     } else {
-        $monster = $character->get_monster();
+        $monster = $character->monster;
     }
-    $character->get_inventory()->addItem("Rubber Dong", 10, 1);
+    $mon_avatar = 'img/enemies/' . preg_replace('/ /', '', $monster->get_name()) . '.png';
+    $character->inventory->addItem("Rubber Dong", 10, 1);
 
-    echo '<pre>';
-    print_r($character);
 ?>
 
 <div class="row row-cols-4 border border-1">
     <div class="col pt-3">
-        <img src="img/enemies/enemy-kobold.webp" width="100" height="100" class="rounded-circle"/>
+        <img src="<?php echo $mon_avatar; ?>" width="100" height="100" class="rounded-circle"/>
     </div>
     <div class="col">
         <div class="row">

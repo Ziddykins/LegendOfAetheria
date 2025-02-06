@@ -6,11 +6,17 @@
         "orhanerday/open-ai": "^5.2"
     },
     "require-dev": {
-        "phpmd/phpmd" : "@stable"
+        "phpmd/phpmd" : "@stable",
+        "phpunit/phpunit": "^11.5"
     },
     "autoload": {
         "psr-4": {
             "Game\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Game\\Tests\\": "src/Tests/"
         }
     }
 }
