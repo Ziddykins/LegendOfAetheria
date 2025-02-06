@@ -11,6 +11,7 @@ class Monster {
     private $id;
     private $accountID;
     private $characterID;
+    private $level;
     private $name;
     private $scope;
     private $seed;
@@ -19,9 +20,9 @@ class Monster {
     private $maxHP;
     private $mp;
     private $maxMP;
-    private $strength;
-    private $intelligence;
-    private $defense;
+    private $str;
+    private $int;
+    private $def;
     private $dropLevel;
     private $expAwarded;
     private $goldAwarded;
@@ -60,21 +61,3 @@ class Monster {
         }
     }
 }
-
-class MonsterPool {
-    public $monsters = [];
-
-    public function __construct() {
-
-    }
-
-    private function get_monster_count() {
-        return count($this->monsters);
-    }
-
-    public function random_monster() {
-        return $this->monsters[rand(0,$this->get_monster_count()-1)];
-    }
-}
-
-?>

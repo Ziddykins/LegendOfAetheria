@@ -26,3 +26,4 @@ phpunit.xml
 /tests/
 .phpunit.result.cache
 /tbl_explore
+**/Tests/**

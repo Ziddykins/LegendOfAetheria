@@ -1,8 +1,10 @@
 <?php
 namespace Game\Character;
+use Game\Inventory\Inventory;
+use Game\Monster\Monster;
+use Game\Traits\Enums\Type;
 use Game\Traits\PropConvert;
 use Game\Traits\PropSync;
-use Game\Traits\Enums\Type;
 
 class Character {
     use PropConvert;
@@ -13,6 +15,7 @@ class Character {
     private $name;
     private $race;
     private $avatar;
+    private $level = 1;
     private $x = 0;
     private $y = 0;
     private $location = 'The Shrine';

@@ -14,8 +14,7 @@
     $dotenv->safeLoad();
 
     $account   = new Account($_SESSION['email']);
-    $character = new Character($account->get_id());
-    $character->set_id($_SESSION['character-id']);
+    $character = new Character($_SESSION['account-id'], $_SESSION['character-id']);
     $character->load();
 
   

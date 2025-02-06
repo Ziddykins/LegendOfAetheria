@@ -3,12 +3,12 @@
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
-    use Game\Monster\MonsterPool;
+    use Game\Monster\Pool;
     session_start();
 
     require_once "bootstrap.php";
     
-    $monster_pool = new MonsterPool;    
+    $monster_pool = new Pool;    
     load_monster_sheet($monster_pool);
 
         /* First make sure the user is logged in before doing anything */

@@ -2,46 +2,62 @@
 namespace Game\Traits;
 
 trait PropConvert {
+    private $acceptable_doubles = ['ID', 'HP', 'MP', 'EP', 'AP'];
+
     private function clsprop_to_tblcol($property) {
-        global $log;
-        $splits = [];
-        $splits = preg_split('/(?=[A-Z]{1,2})/', $property);
+        $property = preg_replace('/[^a-zA-Z_1-3]/', '', $property);
+        $out = null;
+        $check_double = null;
 
-        if (count($splits) === 1) {
-            return $property;
+        for ($i=0; $i<strlen($property); $i++) {
+            if ($i == 0 && ctype_upper($property[$i])) {
+                $out .= strtolower($property[$i]);
+                 continue;
+            }
+
+
+            if (isset($property[$i+1])) {
+                $check_double = $property[$i] . $property[$i + 1];
+            } else {
+                $check_double = $property[$i];
+            }
+
+            if (ctype_upper($check_double)) {
+                if (array_search($check_double, $this->acceptable_doubles) !== false) {
+                    $out .= '_' . strtolower($check_double);
+                    $i++;
+                    continue;
+                }
+            }
+
+            if (ctype_upper($property[$i])) {
+                $let = strtolower($property[$i]);
+                $out .= "_$let";
+                continue;
+            }
+            $out .= $property[$i];
         }
-
-        if ($splits[1] == 'I' && $splits[2] == 'D') {
-            $table_column = strtolower("$splits[0]_id");
-        } else {
-            $table_column = $splits[0] . '_' . strtolower($splits[1]);
-        }
-
-        if (isset($splits[2]) && $splits[1] != 'I' && $splits[2] != 'D') {
-            $table_column .= '_' . strtolower($splits[2]);
-        }
-
-        return $table_column;
+        return $out;
     }
 
     private function tblcol_to_clsprop($column) {
-        global $log;
-
+        $column = preg_replace('/[^a-zA-Z1-3_]/', '', $column);
         $splits = preg_split('/_/', $column);
-
-        if (count($splits) === 1) {
+        $column = strtolower($column);
+        
+        if (count($splits) == 1) {
             return $column;
         }
 
-        if ($splits[1] === 'id') {
-            $class_property = $splits[0] . strtoupper($splits[1]);
-        } else {
-            $class_property = $splits[0] . ucfirst($splits[1]);
+        for ($i=1; $i<count($splits); $i++) {
+            if (strlen($splits[$i]) == 2 && array_search(strtoupper($splits[$i]), $this->acceptable_doubles) !== false) {
+                $splits[$i] = strtoupper($splits[$i]);
+            } else {
+                $splits[$i] = ucfirst($splits[$i]);
+            }
         }
-
-        if (isset($splits[2])) {
-            $class_property .= ucfirst($splits[2]);
-        }
+        
+        $class_property = join('', $splits);
 
         return $class_property;
     }

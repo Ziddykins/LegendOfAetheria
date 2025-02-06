@@ -79,10 +79,9 @@ trait PropSync {
                     $id = $_SESSION['character-id'];
                     break;
                 case Type::MONSTER:
-                    if ($params[1] === false) {
-                        return;
-                    }
-                    break;
+                    $table_col = 'monster';
+                    $params[0] = safe_serialize($this);
+                    $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
                 default:
                     $sql_query = "UPDATE $table ";
                     $table_col = $this->clsprop_to_tblcol($prop);

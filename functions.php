@@ -313,14 +313,15 @@ use Game\System\Enums\LOAError;
             $temp_monster = new Monster(Scope::NONE, 0);
             $temp_stats_arr = explode(',', $monster);
 
+            
             $temp_monster->set_name($temp_stats_arr[0], false);
             $temp_monster->set_hp((int)$temp_stats_arr[1], false);
             $temp_monster->set_maxHP((int)$temp_stats_arr[2], false);
             $temp_monster->set_mp((int)$temp_stats_arr[3], false);
             $temp_monster->set_maxMP((int)$temp_stats_arr[4], false);
-            $temp_monster->set_strength((int)$temp_stats_arr[5], false);
-            $temp_monster->set_intelligence((int)$temp_stats_arr[6], false);
-            $temp_monster->set_defense((int)$temp_stats_arr[7], false);
+            $temp_monster->set_str((int)$temp_stats_arr[5], false);
+            $temp_monster->set_int((int)$temp_stats_arr[6], false);
+            $temp_monster->set_def((int)$temp_stats_arr[7], false);
             $temp_monster->set_dropLevel((int)$temp_stats_arr[8], false);
             $temp_monster->set_expAwarded((int)$temp_stats_arr[9], false);
             $temp_monster->set_goldAwarded((int)$temp_stats_arr[10], false);
