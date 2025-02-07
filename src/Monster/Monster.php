@@ -60,4 +60,8 @@ class Monster {
             $this->characterID = -1;
         }
     }
+
+    private function attack(AttackType $attack) {
+        
+    }
 }

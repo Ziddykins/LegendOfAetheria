@@ -44,6 +44,8 @@ class Pool {
             $log->debug("STAT: {$stats[$i]} -> $calculated_stat");
 
         }
+        $monster->set_hp($monster->get_maxHP());
+        $monster->set_mp($monster->get_maxMP());
 
         return $monster;
     }

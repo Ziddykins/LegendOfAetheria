@@ -3,6 +3,8 @@ namespace Game\Traits;
 
 use Game\Character\Stats;
 use Game\Inventory\Inventory;
+use Game\Monster\Monster;
+use Game\Monster\Enums\Scope;
 use Game\System\Enums\LOAError;
 use Game\Traits\Enums\Type;
 use Game\Traits\PropConvert;
@@ -68,35 +70,30 @@ trait PropSync {
             switch ($type) {
                 case Type::STATS:
                     $table_col = 'stats';
-                    $params[0] = safe_serialize($this);
-                    $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
-                    $id = $this->id;
-                    break;
+                    $srl_data = safe_serialize($this);
+                    $sql_query = "UPDATE $table SET `stats` = ? WHERE `id` = ?";
+                    $db->execute_query($sql_query, [ $srl_data, $id ]);
+                    return;
                 case Type::INVENTORY:
                     $table_col = 'inventory';
-                    $params[0] = safe_serialize($this);
-                    $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
+                    $srl_data = safe_serialize($this);
+                    $sql_query = "UPDATE $table SET `inventory` = ? WHERE `id` = ?";
                     $id = $_SESSION['character-id'];
-                    break;
+                    $db->execute_query($sql_query, [ $srl_data, $this->id ]);
+                    return;
                 case Type::MONSTER:
                     $table_col = 'monster';
-                    $params[0] = safe_serialize($this);
-                    $sql_query = "UPDATE $table SET `$table_col` = '{$params[0]}' WHERE `id` = ?";
-                default:
-                    $sql_query = "UPDATE $table ";
-                    $table_col = $this->clsprop_to_tblcol($prop);
-
-                    if (is_int($params[0])) {
-                        $sql_query .= "SET `$table_col` = {$params[0]} ";
-                    } else {
-                        $sql_query .= "SET `$table_col` = '{$params[0]}' ";
-                    }
-
-                    $sql_query .= "WHERE `id` = ?";
-                    break;
+                    $srl_data = safe_serialize($this);
+                    $sql_query_char = "UPDATE {$_ENV['SQL_CHAR_TBL']} SET `monster` = ? WHERE `id` = ?";
+                    $db->execute_query($sql_query_char, [ $srl_data, $this->characterID ]);
             }
 
-            $db->execute_query($sql_query, [$id]);
+            $sql_query = "UPDATE $table ";
+            $table_col = $this->clsprop_to_tblcol($prop);
+
+            $sql_query .= "SET `$table_col` = ? WHERE `id` = ?";
+
+            $db->execute_query($sql_query, [$params[0], $id ]);
 
             $log->debug("PROPSYNC SET",
                 [
@@ -112,9 +109,9 @@ trait PropSync {
 
             switch ($type) {
                 case Type::ACCOUNT:
-                    $accountID = getNextTableID($_ENV['SQL_ACCT_TBL']);
+                    $accountID  = getNextTableID($_ENV['SQL_ACCT_TBL']);
                     $focused_id = $accountID;
-                    $sql_query = "INSERT INTO $table (id, email) VALUES (?, ?)";
+                    $sql_query  = "INSERT INTO $table (id, email) VALUES (?, ?)";
 
                     $db->execute_query($sql_query, [$accountID, $this->email]);
                     $this->id = $accountID;
@@ -126,9 +123,9 @@ trait PropSync {
                     } else {
                         $next_slot = $this->getNextCharSlotID($this->accountID);
                     }
-                    $char_id = getNextTableId($_ENV['SQL_CHAR_TBL']);
+                    $char_id    = getNextTableId($_ENV['SQL_CHAR_TBL']);
                     $focused_id = $char_id;
-                    $char_col = "char_slot$next_slot";
+                    $char_col   = "char_slot$next_slot";
 
                     $log->debug("PROPSYNC NEW CHAR", [ 'Next Slot' => $next_slot, 'Char ID' => $char_id ]);
 
@@ -139,24 +136,28 @@ trait PropSync {
                     
                     $this->id = $char_id;
                     $tmp_inventory = new Inventory();
-                    $tmp_stats = new Stats($char_id);
+                    $tmp_stats     = new Stats($char_id);
+                    $tmp_monster   = new Monster(Scope::PERSONAL, $char_id);
+
                     
                     $srl_inventory = safe_serialize($tmp_inventory);
-                    $srl_stats = safe_serialize($tmp_stats);
+                    $srl_stats     = safe_serialize($tmp_stats);
+                    $srl_monster   = safe_serialize($tmp_monster);
 
                     $this->inventory = $tmp_inventory;
-                    $this->stats = $tmp_stats;
+                    $this->stats     = $tmp_stats;
+                    $this->monster   = $tmp_monster;
 
-                    $chr_query = "INSERT INTO $table (`id`, `account_id`, `inventory`, `stats`) VALUES (?, ?, ?, ?)";
+                    $chr_query = "INSERT INTO $table (`id`, `account_id`, `inventory`, `stats`, `monster`) VALUES (?, ?, ?, ?, ?)";
                     $act_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$char_col` = ? WHERE `id` = ?";
 
-                    $db->execute_query($chr_query, [$char_id, $this->accountID, $srl_inventory, $srl_stats]);
+                    $db->execute_query($chr_query, [ $char_id, $this->accountID, $srl_inventory, $srl_stats, $srl_monster ]);
                     $db->execute_query($act_query, [$this->id, $this->accountID]);
                     break;
             }
         } elseif (strcmp($action, 'load') === 0) { /*LOAD*/
             $sql_query = "SELECT * FROM $table WHERE `id` = ?";
-            $tmp_char = $db->execute_query($sql_query, [$this->id])->fetch_assoc();
+            $tmp_char  = $db->execute_query($sql_query, [$this->id])->fetch_assoc();
             
             foreach ($tmp_char as $key => $value) {
                 $key = $this->tblcol_to_clsprop($key);
@@ -164,11 +165,13 @@ trait PropSync {
             }
 
             if ($type == Type::CHARACTER) {
-                $tmp_inv = safe_serialize($tmp_char['inventory'], true);
-                $tmp_stats = safe_serialize($tmp_char['stats'], true);
+                $tmp_inv     = safe_serialize($tmp_char['inventory'], true);
+                $tmp_stats   = safe_serialize($tmp_char['stats'], true);
+                $tmp_monster = safe_serialize($tmp_char['monster'], true);
 
                 $this->inventory = $tmp_inv;
-                $this->stats = $tmp_stats;
+                $this->stats     = $tmp_stats;
+                $this->monster   = $tmp_monster;
             }
 
             $log->debug("PROPSYNC LOAD {$type->name}" . print_r($this, true));

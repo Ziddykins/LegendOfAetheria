@@ -8,11 +8,8 @@
 
     require_once "bootstrap.php";
     
-    $monster_pool = new Pool;    
-    load_monster_sheet($monster_pool);
 
-        /* First make sure the user is logged in before doing anything */
-    if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
+    if (check_session() === true) {
         $account = new Account($_SESSION['email']);
         $account->load();
 

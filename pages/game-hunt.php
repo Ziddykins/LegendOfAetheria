@@ -1,14 +1,16 @@
 <?php
-    use Game\Account\Account;
-    use Game\Character\Character;
+
     use Game\Monster\Enums\Scope;
     use Game\Monster\Pool;
     require_once "functions.php";
 
-    [$mon_name, $mon_hp, $mon_maxHP, $mon_mp, $mon_maxMP, $mon_str, $mon_int, $mon_def] = [null, null, null, null, null, null, null, null];
-    $monster = null;
+    $monster_pool = new Pool;
+    load_monster_sheet($monster_pool);
 
-    if (!$character->monster) {
+    [$mon_name, $mon_hp, $mon_maxHP, $mon_mp, $mon_maxMP, $mon_str, $mon_int, $mon_def] = [null, null, null, null, null, null, null, null];
+    $monster = $character->get_monster();
+
+    if ($monster === null) {
         $monster   = $monster_pool->random_monster(Scope::PERSONAL, $character->get_id());
         $mon_name  = $monster->get_name();
         $mon_hp    = $monster->get_hp();
@@ -18,11 +20,12 @@
         $mon_str   = $monster->get_str();
         $mon_int   = $monster->get_int();
         $mon_def   = $monster->get_def();
-        $mon_avatar = 'img/enemies/' . $monster->get_name() . '.webp';
-        $character->monster = $monster;
+        $avatar = 'img/enemies/' . $monster->get_name() . '.webp';
+        $character->set_monster($monster);
     } else {
         $monster = $character->monster;
     }
+
     $mon_avatar = 'img/enemies/' . preg_replace('/ /', '', $monster->get_name()) . '.png';
     $character->inventory->addItem("Rubber Dong", 10, 1);
 
@@ -74,21 +77,29 @@
             <div class="col border border-1 pt-3">
                 <div class="row row-cols-2">
                     <div class="d-grid col column-gap-2">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Attack</button>
+                        <div class="btn-group" role="group" aria-label="Attack">
+                            <button id="hunt-attack-btn" name="hunt-attack-btn" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Attack</button>
+                            <button id="hunt-attack-dropdown" name="hunt-attack-dropdown type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Attack</button>
+                        </div>
+
+                        
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Normal</a></li>
+                            <li><a id="attack-normal" name="attack-normal" class="dropdown-item" href="/page=hunt&action=attack&type=normal">Normal</a></li>
                             <!-- Uses 2x energy does up to 2x? dmg -->
-                            <li><a class="dropdown-item" href="#">Heavy</a></li>
+                            <li><a id="attack-heavy" name="attack-heavy" class="dropdown-item" href="#">Heavy</a></li>
                             <!-- if enchanted, special -->
-                            <li><a class="dropdown-item" href="#">*Special*</a></li>
+                            <li><a id="attack-special" name="attack-special" class="dropdown-item" href="#">*Special*</a></li>
                         </ul>
                     </div>
-                    <div class="d-grid col column-gap-2">    
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Spells</button>
+                    <div class="d-grid col column-gap-2"> 
+                        <div class="btn-group" role="group" aria-label="Spells">
+                            <button id="hunt-spell-dropdown" name="hunt-spell-dropdown" type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Spells</button>
+                            <button>lol</button>
+                        </div>
                         <ul class="dropdown-menu">
                             <!-- Iterate through spellbook of learned spells and populate list items -->
-                            <li><a class="dropdown-item" href="#">Burn</a></li>
-                            <li><a class="dropdown-item" href="#">Burn a bit more</a></li>
+                            <li><a id="spell-burn" name="spell-burn" class="dropdown-item" href="#">Burn</a></li>
+                            <li><a id="spell-frost" name="spell-burn" class="dropdown-item" href="#">Burn a bit more</a></li>
                         </ul>
                     </div>
                 </div>

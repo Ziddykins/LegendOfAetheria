@@ -490,3 +490,26 @@ use Game\System\Enums\LOAError;
             return base64_encode(serialize($data));
         }
     }
+
+    function check_session(): bool {
+        global $db, $log;
+            
+        if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
+            return false;
+        }
+     
+        $sql_query = "SELECT `session_id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE`id` = ?";
+        $result = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc();
+        
+        if ($result === null) {
+            return false;
+        }
+
+        $session = $result['session_id'];
+        
+        if ($session != session_id()) {
+            return false;
+        }
+
+        return true;
+    }
