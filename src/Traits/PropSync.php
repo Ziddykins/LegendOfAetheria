@@ -1,6 +1,7 @@
 <?php
 namespace Game\Traits;
 
+use Exception;
 use Game\Character\Stats;
 use Game\Inventory\Inventory;
 use Game\Monster\Monster;
@@ -12,7 +13,8 @@ use Game\Traits\PropConvert;
 trait PropSync {
     private function propSync($method, $params, Type $type) {
         global $db, $log;
-        $table = 'none';
+        $table = null;
+        $prop  = null;
 
         /* Anything before the underscore, in the sent method is considered
            to be the "action" (set_, get_, init, etc), and the target/property
@@ -51,71 +53,72 @@ trait PropSync {
                 exit(LOAError::FUNCT_PROPSYNC_TYPE);
         }
 
-        $log->debug("In PropSync", [
-            'Table' => $table,
-            'Method' => $method,
-            'Params' => print_r($params, true)
-        ]);
+        if (!isset($params[0])) {
+            $params[0] = null;
+        }
+
+        if (isset($params[0]->name)) {
+            $log_str = $params[0]->name;
+        } else {
+            $log_str = $params[0];
+        }
+        
+
+        @$log->debug("PROPSYNC[" . get_class($this) . "][$table][$this->id][$method]: $log_str");
 
         if (strcmp($action, "get") === 0) { /* GET */
-            $log->debug("PROPSYNC GET", [ 'Type' => $type, 'Prop' => $prop, 'Return' => $this->$prop ]);
             return $this->$prop;
         } elseif (strcmp($action, 'set') === 0) { /* SET */
-            $id = $this->id;
+            $table_col = $this->clsprop_to_tblcol($prop);
             $sql_query = null;
-            $table_col = null;
+            $id = $this->id;
 
             $this->$prop = $params[0];
 
             switch ($type) {
                 case Type::STATS:
-                    $table_col = 'stats';
+                    $id = $this->id;
                     $srl_data = safe_serialize($this);
-                    $sql_query = "UPDATE $table SET `stats` = ? WHERE `id` = ?";
-                    $db->execute_query($sql_query, [ $srl_data, $id ]);
-                    return;
-                case Type::INVENTORY:
-                    $table_col = 'inventory';
-                    $srl_data = safe_serialize($this);
-                    $sql_query = "UPDATE $table SET `inventory` = ? WHERE `id` = ?";
-                    $id = $_SESSION['character-id'];
+                    $sql_query = "UPDATE {$_ENV['SQL_CHAR_TBL']} SET `stats` = ? WHERE `id` = ?";
                     $db->execute_query($sql_query, [ $srl_data, $this->id ]);
                     return;
-                case Type::MONSTER:
-                    $table_col = 'monster';
+                case Type::INVENTORY:
+                    $id = $this->id;
                     $srl_data = safe_serialize($this);
-                    $sql_query_char = "UPDATE {$_ENV['SQL_CHAR_TBL']} SET `monster` = ? WHERE `id` = ?";
-                    $db->execute_query($sql_query_char, [ $srl_data, $this->characterID ]);
+                    $sql_query = "UPDATE {$_ENV['SQL_CHAR_TBL']} SET `inventory` = ? WHERE `id` = ?";
+                    $db->execute_query($sql_query, [ $srl_data, $_SESSION['character-id'] ]);
+                    return;
+                case Type::MONSTER:
+                    $srl_data = safe_serialize($this);
+                    $sql_query = "UPDATE {$_ENV['SQL_CHAR_TBL']} SET `monster` = ? WHERE `id` = ?";
+                    $db->execute_query($sql_query, [ $srl_data, $this->characterID ]);
+                    
+                    if ($prop === 'scope') {
+                        $params[0] = Scope::name_to_enum($params[0]);
+                    }
+
+                    break;
+                case Type::CHARACTER:
+                    $id = $this->id;
+
+                    if ($prop === 'monster') {
+                        $params[0] = safe_serialize($params[0]);
+                    }
+                    
+                    break;
             }
 
-            $sql_query = "UPDATE $table ";
-            $table_col = $this->clsprop_to_tblcol($prop);
-
-            $sql_query .= "SET `$table_col` = ? WHERE `id` = ?";
-
-            $db->execute_query($sql_query, [$params[0], $id ]);
-
-            $log->debug("PROPSYNC SET",
-                [
-                    'SQLQuery' => $sql_query,
-                    'params' => print_r($params, 1),
-                    'method' => $method,
-                    'prop' => $prop,
-                    'type' => $type->name
-                ]
-            );
+            $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";    
+            $db->execute_query($sql_query, [ $params[0], $id ]);
         } elseif (strcmp($action, 'new') === 0) { /*NEW*/
             $focused_id = null;
 
             switch ($type) {
                 case Type::ACCOUNT:
                     $accountID  = getNextTableID($_ENV['SQL_ACCT_TBL']);
-                    $focused_id = $accountID;
                     $sql_query  = "INSERT INTO $table (id, email) VALUES (?, ?)";
-
-                    $db->execute_query($sql_query, [$accountID, $this->email]);
                     $this->id = $accountID;
-                    $log->debug("PROPSYNC NEW ACCOUNT", [ 'Account ID' => $accountID ]);
+                    $db->execute_query($sql_query, [$accountID, $this->email]);
                     break;
                 case Type::CHARACTER:
                     if (isset($params[0])) {
@@ -124,10 +127,7 @@ trait PropSync {
                         $next_slot = $this->getNextCharSlotID($this->accountID);
                     }
                     $char_id    = getNextTableId($_ENV['SQL_CHAR_TBL']);
-                    $focused_id = $char_id;
                     $char_col   = "char_slot$next_slot";
-
-                    $log->debug("PROPSYNC NEW CHAR", [ 'Next Slot' => $next_slot, 'Char ID' => $char_id ]);
 
                     if ($next_slot == -1) {
                         header('Location: /select?no_slots');
@@ -135,46 +135,85 @@ trait PropSync {
                     }
                     
                     $this->id = $char_id;
-                    $tmp_inventory = new Inventory();
-                    $tmp_stats     = new Stats($char_id);
-                    $tmp_monster   = new Monster(Scope::PERSONAL, $char_id);
 
+                    $tmp_inventory = new Inventory($this->id);
+                    $tmp_stats     = new Stats($char_id);
                     
                     $srl_inventory = safe_serialize($tmp_inventory);
                     $srl_stats     = safe_serialize($tmp_stats);
-                    $srl_monster   = safe_serialize($tmp_monster);
-
+                    
                     $this->inventory = $tmp_inventory;
                     $this->stats     = $tmp_stats;
-                    $this->monster   = $tmp_monster;
+                    
 
-                    $chr_query = "INSERT INTO $table (`id`, `account_id`, `inventory`, `stats`, `monster`) VALUES (?, ?, ?, ?, ?)";
+                    $chr_query = "INSERT INTO $table (`id`, `account_id`, `inventory`, `stats`) VALUES (?, ?, ?, ?)";
                     $act_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$char_col` = ? WHERE `id` = ?";
 
-                    $db->execute_query($chr_query, [ $char_id, $this->accountID, $srl_inventory, $srl_stats, $srl_monster ]);
+                    $db->execute_query($chr_query, [ $char_id, $this->accountID, $srl_inventory, $srl_stats ]);
                     $db->execute_query($act_query, [$this->id, $this->accountID]);
+                    break;
+                case Type::MONSTER:
+                    $table     = $_ENV['SQL_MNST_TBL'];
+                    $sql_query = "INSERT INTO $table (`id`, `account_id`, `character_id`, `scope`, `seed`) VALUES (?, ?, ?, ?, ?)";
+                    $next_id   = getNextTableID($table);
+                    $db->execute_query($sql_query, [ $next_id, $this->accountID, $this->characterID, $this->scope->name, $this->seed ]);
                     break;
             }
         } elseif (strcmp($action, 'load') === 0) { /*LOAD*/
             $sql_query = "SELECT * FROM $table WHERE `id` = ?";
-            $tmp_char  = $db->execute_query($sql_query, [$this->id])->fetch_assoc();
+            $tmp_char = $db->execute_query($sql_query, [ $this->id ])->fetch_assoc();
             
             foreach ($tmp_char as $key => $value) {
                 $key = $this->tblcol_to_clsprop($key);
-                $this->$key = $value;
+
+                if ($value !== null || $value !== 'NULL') {
+                    $this->$key = $value;
+                }
             }
 
             if ($type == Type::CHARACTER) {
                 $tmp_inv     = safe_serialize($tmp_char['inventory'], true);
-                $tmp_stats   = safe_serialize($tmp_char['stats'], true);
-                $tmp_monster = safe_serialize($tmp_char['monster'], true);
+                $tmp_stats   = safe_serialize($tmp_char['stats'],     true);
+
+                if ($tmp_char['monster']) {
+                    $tmp_monster   = safe_serialize($tmp_char['monster'], true);
+                    $this->monster = $tmp_monster;
+                }
 
                 $this->inventory = $tmp_inv;
                 $this->stats     = $tmp_stats;
-                $this->monster   = $tmp_monster;
             }
+        } elseif (preg_match('/sub|add|mul|div|exp|mod/', $action)) {
+            $cur_value = $this->$prop;
 
-            $log->debug("PROPSYNC LOAD {$type->name}" . print_r($this, true));
+            if (is_numeric($cur_value)) {
+                $new_value = $cur_value;
+                switch ($action) {
+                    case 'add':
+                        $new_value += $params[0];
+                        break;
+                    case 'sub':
+                        $new_value -= $params[0];
+                        break;
+                    case 'mul':
+                        $new_value *= $params[0];
+                        break;
+                    case 'div':
+                        $new_value /= $params[0];
+                        break;
+                    case 'exp':
+                        $new_value **= $params[0];
+                        break;
+                    case 'mod':
+                        $new_value %= $params[0];
+                        break;
+                    default:
+                        throw new Exception('Unknown PropModder');
+                }
+                $this->$prop = $new_value;
+            } else {
+                throw new Exception('Current value is not numeric!');
+            }
         }
     }
 }

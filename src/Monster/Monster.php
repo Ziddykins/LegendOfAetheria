@@ -8,25 +8,25 @@ use Game\Monster\Enums\Scope;
 class Monster {
     use PropConvert;
     use Propsync;
-    private $id;
-    private $accountID;
-    private $characterID;
-    private $level;
-    private $name;
+    private ?int $id;
+    private int $accountID;
+    private int $characterID;
+    private int $level;
+    private string $name;
     private $scope;
-    private $seed;
-    private $summondBy; // Global or Zone monsters
-    private $hp;
-    private $maxHP;
-    private $mp;
-    private $maxMP;
-    private $str;
-    private $int;
-    private $def;
-    private $dropLevel;
-    private $expAwarded;
-    private $goldAwarded;
-    private $monsterClass;
+    private string $seed;
+    private int $summondBy; // Global or Zone monsters
+    private int $hp;
+    private int $maxHP;
+    private int $mp;
+    private int $maxMP;
+    private int $str;
+    private int $int;
+    private int $def;
+    private int $dropLevel;
+    private int $expAwarded;
+    private int $goldAwarded;
+    private string $monsterClass;
 
     /**
     * Magic method to handle dynamic getters and setters for the Monster class properties.
@@ -48,20 +48,17 @@ class Monster {
         return $this->propSync($method, $params, Type::MONSTER);
     }
 
-    public function __construct(Scope $scope, $character_id) {
+    public function __construct(Scope $scope, $char_id = null, $account_id = null) {
         $this->scope = $scope;
         $this->seed  = bin2hex(random_bytes(8));
+        $this->characterID = $char_id  ?: -1;
+        $this->accountID = $account_id ?: -1;
+        $this->id = -1;
 
         if ($scope == Scope::PERSONAL) {
-            $this->characterID = $character_id;
             $this->summondBy = -1;
         } else {
-            $this->summondBy = $character_id;
-            $this->characterID = -1;
+            $this->summondBy =  $char_id;
         }
-    }
-
-    private function attack(AttackType $attack) {
-        
     }
 }

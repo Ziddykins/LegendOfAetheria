@@ -33,7 +33,6 @@ class Stats {
     }
     public function __call($method, $params): mixed {
         global $log;
-        $log->debug(		"STATS CLASS CALL", ['method' => $method, 'params' => $params]);
         return $this->propSync($method, $params, Type::STATS);
     }
 }

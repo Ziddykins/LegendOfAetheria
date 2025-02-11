@@ -20,7 +20,7 @@ class Pool {
 
         $monster = $this->monsters[rand(0,$this->get_monster_count()-1)];
         $monster->set_characterID($characterID);
-        $monster->set_scope($scope->name);
+        $monster->set_scope($scope);
 
 
         $this->scale_monster($monster, $character->get_level());

@@ -6,9 +6,10 @@ use Game\Character\Enums\Races;
 use Game\Monster\Monster;
 use Game\Monster\Enums\Scope;
 use Game\System\Enums\LOAError;
+use Game\Account\Account;
+use Game\Character\Character;
 
-     /**
-     * Retrieves a MySQL datetime string based on the provided modifier.
+     /**     * Retrieves a MySQL datetime string based on the provided modifier.
      *
      * This function takes an optional modifier parameter, which defaults to 'now'.
      * It extracts the operand (first character) and amount (remaining characters) from the modifier.
@@ -114,13 +115,13 @@ use Game\System\Enums\LOAError;
      * @return int|LOAError The number of unread emails for the specified account.
      *                      If an unsupported value is provided for $what, the function returns LOAError::MAIL_UNKNOWN_DIRECTIVE.
      */
-    function check_mail($what, $account_id) {
+    function check_mail($what) {
         global $db, $log;
 
         switch ($what) {
             case 'unread':
-                $result = $db->query('SELECT * FROM ' . $_ENV['SQL_MAIL_TBL'] . ' ' .
-                                     "WHERE `read` = 'False' AND `account_id` = $account_id")->num_rows;
+                $sql_query = 'SELECT * FROM ' . $_ENV['SQL_MAIL_TBL'] . ' WHERE `read` = ? AND `account_id` = ?';
+                $result = $db->execute_query($sql_query, ['False', $_SESSION['account-id']])->num_rows;
                 return $result;
             default:
                 return LOAError::MAIL_UNKNOWN_DIRECTIVE;
@@ -296,8 +297,7 @@ use Game\System\Enums\LOAError;
         return false;
     }
 
-    function load_monster_sheet(&$monster_pool) {
-        global $log;
+    function load_monster_sheet(&$monster_pool) {        global $log;
 
         $monsters_arr = [];
 
@@ -312,7 +312,6 @@ use Game\System\Enums\LOAError;
         foreach ($monsters_arr as $monster) {
             $temp_monster = new Monster(Scope::NONE, 0);
             $temp_stats_arr = explode(',', $monster);
-
             
             $temp_monster->set_name($temp_stats_arr[0], false);
             $temp_monster->set_hp((int)$temp_stats_arr[1], false);
@@ -483,12 +482,14 @@ use Game\System\Enums\LOAError;
         return $avatar;
     }
 
-    function safe_serialize($data, ?bool $unserialize=null) {
+    function safe_serialize($data, ?bool $unserialize=null): mixed {
         if ($unserialize === true) {
-            return unserialize(base64_decode($data));
+            $data = unserialize(base64_decode($data));
         } else {
-            return base64_encode(serialize($data));
+            $data = base64_encode(serialize($data));
         }
+
+        return $data;
     }
 
     function check_session(): bool {
