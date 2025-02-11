@@ -86,7 +86,6 @@
         $password_confirm   = $_REQUEST['register-password-confirm'];
         $time_sqlformat     = get_mysql_datetime();
         $ip_address         = $_SERVER['REMOTE_ADDR'];
-        $new_privs          = Privileges::UNVERIFIED->value;
         $verification_code  = strrev(hash('sha256', session_id()));
         $verification_code .= substr(hash('sha256', strval(rand(0,100))), 0, 15);
 
@@ -106,11 +105,9 @@
         }
 
         /* Email doesn't exist */
-        if (!Account::checkIfExists($email)) {
+        if (Account::checkIfExists($email) == -1) {
             /* AP assigned properly */
             if ($str + $def + $int === MAX_ASSIGNABLE_AP) {
-                /* ya forgin' posts I know it */
-
                 /* Passwords match */
                 if ($password === $password_confirm) {
                     $password = password_hash($password, PASSWORD_BCRYPT);
@@ -123,16 +120,22 @@
                         ban_user($account->get_id(), 3600, "Multiple accounts within allotted time frame");
                         exit();
                     }
-
+                    
+                    /* ya forgin' posts I know it */
                     if (($str < 10 || $def < 10 || $int < 10)) {
                         $ip = $_SERVER['REMOTE_ADDR'];
                         write_log(Type::POSTMODIFY->name, "Sign-up attributes modified", $ip);
                         check_abuse(Type::POSTMODIFY, $account->get_id(), $ip, 2);
                     }
 
+                    if ($account->get_id() === 1) {
+                        $account->set_privileges(Privileges::ADMINISTRATOR->value);
+                    } else {
+                        $account->set_privileges(Privileges::UNVERIFIED->value);
+                    }
+
                     $account->set_password($password);
                     $account->set_dateRegistered($time_sqlformat);
-                    $account->set_privileges($new_privs);
                     $account->set_ipAddress($ip_address);
                     $account->set_loggedIn('False');
                     $account->set_verificationCode($verification_code);

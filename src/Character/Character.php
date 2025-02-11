@@ -40,9 +40,9 @@ class Character {
         $this->id = $characterID;
     }
 
-    public function __call($method, $params) {
+    public function __call($method, $params): mixed {
         if ($method == 'propSync') {
-            return;
+            return -1;
         }
         
         return $this->propSync($method, $params, Type::CHARACTER);
@@ -63,8 +63,6 @@ class Character {
             $sqlQuery = "SELECT `name`, `avatar`, `race`, `stats` FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
             $character = $db->execute_query($sqlQuery, [ $characterID ])->fetch_assoc();
             $stats = safe_serialize($character['stats'], true);
-
-            
 
             $cardHtml = '<div class="card text-center me-3 ms-1" data-loa-slot="' . $slot . '">
                     <span class="small text-bg-dark bg-gradient float-right">Slot ' . $slot . '</span>

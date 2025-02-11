@@ -16,7 +16,8 @@ class Inventory {
 
     private array $slots;
 
-    public function __construct($slotCount = 20, $maxWeight = 1000) {
+    public function __construct($characterID, $slotCount = 20, $maxWeight = 1000) {
+        $this->id = $characterID;
         $this->slotCount     = $slotCount;
         $this->maxWeight     = $maxWeight;
         $this->currentWeight = 0;

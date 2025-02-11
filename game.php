@@ -312,7 +312,7 @@
                                 <li>
                                     <a class="dropdown-item" href="?page=mail">Mail
                                         <?php
-                                            $unread_mail = check_mail('unread', $account->get_id());
+                                            $unread_mail = check_mail('unread');
                                             $pill_bg = 'bg-danger';
         
                                             if ($unread_mail == 0) {
@@ -331,20 +331,20 @@
                                 <?php
                                     $privileges = Privileges::name_to_value($account->get_privileges());
                                             
-                                    if ($privileges > Privileges::MODERATOR->value) {
+                                    if ($privileges > Privileges::ADMINISTRATOR->value) {
+                                        $href = $_ENV['ADMIN_PANEL'];
                                         echo "<li>\n\t\t\t\t\t\t\t\t\t";
-                                        echo '<a class="dropdown-item" href="?page=administrator">Administrator</a>';
+                                    
+                                        echo "<a class=\"dropdown-item\" href=\"$href\">Administrator</a>";
                                         echo "\n\t\t\t\t\t\t\t\t</li>\n";
                                     }
                                 ?>
                                 
                                 <li>
-                                    <a class="dropdown-item" href="/select">Select Character</a>
-                                    <?php $_SESSION['focused-slot'] = 0; ?>
+                                    <a class="dropdown-item" href="/select">Characters</a>
                                 </li>
                                         
-                                </li>
-<li>
+                                <li>
                                     <a class="dropdown-item" href="/logout">Sign out</a>
                                 </li>
                             </ul>

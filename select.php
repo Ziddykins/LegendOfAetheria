@@ -16,7 +16,7 @@ if (isset($_REQUEST['create-submit']) && $_REQUEST['create-submit'] == 1) {
     }
 }
 
-if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
+if (check_session()) {
     $account = new Account($_SESSION['email']);
     $account->load();
 
@@ -42,8 +42,8 @@ if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
                 $sql_query = "SELECT `$char_slot` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
                 $char_id = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc()["$char_slot"];
 
-                $_SESSION['focused-slot'] = $slot;
-                $_SESSION['character-id'] = $char_id;
+                $_SESSION['focused-slot'] = (int)$slot;
+                $_SESSION['character-id'] = (int)$char_id;
                 header('Location: /game');
                 exit();
             case 'new':
@@ -124,6 +124,10 @@ if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
 
 <body class="main-font" data-bs-theme="dark">
     <div class="d-flex align-items-center min-vh-100" style="min-width: 325px;">
+        <div class="text-center float-right">
+            <button type="button" role="button" class="btn btn-sm btn-outline-secondary">Sign Out</button>
+        </div>
+        
         <div class="container mt-5">
             <div class="d-flex justify-content-center">
                 <?php
@@ -146,6 +150,7 @@ if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
             });
         });
     </script>
+    
     <?php include "snippets/snip-new-char.php"; ?>
 
     <script>
@@ -161,13 +166,8 @@ if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1) {
         //const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
         //const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
     </script>
-            <div aria-live="polite" aria-atomic="true" class="position-relative">
-                <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
-                    <!-- Toast placeholder -->
-                </div>
-            </div>
 
-<?php include "html/footers.html"; ?>    
+    <?php include "html/footers.html"; ?>    
 
 </body>
 

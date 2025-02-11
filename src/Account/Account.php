@@ -11,7 +11,7 @@ class Account {
     
     private $id;
     private $email;
-    public $password;
+    private $password;
     private $dateRegistered;
     private $verified;
     private $verificationCode;
@@ -61,7 +61,7 @@ class Account {
         return $this->propSync($method, $params, Type::ACCOUNT);
     }
     
-    public static function checkIfExists($email) {
+    public static function checkIfExists($email): int {
         global $db, $log;
         $sqlQuery = "SELECT `id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `email` = ?";
         $result = $db->execute_query($sqlQuery, [$email])->fetch_assoc();
@@ -70,6 +70,6 @@ class Account {
             return $result['id'];
         }
 
-        return 0;
+        return -1;
     }
 }

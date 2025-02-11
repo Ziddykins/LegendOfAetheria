@@ -5,9 +5,9 @@
         <meta name="description" content="Legend of Aetheria - A Fantasy-RPG, browser-based game full of exciting adventures">
         <meta name="google-signin-client_id" content="905625455039-22nlqmke7jn849t3h7125i5tjtea89fb.apps.googleusercontent.com">
         <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
-        <meta http-equiv="Content-Security-Policy" 
-                 content="script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client https://apis.google.com/js/platform.js;
-                         style-src 'self' 'unsafe-inline' https://accounts.google.com;
+        <meta http-equiv="Content-Security-Policy"
+                 content="script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client https://apis.google.com/js/platform.js https://cdn.jsdelivr.net/npm/apexcharts@3.50.0/dist/apexcharts.min.js;
+                         style-src 'self' 'unsafe-inline' https://accounts.google.com https://cdn.jsdelivr.net/npm/apexcharts@3.50/dist/apexcharts.min.css;
                          object-src 'none';
                          base-uri 'self';
                          connect-src 'self' https://accounts.google.com;
@@ -20,15 +20,13 @@
         <!-- local -->
         <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
         <link rel="stylesheet" href="../css/bootstrap-icons.min.css">
-    
+
         <link rel="stylesheet" type="text/css" href="../css/gfonts.css" />
         <script src="../js/bootstrap.bundle.min.js" type="text/javascript"></script>
         <script src="../js/jquery-3.7.1.min.js" type="text/javascript"></script>
-        
+
         <!-- Progress bar library from https://loading.io -->
         <link rel="stylesheet" type="text/css" href="../css/loading-bar.css"/>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-        <?php include 'html/ee.html'; ?>
