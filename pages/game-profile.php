@@ -91,6 +91,7 @@
 
                             <button id="profile-apply" name="profile-apply" class="btn btn-primary border border-black" value="1">Apply</button>
                             <button id="profile-discard" name="profile-discard" class="btn btn-danger border border-black">Discard</button>
+                            <input id="csrf-token" name="csrf-token" type="hidden" value="<?php echo $_SESSION['csrf-token']; ?>" />
                         </form>
                     </div>
 

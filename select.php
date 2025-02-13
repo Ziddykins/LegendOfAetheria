@@ -154,7 +154,7 @@ if (check_session()) {
     <?php include "snippets/snip-new-char.php"; ?>
 
     <script>
-        document.querySelectorAll("a[id^='select-delete-']").forEach((ahref_btn) => {
+        document.querySelectorAll("button[id^='select-delete-']").forEach((ahref_btn) => {
             ahref_btn.addEventListener("click", (e) => {
                 if (e.target.classList.contains("btn-outline-danger")) {
                     e.preventDefault();

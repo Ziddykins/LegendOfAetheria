@@ -60,7 +60,7 @@ class Character {
         $log->debug("Generating card", [ 'ID' => $characterID, 'Slot' => $slot]);
 
         if ($characterID) {
-            $sqlQuery = "SELECT `name`, `avatar`, `race`, `stats` FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
+            $sqlQuery = "SELECT `name`, `avatar`, `race`, `stats`, `level` FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
             $character = $db->execute_query($sqlQuery, [ $characterID ])->fetch_assoc();
             $stats = safe_serialize($character['stats'], true);
 
@@ -71,7 +71,7 @@ class Character {
                 </div>
 
                 <div class="card-body">
-                    <p class="card-text">' . $character['name'] . ' the Lv. ' . $stats->get_level() . ' ' . $character['race']  . '</p>
+                    <p class="card-text">' . $character['name'] . ' the Lv. ' . $character['level'] . ' ' . $character['race']  . '</p>
                     <div class="small" style="font-size: 12px;">
                         <div class="row">
                             <div class="col-3 text-white">
@@ -95,11 +95,13 @@ class Character {
                     </div>
                 </div>
                 
-                <div class="card-footer d-grid gap-2">
+                <div class="card-footer">
                     <form id="select-char-' . $slot . '" action="/select" method="POST">
-                        <button id="select-delete-' . $slot . '" name="select-delete-' . $slot . '" class="btn btn-sm btn-outline-danger pe-3" value="' . $slot . '">Delete</button>
-                        <button id="select-load-' . $slot . '" name="select-load-' . $slot . '" class="btn btn-sm btn-primary" value="' . $slot . '">Load</button>
-                    </form>
+                        <div class="d-flex w-100">
+                            <button id="select-delete-' . $slot . '" name="select-delete-' . $slot . '" class="btn btn-sm btn-outline-danger flex-fill border-black me-3" value="' . $slot . '">Delete</button>
+                            <button id="select-load-' . $slot . '" name="select-load-' . $slot . '" class="btn btn-sm btn-primary flex-fill border-black" value="' . $slot . '">Load</button>
+                        </form>
+                    </div>
                 </div>
             </div>';
         } else {

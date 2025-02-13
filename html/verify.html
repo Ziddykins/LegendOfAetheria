@@ -20,11 +20,12 @@
                     <div class="d-grid col-12 gap-2">
                         <button type="submit" id="verify-submit" name="verify-submit" class="btn btn-primary mt-3" value="1">Verify</button>
                     </div>
+                    <input id="csrf-token" name="csrf-token" type="hidden" value="<?php echo $_SESSION['csrf-token']; ?>" />
                 </form>
             </div>
 
             <div class="card-footer">
-                    Click <a href="/verification?resend=1">Here</a> to re-send the confirmation email
+                Click <a href="/verification?resend=1">Here</a> to re-send the confirmation email
             </div>
         </div>
     </div>

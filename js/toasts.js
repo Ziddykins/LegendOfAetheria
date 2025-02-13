@@ -83,6 +83,8 @@ $(document).ready(function() {
                 gen_toast('already-friend', 'danger', 'bi-slash-circle', 'Already Friended', 'User already added as a friend!');
             }
         }
+    } else if (query.has('csrf-failed')) {
+        gen_toast('csrf-failed', 'danger', 'bi-highlighter', 'CSRF Failed', 'CSRF token invalid, please refresh the page');
     }
 
 });

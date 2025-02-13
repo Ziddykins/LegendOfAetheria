@@ -8,6 +8,9 @@ use Game\Traits\PropSync;
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\Abuse\Enums\Type;
+use Game\System\System;
+
+$system = new System(0);
 
 /* Funcs etc */
 require_once 'logger.php';

@@ -8,12 +8,12 @@
     require_once 'bootstrap.php';
 
     session_start();
-
-    if (isset($_REQUEST['login-submit']) && $_REQUEST['login-submit'] == 1) {
-        $email = $_REQUEST['login-email'];
-        $password = $_REQUEST['login-password'];
-
-        $account   = null;
+    
+    if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
+        check_csrf($_POST['csrf-token']);
+        $email    = $_POST['login-email'];
+        $password = $_POST['login-password'];
+        $account  = null;
 
         if (!check_valid_email($email)) {
             header('Location: /?invalid_email');
@@ -72,32 +72,34 @@
                 header('Location: /banned');
                 exit();
             } else {
-                $message = "Failed login for IP Address $ip trying {$_REQUEST['login-email']}";
+                $message = "Failed login for IP Address $ip trying {$_POST['login-email']}";
                 //write_log('MULTISIGNUP', $message, $ip);
             }
 
             header('Location: /?failed_login');
             exit();
         }
-    } else if (isset($_REQUEST['register-submit']) && $_REQUEST['register-submit'] == 1) {
+    } else if (isset($_POST['register-submit']) && $_POST['register-submit'] == 1) {
+        check_csrf($_POST['csrf-token']);
+
         /* Account information */
-        $email              = $_REQUEST['register-email'];
-        $password           = $_REQUEST['register-password'];
-        $password_confirm   = $_REQUEST['register-password-confirm'];
+        $email              = $_POST['register-email'];
+        $password           = $_POST['register-password'];
+        $password_confirm   = $_POST['register-password-confirm'];
         $time_sqlformat     = get_mysql_datetime();
         $ip_address         = $_SERVER['REMOTE_ADDR'];
         $verification_code  = strrev(hash('sha256', session_id()));
         $verification_code .= substr(hash('sha256', strval(rand(0,100))), 0, 15);
 
         /* Character information */
-        $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $_REQUEST['register-character-name']);
+        $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $_POST['register-character-name']);
 
-        $avatar = validate_avatar('avatar-' . $_REQUEST['avatar-select'] . '.webp');
-        $race   = validate_race($_REQUEST['race-select']);
+        $avatar = validate_avatar('avatar-' . $_POST['avatar-select'] . '.webp');
+        $race   = validate_race($_POST['race-select']);
 
-        $str    = $_REQUEST['str-ap'];
-        $def    = $_REQUEST['def-ap'];
-        $int    = $_REQUEST['int-ap'];
+        $str    = $_POST['str-ap'];
+        $def    = $_POST['def-ap'];
+        $int    = $_POST['int-ap'];
 
         if (!check_valid_email($email)) {
             header('Location: /?invalid_email');
@@ -168,7 +170,8 @@
             exit();
         }
     }
-
+    $_SESSION['csrf-token'] = gen_csrf_token();
+    
     include 'html/opener.html';
 ?>
 

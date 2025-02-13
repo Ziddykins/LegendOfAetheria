@@ -297,39 +297,6 @@ use Game\Character\Character;
         return false;
     }
 
-    function load_monster_sheet(&$monster_pool) {        global $log;
-
-        $monsters_arr = [];
-
-        $handle = fopen("monsters.raw", "r");
-
-        if ($handle) {
-            while (($line = fgets($handle)) !== false) {
-                array_push($monsters_arr, $line);
-            }
-        }
-
-        foreach ($monsters_arr as $monster) {
-            $temp_monster = new Monster(Scope::NONE, 0);
-            $temp_stats_arr = explode(',', $monster);
-            
-            $temp_monster->set_name($temp_stats_arr[0], false);
-            $temp_monster->set_hp((int)$temp_stats_arr[1], false);
-            $temp_monster->set_maxHP((int)$temp_stats_arr[2], false);
-            $temp_monster->set_mp((int)$temp_stats_arr[3], false);
-            $temp_monster->set_maxMP((int)$temp_stats_arr[4], false);
-            $temp_monster->set_str((int)$temp_stats_arr[5], false);
-            $temp_monster->set_int((int)$temp_stats_arr[6], false);
-            $temp_monster->set_def((int)$temp_stats_arr[7], false);
-            $temp_monster->set_dropLevel((int)$temp_stats_arr[8], false);
-            $temp_monster->set_expAwarded((int)$temp_stats_arr[9], false);
-            $temp_monster->set_goldAwarded((int)$temp_stats_arr[10], false);
-            $temp_monster->set_monsterClass($temp_stats_arr[11], false);
-            array_push($monster_pool->monsters, $temp_monster);
-        }
-        $log->info(count($monster_pool->monsters) . " monsters loaded into pool");
-    }
-
     /**
      * Checks for potential abuse based on the provided type and data.
      *global $log;
@@ -407,6 +374,11 @@ use Game\Character\Character;
                 </div>';
 
         return $html;
+    }
+
+    function get_monster_count() {
+        global $system;
+        return count($system->monsters);
     }
 
     function getNextTableID($table): int {
@@ -513,4 +485,16 @@ use Game\Character\Character;
         }
 
         return true;
+    }
+
+    function gen_csrf_token() {
+        return bin2hex(random_bytes(32));
+    }
+
+    function check_csrf($req_csrf) {
+        if ($req_csrf != $_SESSION['csrf-token']) {
+            //session_destroy();
+            //header('Location: /?csrf_fail');
+            //exit();
+        }
     }

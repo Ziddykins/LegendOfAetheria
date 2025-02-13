@@ -7,6 +7,7 @@ enum Type {
     case FAMILIAR;
     case INVENTORY;
     case MONSTER;
-    case STATS;
+    case CSTATS;
+    case MSTATS;
 }
 

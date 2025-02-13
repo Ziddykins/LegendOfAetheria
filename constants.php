@@ -12,14 +12,6 @@ enum ModalButtonType {
     case OKCancel;
 }
 
-
-
 enum Components {
     case FLOATING_LABEL_TEXTBOX;
-}
-
-enum PrepDirection {
-    case IN;
-    case OUT;
-    
 }

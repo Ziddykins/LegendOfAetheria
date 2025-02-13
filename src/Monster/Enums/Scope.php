@@ -7,10 +7,10 @@ namespace Game\Monster\Enums;
 #     players in this area will be able to contribute. Leaving the area forefits contribution
 #   - Personal monsters are only visible and attackable by you
 enum Scope: int {
-    case GLOBAL = 1;
-    case ZONE = 2;
-    case PERSONAL = 3;
-    case NONE = 4;
+    case GLOBAL = 0;
+    case ZONE = 1;
+    case PERSONAL = 2;
+    case NONE = 3;
 
     public static function name_to_enum(string $name) {
         foreach (self::cases() as $privilege) {
