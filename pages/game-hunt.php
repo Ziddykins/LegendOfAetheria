@@ -1,38 +1,44 @@
 <?php
     use Game\Monster\Enums\Scope;
-    use Game\Monster\Pool;
-    require_once "functions.php";
+    use Game\System\System;
+    use Game\Monster\Monster;
 
-    $monster_pool = new Pool;
-    load_monster_sheet($monster_pool);
+    require_once "functions.php";
+    
 
     [$mon_name, $mon_avatar, $mon_hp, $mon_maxHP, $mon_mp, $mon_maxMP, $mon_str, $mon_int, $mon_def] = [null, null, null, null, null, null, null, null, null];
     $monster = $character->get_monster();
     $mon_loaded = 0;
 
-    if (isset($_POST['hunt-new-monster']) && $_POST['hunt-new-monster'] == 1) {
+    if ($monster != null && $monster != "") {
         $mon_loaded = 1;
+    }
 
-        if ($monster === false || $monster === null) {
-            $monster   = $monster_pool->random_monster(Scope::PERSONAL, $character->get_id());
-            $monster->new(Scope::PERSONAL);
-            $monster->load();
-            $character->set_monster($monster);
-
-            
+    if (isset($_POST['hunt-new-monster']) && $_POST['hunt-new-monster'] == 1) {
+        //check_csrf($_POST['csrf-token']);
+        if ($mon_loaded) {
+            //modal, flee or kill
         } else {
-            $monster = $character->monster;
+            $monster = new Monster(Scope::PERSONAL);
+            
+            $monster->new();
+            $monster->load(Scope::PERSONAL);
+            $monster->random_monster(Scope::PERSONAL, $monster->get_id());            
+            $character->set_monster($monster);
         }
     }
-    $mon_name  = $monster->get_name();
-    $mon_hp    = $monster->get_hp();
-    $mon_maxHP = $monster->get_maxHP();
-    $mon_mp    = $monster->get_mp();
-    $mon_maxMP = $monster->get_maxMP();
-    $mon_str   = $monster->get_str();
-    $mon_int   = $monster->get_int();
-    $mon_def   = $monster->get_def();
-    $mon_avatar = 'img/enemies/' . $monster->get_name() . '.webp';
+     
+    if ($mon_loaded) {
+        $mon_name  = $monster->get_name();
+        $mon_hp    = $monster->stats->get_hp();
+        $mon_maxHP = $monster->stats->get_maxHP();
+        $mon_mp    = $monster->stats->get_mp();
+        $mon_maxMP = $monster->stats->get_maxMP();
+        $mon_str   = $monster->stats->get_str();
+        $mon_int   = $monster->stats->get_int();
+        $mon_def   = $monster->stats->get_def();
+        $mon_avatar = 'img/enemies/' . $monster->get_name() . '.webp';
+    }
 ?>
     <div class="d-flex pt-3">
         <div class="container border border-1">
@@ -42,7 +48,9 @@
                         if ($mon_loaded) {
                             echo $monster->get_name();
                             echo '<br><hr><br>';
-                            echo "HP: $mon_hp / $mon_maxHP<br>";
+                            echo "HP : $mon_hp / $mon_maxHP<br>";
+                            echo "MP : $mon_mp / $mon_maxMP<br>";
+                            echo "STR: $mon_str - DEF: $mon_def - INT: $mon_int<br>";
                         } else {
                             echo '-- No Monster --';
                         }
@@ -54,14 +62,15 @@
         <div class="container border border-1 ">
             <div class="row">
                 <div class="col">
-                    <?php
-                        if ($mon_loaded) {
-                            echo $character->get_name();
-                            echo '<br><hr><br>';
-                        } else {
-                            echo '-- our stats --';
-                        }
-                    ?>
+                    <?php if ($mon_loaded): ?>
+                        <?php echo $character->get_name(); ?>
+                        <?php echo '<br><hr><br>'; ?>
+                        <span class="text-danger">HP :</span>  <?php echo $mon_hp; echo ' / '; echo $mon_maxHP; ?>
+                        <span class="text-primary">MP :</span> <?php echo $mon_mp; echo ' / '; echo $mon_maxMP; ?>
+                    <?php else: ?>
+                    
+                            
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -72,7 +81,7 @@
                 <div class="row">
                     <div class="d-flex w-100">
                         <div class="btn-group mb-3 me-1" role="group" aria-label="attack">
-                            <button id="hunt-attack-btn" name="hunt-attack-btn" type="button" class="btn btn-sm btn-primary mb-1 flex-fill disabled">
+                            <button id="hunt-attack-btn" name="hunt-attack-btn" type="button" class="btn btn-sm btn-primary mb-1 flex-fill">
                                 Attack
                             </button>
                     
@@ -121,18 +130,21 @@
 
                 <div class="row mb-3">
                     <form id="new-mon" name="new-mon" action="/game?page=hunt&action=hunt&scope=personal" method="post">
-                        <button id="hunt-new-monster" name="hunt-new-monster" class="btn btn-sm border-black btn-success flex-fill" type="submit" style="width: calc(100% + 20px);" value="1">Hunt</button>
-                        <button id="hunt-global-btn" name="hunt-global-btn" class="btn btn-sm border-black btn-secondary flex-fill disabled" style="width: calc(100% + 20px);">Global</button>
+                        <div class="d-flex w-100">
+                            <button id="hunt-new-monster" name="hunt-new-monster" class="btn btn-sm border-black btn-success flex-fill" style="width: calc(100% + 20px);" type="submit" value="1">Hunt</button>
+                            <button id="hunt-global-btn" name="hunt-global-btn" class="btn btn-sm border-black btn-secondary flex-fill disabled" style="width: calc(100% + 20px);">Global</button>
+                            <input id="csrf-token" name="csrf-token" type="hidden" value="<?php echo $_SESSION['csrf-token']; ?>" />
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="container w-100 border border-1">
+    <div class="container-fluid border border-1">
         <div class="row">
-            <div class="col">
-                woo
+            <div id="battle-log" name="battle-log" class="col">
+
             </div>
         </div>
     </div>

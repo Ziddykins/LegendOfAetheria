@@ -29,3 +29,4 @@ phpunit.xml
 **/Tests/**
 **/test**
 /admin/*
+.blackboxrules

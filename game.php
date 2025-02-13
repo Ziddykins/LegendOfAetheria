@@ -3,11 +3,13 @@
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
-    use Game\Monster\Pool;
-    session_start();
+    use Game\System\System;
 
+    session_start();
     require_once "bootstrap.php";
+    $system->load_sheet();
     
+    gen_csrf_token();    
 
     if (check_session() === true) {
         $account = new Account($_SESSION['email']);
@@ -16,6 +18,8 @@
         $character = new Character($account->get_id());
         $character->set_id($_SESSION['character-id']);
         $character->load();
+
+
 
       //  $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
       //  $familiar->loadFamiliar($character->get_id());
@@ -29,10 +33,11 @@
         $avatar           = $character->get_avatar();
 
         /* Check if the user has clicked the apply button on the profile tab */
-        if (isset($_REQUEST['profile-apply']) && $_REQUEST['profile-apply'] == 1) {
-            $old_password     = $_REQUEST['profile-old-password'];
-            $new_password     = $_REQUEST['profile-new-password'];
-            $confirm_password = $_REQUEST['profile-confirm-password'];
+        if (isset($_POST['profile-apply']) && $_POST['profile-apply'] == 1) {
+            check_csrf($_POST['csrf-token']);
+            $old_password     = $_POST['profile-old-password'];
+            $new_password     = $_POST['profile-new-password'];
+            $confirm_password = $_POST['profile-confirm-password'];
             $account_email    = $_SESSION['email'];
 
             /* Old password matches current */
@@ -60,6 +65,7 @@
 <?php include('html/opener.html'); ?>
     <head>
         <?php include('html/headers.html'); ?>
+
         
     </head>
         
@@ -78,8 +84,8 @@
                             <ul class="nav nav-flush flex-column mb-auto" id="menu">
                                 <li class="border rounded w-100">
                                     <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary text-white" data-bs-toggle="collapse" aria-expanded="true">
-                                        <i class="fs-5 bi <?php echo $char_menu_icon; ?> d-md-inline text-center"></i>
-                                        <span class="d-none d-md-inline">Character</span>
+                                        <i class="fs-5 bi <?php echo $char_menu_icon; ?> d-xl-inline text-center"></i>
+                                        <span class="d-none d-lg-inline">Character</span>
                                     </a>
                                     
                                     <ul id="menu-header-character" class="nav nav-pills collapse nav-flush flex-column bg-body-secondary" data-bs-parent="#menu" aria-expanded="false">
@@ -298,15 +304,15 @@
                                 <li>
                                     <a class="dropdown-item" href="?page=friends">Friends
                                     <?php
-                                        $requests = 0;
-                                        $requests = get_friend_counts('requests');
+                                        $posts = 0;
+                                        $posts = get_friend_counts('posts');
                                         $pill_bg  = 'bg-danger';
 
-                                        if (!$requests) {
+                                        if (!$posts) {
                                             $pill_bg = 'bg-primary';
                                         }
                                     ?>
-    <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $requests; ?></span>
+    <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $posts; ?></span>
                                     </a>
                                 </li>
                                 <li>
@@ -353,7 +359,7 @@
                 </div>
 
                 <div id="content" name="content" class="container border border-danger" style="flex-shrink: 1;">
-                    <?php
+                <?php
                         $privileges = Privileges::name_to_value($account->get_privileges());
                         
                         if ($privileges == Privileges::UNVERIFIED->value) {
@@ -365,7 +371,11 @@
 
                         if (isset($_REQUEST['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_REQUEST['page']);
-                            $page_uri = "pages/game-$requested_page.php";
+                            if (file_exists("pages/game-$requested_page.php")) {
+                                $page_uri = "pages/game-$requested_page.php";
+                            } else {
+                                $page_uri = "pages/game-sheet.php";
+                            }
                             include (string) $page_uri;
                         } else {
                             $page_uri = 'pages/game-sheet.php';

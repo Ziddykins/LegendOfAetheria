@@ -1,5 +1,5 @@
 <?php
-namespace Game\Character;
+namespace Game\Monster;
 use Game\Traits\PropConvert;
 use Game\Traits\PropSync;
 use Game\Traits\Enums\Type;
@@ -7,8 +7,9 @@ use Game\Traits\Enums\Type;
 class Stats {
     use PropConvert;
     use Propsync;
-    
+
     private int $id;
+
 
     private int $hp     = 100;
     private int $maxHp  = 100;
@@ -21,19 +22,13 @@ class Stats {
     private int $int    = 10;
     private int $def    = 10;
     private int $luk    = 3;
-    private int $exp    = 0;
-    private int $maxExp = 100;
-    private int $ap     = 0;
 
-    /* Enum CharacterStatus, constants.php */
-    //private CharacterStatus $status;
-    
-    public function __construct ($characterID = 0) {
-        $this->id = $characterID;
+    public function __construct ($monsterID = 0) {
+        $this->id = $monsterID;
 
     }
     public function __call($method, $params): mixed {
         global $log;
-        return $this->propSync($method, $params, Type::CSTATS);
+        return $this->propSync($method, $params, Type::MSTATS);
     }
 }
