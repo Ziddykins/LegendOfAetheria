@@ -5,11 +5,13 @@
     use Game\Character\Character;
     use Game\Monster\Pool;
     use Game\Battle\Enums\Turn;
-    
+
+    $verbs = ["attacks", "pummels", "strikes", "assaults", "blugeons", "ambushes", "beats", "besieges", "blasts", "bombards", "charges", "harms", "hits", "hurts", "infiltrates", "invades", "raids", "stabs", "stormss", "strikes"];
+    $adverbs = [ "clumsily", "lazily", "spastically", "carefully", "precisely" ];
+
     session_start();
 
     require_once "bootstrap.php";
-
 
     $account = new Account($_SESSION['email']);
     $account->load();
@@ -21,7 +23,8 @@
     $ch_name = $character->get_name();
     $mn_name = $monster->get_name();
 
-   
+    $colors = [ 'text-danger', 'text-primary' ];
+
     if (check_session() === true) {
         if (isset($_POST['action'])) {
             $action = $_POST['action'];
@@ -30,58 +33,52 @@
             if ($action === 'attack') {
                 do_turn(Turn::PLAYER);
                 $character->stats->sub_ep(1);
+                do_turn(Turn::ENEMY);
             }
         }
     }
 
- 
-    function do_turn(Turn $target=null) {
+    function do_turn(Turn $current) {
         global $monster, $character;
+        [$attacker, $attackee] = [ $character, $monster ];
         $roll = roll(1, 100);
+        [ $attack, $defense, $damage ] = [ null, null, null ];
 
-        if ($target !== null) {
-            $next_up = null;
+        if ($current == Turn::ENEMY) {
+            $attacker = $monster;
+            $attackee = $character;
+        }
 
-            if ($roll == 100) {
-                $next_up = Turn::ENEMY;                
-            } elseif ($roll == 0) {
-                $next_up = Turn::PLAYER;
-            }
+        $attack  = roll(0, $attacker->stats->get_str());
+        $defense = roll(0, $attackee->stats->get_def());
+        $damage  = $defense - $attack;
+
+        // crit
+        if ($roll === 100) {
+            $damage *= intval(random_float(0.1, 1.5));
+        }
             
-            $offguard = 0;
-            if (roll(0,250) >= 125) {
-                $offguard = 1;
-            }
-            attack_misses($monster, $character,  $offguard);
-            do_turn($next_up);
-            return;
+        // miss
+        if ($roll === 0) {
+            attack_missed($attacker, $attackee, 1, $current);
         }
 
-        if ($target == Turn::PLAYER) {
-            $attack  = roll(0, $character->stats->get_str());
-            $defense = roll(0, $monster->stats->get_def());
-            $damage  = $defense - $attack;
-        } else {
-            $attack  = roll(0, $monster->stats->get_str());
-            $defense = roll(0, $character->stats->get_def());
-            $damage  = $defense - $attack;
-        }
-
-        if ($attack > $defense) {
-            attack_success($monster, $damage);
-        } else {
+        // block
+        if ($damage <= 0) {
             $parry = roll(1,300) >= 150 ? 1 : 0;
-            attack_blocked($character, $monster, $parry);
+            attack_blocked($attacker, $attackee, $parry, $current);
+        } else {
+            attack_success($attacker, $attackee, $damage, $current);
         }
     }
-    
 
-    function attack_misses($attacker, $attackee, $offguard) {
-        global $mn_name, $ch_name, $monster, $character;
-        $verbs = ["attacks", "pummels", "strikes", "assaults", "blugeons", "ambushes", "beats", "besieges", "blasts", "bombards", "charges", "harms", "hits", "hurts", "infiltrates", "invades", "raids", "stabs", "stormss", "strikes"];
+    function attack_missed($attacker, $attackee, $offguard, $turn) {
+        global $mn_name, $ch_name, $monster, $character, $verbs, $adverbs, $turn, $colors;
         $atk_verb = $verbs[array_rand($verbs)];
+        $atk_adverb = $adverbs[array_rand($adverbs)];
+        
 
-        $out_msg = "<span class=\"text-danger\">{$attacker->get_name()} $atk_verb {$attackee->get_name()} but misses horribly</span><br>";
+        $out_msg = "<span class=\"{$colors[0]}\">{$attacker->get_name()} $atk_adverb $atk_verb {$attackee->get_name()} but misses!</span><br>";
 
         if ($offguard) {
             $attack = roll(0, intval($attackee->stats->get_str() / 2));
@@ -89,22 +86,37 @@
             
             if (!check_alive($attacker)) {
                 $class = "bg-text-danger";
-                $out_msg .= "<span class=\"bg-text-danger fw-bold\">{$attacker->get_name()} has been killed!</span><br>";
+                $out_msg .= "<span class=\"fw-bold text-center bg-text-danger\">{$attacker->get_name()} has been killed!</span><br>";
+                
+                if ($turn == Turn::ENEMY) {
+                    award_player($attacker, $attackee);
+                }
+
                 echo $out_msg;
                 return;
             }
-            $out_msg .= "<span class=\"text-danger\">{$attackee->get_name()} sees an opportunity to strike the {$attacker->get_name()} and with a carefully timed blow, lands a hit for $attack damage!</span><br>";
+            $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$attackee->get_name()} sees an opportunity to strike the {$attacker->get_name()} and with a carefully timed blow, lands a hit for $attack damage! ({$attackee->stats->get_hp()} left)</span><br>";
+            $attackee->stats->sub_hp($attack);
+            check_alive($attackee);
         }
         echo $out_msg;
         
     }
 
-    function attack_success($attacker, $attackee){
-        $out_msg = '';
+    function attack_success($attacker, $attackee, $damage, $turn){
+        global $colors, $verbs;
+        $out_msg = "<span class=\"{$colors[$turn->value]}}\">{$attackee->get_name()} {$verbs[array_rand($verbs)]} {$attacker->get_name()} for $damage damage! ({$attackee->stats->get_hp()} left)</span><br>";
+        $attackee->stats->sub_hp($damage);
+        check_alive($attackee);
+        echo $out_msg;
+
     }
 
-    function attack_blocked($attacker, $attackee, $parry) {
+    function attack_blocked($attacker, $attackee, $parry, $turn) {
+        global $colors, $verbs;
 
+        $out_msg = "<span class=\"{$colors[0]}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} but {$attackee->get_name()} blocks it!</span><br>";
+        echo $out_msg;
     }
 
     function check_alive(&$target): bool {

@@ -43,7 +43,7 @@
     <div class="d-flex pt-3">
         <div class="container border border-1">
             <div class="row">
-                <div class="col pt-3">
+                <div id="monster-stats" name="monster-stats" class="col pt-3">
                     <?php
                         if ($mon_loaded) {
                             echo $monster->get_name();

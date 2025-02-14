@@ -180,11 +180,11 @@
 
     </head>
 
-    <body data-bs-theme="dark">
+    <body data-bs-theme="dark" class="main-font">
 
 
-        <div class="d-flex align-items-center min-vh-100" style="min-width: 325px;">
-            <div id="login-container" class="container shadow border border-secondary" style="max-width:550px; width: 100%;">
+        <div class="d-flex align-items-center min-vh-100" style="min-width: 60%;">
+            <div id="login-container" class="container shadow border border-round border-1 border-tertiary" style="max-width:550px; width: 100%;">
                 <div class="row">
                     <div class="col p-4">
                         <div class="logo-container">
@@ -195,9 +195,7 @@
                 </div>
                 
                 <div class="row">
-                    <div class="col">
-                        <?php require_once 'navs/nav-login.php'; ?>
-                    </div>
+                    <?php require_once 'navs/nav-login.php'; ?>
                 </div>
 
                 <div aria-live="polite" aria-atomic="true" class="position-relative">

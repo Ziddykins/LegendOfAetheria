@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs" id="login-box" role="tablist">
+<ul class="nav nav-tabs mb-3" id="login-box" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-tab-pane" type="button" role="tab" aria-controls="login-tab-pane" aria-selected="true" onclick=tgl_active_signup(this)>
                                     <i class="fa-sm bi bi-diamond-fill" style="font-size: 10px;"></i> Login
@@ -24,18 +24,20 @@
                             </li>
                         </ul>
 
-                        <div class="tab-content" id="login-box-content">
-                            <p></p>
-                            <div class="tab-pane fade show active" id="login-tab-pane" role="tabpanel" aria-labelledby="login-tab" tabindex="0">
+                        <div class="tab-content mb-3" id="login-box-content">
+                            
+                            <div class="tab-pane fade show active mt-3" id="login-tab-pane" role="tabpanel" aria-labelledby="login-tab" tabindex="0">
                                 <form id="login-form" name="login-form" action="/" method="POST">
                                     <div class="border">
-                                        <div class="d-flex bg-body-secondary border">
-                                            <div class="p-2"><h6><i class="bi bi-person-fill-gear"></i> Account</h6></div>
+                                        <div class="d-flex text-bg-tertiary bg-gradient border shadow">
+                                            <div class="p-2">
+                                                <h6><i class="bi bi-person-fill-gear"></i> Account</h6>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <div class="input-group">
-                                        <span class="input-group-text rounded-0" id="icon-email"><i class="bi bi-envelope-plus"></i></span>
+                                        <span class="input-group-text" id="icon-email"><i class="bi bi-envelope-plus"></i></span>
                                         <div class="form-floating flex-grow-1">
                                             <input type="email" class="form-control" aria-label="Email" aria-describedby="icon-email" id="login-email" name="login-email" placeholder="Email" required />
                                             <label for="login-email">E-mail</label>
@@ -43,7 +45,7 @@
                                     </div>
 
                                     <div class="input-group mb-3">
-                                        <span class="input-group-text rounded-0" id="icon-password"><i class="bi bi-key"></i></span>
+                                        <span class="input-group-text" id="icon-password"><i class="bi bi-key"></i></span>
                                         <div class="form-floating flex-grow-1">
                                             <input type="password" class="form-control" id="login-password" name="login-password" placeholder="Password" aria-label="Password" aria-describedby="icon-password" required />
                                             <label for="login-password">Password</label>
@@ -51,7 +53,7 @@
                                     </div>
 
                                     <div class="vstack gap-1">                                    
-                                        <button class="btn btn-primary mb-3" id="login-submit" name="login-submit" value="1">
+                                        <button class="btn btn-primary" id="login-submit" name="login-submit" value="1">
                                             <i class="bi bi-door-open-fill"></i> Login
                                         </button>
                                     </div>
@@ -61,18 +63,16 @@
 
                             <div class="tab-pane fade" id="register-tab-pane" role="tabpanel" aria-labelledby="register-tab" tabindex="1">
                                 <form id="register-form" name="register-form" action="/" method="POST">
-                                    <div>
-                                        <div class="d-flex bg-body-secondary border">
+                                    <div class="mb-2">
+                                        <div class="d-flex text-bg-tertiary bg-gradient border shadow">
                                             <div class="p-2 flex-grow-1">
-                                                <h6>
-                                                    <i class="bi bi-person-fill-gear"></i> Account
-                                                </h6>
+                                                <h6><i class="bi bi-person-fill-gear"></i> Account</h6>
                                             </div>
                                         </div>
 
                                         <div>
                                             <div class="input-group">
-                                                <span class="input-group-text rounded-0" id="register-icon-email">
+                                                <span class="input-group-text" id="register-icon-email">
                                                     <i class="bi bi-envelope-plus"></i>
                                                 </span>
 
@@ -83,7 +83,7 @@
                                             </div>
 
                                             <div class="input-group">
-                                                <span class="input-group-text rounded-0" id="register-icon-password">
+                                                <span class="input-group-text" id="register-icon-password">
                                                     <i class="bi bi-key"></i>
                                                 </span>
                                                 <div class="form-floating flex-grow-1">
@@ -93,9 +93,9 @@
                                             </div>
 
                                             <div class="input-group">
-                                                <span class="input-group-text rounded-0" id="register-icon-password">
+                                                <span class="input-group-text" id="register-icon-password">
                                                     <i class="bi bi-key"></i>
-                                                    <sup style="margin-left: -12px; margin-top: -8px;">x2</sup>
+                                                    <sup style="margin-left: -14px; margin-top: -8px;">x2</sup>
                                                 </span>
                                                 <div class="form-floating flex-grow-1">
                                                     <input type="password" class="form-control" id="register-password-confirm" name="register-password-confirm" placeholder="Password (Confirm)" aria-label="Password" aria-describedby="register-icon-password-confirm" required>
@@ -106,18 +106,17 @@
                                     </div>
                                     
                                     <div>
-                                        <div class="d-flex bg-body-secondary border">
+                                        <div class="d-flex text-bg-tertiary bg-gradient border shadow">
                                             <div class="p-2 flex-grow-1">
-                                                <h6>
-                                                    <i class="bi bi-emoji-laughing-fill"></i> Character
-                                                </h6>
+                                                <h6><i class="bi bi-emoji-laughing-fill"></i> Character</h6>
                                             </div>
                                         </div>
                                     
                                         <div class="input-group">
-                                            <span class="input-group-text rounded-0" id="register-icon-character">
+                                            <span class="input-group-text" id="register-icon-character">
                                                 <i class="bi bi-credit-card-2-front"></i>
                                             </span>
+
                                             <div class="form-floating flex-grow-1">
                                                 <input type="text" class="form-control" id="register-character-name" name="register-character-name" placeholder="character-name" required>
                                                 <label for="register-character-name">Character Name</label>
@@ -125,10 +124,10 @@
                                         </div>
                                         
                                         <div class="input-group">
-                                            <span class="input-group-text rounded-0" id="register-icon-character">
+                                            <span class="input-group-text" id="register-icon-character">
                                                 <i class="bi bi-droplet"></i>
                                             </span>
-                                            <select class="form-select form-select form-control" style="font-size: 1.00rem;" aria-label=".form-select" id="race-select" name="race-select" required>
+                                            <select class="form-select form-select form-control" style="font-size: 1.20rem; font-weight: lighter;" aria-label=".form-select" id="race-select" name="race-select" required>
                                                 <option value="Select a Race" disabled selected>Select a Race</option>
                                                 <?php
                                                     use Game\Character\Enums\Races;
@@ -143,12 +142,12 @@
                                         </div>
 
                                         <div class="input-group">
-                                            <span class="input-group-text rounded-0" id="register-icon-avatar">
+                                            <span class="input-group-text" id="register-icon-avatar">
                                                 <i class="bi bi-person-bounding-box"></i>
                                             </span>
 
-                                            <select class="form-select form-select form-control" aria-label=".form-select" id="avatar-select" name="avatar-select" style="font-size: 1.00rem" required>
-                                                <option value="select avatar" disabled selected>select avatar</option>
+                                            <select class="form-select form-select form-control" aria-label=".form-select" id="avatar-select" name="avatar-select" style="font-size: 1.20rem; font-weight: lighter;" required>
+                                                <option value="select avatar" disabled selected>Select Avatar</option>
                                                 <?php
                                                     $images = scandir('img/avatars');
                                                     for ($i=2; $i<count($images); $i++) {
@@ -175,12 +174,23 @@
                                                 document.getElementById("avatar-img").classList.remove("invisible");
                                             });
                                         </script>
-                                        
+                                    </div>
+
+                                    <div class="mb-2 mt-2">    
                                         <div class="border">
-                                            <div class="d-flex bg-body-secondary border">
-                                                <div class="p-2 flex-grow-1"><h6><i class="bi bi-dice-5-fill"></i> Stats</h6></div>
-                                                <div class="p-2 fw-bold"><i class="bi bi-capslock-fill"></i> AP: </div>
-                                                <div class="p-2" name="stats-remaining-ap" id="stats-remaining-ap">10</div>
+                                            <div class="d-flex text-bg-tertiary bg-gradient border shadow align-content-start">
+                                                <div class="p-2 flex-grow-1">
+                                                    <h6><i class="bi bi-dice-5-fill"></i> Stats</h6>
+                                                </div>
+                                                
+                                                <div class="p-2 fw-bold">
+                                                    <i class="bi bi-capslock-fill"></i>
+                                                    AP: 
+                                                </div>
+                                                
+                                                <div class="p-2" name="stats-remaining-ap" id="stats-remaining-ap">
+                                                    10
+                                                </div>
                                             </div>
                                         </div>
 
@@ -211,7 +221,7 @@
                                     <input type="text" id="def-ap" name="def-ap" hidden />
                                     <input type="text" id="int-ap" name="int-ap" hidden />
                                     
-                                    <p></p>
+                                    
                                     
                                     <div class="vstack gap-1 mb-3">
                                         <button class="btn btn-success mb-3" id="register-submit" name="register-submit" value="1">
@@ -268,7 +278,7 @@
                                                 </div>
 
                                                 <div class="input-group">
-                                                    <span class="input-group-text rounded-0" id="icon-name"><i class="bi bi-envelope-plus"></i></span>
+                                                    <span class="input-group-text" id="icon-name"><i class="bi bi-envelope-plus"></i></span>
                                                     <div class="form-floating flex-grow-1">
                                                         <input type="email" class="form-control" aria-label="Email" aria-describedby="icon-email" id="contact-email" name="contact-email" placeholder="Email" required>
                                                         <label for="contact-email">E-mail<span class="form-text text-danger">*</span></label>
@@ -276,7 +286,7 @@
                                                 </div>
 
                                                 <div class="input-group">
-                                                    <span class="input-group-text rounded-0" id="icon-message"><i class="bi bi-chat-dots-fill"></i></span>
+                                                    <span class="input-group-text" id="icon-message"><i class="bi bi-chat-dots-fill"></i></span>
                                                     <div class="form-floating flex-grow-1">
                                                         <textarea class="form-control" id="contact-message" name="contact-message" placeholder="Message" aria-label="Message" aria-describedby="contact-message" style="height: 200px;" required></textarea>
                                                         <label for="contact-message">Message</label>
@@ -297,26 +307,28 @@
                             </div>
                             
                             <div class="tab-pane fade text-center" id="status-tab-pane" role="tabpanel" aria-labelledby="status-tab" tabindex="3">
-                                <a href="<?php echo "https://" . htmlentities($_SERVER['HTTP_HOST']) . "/";?>">
-                                    <div class="btn-group ms-3" role="group" aria-label="basic outlined example">
-                                        <button type="button" class="btn btn-sm btn-secondary bg-gradient text-center text-white text-shadow fw-bolder font-monospace border border-black border-round">Almost</button>
-                                        <button type="button" class="btn btn-sm text-bg-dark bg-gradient text-center fw-bolder font-monospace border border-black border-round" style="text-shadow: black 0.45px 0.75px 0.5px;">&nbsp;&nbsp;Main Game&nbsp;&nbsp;</button>
-                                    </div>
-                                </a>
+                                <div class="d-grid gap-2">
+                                    <a href="<?php echo "https://" . htmlentities($_SERVER['HTTP_HOST']) . "/";?>">
+                                        <div class="btn-group mb-3" role="group" aria-label="basic outlined example">
+                                            <button type="button" class="btn btn-sm btn-success bg-gradient text-center text-white text-shadow fw-bolder font-monospace border border-black" style="text-shadow: black 0.45px 0.75px 0.2px;">Working</button>
+                                            <button type="button" class="btn btn-sm text-bg-dark bg-gradient text-center fw-bolder font-monospace border border-black" style="text-shadow: black 0.45px 0.75px 0.2px;">&nbsp;&nbsp;Main Game&nbsp;&nbsp;</button>
+                                        </div>
+                                    </a>
 
-                                <a href="https://github.com/ziddykins/legendofaetheria">
-                                    <div class="btn-group ms-3 mb-2" role="group" aria-label="basic outlined example">
-                                        <button type="button" class="btn btn-sm btn-danger bg-gradient text-center text-shadow fw-bolder font-monospace border border-black border-round" style="text-shadow: black 0.45px 0.75px 0.5px;">Unstable</button>
-                                        <button type="button" class="btn btn-sm text-bg-dark bg-gradient text-center fw-bolder font-monospace border border-black border-round" style="text-shadow: black 0.45px 0.75px 0.5px;">&nbsp;Repository&nbsp;&nbsp;</button>
-                                    </div>
-                                </a>
-                                
-                                <a href="https://github.com/Ziddykins/LegendOfAetheria/blob/master/install/AutoInstaller.pl">
-                                    <div class="btn-group ms-3 mb-2" role="group" aria-label="basic outlined example">
-                                        <button type="button" class="btn btn-sm btn-danger bg-gradient text-center text-shadow fw-bolder font-monospace border border-black border-round" style="text-shadow: black 0.45px 0.75px 0.5px;">Unstable</button>
-                                        <button type="button" class="btn btn-sm text-bg-dark bg-gradient text-center fw-bolder font-monospace border border-black border-round" style="text-shadow: black 0.45px 0.75px 0.5px;">Autoinstaller</button>
-                                    </div>
-                                </a>
+                                    <a href="https://github.com/ziddykins/legendofaetheria">
+                                        <div class="btn-group mb-3" role="group" aria-label="basic outlined example">
+                                            <button type="button" class="btn btn-sm btn-success bg-gradient text-center text-shadow fw-bolder font-monospace border border-black" style="text-shadow: black 0.45px 0.75px 0.2px;">Working</button>
+                                            <button type="button" class="btn btn-sm text-bg-dark bg-gradient text-center fw-bolder font-monospace border border-black" style="text-shadow: black 0.45px 0.75px 0.2px;">&nbsp;Repository&nbsp;&nbsp;</button>
+                                        </div>
+                                    </a>
+                                    
+                                    <a href="https://github.com/Ziddykins/LegendOfAetheria/blob/master/install/AutoInstaller.pl">
+                                        <div class="btn-group mb-3" role="group" aria-label="basic outlined example">
+                                            <button type="button" class="btn btn-sm btn-danger bg-gradient text-center text-shadow fw-bolder font-monospace border border-black" style="text-shadow: black 0.45px 0.75px 0.2px;">Unstable</button>
+                                            <button type="button" class="btn btn-sm text-bg-dark bg-gradient text-center fw-bolder font-monospace border border-black" style="text-shadow: black 0.45px 0.75px 0.2px;">Autoinstaller</button>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
 

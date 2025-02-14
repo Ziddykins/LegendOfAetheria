@@ -1,7 +1,7 @@
 <?php
 namespace Game\Battle\Enums;
 
-enum Turn {
-    case ENEMY;
-    case PLAYER;
+enum Turn: int{
+    case ENEMY = 0;
+    case PLAYER = 1;
 }

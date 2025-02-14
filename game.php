@@ -80,33 +80,33 @@
 
                         <hr style="width: 35%; opacity: .25; align-self: center;" />
 
-                        <div class="d-flex flex-column">
+                        <div class="d-flex flex-column" style="min-width:16px;">
                             <ul class="nav nav-flush flex-column mb-auto" id="menu">
-                                <li class="border rounded w-100">
-                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary text-white" data-bs-toggle="collapse" aria-expanded="true">
-                                        <i class="fs-5 bi <?php echo $char_menu_icon; ?> d-xl-inline text-center"></i>
+                                <li class="border w-100">
+                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary text-start" data-bs-toggle="collapse" aria-expanded="true">
+                                        <i class="fs-5 bi <?php echo $char_menu_icon; ?> nav-link d-md-inline text-center"></i>
                                         <span class="d-none d-lg-inline">Character</span>
                                     </a>
                                     
-                                    <ul id="menu-header-character" class="nav nav-pills collapse nav-flush flex-column bg-body-secondary" data-bs-parent="#menu" aria-expanded="false">
+                                    <ul id="menu-header-character" class="nav collapse nav-flush flex-column d-lg-inline" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
                                             <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">account_circle</span>
-                                                <span class="d-none d-md-inline"> Sheet</span>
+                                                <span class="d-none d-lg-inline"> Sheet</span>
                                             </a>
                                         </li>
                                         
                                         <li>
                                             <a href="?page=inventory" id="menu-sub-inventory" name="menu-sub-inventory" class="nav-link d-lg-inline text-center">
-                                                <span class="material-symbols-sharp">deployed_code</span>
-                                                <span class="d-none d-md-inline"> Inventory</span>
+                                                <span class="material-symbols-sharp fs-xl-5">deployed_code</span>
+                                                <span class="d-none d-xl-inline"> Inventory</span>
                                             </a>
                                         </li>
                                         
                                         <li>
                                             <a href="?page=" id="menu-sub-skills" name="menu-sub-skills" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">book_2</span>
-                                                <span class="d-none d-md-inline">Skills</span>
+                                                <span class="d-none d-lg-inline">Skills</span>
                                             </a>
                                         </li>
                                         
@@ -139,25 +139,26 @@
                                         </script>
 
                                         <li>
-                                            <a href="#" id="menu-sub-save" name="menu-sub-save" class="nav-link d-md-inline text-center" onclick=saveChar()>
+                                            <a href="#" id="menu-sub-save" name="menu-sub-save" class="nav-link d-lg-inline text-center" onclick=saveChar()>
                                                 <span class="material-symbols-sharp">save</span>
                                                 <span class="d-none d-lg-inline">Save</span>
                                             </a>
                                         </li>
+
                                     </ul>
                                 </li>
 
-                                 <li class="border rounded w-100">
+                                <li class="border w-100">
                                     <a href="#menu-header-familiar" id="menu-anchor-familiar" name="menu-anchor-familiar" class="nav-link" data-bs-toggle="collapse">
                                         <span class="fs-5 material-symbols-sharp">pets</span>
                                         <span class="d-none d-md-inline">Familiar</span>
                                     </a>
                                 
-                                    <ul class="collapse nav flex-column text-start bg-body-secondary" id="menu-header-familiar" data-bs-parent="#menu" aria-expanded="false">
+                                    <ul id="menu-header-familiar" class="collapse nav flex-column text-start"  data-bs-parent="#menu" aria-expanded="false">
                                         <li>
                                             <a href="?page=eggs" id="menu-sub-eggs" name="menu-sub-eggs" class="nav-link d-md-inline text-center">
                                                 <span class="material-symbols-sharp">egg</span>
-                                                <span class="d-none d-sm-inline">Hatchery</span>
+                                                <span class="d-none d-lg-inline">Hatchery</span>
                                             </a>
 
                                         </li>
@@ -165,12 +166,12 @@
                                 </li>
 
                                 <li class="border w-100">
-                                    <a href="#menu-header-travel" id="menu-anchor-location" name="menu-anchor-location" class="nav-link align-middle" data-bs-toggle="collapse">
+                                    <a href="#menu-header-travel" id="menu-anchor-location" name="menu-anchor-location" class="nav-link" data-bs-toggle="collapse">
                                         <i class="fs-5 bi bi-signpost-split-fill"></i>
-                                        <span class="d-none d-md-inline">Location</span>
+                                        <span class="d-none d-xl-inline">Location</span>
                                     </a>
                                 
-                                    <ul class="collapse nav flex-column text-start bg-body-secondary" id="menu-header-travel" data-bs-parent="#menu" aria-expanded="false">
+                                    <ul id="menu-header-travel" name="menu-header-travel" class="collapse nav flex-column text-start" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
                                             <a href="?page=hunt" id="menu-sub-hunt" name="menu-sub-hunt" class="nav-link d-md-inline text-center">
                                                 <span class="material-symbols-sharp">cruelty_free</span>
@@ -184,9 +185,9 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" id="menu-sub-explore" name="menu-sub-explore" class="nav-link d-md-inline text-center">
-                                                <span class="material-symbols-sharp">travel_explore</span>
-                                                <span class="d-none d-lg-inline">Explore</span>
+                                            <a href="?page=" id="menu-sub-explore" name="menu-sub-explore" class="nav-link d-lg-inline text-center">
+                                                <span class="text-xl-center fs-xl-1 material-symbols-sharp">travel_explore</span>
+                                                <span class="d-sm-none d-xl-inline">Explore</span>
                                             </a>
                                         </li>
                                         <li>
@@ -213,12 +214,12 @@
                                 </li>
 
                                 <li class="border w-100">
-                                    <a href="#menu-header-dungeon" id="menu-anchor-dungeon" name="menu-anchor-dungeon" class="nav-link align-middle" data-bs-toggle="collapse">
+                                    <a href="#menu-header-dungeon" id="menu-anchor-dungeon" name="menu-anchor-dungeon" class="nav-link" data-bs-toggle="collapse">
                                         <i class="fs-4 bi bi-bricks"></i>
-                                        <span class="d-none d-md-inline fs-6">Dungeon</span>
+                                        <span class="d-none d-lg-inline fs-6">Dungeon</span>
                                     </a>
 
-                                    <ul id="menu-header-dungeon" class="collapse nav flex-column text-start bg-body-secondary" data-bs-parent="#menu" aria-expanded="false">
+                                    <ul id="menu-header-dungeon" name="menu-header-dungeon" class="collapse nav flex-column text-start" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
                                             <a href="?page=" id="menu-sub-floor" name="menu-sub-floor" class="nav-link d-md-inline text-center">
                                                 <span class="material-symbols-sharp">floor</span>
@@ -249,7 +250,7 @@
                                         <span class="d-none d-md-inline">Quests</span>
                                     </a>
 
-                                    <ul id="menu-header-quests" name="menu-header-quests bg-body-secondary" class="collapse nav flex-column text-start" data-bs-parent="#menu">
+                                    <ul id="menu-header-quests" name="menu-header-quests" class="collapse nav flex-column text-start" data-bs-parent="#menu">
                                         <li>
                                             <a href="?page=" id="menu-sub-active" name="menu-sub-active" class="nav-link d-md-inline text-center">
                                                 <span class="material-symbols-sharp">pending_actions</span>
