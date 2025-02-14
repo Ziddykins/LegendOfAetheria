@@ -124,11 +124,7 @@ if (check_session()) {
 
 <body class="main-font" data-bs-theme="dark">
     <div class="d-flex align-items-center min-vh-100" style="min-width: 325px;">
-        <div class="text-center float-right">
-            <button type="button" role="button" class="btn btn-sm btn-outline-secondary">Sign Out</button>
-        </div>
-        
-        <div class="container mt-5">
+        <div class="container">
             <div class="d-flex justify-content-center">
                 <?php
                 for ($i = 1; $i < 4; $i++) {
@@ -142,7 +138,12 @@ if (check_session()) {
             </div>
         </div>
     </div>
-    <script>
+
+    <span class="d-grid sticky-bottom">
+        <a href="/logout"><button id="signout-button" name="signout-button" type="button" role="button" class="btn btn-sm btn-dark bg-gradient">Sign Out</button></a>
+    </span>
+
+<script>
         document.querySelectorAll("button[id^='select-new-']").forEach((button) => {
             button.addEventListener("click", (e) => {
                 let slot = button.id.split("-")[2];
