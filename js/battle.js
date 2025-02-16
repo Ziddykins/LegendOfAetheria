@@ -27,7 +27,7 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
                 'Accept': 'text/plain'
             },
             method: 'POST',
-            body: `action=${which}&type=${atk_type}`}
+            body: `action=${which}&type=${atk_type}&csrf-token=${csrf_token}`}
         ).then((response) => {
             if (!response.ok) {
                 return response.text().then((data) => {
@@ -38,7 +38,7 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
             }
         }).then((data) => {
             battle_log.innerHTML = battle_log.innerHTML + `${data}`;
-            console.log(data);
+            document.getElementById('battle-log').textContent = player_hp;
         }).catch((error) => {
             battle_log.innerHTML = battle_log.innerHTML + `${error.message}`;
         });
@@ -47,12 +47,19 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
 
 document.querySelectorAll("button").forEach((btn) => {
     if (btn.attributes.getNamedItem("data-loa-monld") != null) {
+
         if (btn.attributes.getNamedItem("data-loa-monld").value == "1") {
-            btn.disabled = false;
-            console.log("Should be enabled");
+            if (mon_loaded == 1) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
         } else {
-            btn.disabled = true;
-            console.log("Shouldn't be enabled");
+            if (mon_loaded == 1) {
+                btn.disabled = true;
+            } else {
+                btn.disabled = false;
+            }
         }
     }
 });
