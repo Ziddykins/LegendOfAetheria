@@ -141,7 +141,7 @@ use Game\Character\Enums\FriendStatus;
                             $temp_account->load();
                             $online = $temp_account->get_sessionID();
                             $sender_account = new Character($temp_account->get_id());
-                            $sender_account->set_id($temp_account->get_charSlot1());
+                            $sender_account->set_id(intval($temp_account->get_charSlot1()));
                             $sender_account->load();
                             
                           
@@ -191,7 +191,7 @@ use Game\Character\Enums\FriendStatus;
                             $temp_account   = new Account($requests[$i]['email_1']);
                             $temp_account->load();
                             $sender_account = new Character($temp_account->get_id());
-                            $sender_account->set_id($temp_account->get_charSlot1());
+                            $sender_account->set_id(intval($temp_account->get_charSlot1()));
                             $sender_account->load();
                             
                             echo '<form id="accept-request-' . $sender_account->get_accountID() . '" name="accept-request-'. $sender_account->get_accountID(). '" action="/game?page=friends&action=accept_request" method="POST">';

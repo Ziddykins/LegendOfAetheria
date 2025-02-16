@@ -4,11 +4,15 @@
 
     use Game\System\Enums\LOAError;
     use Game\System\Enums\Weather;
+    use Game\Character\Character;
+
+    require_once "functions.php";
+
     session_start();
 
     if (!isset($argv)) {
-        echo 'Access to cron.php directly is not allowed!';
-        exit(LOAError::CRON_HTTP_DIRECT_ACCESS);
+        echo 'Access to cron.php directly is not allowed!<br>';
+        exit(LOAError::CRON_HTTP_DIRECT_ACCESS->name);
     }
     
     switch ($argv[1]) {
@@ -28,7 +32,7 @@
 
     function do_minute() {
         regenerate();
-        check_eggs();
+//        check_eggs();
     }
     
     function do_hourly() {
@@ -76,21 +80,17 @@
     
     function regenerate() {
         global $db, $log;
-        $sql_query = "SELECT * FROM  {$_ENV['SQL_CHAR_TBL']} WHERE `ep` <> `max_ep` OR `hp` <> `max_hp` OR `mp` <> `max_mp`";
-        $results = $db->query($sql_query);
+        $sql_query = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']}";
+        $characters = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
     
-        while ($player = $results->fetch_assoc()) {
+        foreach ($characters as $character) {
+            $obj_char = new Character($character['account_id'], $character['id']);
+            $obj_char->stats = safe_serialize($character['stats'], true);
+            
             $stats = [ "mp", "hp", "ep" ];
-
             foreach ($stats as $stat) {
-                $new_stat = $player[$stat] + REGEN_PER_TICK;
-                $new_stat = min($new_stat, $player["max_$stat"]);
-    
-                $sql_query = 'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . " SET $stat = ? WHERE id = ?";
-                $db->execute_query($sql_query, [ $new_stat, $player['id'] ]);
-
-                $log->info("Updating $stat to $new_stat", ['SQL_QUERY' => $sql_query]);
-                $db->query($sql_query);
+                $set_str = "add_$stat";
+                $obj_char->stats->$set_str(REGEN_PER_TICK);
             }
         }
     }
