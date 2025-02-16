@@ -83,12 +83,12 @@
                         <div class="d-flex flex-column" style="min-width:16px;">
                             <ul class="nav nav-flush flex-column mb-auto" id="menu">
                                 <li class="border w-100">
-                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary text-start" data-bs-toggle="collapse" aria-expanded="true">
-                                        <i class="fs-5 bi <?php echo $char_menu_icon; ?> nav-link d-md-inline text-center"></i>
-                                        <span class="d-none d-lg-inline">Character</span>
+                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary active" data-bs-toggle="collapse" aria-expanded="true">
+                                        <i class="fs-5 bi <?php echo $char_menu_icon; ?> d-lg-inline text-sm-center"></i>
+                                        <span class="d-none d-xxl-inline text-sm-start">Character</span>
                                     </a>
                                     
-                                    <ul id="menu-header-character" class="nav collapse nav-flush flex-column d-lg-inline" data-bs-parent="#menu" aria-expanded="false">
+                                    <ul id="menu-header-character" class="nav collapse nav-flush flex-column" data-bs-parent="#menu" aria-expanded="true">
                                         <li>
                                             <a href="?page=sheet" id="menu-sub-sheet" name="menu-sub-sheet" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">account_circle</span>
@@ -98,8 +98,8 @@
                                         
                                         <li>
                                             <a href="?page=inventory" id="menu-sub-inventory" name="menu-sub-inventory" class="nav-link d-lg-inline text-center">
-                                                <span class="material-symbols-sharp fs-xl-5">deployed_code</span>
-                                                <span class="d-none d-xl-inline"> Inventory</span>
+                                                <span class="material-symbols-sharp">deployed_code</span>
+                                                <span class="small d-none d-lg-inline"> Inventory</span>
                                             </a>
                                         </li>
                                         
@@ -150,13 +150,13 @@
 
                                 <li class="border w-100">
                                     <a href="#menu-header-familiar" id="menu-anchor-familiar" name="menu-anchor-familiar" class="nav-link" data-bs-toggle="collapse">
-                                        <span class="fs-5 material-symbols-sharp">pets</span>
-                                        <span class="d-none d-md-inline">Familiar</span>
+                                        <span class="material-symbols-sharp">pets</span>
+                                        <span class="d-none d-lg-inline">Familiar</span>
                                     </a>
                                 
                                     <ul id="menu-header-familiar" class="collapse nav flex-column text-start"  data-bs-parent="#menu" aria-expanded="false">
                                         <li>
-                                            <a href="?page=eggs" id="menu-sub-eggs" name="menu-sub-eggs" class="nav-link d-md-inline text-center">
+                                            <a href="?page=eggs" id="menu-sub-eggs" name="menu-sub-eggs" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">egg</span>
                                                 <span class="d-none d-lg-inline">Hatchery</span>
                                             </a>
@@ -168,30 +168,30 @@
                                 <li class="border w-100">
                                     <a href="#menu-header-travel" id="menu-anchor-location" name="menu-anchor-location" class="nav-link" data-bs-toggle="collapse">
                                         <i class="fs-5 bi bi-signpost-split-fill"></i>
-                                        <span class="d-none d-xl-inline">Location</span>
+                                        <span class="d-none d-lg-inline">Location</span>
                                     </a>
                                 
                                     <ul id="menu-header-travel" name="menu-header-travel" class="collapse nav flex-column text-start" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
-                                            <a href="?page=hunt" id="menu-sub-hunt" name="menu-sub-hunt" class="nav-link d-md-inline text-center">
+                                            <a href="?page=hunt" id="menu-sub-hunt" name="menu-sub-hunt" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">cruelty_free</span>
                                                 <span class="d-none d-lg-inline">Hunt</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" id="menu-sub-map" name="menu-sub-map" class="nav-link d-md-inline text-center">
+                                            <a href="?page=" id="menu-sub-map" name="menu-sub-map" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">map</span>
                                                 <span class="d-none d-lg-inline">Map</span>
                                             </a>
                                         </li>
                                         <li>
                                             <a href="?page=" id="menu-sub-explore" name="menu-sub-explore" class="nav-link d-lg-inline text-center">
-                                                <span class="text-xl-center fs-xl-1 material-symbols-sharp">travel_explore</span>
-                                                <span class="d-sm-none d-xl-inline">Explore</span>
+                                                <span class="material-symbols-sharp">travel_explore</span>
+                                                <span class="d-none d-lg-inline">Explore</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" id="menu-sub-zone" name="menu-sub-zone" class="nav-link d-md-inline text-center">
+                                            <a href="?page=" id="menu-sub-zone" name="menu-sub-zone" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">move_location</span>
                                                 <span class="d-none d-lg-inline">Zone</span>
                                             </a>
@@ -205,9 +205,9 @@
                                                     $rest_disabled = '';
                                                 }
                                             ?>
-                                            <a href="?page=" id="menu-sub-rest" name="menu-sub-rest" class="nav-link <?php echo $rest_disabled; ?> d-md-inline text-center">
+                                            <a href="?page=" id="menu-sub-rest" name="menu-sub-rest" class="nav-link <?php echo $rest_disabled; ?> d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">nights_stay</span>
-                                                <span class="d-none d-lg-inline"> Rest</span>
+                                                <span class="d-none d-lg-inline">Rest</span>
                                             </a>
                                         </li>
                                     </ul>
@@ -221,15 +221,15 @@
 
                                     <ul id="menu-header-dungeon" name="menu-header-dungeon" class="collapse nav flex-column text-start" data-bs-parent="#menu" aria-expanded="false">
                                         <li>
-                                            <a href="?page=" id="menu-sub-floor" name="menu-sub-floor" class="nav-link d-md-inline text-center">
+                                            <a href="?page=" id="menu-sub-floor" name="menu-sub-floor" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">floor</span>
                                                 <span class="d-none d-lg-inline">Floor <?php echo $character->get_floor(); ?></span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="#" id="menu-sub-reset" name="menu-sub-reset" class="nav-link d-md-inline text-center" data-bs-toggle="modal" data-bs-target="#reset-modal" >
+                                            <a href="#" id="menu-sub-reset" name="menu-sub-reset" class="nav-link d-lg-inline text-center" data-bs-toggle="modal" data-bs-target="#reset-modal" >
                                                 <span class="material-symbols-sharp text-danger">restart_alt</span>
-                                                <span class="d-none d-sm-inline text-danger">Reset</span>
+                                                <span class="d-none d-lg-inline text-danger">Reset</span>
                                             </a>
 
                                             <?php
@@ -252,25 +252,25 @@
 
                                     <ul id="menu-header-quests" name="menu-header-quests" class="collapse nav flex-column text-start" data-bs-parent="#menu">
                                         <li>
-                                            <a href="?page=" id="menu-sub-active" name="menu-sub-active" class="nav-link d-md-inline text-center">
+                                            <a href="?page=" id="menu-sub-active" name="menu-sub-active" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">pending_actions</span>
                                                 <span class="d-none d-lg-inline">Active</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" id="menu-sub-completed" name="menu-sub-completed" class="nav-link d-md-inline text-center">
+                                            <a href="?page=" id="menu-sub-completed" name="menu-sub-completed" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">inventory</span>
                                                 <span class="d-none d-lg-inline">Completed</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=achievements" id="menu-sub-achievements" name="menu-sub-achievements" class="nav-link d-md-inline text-center">
+                                            <a href="?page=achievements" id="menu-sub-achievements" name="menu-sub-achievements" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">military_tech</span>
                                                 <span class="d-none d-lg-inline">Achievements</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="?page=" id="menu-sub-awards" name="menu-sub-awards" class="nav-link d-md-inline text-center">
+                                            <a href="?page=" id="menu-sub-awards" name="menu-sub-awards" class="nav-link d-lg-inline text-center">
                                                 <span class="material-symbols-sharp">trophy</span>
                                                 <span class="d-none d-lg-inline">Awards</span>
                                             </a>

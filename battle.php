@@ -27,6 +27,13 @@
 
     if (check_session() === true) {
         if (isset($_POST['action'])) {
+            if (isset($_POST['csrf-token']) && $_POST['csrf-token'] !== $_SESSION['csrf-token']) {
+                http_response_code(400);
+                echo "CSRF Token Mismatch";
+                exit();
+            } else {
+                echo $_SESSION['csrf-token'];
+            }
             $action = $_POST['action'];
             $out_msg = null;
 

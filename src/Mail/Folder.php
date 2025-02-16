@@ -35,12 +35,16 @@ class Folder {
      */
     public function getMessages() {
         global $db;
-        $sql_query = 'SELECT * FROM '. $_ENV['SQL_MAIL_TBL']. 
-                    'WHERE account_id = '. $this->accountID. 
-                    'AND folder = "'. $this->folderType->name. '"';
-        $results = $db->query($sql_query);
+        $sql_query = <<<SQL
+            SELECT * FROM {$_ENV['SQL_MAIL_TBL']} 
+            WHERE
+                account_id = ? AND
+                folder = ?
+        SQL;
 
-        while ($row = $results->fetch_assoc()) {
+        $characters = $db->execute_query($sql_query, [ $this->accountID, $this->folderType->name ])->fetch_all(MYSQLI_ASSOC);
+
+        foreach ($characters as $row) {
             $envelope = new Envelope($row['sender'], $row['recipient']);
             $envelope->mail_id    = $row['id'];
             $envelope->sender     = $row['sender'];

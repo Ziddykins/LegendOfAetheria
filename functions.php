@@ -493,8 +493,9 @@ use Game\Character\Character;
 
     function check_csrf($req_csrf) {
         if ($req_csrf != $_SESSION['csrf-token']) {
-            //session_destroy();
-            //header('Location: /?csrf_fail');
-            //exit();
+            $_SESSION = [];
+            session_destroy();
+            header('Location: /?csrf_fail');
+            exit();
         }
     }

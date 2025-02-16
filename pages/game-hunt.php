@@ -15,10 +15,8 @@
     }
 
     if (isset($_POST['hunt-new-monster']) && $_POST['hunt-new-monster'] == 1) {
-        //check_csrf($_POST['csrf-token']);
-        if ($mon_loaded) {
-            //modal, flee or kill
-        } else {
+        check_csrf($_POST['csrf-token']);
+        if (!$mon_loaded) {
             $monster = new Monster(Scope::PERSONAL);
             
             $monster->new();
@@ -37,15 +35,32 @@
         $mon_str   = $monster->stats->get_str();
         $mon_int   = $monster->stats->get_int();
         $mon_def   = $monster->stats->get_def();
-        $mon_avatar = 'img/enemies/' . $monster->get_name() . '.webp';
+        $mon_avatar = '/img/enemies/' . str_replace(' ', '', $monster->get_name()) . '.png';
     }
 ?>
     <div class="d-flex pt-3">
         <div class="container border border-1">
             <div class="row">
-                <div id="monster-stats" name="monster-stats" class="col pt-3">
+                <div id="monster-stats" name="monster-stats" class="col pt-1 lh-1">
                     <?php if ($mon_loaded): ?>
+                        <?php echo $monster->get_name(); ?>
+                        <?php echo '<br><hr>'; ?>
+                        <div class="d-flex align-items-center">
+                            <img class="rounded-circle me-2" src="/img/enemies/<?php echo str_replace(' ', '', $monster->get_name()) . '.png';?>" width="50" height="50" />
+                            <div class="flex-grow-1">
+                                <span class="d-flex align-items-center small">
+                                    <span class="flex-grow-1 text-center">HP</span>
+                                    <span class="flex-grow-1 text-center">MP</span>
+                                    <span class="flex-grow-1 text-center">EP</span>
+                                </span>
 
+                                <span class="d-flex align-items-center small">
+                                    <span class="flex-grow-1 text-center"><?php echo $monster->stats->get_hp(); echo ' / '; echo $monster->stats->get_maxHp(); ?></span>
+                                    <span class="flex-grow-1 text-center"><?php echo $monster->stats->get_mp(); echo ' / '; echo $monster->stats->get_maxMp(); ?></span>
+                                    <span class="flex-grow-1 text-center"><?php echo $monster->stats->get_ep(); echo ' / '; echo $monster->stats->get_maxEp(); ?></span>
+                                </span>
+                            </div>
+                        </div>
                     <?php else: ?>
                             echo '-- No Monster --';
                     <?php endif; ?>
@@ -55,13 +70,25 @@
 
         <div class="container border border-1 ">
             <div class="row">
-                <div class="col">
+                <div class="col pt-1 lh-1">
                     <?php if ($mon_loaded): ?>
                         <?php echo $character->get_name(); ?>
-                        <?php echo '<br><hr><br>'; ?>
-                        HP :</span>  <?php echo $character->stats->get_hp(); echo ' / '; echo $character->stats->get_maxHp(); echo '<br>'; ?>
-                        MP :</span>  <?php echo $character->stats->get_mp(); echo ' / '; echo $character->stats->get_maxMp(); echo '<br>'; ?>
-                        EP :</span>  <?php echo $character->stats->get_ep(); echo ' / '; echo $character->stats->get_maxEp(); echo '<br>'; ?>
+                        <?php echo '<br><hr>'; ?>
+                        <div class="d-flex align-items-center">
+                            <img class="rounded-circle me-2" src="/img/avatars/<?php echo $character->get_avatar(); ?>" width="50" height="50" />
+                            <div class="flex-grow-1">
+                                <span class="d-flex align-items-center small">
+                                    <span class="flex-grow-1 text-center">HP</span>
+                                    <span class="flex-grow-1 text-center">MP</span>
+                                    <span class="flex-grow-1 text-center">EP</span>
+                                </span>
+                                <span class="d-flex align-items-center small">
+                                    <span id="player-hp" name="player-hp" class="flex-grow-1 text-center"><?php echo $character->stats->get_hp(); echo ' / '; echo $character->stats->get_maxHp(); ?></span>
+                                    <span class="flex-grow-1 text-center"><?php echo $character->stats->get_mp(); echo ' / '; echo $character->stats->get_maxMp(); ?></span>
+                                    <span class="flex-grow-1 text-center"><?php echo $character->stats->get_ep(); echo ' / '; echo $character->stats->get_maxEp(); ?></span>
+                                </span>
+                            </div>
+                        </div>
                     <?php else: ?>
                         // lol
                     <?php endif; ?> 
@@ -116,10 +143,12 @@
                 </div>
 
                 <div class="row mb-3">
-                    <div class="d-flex w-100">
-                        <button class="btn btn-sm btn-warning border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Steal</button>
-                        <button class="btn btn-sm btn-danger  border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Flee</button>
-                    </div>
+                    <form id="new-mon" name="new-mon" action="/game?page=hunt&action=flee&scope=personal" method="post">
+                        <div class="d-flex w-100">
+                            <button class="btn btn-sm btn-warning border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Steal</button>
+                            <button class="btn btn-sm btn-danger  border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Flee</button>
+                        </div>
+                    </form>
                 </div>
 
                 <div class="row mb-3">
@@ -137,12 +166,14 @@
 
     <div class="container-fluid border border-1">
         <div class="row">
-            <div id="battle-log" name="battle-log" class="col">
+            <div id="battle-log" name="battle-log" class="col lh-1">
 
             </div>
         </div>
     </div>
 </div>
 
-
-    <script src="/js/battle.js"></script>
+<script>var mon_loaded = <?php echo $mon_loaded; ?>;</script>
+<script>var csrf_token = "<?php echo $_SESSION['csrf-token']; ?>";</script>
+<script>var player_hp = <?php echo $character->stats->get_hp(); ?>;</script>
+<script src="/js/battle.js"></script>
