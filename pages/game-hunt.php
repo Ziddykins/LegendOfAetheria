@@ -23,7 +23,7 @@
             
             $monster->new();
             $monster->load(Scope::PERSONAL);
-            $monster->random_monster(Scope::PERSONAL, $monster->get_id());            
+            $monster->random_monster();
             $character->set_monster($monster);
         }
     }
@@ -44,17 +44,11 @@
         <div class="container border border-1">
             <div class="row">
                 <div id="monster-stats" name="monster-stats" class="col pt-3">
-                    <?php
-                        if ($mon_loaded) {
-                            echo $monster->get_name();
-                            echo '<br><hr><br>';
-                            echo "HP : $mon_hp / $mon_maxHP<br>";
-                            echo "MP : $mon_mp / $mon_maxMP<br>";
-                            echo "STR: $mon_str - DEF: $mon_def - INT: $mon_int<br>";
-                        } else {
+                    <?php if ($mon_loaded): ?>
+
+                    <?php else: ?>
                             echo '-- No Monster --';
-                        }
-                    ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -65,12 +59,12 @@
                     <?php if ($mon_loaded): ?>
                         <?php echo $character->get_name(); ?>
                         <?php echo '<br><hr><br>'; ?>
-                        <span class="text-danger">HP :</span>  <?php echo $mon_hp; echo ' / '; echo $mon_maxHP; ?>
-                        <span class="text-primary">MP :</span> <?php echo $mon_mp; echo ' / '; echo $mon_maxMP; ?>
+                        HP :</span>  <?php echo $character->stats->get_hp(); echo ' / '; echo $character->stats->get_maxHp(); echo '<br>'; ?>
+                        MP :</span>  <?php echo $character->stats->get_mp(); echo ' / '; echo $character->stats->get_maxMp(); echo '<br>'; ?>
+                        EP :</span>  <?php echo $character->stats->get_ep(); echo ' / '; echo $character->stats->get_maxEp(); echo '<br>'; ?>
                     <?php else: ?>
-                    
-                            
-                    <?php endif; ?>
+                        // lol
+                    <?php endif; ?> 
                 </div>
             </div>
         </div>
@@ -81,11 +75,11 @@
                 <div class="row">
                     <div class="d-flex w-100">
                         <div class="btn-group mb-3 me-1" role="group" aria-label="attack">
-                            <button id="hunt-attack-btn" name="hunt-attack-btn" type="button" class="btn btn-sm btn-primary mb-1 flex-fill">
+                            <button id="hunt-attack-btn" name="hunt-attack-btn" type="button" class="btn btn-sm btn-primary mb-1 flex-fill" data-loa-monld="1">
                                 Attack
                             </button>
                     
-                            <button id="hunt-attack-drop" name="hunt-attack-drop" type="button" class="btn btn-sm btn-primary mb-1 dropdown-toggle dropdown-toggle-split flex-fill disabled" data-bs-toggle="dropdown" aria-expanded="false" style="max-width: 20px;">
+                            <button id="hunt-attack-drop" name="hunt-attack-drop" type="button" class="btn btn-sm btn-primary mb-1 dropdown-toggle dropdown-toggle-split flex-fill" data-bs-toggle="dropdown" aria-expanded="false" style="max-width: 20px;" data-loa-monld="1">
                                 <span class="visually-hidden">Toggle Dropdown</span>
                             </button>
                         
@@ -97,11 +91,11 @@
                         </div>
 
                         <div class="btn-group mb-3" role="group" aria-label="spells">
-                            <button id="hunt-spells-btn" name="hunt-spells-btn" type="button" class="btn btn-sm btn-primary mb-1 flex-fill disabled">
+                            <button id="hunt-spells-btn" name="hunt-spells-btn" type="button" class="btn btn-sm btn-primary mb-1 flex-fill" data-loa-monld="1">
                                 Spells
                             </button>
                     
-                            <button id="hunt-spells-drop" name="hunt-spells-drop" type="button" class="btn btn-sm btn-primary mb-1 dropdown-toggle dropdown-toggle-split flex-fill disabled" data-bs-toggle="dropdown" aria-expanded="false" style="max-width: 20px;">
+                            <button id="hunt-spells-drop" name="hunt-spells-drop" type="button" class="btn btn-sm btn-primary mb-1 dropdown-toggle dropdown-toggle-split flex-fill" data-bs-toggle="dropdown" aria-expanded="false" style="max-width: 20px;" data-loa-monld="1">
                                 <span class="visually-hidden">Toggle Dropdown</span>
                             </button>
                         
@@ -116,23 +110,23 @@
 
                 <div class="row mb-3">
                     <div class="d-flex w-100">
-                        <button class="btn btn-sm btn-primary border-black flex-fill disabled" style="width: calc(100% + 20px);">Entice</button>
-                        <button class="btn btn-sm btn-primary border-black flex-fill disabled" style="width: calc(100% + 20px);">Capture</button>
+                        <button class="btn btn-sm btn-primary border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Entice</button>
+                        <button class="btn btn-sm btn-primary border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Capture</button>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="d-flex w-100">
-                        <button class="btn btn-sm btn-warning border-black flex-fill disabled" style="width: calc(100% + 20px);">Steal</button>
-                        <button class="btn btn-sm btn-danger  border-black flex-fill disabled" style="width: calc(100% + 20px);">Flee</button>
+                        <button class="btn btn-sm btn-warning border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Steal</button>
+                        <button class="btn btn-sm btn-danger  border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Flee</button>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <form id="new-mon" name="new-mon" action="/game?page=hunt&action=hunt&scope=personal" method="post">
                         <div class="d-flex w-100">
-                            <button id="hunt-new-monster" name="hunt-new-monster" class="btn btn-sm border-black btn-success flex-fill" style="width: calc(100% + 20px);" type="submit" value="1">Hunt</button>
-                            <button id="hunt-global-btn" name="hunt-global-btn" class="btn btn-sm border-black btn-secondary flex-fill disabled" style="width: calc(100% + 20px);">Global</button>
+                            <button id="hunt-new-monster" name="hunt-new-monster" class="btn btn-sm border-black btn-success flex-fill" style="width: calc(100% + 20px);" type="submit" value="1" data-loa-monld="0">Hunt</button>
+                            <button id="hunt-global-btn" name="hunt-global-btn" class="btn btn-sm border-black btn-secondary flex-fill" style="width: calc(100% + 20px);" data-loa-monld="0">Global</button>
                             <input id="csrf-token" name="csrf-token" type="hidden" value="<?php echo $_SESSION['csrf-token']; ?>" />
                         </div>
                     </form>

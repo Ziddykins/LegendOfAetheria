@@ -51,7 +51,7 @@ class Character {
     private function getNextCharSlotID($accountID): int {
         global $db;
         $sqlQuery = "SELECT IF (`char_slot1` IS NULL, 1, IF (`char_slot2` IS NULL, 2, IF (`char_slot3` IS NULL, 3, -1))) AS `free_slot` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
-        return $db->execute_query($sqlQuery, [ $accountID ])->fetch_assoc()['free_slot'];
+        return intval($db->execute_query($sqlQuery, [ $accountID ])->fetch_assoc()['free_slot']);
     }
 
     public static function genSelectCard($characterID, $slot): string {

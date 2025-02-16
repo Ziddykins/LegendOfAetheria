@@ -26,13 +26,13 @@
         $credits = $account->get_credits();
 
     
-        if ($credits < 1) {
+        /*if ($credits < 1) {
             echo "Not Enough Credits\n";
             exit();
         } else {
             $credits--;
             $account->set_credits($credits);
-        }
+        }(*/
 
         $sql_query = <<<SQL
             SELECT
@@ -65,11 +65,11 @@
             "messages" => [
                 [
                     "role" => "system",
-                    "content" =>  "You are a dungeon master who generates highly-detailed character descriptions",
+                    "content" =>  "You are a dungeon master who generates highly-detailed character descriptions. Only the description.",
                 ],
                 [
                     "role" => "user",
-                    "content" => "$prompt",
+                    "content" => (string) $prompt,
                 ],
             ],
             "max_tokens" => $chatbot->get_maxTokens()
@@ -79,20 +79,22 @@
             $chatbot->doRequest(HttpMethod::POST, $data)
         );
 
-
         $content       = $response->choices[0]->message->content;
         $finish_reason = $response->choices[0]->finish_reason;
         $description   = "";
 
-        if ($finish_reason == 'length') {
-            $tmp = explode("\n\n", $content);
+        $tmp = preg_split('/\./', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-            for ($i=0; $i<count($tmp) - 2; $i++) {
-                $description .= $tmp[$i] . "\n\n";
-            }
+        for ($i=0; $i<count($tmp) - 1; $i++) {
+            $description .= $tmp[$i] . ".\n\n";
         }
 
-        echo htmlentities($content);
+        $description = trim($description);
+
+        $character->set_description($description);
+        $account->sub_credits(10);
+        
+        echo $description;
     } else {
         echo "Invalid Query";
     }

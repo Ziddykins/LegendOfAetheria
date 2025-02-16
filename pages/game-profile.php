@@ -63,7 +63,7 @@
                             <label for="character-race" class="col-form-label fw-bold">LoAI Credits</label>
                             <div class="col">
                                 <input type="text" class="form-control" id="account-credits" name="account-credits" value="<?php echo $account->get_credits(); ?>" disabled>
-                                <small>Credits can be used for some OpenAI generation, such as your character's description below. Each generation costs 1 credit</small>
+                                <small>LoAI Credits can be used for some OpenAI generation, such as your character's description below.</small>
                             </div>
                         </div>
 
@@ -146,78 +146,61 @@
 </div>
 
 <script>
-    let original_description = "<?php echo $character->get_description();?>";
-    let description_changed  = 0;
     let swap_icons = document.querySelectorAll(".swap-icon");
     let id = null;
 
-    $("#character-description").on("change", 
-        function (event) {
-            if (document.getElementById("character-description").textContent == original_description) {
-                description_changed = 0;
+    swap_icons.forEach((element) => {
+        element.addEventListener('click', (btn) => {
+            let icon_par = element.parentElement;
+            id = '#' + $(element)[0].children[0].id;
+
+            if (btn.target.id == 'clear-icon') {
+                document.getElementById("character-description").textContent = "";
             } else {
-                description_changed = 1;
-            }
-        }
-    );
+                let do_ajax = 0;
+                let data    = null;
+                let url     = null;
 
+                $(id).hide();
+                $(element).prepend('<span id="spinner" class="spinner-border spinner-border-sm">');
+                icon_par.classList.add('disabled');
 
-    swap_icons.forEach(
-        function(element) {
-            element.addEventListener('click', 
-                function () {
-                    let icon_par = element.parentElement;
-                    id = '#' + $(element)[0].children[0].id;
-
-                    if (id == '#clear-icon') {
-                        document.getElementById("character-description").textContent = "";
-                    } else {
-                        let do_ajax = 0;
-                        let data    = null;
-                        let url     = null;
-
-                        $(id).hide();
-                        $(element).prepend('<span id="spinner" class="spinner-border spinner-border-sm">');
-                        icon_par.classList.add('disabled');
-
-                        if (id == "#save-icon") {
-                            url = "/game?page=save";
-                            data = {
-                                type: 'character',
-                                id: <?php echo $character->get_id(); ?>,
-                                data: JSON.stringify(document.getElementById("character-description").textContent)
-                            };
-                            do_ajax = 1;
-                        } else if (id == "#generate-icon") {
-                            url = "openai";
-                            data = { 
-                                characterID: <?php echo $character->get_id(); ?>,
-                                accountID: <?php echo $account->get_id(); ?>,
-                                generate_description: 1
-                            };
-                            do_ajax = 1;
-                        }
-
-                        if (do_ajax) {
-                            $.ajax({
-                                type: "POST",
-                                url: url,
-                                data: data,
-                                dataType: "json"
-                            }).always(function (response) {
-                                    document.querySelector("#character-description").value = response.responseText;
-                                    $("#spinner").remove();
-                                    $(id).show();
-                                    icon_par.classList.remove('disabled');
-                                    console.log(icon_par);
-                                }
-                            );
-                        }
-                    }
+                if (id == "#save-icon") {
+                    url = "/game?page=save";
+                    data = {
+                        type: 'character',
+                        id: <?php echo $character->get_id(); ?>,
+                        data: JSON.stringify(document.getElementById("character-description").textContent)
+                    };
+                    do_ajax = 1;
+                } else if (id == "#generate-icon") {
+                    url = "openai";
+                    data = { 
+                        characterID: <?php echo $character->get_id(); ?>,
+                        accountID: <?php echo $account->get_id(); ?>,
+                        generate_description: 1
+                    };
+                    do_ajax = 1;
                 }
-            );
-        }
-    );
+
+                if (do_ajax) {
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: data,
+                        dataType: "json"
+                    }).always(function (response) {
+                            document.querySelector("#character-description").value = response.responseText;
+                            $("#spinner").remove();
+                            $(id).show();
+                            icon_par.classList.remove('disabled');
+                            console.log(icon_par);
+                        }
+                    );
+                }
+            }
+        });
+    });
 
     document.getElementById('profile-apply').addEventListener('click',
         function(e) {

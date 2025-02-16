@@ -46,7 +46,7 @@ class Monster {
         return $this->propSync($method, $params, Type::MONSTER);
     }
 
-    public function __construct(Scope $scope, $char_id = null, $account_id = null) {
+    public function __construct(Scope $scope) {
         $this->scope = $scope;
         $this->seed  = bin2hex(random_bytes(8));
     }

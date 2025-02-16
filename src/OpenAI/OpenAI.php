@@ -1,6 +1,8 @@
 <?php
 namespace Game\OpenAI;
 
+use Game\OpenAI\Enums\HttpMethod;
+
 
 class OpenAI {
     protected $apiKey;
@@ -26,13 +28,13 @@ class OpenAI {
         curl_setopt($ch, CURLOPT_URL, $this->endPoint);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . $this->apiKey
+            "Authorization: Bearer {$this->apiKey}"
         ]);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         
         if ($method == HttpMethod::POST) {
             curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         }
         
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -52,7 +54,7 @@ class OpenAI {
         }
     }
 
-    function __call($method, $params) {
+    public function __call($method, $params) {
         $var = lcfirst(substr($method, 4));
 
         if (strncasecmp($method, "get_", 4) === 0) {

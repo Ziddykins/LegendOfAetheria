@@ -31,9 +31,15 @@
             $out_msg = null;
 
             if ($action === 'attack') {
-                do_turn(Turn::PLAYER);
-                $character->stats->sub_ep(1);
-                do_turn(Turn::ENEMY);
+                if ($character->stats->get_ep() > 0) {
+                    do_turn(Turn::PLAYER);
+                    $character->stats->sub_ep(1);
+                    do_turn(Turn::ENEMY);
+                } else {
+                    http_response_code(400);
+                    echo "<span class=\"text-danger\">SYSTEM></div><div class=\"text-warning\">No EP Left</div>\r\n\r\n";
+                    return false;
+                }
             }
         }
     }
@@ -107,9 +113,7 @@
         global $colors, $verbs;
         $out_msg = "<span class=\"{$colors[$turn->value]}}\">{$attackee->get_name()} {$verbs[array_rand($verbs)]} {$attacker->get_name()} for $damage damage! ({$attackee->stats->get_hp()} left)</span><br>";
         $attackee->stats->sub_hp($damage);
-        check_alive($attackee);
         echo $out_msg;
-
     }
 
     function attack_blocked($attacker, $attackee, $parry, $turn) {
@@ -120,9 +124,11 @@
     }
 
     function check_alive(&$target): bool {
-        if ($target->stats->get_hp()) {
+        if ($target->stats->get_hp() > 0) {
             return true;
         }
+        http_response_code(401);
+        echo "{$target->get_name()} is no longer alive";
         return false;
     }
 

@@ -40,7 +40,19 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
             battle_log.innerHTML = battle_log.innerHTML + `${data}`;
             console.log(data);
         }).catch((error) => {
-            console.error(error);
+            battle_log.innerHTML = battle_log.innerHTML + `${error.message}`;
         });
     });
+});
+
+document.querySelectorAll("button").forEach((btn) => {
+    if (btn.attributes.getNamedItem("data-loa-monld") != null) {
+        if (btn.attributes.getNamedItem("data-loa-monld").value == "1") {
+            btn.disabled = false;
+            console.log("Should be enabled");
+        } else {
+            btn.disabled = true;
+            console.log("Shouldn't be enabled");
+        }
+    }
 });

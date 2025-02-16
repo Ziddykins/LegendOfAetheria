@@ -213,13 +213,20 @@ trait PropSync {
             }
         } elseif (preg_match('/sub|add|mul|div|exp|mod/', $action)) {
             $cur_value = null;
+            $max_value = null;
             
             if (isset($this->$prop)) {
+                $str_max_prop = "max" . ucfirst($prop);
                 $cur_value = (int)$this->$prop;
+                $max_value = (int)$this->$str_max_prop;
+            } else {
+                return;
             }
 
             if (is_numeric($cur_value)) {
                 $new_value = $cur_value;
+
+                
                 switch ($action) {
                     case 'add':
                         $new_value += $params[0];
@@ -250,6 +257,8 @@ trait PropSync {
                         throw new Exception('Unknown PropModder');
                 }
                 $func = "set_$prop";
+
+                $new_value = min($new_value, $max_value);
                 $this->$func($new_value);
             } else {
                 throw new Exception('Current value is not numeric!');
