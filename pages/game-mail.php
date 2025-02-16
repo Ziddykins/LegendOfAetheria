@@ -56,9 +56,7 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                             <h3><?php echo $_SESSION['name']; ?>'s Messages</h3>
                         </div>
 
-                        ziddy   ThisIsNotTheLastTime
-                        /
-                        <?php
+<?php
                             for ($i=0; $i<$inbox_count - 1; $i++) {                                
                                 $subject  = $user_mailbox->focusedFolder->envelopes[$i]->subject;
                                 $sender   = $user_mailbox->focusedFolder->envelopes[$i]->sender;
