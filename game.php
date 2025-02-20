@@ -19,10 +19,8 @@
         $character->set_id($_SESSION['character-id']);
         $character->load();
 
-
-
-      //  $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
-      //  $familiar->loadFamiliar($character->get_id());
+        //  $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
+        //  $familiar->loadFamiliar($character->get_id());
 
         $char_menu_icon = $character->stats->get_hp() > 0 
             ? 'bi-emoji-laughing-fill' 
@@ -65,8 +63,6 @@
 <?php include('html/opener.html'); ?>
     <head>
         <?php include('html/headers.html'); ?>
-
-        
     </head>
         
     <body class="main-font" data-bs-theme="dark"> 
@@ -83,9 +79,9 @@
                         <div class="d-flex flex-column" style="min-width:16px;">
                             <ul class="nav nav-flush flex-column mb-auto" id="menu">
                                 <li class="border w-100">
-                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary active" data-bs-toggle="collapse" aria-expanded="true">
-                                        <i class="fs-5 bi <?php echo $char_menu_icon; ?> d-lg-inline text-sm-center"></i>
-                                        <span class="d-none d-xxl-inline text-sm-start">Character</span>
+                                    <a href="#menu-header-character" id="menu-anchor-character" name="menu-anchor-character" class="nav-link bg-primary active text-lg-start text-center" data-bs-toggle="collapse" aria-expanded="true">
+                                        <i class="fs-5 bi <?php echo $char_menu_icon; ?> d-lg-inline w-100 text-center text-lg-start"></i>
+                                        <span class="d-none d-xxl-inline text-start">Character</span>
                                     </a>
                                     
                                     <ul id="menu-header-character" class="nav collapse nav-flush flex-column" data-bs-parent="#menu" aria-expanded="true">
@@ -149,9 +145,9 @@
                                 </li>
 
                                 <li class="border w-100">
-                                    <a href="#menu-header-familiar" id="menu-anchor-familiar" name="menu-anchor-familiar" class="nav-link" data-bs-toggle="collapse">
-                                        <span class="material-symbols-sharp">pets</span>
-                                        <span class="d-none d-lg-inline">Familiar</span>
+                                    <a href="#menu-header-familiar" id="menu-anchor-familiar" name="menu-anchor-familiar" class="nav-link text-lg-start text-center" data-bs-toggle="collapse">
+                                        <span class="material-symbols-sharp d-lg-inline w-100 text-center text-lg-start">pets</span>
+                                        <span class="d-none d-xxl-inline text-start">Familiar</span>
                                     </a>
                                 
                                     <ul id="menu-header-familiar" class="collapse nav flex-column text-start"  data-bs-parent="#menu" aria-expanded="false">
@@ -166,9 +162,9 @@
                                 </li>
 
                                 <li class="border w-100">
-                                    <a href="#menu-header-travel" id="menu-anchor-location" name="menu-anchor-location" class="nav-link" data-bs-toggle="collapse">
-                                        <i class="fs-5 bi bi-signpost-split-fill"></i>
-                                        <span class="d-none d-lg-inline">Location</span>
+                                    <a href="#menu-header-travel" id="menu-anchor-location" name="menu-anchor-location" class="nav-link text-lg-start text-center" data-bs-toggle="collapse">
+                                        <i class="fs-5 bi bi-signpost-split-fill d-lg-inline w-100 text-center text-lg-start"></i>
+                                        <span class="d-none d-xxl-inline text-start">Location</span>
                                     </a>
                                 
                                     <ul id="menu-header-travel" name="menu-header-travel" class="collapse nav flex-column text-start" data-bs-parent="#menu" aria-expanded="false">
@@ -214,9 +210,9 @@
                                 </li>
 
                                 <li class="border w-100">
-                                    <a href="#menu-header-dungeon" id="menu-anchor-dungeon" name="menu-anchor-dungeon" class="nav-link" data-bs-toggle="collapse">
-                                        <i class="fs-4 bi bi-bricks"></i>
-                                        <span class="d-none d-lg-inline fs-6">Dungeon</span>
+                                    <a href="#menu-header-dungeon" id="menu-anchor-dungeon" name="menu-anchor-dungeon" class="nav-link text-lg-start text-center" data-bs-toggle="collapse">
+                                        <i class="fs-4 bi bi-bricks d-lg-inline w-100 text-center text-lg-start"></i>
+                                        <span class="d-none d-xxl-inline text-start fs-6">Dungeon</span>
                                     </a>
 
                                     <ul id="menu-header-dungeon" name="menu-header-dungeon" class="collapse nav flex-column text-start" data-bs-parent="#menu" aria-expanded="false">
@@ -245,9 +241,9 @@
                                 </li>
 
                                 <li class="border w-100">
-                                    <a href="#menu-header-quests" id="menu-anchor-quests" name="menu-anchor-quests" class="nav-link" data-bs-toggle="collapse">
-                                        <i class="fs-4 bi bi-clipboard-fill"></i>
-                                        <span class="d-none d-md-inline">Quests</span>
+                                    <a href="#menu-header-quests" id="menu-anchor-quests" name="menu-anchor-quests" class="nav-link text-lg-start text-center" data-bs-toggle="collapse">
+                                        <i class="fs-4 bi bi-clipboard-fill d-lg-inline w-100 text-center text-lg-start"></i>
+                                        <span class="d-none d-xxl-inline text-start">Quests</span>
                                     </a>
 
                                     <ul id="menu-header-quests" name="menu-header-quests" class="collapse nav flex-column text-start" data-bs-parent="#menu">
@@ -284,7 +280,7 @@
                         <hr style="width: 35%; opacity: .25; align-self: center;">
 
 
-                        <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 fixed-bottom" style="width: 15%;">
+                        <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 fixed-bottom">
                             <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
                                 <span><img src="img/avatars/<?php echo $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
                             </a>

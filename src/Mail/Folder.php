@@ -1,7 +1,6 @@
 <?php
 namespace Game\Mail;
 
-
 use Game\Mail\Enums\Type;
 
 class Folder {
@@ -45,18 +44,16 @@ class Folder {
         $characters = $db->execute_query($sql_query, [ $this->accountID, $this->folderType->name ])->fetch_all(MYSQLI_ASSOC);
 
         foreach ($characters as $row) {
-            $envelope = new Envelope($row['sender'], $row['recipient']);
+            $envelope = new Envelope($row['from'], $row['to']);
             $envelope->mail_id    = $row['id'];
-            $envelope->sender     = $row['sender'];
-            $envelope->recipient  = $row['recipient'];
+            $envelope->sender     = $row['from'];
+            $envelope->recipient  = $row['to'];
             $envelope->subject    = $row['subject'];
             $envelope->message    = $row['message'];
             $envelope->folder     = $row['folder'];
             $envelope->date       = $row['date'];
-            $envelope->read       = $row['read'];
-            $envelope->favorite   = $row['favorite'];
-            $envelope->important  = $row['important'];
-            $envelope->replied_to = $row['replied_to'];
+            $envelope->status     = $row['status'];
+
             array_push($this->envelopes, $envelope);
         }
     }

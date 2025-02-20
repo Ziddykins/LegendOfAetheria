@@ -20,6 +20,7 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
     document.getElementById(`hunt-${which}-btn`).addEventListener("click", async (e) => {
         let atk_type = document.getElementById(`hunt-${which}-btn`).textContent;
         let battle_log = document.getElementById("battle-log");
+        let lines = document.getElementById("battle-log").getClientRects()[0]['height'] / 56;
 
         fetch('/battle', {
             headers: {
@@ -36,11 +37,10 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
             } else {
                 return response.text();
             }
-        }).then((data) => {
-            battle_log.innerHTML = battle_log.innerHTML + `${data}`;
-            document.getElementById('battle-log').textContent = player_hp;
+            battle_log.insertAdjacentHTML('beforeend', data);
+            battle_log.insertAdjacentHTML('beforeend', `${data}`);
         }).catch((error) => {
-            battle_log.innerHTML = battle_log.innerHTML + `${error.message}`;
+            battle_log.insertAdjacentHTML('beforeend', `${error.message}`);
         });
     });
 });

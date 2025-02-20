@@ -1,1 +1,5 @@
-{}
+{
+  "dependencies": {
+    "smooth-scrollbar": "^8.8.4"
+  }
+}
