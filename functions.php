@@ -120,8 +120,8 @@ use Game\Character\Character;
 
         switch ($what) {
             case 'unread':
-                $sql_query = 'SELECT * FROM ' . $_ENV['SQL_MAIL_TBL'] . ' WHERE `read` = ? AND `account_id` = ?';
-                $result = $db->execute_query($sql_query, ['False', $_SESSION['account-id']])->num_rows;
+                $sql_query = "SELECT * FROM {$_ENV['SQL_MAIL_TBL']} WHERE NOT FIND_IN_SET('READ', `status`) AND `account_id` = ?";
+                $result = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->num_rows;
                 return $result;
             default:
                 return LOAError::MAIL_UNKNOWN_DIRECTIVE;

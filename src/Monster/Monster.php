@@ -59,7 +59,7 @@ class Monster {
         $multi   = [0.1,  0.5,  0.5, 0.3, 0.3, 0.3, 0.7, 0.7];
         $st_dv   = random_float(-0.5, 0.5);
 
-        for ($i=0; $i<count($stats)-1; $i++) {
+        for ($i=0; $i<count($stats); $i++) {
             $calculated_stat = $bases[$i] * (1 + ($player_lvl - 1) * $multi[$i]) + $st_dv * ($player_lvl - 1);
             $func = "set_{$stats[$i]}";
             $monster->stats->$func($calculated_stat);

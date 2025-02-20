@@ -56,11 +56,12 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                             <h3><?php echo $_SESSION['name']; ?>'s Messages</h3>
                         </div>
 
-<?php
-                            for ($i=0; $i<$inbox_count - 1; $i++) {                                
+                        <?php
+                        
+                            for ($i=0; $i<$inbox_count; $i++) {                                
                                 $subject  = $user_mailbox->focusedFolder->envelopes[$i]->subject;
                                 $sender   = $user_mailbox->focusedFolder->envelopes[$i]->sender;
-                                $msg_frag = substr($user_mailbox->focusedFolder->envelopes[$i]->message, 0, 25);
+                                $msg_frag = substr($user_mailbox->focusedFolder->envelopes[$i]->message, 0, 100);
                                 $date     = $user_mailbox->focusedFolder->envelopes[$i]->date;
 
                                 echo '<div class="list-group">';
@@ -74,7 +75,7 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                                 echo '            <small>' . $date . '</small>';
                                 echo '        </div>';
                                 echo '        <p class="mb-1">' . $sender . '</p>';
-                                echo '        <small>' . $msg_frag . '</small>';
+                                echo '        <small class="col text-truncate">' . $msg_frag . '</small>';
                                 echo '   </a>';
                                 echo '</div>';
                                 echo '';
@@ -91,7 +92,7 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                         <div class="list-group">
                             <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1">List group item heading</h5>
+                                    <h5 class="mb-1">Sub</h5>
                                     <small>3 days ago</small>
                                 </div>
                                 <p class="mb-1">Some placeholder content in a paragraph.</p>

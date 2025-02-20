@@ -31,9 +31,8 @@
                 http_response_code(400);
                 echo "CSRF Token Mismatch";
                 exit();
-            } else {
-                echo $_SESSION['csrf-token'];
             }
+            
             $action = $_POST['action'];
             $out_msg = null;
 
