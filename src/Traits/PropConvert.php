@@ -2,8 +2,6 @@
 namespace Game\Traits;
 
 trait PropConvert {
-    private $acceptable_doubles = ['ID', 'HP', 'MP', 'EP', 'AP'];
-
     private function clsprop_to_tblcol($property) {
         $property = preg_replace('/[^a-zA-Z_1-3]/', '', $property);
         $out = null;
@@ -23,7 +21,8 @@ trait PropConvert {
             }
 
             if (ctype_upper($check_double)) {
-                if (array_search($check_double, $this->acceptable_doubles) !== false) {
+                $acceptable_doubles = ['ID', 'HP', 'MP', 'EP', 'AP'];
+                if (array_search($check_double, $acceptable_doubles) !== false) {
                     $out .= '_' . strtolower($check_double);
                     $i++;
                     continue;
@@ -44,13 +43,14 @@ trait PropConvert {
         $column = preg_replace('/[^a-zA-Z1-3_]/', '', $column);
         $splits = preg_split('/_/', $column);
         $column = strtolower($column);
+        $acceptable_doubles = ['ID', 'HP', 'MP', 'EP', 'AP'];
         
         if (count($splits) == 1) {
             return $column;
         }
 
         for ($i=1; $i<count($splits); $i++) {
-            if (strlen($splits[$i]) == 2 && array_search(strtoupper($splits[$i]), $this->acceptable_doubles) !== false) {
+            if (strlen($splits[$i]) == 2 && array_search(strtoupper($splits[$i]), $acceptable_doubles) !== false) {
                 $splits[$i] = strtoupper($splits[$i]);
             } else {
                 $splits[$i] = ucfirst($splits[$i]);

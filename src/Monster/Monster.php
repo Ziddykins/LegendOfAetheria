@@ -19,7 +19,7 @@ class Monster {
     private $scope;
     private string $seed;
     private int $summondBy; // Global or Zone monsters
-    private int $dropLevel;
+    private int $dropLevel = 1;
     private int $expAwarded;
     private int $goldAwarded;
     private string $monsterClass;

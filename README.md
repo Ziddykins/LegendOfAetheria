@@ -1,13 +1,15 @@
 ![Legend of Aetheria logo](https://github.com/Ziddykins/LegendOfAetheria/blob/master/img/logos/logo-banner-no-bg.webp)
 
-A browser-based RPG game written in PHP/JS using the Bootstrap 5 framework
+A browser-based RPG game written in PHP/JS using the [Bootstrap 5.3 framework][https://github.com/twbs], with a heavily modified version of [AdminLTE][https://github.com/ColorlibHQ/AdminLTE] for the administrative panel, which I've tailored to work with PHP and MySQL in a more modular fashion. See [Credits](#Credits) for more information on the technology used.
 
 > [!CAUTION]
-> The current state is: **Not Working** -- Take care when cloning this until this banner is gone.
+> The current state of the AutoInstaller is: **Not Working** -- Take care when cloning this until this banner is gone.
 
 # Getting Started
 
-The recommended method to install and configure LoA is by using the auto-installer, however, the auto installer is pretty hefty and a work-in-progress. You may find it easier to go through the manual steps provided below if you find yourself running into issues with the autoinstaller. Please report any bugs found and they will be addressed.
+The recommended method to install and configure LoA is by using the auto-installer, however, the auto installer is pretty hefty and a work-in-progress. You may find it easier to go through the manual steps provided below if you find yourself running into issues with the autoinstaller.
+
+Please report any bugs found and they will be addressed.
 
 ## Download
 
@@ -29,9 +31,10 @@ created/imported/modified/configured - from fork/clone, right to SSL-enforced,
 web-accessible browser game (provided your A/CNAME records are set up of course!)
 
 > [!IMPORTANT]
-> The autoinstaller has a bunch of variables which will > need your attention before it works.
-> This will be made interactive eventually, but for now, > please go through and any section
-> which has the # CONFIG flag, you should adjust to suit  your needs - These will be found at the top of the file and won't > be scattered throughout the code.
+> ~~The autoinstaller has a bunch of variables which will > need your attention before it works.~~
+> ~~This will be made interactive eventually, but for now, > please go through and any section~~
+> ~~which has the # CONFIG flag, you should adjust to suit  your needs - These will be found at the top of the file and won't > be scattered throughout the code.~~
+> Interactive now :D
 
 The script must be ran as root, so again, be aware of what is going on if you are installing this
 on a machine with existing services (PHP configs, SQL configs, Apache, etc).
@@ -46,20 +49,19 @@ sudo ./AutoInstaller.pl
 > [!TIP]
 > It's best to do these in order
 
-| Step             | Explanation/Manual Setup    |
-| ---------------: | :-------------------------: |
-| Software         | [Jump To](#Software)        |
-| Templates        | [Jump To](#Templates)       |
-| Hostname         | [Jump To](#Hostname)        |
-| Apache           | [Jump To](#Apache)          |
-| Certificates/SSL | [Jump To](#SSL)             |
-| PHP Config       | [Jump To](#PHP)             | 
-| Composer         | [Jump To](#Composer)        |
-| System Services  | [Jump To](#Composer)        |
-| Permissions      | [Jump To](#Permissions)     |
-| CRON Jobs        | [Jump To](#CRONJobs)        |
-| OpenAI           | [Jump To](#OpenAI)          |
-| Clean-Up         | [Jump To](#CleanUp)         |
+| Step             | Explanation/Manual Setup           |
+| ---------------: | :----------------------------------:   
+| Software         | [Jump To Software](Software)       |
+| Templates        | [Jump To Templates](Templates)     |
+| Apache           | [Jump To Apache](Apache)           |
+| Certificates/SSL | [Jump To SSL](SSL)                 |
+| PHP Config       | [Jump To PHP](PHP)                 | 
+| Composer         | [Jump To Composer](Composer)       |
+| System Services  | [Jump To Composer](Composer)       |
+| Permissions      | [Jump To Permissions](Permissions) |
+| CRON Jobs        | [Jump To CRONJobs](CRONJobs)       |
+| OpenAI           | [Jump To OpenAI](OpenAI)           |
+| Clean-Up         | [Jump To CleanUp](CleanUp)         |
  
 ## Software
 
@@ -81,19 +83,17 @@ apt-get update
 ```bash
 apt update && apt upgrade -y
 
-apt install -y php8.3 php8.3-cli php8.3-common php8.3-curl php8.3-dev php8.3-fpm php8.3-mbstring php8.3-mysql mariadb-server apache2 libapache2-mod-php8.3 composer letsencrypt python-is-python3 python3-certbot-apache
+apt install -y php8.4 php8.4-cli php8.4-common php8.4-curl php8.4-dev php8.4-fpm php8.4-mysql mariadb-server apache2 libapache2-mod-php8.4 composer letsencrypt python-is-python3 python3-certbot-apache
 ```
 
 
 ### Templates
 
-LoA comes packaged with a bunch of template files, which get their values from the AutoInstaller script. Make sure the template values are all filled in, and suit your system and software. The entire SQL schema will be generated and imported. A random password is chosen for the SQL user, 16 characters long.
+LoA comes packaged with a bunch of template files, which get their values from the AutoInstaller script. Make sure the template values are all filled in, and suit your system and software. The entire SQL schema will be generated and imported. A random password is chosen for the SQL user, 16 characters long. If you're setting this up manually, I've included a --flag for the utoInstaller which will only process templates, which will make your life a lot easier, especially for importing SQL schema.
 
-### Hostname
-
-Setup your host to have a FQDN with `hostnamectl set-hostname <fqdn>` and 
-`hostnamectl set-hostname <fqdn> --pretty`. Make sure to update your `/etc/hosts` file.
-
+```sh
+sudo perl AutoInstaller.pl --templates
+```
 ### Apache
 
 Virtual Hosts, for non-SSL:
@@ -111,8 +111,7 @@ Virtual Hosts, for non-SSL:
     </VirtualHost>
 ```
 
-If you've SSL'd up the fqdn the game will be running at, add these lines to the
-virtual host above, just before the </VirtualHost> tag, to force http -> https redirection
+If you have a valid SSL certificate, add these lines to the virtual host above, just before the </VirtualHost> tag, to force http -> https redirection.
 
 ```apacheconf
     RewriteEngine on
@@ -196,8 +195,8 @@ Once those are setup:
 ```sh
 a2ensite loa.example.com
 a2ensite ssl-loa.example.com
-a2enmod php8.3 headers setenvif http2 ssl
-a2enconf php8.3-fpm
+a2enmod php8.4 headers setenvif http2 ssl
+a2enconf php8.4-fpm
 ```
 
 > [!IMPORTANT]
@@ -250,14 +249,10 @@ Open a terminal and navigate to your webroot, then just issue `sudo -u www-data 
 
 ### CRONJobs
 
-
-
-
-
-
-
-
-## CRONJobs
+### Credits
+    - [Bootstrap 5.3][https://github.com/twbs]
+    - [AdminLTE4][https://github.com/ColorlibHQ/AdminLTE]
+    - [Tabulator][https://tabulator.info]
 
 
 

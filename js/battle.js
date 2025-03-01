@@ -20,7 +20,14 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
     document.getElementById(`hunt-${which}-btn`).addEventListener("click", async (e) => {
         let atk_type = document.getElementById(`hunt-${which}-btn`).textContent;
         let battle_log = document.getElementById("battle-log");
-        let lines = document.getElementById("battle-log").getClientRects()[0]['height'] / 56;
+        let lines = document.getElementById("battle-log").querySelectorAll("span").length;
+        let text_height = 24;
+        let max_lines = Math.round(document.getElementById("battle-log").clientHeight / text_height);
+        
+        console.log(`lines ${lines} max_lines ${max_lines}`);
+        if (lines >= max_lines) {
+            battle_log.innerHTML = "";
+        }
 
         fetch('/battle', {
             headers: {
@@ -28,19 +35,14 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
                 'Accept': 'text/plain'
             },
             method: 'POST',
-            body: `action=${which}&type=${atk_type}&csrf-token=${csrf_token}`}
-        ).then((response) => {
-            if (!response.ok) {
-                return response.text().then((data) => {
-                    throw new Error(data);
-                });
-            } else {
-                return response.text();
-            }
-            battle_log.insertAdjacentHTML('beforeend', data);
-            battle_log.insertAdjacentHTML('beforeend', `${data}`);
+            body: `action=${which}&type=${atk_type}&csrf-token=${csrf_token}`
+        })
+        .then((response) => response.text())
+        .then((data) => {
+            console.log(`got data: ${data}`);
+            battle_log.insertAdjacentHTML('afterbegin', data);
         }).catch((error) => {
-            battle_log.insertAdjacentHTML('beforeend', `${error.message}`);
+            battle_log.innerHTML = battle_log.innerHTML + `${error.message}`;
         });
     });
 });

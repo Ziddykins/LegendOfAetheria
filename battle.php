@@ -28,7 +28,7 @@
     if (check_session() === true) {
         if (isset($_POST['action'])) {
             if (isset($_POST['csrf-token']) && $_POST['csrf-token'] !== $_SESSION['csrf-token']) {
-                http_response_code(400);
+                http_response_code(401);
                 echo "CSRF Token Mismatch";
                 exit();
             }
@@ -38,12 +38,22 @@
 
             if ($action === 'attack') {
                 if ($character->stats->get_ep() > 0) {
-                    do_turn(Turn::PLAYER);
-                    $character->stats->sub_ep(1);
-                    do_turn(Turn::ENEMY);
+                    if ($character->stats->get_hp() > 0) {
+                        $out_msg = '<div class="small text-warning"><-}====[ <span class="text-primary">Player</span> Turn ]====={-></div><br>';
+                        do_turn(Turn::PLAYER);
+                        $character->stats->sub_ep(1);
+                        $out_msg = '<div class="small text-warning"><-}====[ <span class="text-danger">Enemy</span> Turn ]====={-></div><br>';
+                        do_turn(Turn::ENEMY);
+                        echo $out_msg;
+                        return true;
+                    } else {
+                        http_response_code(401);
+                        echo "<span class=\"text-danger\">SYSTEM></span><span class=\"text-warning\">No HP Left</span><br>\r\n\r\n";
+                        return false;
+                    }
                 } else {
-                    http_response_code(400);
-                    echo "<span class=\"text-danger\">SYSTEM></div><div class=\"text-warning\">No EP Left</div>\r\n\r\n";
+                    http_response_code(401);
+                    echo "<span class=\"text-danger\">SYSTEM></span><span class=\"text-warning\">No EP Left</span><br>\r\n\r\n";
                     return false;
                 }
             }
@@ -85,12 +95,12 @@
     }
 
     function attack_missed($attacker, $attackee, $offguard, $turn) {
-        global $mn_name, $ch_name, $monster, $character, $verbs, $adverbs, $turn, $colors;
+        global $mn_name, $ch_name, $monster, $character, $verbs, $adverbs, $turn, $colors, $out_msg;
         $atk_verb = $verbs[array_rand($verbs)];
         $atk_adverb = $adverbs[array_rand($adverbs)];
         
 
-        $out_msg = "<span class=\"{$colors[0]}\">{$attacker->get_name()} $atk_adverb $atk_verb {$attackee->get_name()} but misses!</span><br>";
+        $out_msg .= "<span class=\"{$colors[0]}\">{$attacker->get_name()} $atk_adverb $atk_verb {$attackee->get_name()} but misses!</span><br>";
 
         if ($offguard) {
             $attack = roll(0, intval($attackee->stats->get_str() / 2));
@@ -104,37 +114,32 @@
                     award_player($attacker, $attackee);
                 }
 
-                echo $out_msg;
                 return;
             }
             $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$attackee->get_name()} sees an opportunity to strike the {$attacker->get_name()} and with a carefully timed blow, lands a hit for $attack damage! ({$attackee->stats->get_hp()} left)</span><br>";
             $attackee->stats->sub_hp($attack);
             check_alive($attackee);
         }
-        echo $out_msg;
-        
     }
 
     function attack_success($attacker, $attackee, $damage, $turn){
-        global $colors, $verbs;
-        $out_msg = "<span class=\"{$colors[$turn->value]}}\">{$attackee->get_name()} {$verbs[array_rand($verbs)]} {$attacker->get_name()} for $damage damage! ({$attackee->stats->get_hp()} left)</span><br>";
+        global $colors, $verbs, $out_msg;
         $attackee->stats->sub_hp($damage);
-        echo $out_msg;
+        $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} for $damage damage! ({$attackee->stats->get_hp()} left)</span><br>";
     }
 
     function attack_blocked($attacker, $attackee, $parry, $turn) {
-        global $colors, $verbs;
-
-        $out_msg = "<span class=\"{$colors[0]}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} but {$attackee->get_name()} blocks it!</span><br>";
-        echo $out_msg;
+        global $colors, $verbs, $out_msg;
+        $out_msg .= "<span class=\"{$colors[0]}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} but {$attackee->get_name()} blocks it!</span><br>";
     }
 
     function check_alive(&$target): bool {
+        global $out_msg;
         if ($target->stats->get_hp() > 0) {
             return true;
         }
         http_response_code(401);
-        echo "{$target->get_name()} is no longer alive";
+        $out_msg .= '<div class="text-warning">' . $target->get_name() . ' is no longer alive"></div><br>';
         return false;
     }
 

@@ -6,7 +6,6 @@
     use Game\Character\Character;
 
     require_once 'bootstrap.php';
-
     session_start();
     
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {

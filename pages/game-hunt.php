@@ -34,6 +34,7 @@
         $mon_str   = $monster->stats->get_str();
         $mon_int   = $monster->stats->get_int();
         $mon_def   = $monster->stats->get_def();
+        $mon_dl    = $monster->get_dropLevel();
         $mon_avatar = '/img/enemies/' . str_replace(' ', '', $monster->get_name()) . '.png';
     }
 ?>
@@ -52,18 +53,17 @@
                             <div class="d-grid align-items-start">
                                 <span class="d-grid align-items-center small mb-3">
                                     <span class="flex-grow-1 text-center">HP</span>
-                                    <span id="player-hp" name="player-hp" class="flex-grow-1 text-center"><?php echo $monster->stats->get_hp(); echo ' / '; echo $monster->stats->get_maxHp(); ?></span>
+                                    <span id="player-hp" name="player-hp" class="flex-grow-1 text-center"><?php echo "$mon_hp / $mon_maxHP"; ?></span>
                                 </span>
 
                                 <span class="d-grid align-items-center small mb-3">
                                     <span class="flex-grow-1 text-center">MP</span>
-                                    <span class="flex-grow-1 text-center"><?php echo $monster->stats->get_ep(); echo ' / '; echo $monster->stats->get_maxEp(); ?></span>
+                                    <span class="flex-grow-1 text-center"><?php echo "$mon_mp / $mon_maxMP"; ?></span>
                                 </span>
 
-                                <span class="d-grid align-items-center small">
-                                    <span class="flex-grow-1 text-center">EP</span>                                    
-                                    <span class="flex-grow-1 text-center"><?php echo $monster->stats->get_mp(); echo ' / '; echo $monster->stats->get_maxMp(); ?></span>
-                                    
+                                <span c7lass="d-grid align-items-center small mb-3">
+                                    <span class="flex-grow-1 text-center">Drop Lv.</span>                                    
+                                    <span class="flex-grow-1 text-center"><?php echo $mon_dl; ?></span>
                                 </span>
                             </div>
                         </div>
@@ -176,9 +176,9 @@
     </div>
 
 
-    <div class="container-fluid border border-1 mb-1 overflow-hidden" style="max-height: 65.0vh!important;">
-        <div class="row">
-            <div id="battle-log" name="battle-log" class="col lh-1">
+    <div class="container-fluid border border-1 mb-1 overflow-hidden" style="max-height: 65.0vh!important; height: 65.0vh;">
+        <div class="d-flex">
+            <div id="battle-log" name="battle-log" class="lh-1 flex-row-reverse h-100">
                     
             </div>
         </div>

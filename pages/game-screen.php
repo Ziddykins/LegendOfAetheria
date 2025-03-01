@@ -59,7 +59,7 @@
                 id = id.substring(0, 12);
                 return id;
             }
-
+ 
             async function do_get(idz, idx) {
                 const proxy_return = cors_proxies[idx].split(" ")[0];
                 const proxy_url    = cors_proxies[idx].split(" ")[1];

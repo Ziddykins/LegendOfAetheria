@@ -1,11 +1,12 @@
 <?php
 namespace Game\Inventory\Gems;
 use Game\Inventory\Enums\ObjectRarity;
+use Game\Inventory\Gems\Enums\Type;
 
 class Gem {
     private int $itemID;
     private int $socketID;
-    private $color;
+    private Type $type;
     private $quality;
     private ObjectRarity $rarity;
     private string $name;

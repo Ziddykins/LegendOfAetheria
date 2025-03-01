@@ -5,6 +5,9 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+    paths-ignore:
+      - '**/*.css'
+      - '**/*.js'
   schedule:
     - cron: '44 10 * * 3'
 

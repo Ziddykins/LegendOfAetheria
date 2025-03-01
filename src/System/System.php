@@ -12,7 +12,7 @@ class System {
     public function load_sheet() {
         global $log;
 
-        $handle = fopen(ROOT_WEB_DIR . '/monsters.raw', 'r');
+        $handle = fopen(PATH_WEBROOT . '/monsters.raw', 'r');
         
         if ($handle) {
             while (($line = fgets($handle)) !== false) {
