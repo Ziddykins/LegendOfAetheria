@@ -7,7 +7,11 @@ enum Type {
     case FAMILIAR;
     case INVENTORY;
     case MONSTER;
+
+    /* Character Stats */
     case CSTATS;
+
+    /* Monster Stats */
     case MSTATS;
 }
 

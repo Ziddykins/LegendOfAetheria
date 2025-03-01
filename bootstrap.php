@@ -2,26 +2,21 @@
 /* Core requirements */
 require_once 'vendor/autoload.php';
 
-/* Classes */
-use Game\Account\Enums\Privileges;
-use Game\Traits\PropSync;
-use Game\Account\Account;
-use Game\Character\Character;
-use Game\Abuse\Enums\Type;
 use Game\System\System;
-
 $system = new System(0);
 
+define('PATH_WEBROOT',   $_SERVER['DOCUMENT_ROOT']);
+define('PATH_ADMINROOT', PATH_WEBROOT . '/admin/25654');
+define('WEB_ADMINROOT', '/admin/25654');
+
 /* Funcs etc */
-require_once 'logger.php';
-require_once 'db.php';
-require_once 'functions.php';
-require_once 'mailer.php';
-require_once 'constants.php';
+require_once PATH_WEBROOT . '/logger.php';
+require_once PATH_WEBROOT . '/db.php';
+require_once PATH_WEBROOT . '/functions.php';
+require_once PATH_WEBROOT . '/mailer.php';
+require_once PATH_WEBROOT . '/constants.php';
 
 /* .env */
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
 
-const ROOT_WEB_DIR = __DIR__;
-const ROOT_ADMIN_DIR = __DIR__ . '/admin/25654';

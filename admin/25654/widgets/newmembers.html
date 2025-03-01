@@ -1,0 +1,43 @@
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Latest Members</h3>
+        <div class="card-tools">
+            <span class="badge text-bg-primary">
+                <?php
+                    $date = new DateTime(date('Y-m-d H:i:s'));
+                    $end_date = $date->format('Y-m-d H:i:s');
+                    $date->modify('-7 day');
+
+                    $start_date = $date->format('Y-m-d H:i:s');
+                    echo new_members_count() . " New Members";
+                ?>
+            </span>
+            <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
+                <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
+                <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
+            </button>
+
+            <button id="expand-widget-members"  class="btn btn-tool">
+                <i class="bi bi-chevron-bar-right"></i>
+            </button>
+
+            <button type="button" class="btn btn-tool" data-lte-toggle="card-remove" onclick="show_alert(this, 'alert_container')">
+                <i class="bi bi-x-lg"></i>
+            </button>
+          
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="row text-center m-1">
+            <?php
+                $new_accounts = get_new_members($start_date, $end_date);
+                populate_new_members($new_accounts);
+            ?>
+        </div>
+    </div>
+    
+    <div class="card-footer text-center">
+        <a href="javascript:" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">View All Users</a>
+    </div>
+</div>
