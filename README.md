@@ -1,6 +1,6 @@
 ![Legend of Aetheria logo](https://github.com/Ziddykins/LegendOfAetheria/blob/master/img/logos/logo-banner-no-bg.webp)
 
-A browser-based RPG game written in PHP/JS using the [Bootstrap 5.3 framework][https://github.com/twbs], with a heavily modified version of [AdminLTE][https://github.com/ColorlibHQ/AdminLTE] for the administrative panel, which I've tailored to work with PHP and MySQL in a more modular fashion. See [Credits](#Credits) for more information on the technology used.
+A browser-based RPG game written in PHP/JS using the [Bootstrap 5.3 framework](https://github.com/twbs), with a heavily modified version of [AdminLTE](https://github.com/ColorlibHQ/AdminLTE) for the administrative panel, which I've tailored to work with PHP and MySQL in a more modular fashion. See [Credits](#Credits) for more information on the technology used.
 
 > [!CAUTION]
 > The current state of the AutoInstaller is: **Not Working** -- Take care when cloning this until this banner is gone.
