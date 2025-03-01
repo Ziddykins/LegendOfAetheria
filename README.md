@@ -250,9 +250,9 @@ Open a terminal and navigate to your webroot, then just issue `sudo -u www-data 
 ### CRONJobs
 
 ### Credits
-    - [Bootstrap 5.3](https://github.com/twbs)
-    - [AdminLTE4](https://github.com/ColorlibHQ/AdminLTE)
-    - [Tabulator](https://tabulator.info)
+    [Bootstrap 5.3](https://github.com/twbs)
+    [AdminLTE4](https://github.com/ColorlibHQ/AdminLTE)
+    [Tabulator](https://tabulator.info)
 
 
 
