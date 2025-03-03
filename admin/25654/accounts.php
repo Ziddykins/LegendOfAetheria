@@ -10,13 +10,36 @@
     use Game\Inventory\Gems\Gem;
 
     require_once "../../bootstrap.php";
-    require_once "/system/functions.php";
+    require_once "system/functions.php";
 
 
     if (check_session()) {
         $account = new Account($_SESSION['email']);
         $character = new Character($account->get_id(), $_SESSION['character-id']);
         $character->load();
+
+        if (isset($_REQUEST['action'])) {
+            $action     = $_REQUEST['action'];
+            $account_id = null;
+
+            if (isset($_REQUEST['account_id'])) {
+                $account_id = $_REQUEST['account-id'];
+            }
+
+            if ($account_id == $_SESSION['account-id']) {
+
+            }
+
+            switch ($action) {
+                case 'ban':
+                    $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `banned` = 'True' WHERE `id` = ?";
+                    $db->execute_query($sql_query, [ $account_id ]);
+                    $sql_query = "INSERT INTO {$_ENV['SQL_BANS_TBL']} (`expires`, `reason, `account_id`) VALUES (?, ?, ?)";
+                    $db->execute_query($sql_query, [ "NOW() + INTERVAL 1 DAY", "Admin Ban", $account_id ]);
+                    break;
+                case 'delete':
+                    break;
+                }
     } else {
         header('Location: /?no_login');
     }
@@ -161,7 +184,12 @@
                             }
 
                             foreach ($accounts as $account) {
-                                $account['manage'] ='<div class="text-center"><a href="./accounts/?action=ban&account_id=' . $account['id'] . '"><i class="bi bi-ban-fill text-danger fw-bold fs-6 me-2 opacity-50"></i></a><a href="./accounts/?action=message"><i class="bi bi-chat-text-fill text-primary fw-bold fs-6 me-2 opacity-50"></i></a><a href="./accounts/?action=save"><i class="bi bi-floppy-fill text-success fw-bold fs-6 me-2 opacity-50"></i></a></span>'; 
+                                if ($account['id'] === $_SESSION['account-id']) {
+                                    $account['manage'] = '<div class="text-center">-----</div>';
+                                } else {
+                                    $account['manage'] = '<div class="text-center' . $ad . '"><a href="./accounts/?action=delete&account_id=' . $account['id'] . '"><i class="bi bi-eraser-fill fw-bold fs-6 me-2" styke="text-color: #fc4903;"></i></a><a href="./accounts/?action=ban&account_id=' . $account['id'] . '"><i class="bi bi-ban-fill fw-bold fs-6 me-2 text-danger"></i></a><a href="./accounts/?action=message"><i class="bi bi-chat-text-fill text-primary fw-bold fs-6 me-2 opacity-50"></i></a><a href="./accounts/?action=save"><i class="bi bi-floppy-fill text-success fw-bold fs-6 me-2 opacity-50"></i></a></span>'; 
+                                }
+                                
                                 unset($account['focused_slot']);
                                 unset($account['acceptable_doubles']);
                                 
@@ -183,8 +211,8 @@
             var tbl_data = [<?php echo join(",", $row_data); ?>];
             var table = new Tabulator("#accounts-tbl", {
                 height:"70.0vh",
-                layout:"fitColumns",
-                rowHeight: 30,
+                layout:"fitColumnsData",
+                rowHeight: Math.round(visualViewport.height / 20, 0),
                 groupBy: "privileges",
                 columns: [<?php echo join(",", $col_data); ?>],
                 data: tbl_data,

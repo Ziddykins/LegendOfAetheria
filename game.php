@@ -335,7 +335,7 @@
                                     $privileges = Privileges::name_to_value($account->get_privileges());
                                             
                                     if ($privileges > Privileges::ADMINISTRATOR->value) {
-                                        $href = $_ENV['ADMIN_PANEL'];
+                                        $href = $_ENV['ADMIN_PANEL'] . '/dashboard';
                                         echo "<li>\n\t\t\t\t\t\t\t\t\t";
                                     
                                         echo "<a class=\"dropdown-item\" href=\"$href\">Administrator</a>";
@@ -364,7 +364,7 @@
                             exit();
                         }
                         
-                        //include('navs/nav-summary.php');
+                        include 'navs/nav-summary.php';
 
                         if (isset($_REQUEST['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_REQUEST['page']);

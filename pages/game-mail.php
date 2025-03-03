@@ -61,21 +61,23 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                             for ($i=0; $i<$inbox_count; $i++) {                                
                                 $subject  = $user_mailbox->focusedFolder->envelopes[$i]->subject;
                                 $sender   = $user_mailbox->focusedFolder->envelopes[$i]->sender;
-                                $msg_frag = substr($user_mailbox->focusedFolder->envelopes[$i]->message, 0, 100);
+                                $msg_frag = $user_mailbox->focusedFolder->envelopes[$i]->message;
                                 $date     = $user_mailbox->focusedFolder->envelopes[$i]->date;
 
                                 echo '<div class="list-group">';
-                                echo '    <a href="#" class="list-group-item list-group-item-action mb-1 ';
+                                echo '    <a href="#" id="env-id-' . $i . '" class="list-group-item list-group-item-action mb-1 text-truncate ';
+
                                 if ($i == 0) {
                                     echo 'active';
                                 }
+
                                 echo '" aria-current="true">';
                                 echo '        <div class="d-flex w-100 justify-content-between">';
-                                echo '            <h6 class="mb-1">' . $subject . '</h6>';
-                                echo '            <small>' . $date . '</small>';
+                                echo '            <h6 id="env-sub-' . $i . '" class="mb-1">' . $subject . '</h6>';
+                                echo '            <small id="env-date-' . $i . '">' . $date . '</small>';
                                 echo '        </div>';
-                                echo '        <p class="mb-1">' . $sender . '</p>';
-                                echo '        <small class="col text-truncate">' . $msg_frag . '</small>';
+                                echo '        <p id="env-from-' . $i . '" class="mb-1">' . $sender . '</p>';
+                                echo '        <small id="env-frag-' . $i . '" class="col text-truncate">' . $msg_frag . '</small>';
                                 echo '   </a>';
                                 echo '</div>';
                                 echo '';
@@ -120,9 +122,58 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                 </div>
                 
                 <div class="tab-pane fade" id="list-compose" role="tabpanel" aria-labelledby="list-mail-compose">
-                    
+                    <div class="container border border-secondary">
+                        <div class="row text-bg-dark bg-gradient mb-3 align-items-center">
+                            <div class="col">
+                                <div class="lead p-2">
+                                    Compose Message
+                                </div>
+                            </div>
+
+                            <div class="col text-end">
+                                <div id="mail-close" name="mail-close" class="btn btn-close" onclick=close_click()>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col text-end">
+                                <label for="to-field" class="col-form-label">To:</label>
+                            </div>
+
+                            <div class="col-sm-10 pe-5">
+                                <input id="to-field" name="to-field" type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col text-end">
+                                <label for="subject-field" class="col-form-label">Subject:</label>
+                            </div>
+
+                            <div class="col-sm-10 pe-5">
+                                <input id="subject-field" name="subject-field" type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mb-5">
+                            <div class="col text-end">
+                                <label for="message-field" class="col-form-label">Message:</label>
+                            </div>
+
+                            <div class="col-sm-10 pe-5">
+                                <textarea id="message-field" name="message-field" rows="5" class="form-control mb-3"></textarea>
+                                <div class="d-grid gap-1">
+                                    <button id="send-mail" name="send-mail" class="btn btn-primary">Send Mail</button>
+                                    <button id="cancel-mail" name="cancel-mail" class="btn btn-secondary" onclick=close_click()>Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
+
+            <script src="/js/mail.js" type="text/javascript"></script>
+            
+        
+    

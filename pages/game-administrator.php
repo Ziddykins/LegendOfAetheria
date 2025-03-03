@@ -90,6 +90,9 @@
                                     <option value="eggs">Egg</option>
                                     <option value="enemies">Enemy</option>
                                 </select>
+
+                                <label for="image-prompt">Enter image description:</label>
+                                <input type="text" class="form-control" id="image-prompt" name="image-prompt">
                             </div>
                         </div>
                     </div>
@@ -166,7 +169,6 @@
     </div>
     <script type="text/javascript" src="../js/openai.js"></script>
 <?php
-require_once 'classes/class-openai.php';
 
 $gpt_models = [
     'gpt-4',
@@ -182,47 +184,63 @@ $dalle_models = [
 
 $user_privs = Privileges::name_to_enum($account->get_privileges());
 
-if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) { 
-    $count = 0;
-    foreach ($monster_pool->monsters as $monster) {
-        $count++;
-        $prompt = "Generate an image of a " . $monster->get_name();
-        $type   = $_REQUEST['type'];
-        $model = $_REQUEST['model'];
-        $count  = 1;
+if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) {
+    global $system;
+    $count  = 0;
+    $prompt = null;
 
-            $endpoint = 'https://api.openai.com/v1/images/generations';
-        
-        if (in_array($model, $dalle_models)) {
-            if ($count < 1 || $count > 5) {
-                $count = 2;
-            }
-            
-            $openai_apikey = $_ENV['OPENAI_APIKEY'];    
-            $OpenAI = new OpenAI($openai_apikey, $endpoint);
-            
-            $headers = [
-                'Content-Type'  => 'application/json',
-                'Authorization' => "Bearer " . $OpenAI->get_apiKey()
-            ];
+    if (isset($_REQUEST['image-prompt'])) {
+        $prompt = htmlentities($_REQUEST['image-prompt']);
+    } else {
+        $prompt = "Generate an image of a monster";
+    }
+    
+    $count++;
+    
+    $type   = $_REQUEST['type'];
+    $model = $_REQUEST['model'];
+    $count  = 1;
 
-            $OpenAI->set_imageModel($model);
-            $OpenAI->set_imagePrompt($prompt);
-            $OpenAI->set_imageCount($count);
-            $OpenAI->set_imageSize("256x256");
-            
-            $response = $OpenAI->doRequest(
-                HttpMethod::POST,
-                $OpenAI->get_payload()
-            );
-        } else {
-            echo "sry no";
-            exit();
+    $endpoint = 'https://api.openai.com/v1/images/generations';
+    
+    if (in_array($model, $dalle_models)) {
+        if ($count < 1 || $count > 5) {
+            $count = 2;
         }
+        
+        $openai_apikey = $_ENV['OPENAI_APIKEY'];    
+        $OpenAI = new OpenAI($openai_apikey, $endpoint);
+        
+        $headers = [
+            'Content-Type'  => 'application/json',
+            'Authorization' => "Bearer " . $OpenAI->get_apiKey()
+        ];
+
+        $OpenAI->set_imageModel($model);
+        $OpenAI->set_imagePrompt($prompt);
+        $OpenAI->set_imageCount($count);
+        $OpenAI->set_imageSize("256x256");
+        
+        $temp = print_r($OpenAI, true);
+        $temp = str_replace($_ENV['OPENAI_APIKEY'], '<font color="red"><APIKEY></font>', $temp);
+        echo $temp ;
+        $response = $OpenAI->doRequest(
+            HttpMethod::POST,
+            $OpenAI->get_payload()
+        );
+    } else {
+        echo "sry no";
+        exit();
+    }
 
         $json_obj = json_decode($response);
 
-        $img_file = 'img/enemies/' . $monster->get_name() . '.png';
+        echo '<pre>';
+        print_r($json_obj);
+        exit();
+        $filename = explode("/", $json_obj->data[0]->url)[-1];
+        echo "<img src='" . $json_obj->data[0]->url . "'></img><br>";
+        $img_file = 'img/generated/';
         $ch = curl_init($json_obj->data[0]->url);
         $fp = fopen($img_file, 'wb');
         curl_setopt($ch, CURLOPT_FILE, $fp);
@@ -259,5 +277,5 @@ if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) {
     }
     echo '</div>';
     */
-}
+
 ?>

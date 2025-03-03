@@ -341,6 +341,7 @@ use Game\Character\Character;
         return false;
     }
 
+
     function generate_modal($id, $bg_color, $header, $body, ModalButtonType $btn_type) {
         $btn = null;
         if ($btn_type === ModalButtonType::YesNo) {
@@ -454,7 +455,7 @@ use Game\Character\Character;
         return $avatar;
     }
 
-    function safe_serialize($data, ?bool $unserialize=null): mixed {
+    function safe_serialize($data, bool $unserialize=null): mixed {
         if ($unserialize === true) {
             $data = unserialize(base64_decode($data));
         } else {
