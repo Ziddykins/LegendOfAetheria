@@ -11,6 +11,8 @@ use File::Path qw(make_path remove_tree);
 use File::Find;
 use File::Copy;
 
+$| = 1;
+
 use vars qw/*name *dir *prune/;
 
 use constant {
@@ -60,6 +62,11 @@ my $question;    # current question to ask the user
 
 my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
 
+if (!-e $cfg_file && -e 'config.ini.default') {
+    croak("You need to have a config.ini file; either create one" .
+          " or rename the 'config.ini.default' file to 'config.ini' before continuing\n");
+}
+
 tie %ini, 'Config::IniFiles', (
     -file => $cfg_file,
     -default => 'all',
@@ -75,7 +82,22 @@ if ($ENV{'USER'} ne 'root') {
         $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
 }
 
+
+if (check_platform() eq 'linux') {
+    chomp(my $check_docker = `mount | grep 'overlay on / type' -ao`);
+
+    if ($check_docker) {
+        $cfg{svc_cmd} = 'service';
+    } else {
+        $cfg{svc_cmd} = 'systemctl';
+    }
+} else {
+    $cfg{svc_cmd} = 'sc';
+}
+
+
 step_firstrun();
+$cfg{step} = SOFTWARE;
 handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 
 if ($cfg{step} == SOFTWARE) {
@@ -170,7 +192,7 @@ if ($cfg{step} == TEMPLATES) {
 
 if ($cfg{step} == APACHE) {
     if (ask_user("Perform necessary apache updates?", 'yes', 'yesno')) {
-        step_apache_config();
+        step_vhost_ssl();
     }
 
     if (ask_user("Enable the required Apache conf/mods/sites?", 'yes', 'yesno')) {
@@ -206,103 +228,9 @@ if ($cfg{step} == CLEANUP) {
     }
 }
 
-#Step: Webserver
-sub step_webserver_configure {
-    my $question = "Enter the location of your webserver's config directory (e.g. /etc/apache2)";
-    $cfg{apache_directory} = ask_user($question, '/etc/apache2', 'input');
-
-    $question = "Please enter the path to where the game will reside (e.g. /var/www/html/example.com/loa)";
-    $cfg{web_root} = ask_user($question, $cfg{web_root} ? $cfg{web_root} : '/var/www/html/kali.local/loa', 'input');
-    $cfg{web_root} =~ s/\/$//;
-
-    $cfg{virthost_conf_file}    = "$cfg{apache_directory}/sites-available/$cfg{$fqdn}.conf";
-    $cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{$fqdn}.conf";
-
-    if ($cfg{os} eq 'linux') {
-        $cfg{composer_runas} = 'www-data';
-        $cfg{apache_runas}   = 'www-data';
-    }
-
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
-}
-
-#Step: software
-sub step_install_software {
-    my ($apt_output, $sury_output);
-
-    if (-e '/etc/apt/sources.list.d/php.list' || -e '/etc/apt/sources.list.d/ondrej-ubuntu-php-noble.sources') {
-        tell_user('INFO', 'Sury repo entries already present');
-    } else {
-        my $cmd;
-        tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
-
-        if ($cfg{distro} eq 'ubuntu') {
-            $cmd = "sh -c $cfg{scripts_dir}/sury_setup_ubnt.sh";
-        } elsif ($cfg{distro} =~ /debian|kali/i) {
-            $cmd = "sh -c $cfg{scripts_dir}/sury_setup_deb.sh";
-        } elsif ($cfg{os} eq 'windows') {
-            # TODO: implement windows setup
-        }
-        tell_user('SYSTEM', `$cmd`);
-    }
-
-    tell_user('INFO',   'Updating system packages');
-
-    if (!$cfg{php_version}) {
-        tell_user('WARN', "PHP version not specified, attempting to find it...\n");
-
-        if ($cfg{os} eq 'linux') {
-            tell_user('SYSTEM', `apt update`);
-            chomp(my $ver_output = `php --version | head -n1`);
-
-            if ($ver_output =~ /PHP (\d+\.\d+)/) {
-                $cfg{php_version} = $1;
-            }
-
-            if ($cfg{php_version}) {
-                tell_user('SUCCESS', "Found PHP version $cfg{php_version}");
-            } else {
-                tell_user('ERROR', 'Failed to agree on a PHP version');
-                die "Exiting on failure...\n";
-            }
-        }
-    } else {
-        tell_user('ERROR', "Invalid or unsupported PHP version set in the installer\n" .
-                           "supported PHP versions: 7.0 - 8.4\n\n");
-        if (ask_user('Try with version 8.3?', 'yes', 'yesno')) {
-            $cfg{php_version} = "8.3";
-        }
-    }
-
-    my @packages = (
-        "cron",
-        "php$cfg{php_version}",
-        "php$cfg{php_version}-cli",
-        "php$cfg{php_version}-common",
-        "php$cfg{php_version}-curl",
-        "php$cfg{php_version}-dev",
-        "php$cfg{php_version}-fpm",
-        "php$cfg{php_version}-mbstring",
-        "php$cfg{php_version}-mysql",
-        "php$cfg{php_version}-xml",
-        "mariadb-server",
-        "apache2",
-        "letsencrypt",
-        "python-is-python3",
-        "python3-certbot-apache",
-        "libapache2-mod-php",
-        "libapache2-mod-php$cfg{php_version}",
-        "composer",
-    );
-
-    tell_user('INFO', 'Installing ' . @packages . ' packages\n');
-    my $apt_cmd = 'apt install -y ' . join (' ', @packages) . ' 2>&1';
-    tell_user('SYSTEM', `$apt_cmd` . "\n");
-}
-
 sub step_firstrun {
     my $question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
-    $fqdn        = ask_user($question, '', 'input');
+    $fqdn = ask_user($question, '', 'input');
 
     if ($ini{$fqdn}) {
         %cfg = %{$ini{$fqdn}};
@@ -361,7 +289,7 @@ sub step_firstrun {
     merge_hashes(\%cfg, \%def);
     merge_hashes(\%cfg, \%glb);
 
-    $cfg{os} = $os;
+    $cfg{os}     = $os;
     $cfg{distro} = $distro;
 
     handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
@@ -399,6 +327,110 @@ sub step_firstrun {
     $cfg{php_template}          = "$cfg{template_dir}/php.template";
 }
 
+sub step_install_software {
+    my ($apt_output, $sury_output);
+
+    if (-e '/etc/apt/sources.list.d/php.list' || -e '/etc/apt/sources.list.d/ondrej-ubuntu-php-noble.sources') {
+        tell_user('INFO', 'Sury repo entries already present');
+    } else {
+        my $cmd;
+        tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
+
+        if ($cfg{distro} eq 'ubuntu') {
+            $cmd = "/bin/bash $cfg{scripts_dir}/sury_setup_ubnt.sh";
+        } elsif ($cfg{distro} =~ /debian|kali/i) {
+            $cmd = "/bin/bash 
+            $cfg{scripts_dir}/sury_setup_deb.sh";
+        } elsif ($cfg{os} eq 'windows') {
+            # TODO: implement windows setup
+        }
+        tell_user('SYSTEM', `$cmd`);
+    }
+
+    tell_user('INFO', 'Updating system packages');
+
+    if (!$cfg{php_version}) {
+        tell_user('WARN', "PHP version not specified, attempting to find it...\n");
+
+        if ($cfg{os} eq 'linux') {
+            tell_user('SYSTEM', `apt update`);
+            chomp(my $ver_output = `php --version | head -n1`);
+
+            if ($ver_output =~ /PHP (\d+\.\d+)/) {
+                $cfg{php_version} = $1;
+            }
+
+            if ($cfg{php_version}) {
+                tell_user('SUCCESS', "Found PHP version $cfg{php_version}");
+            } else {
+                if (ask_user('ERROR', 'Failed to agree on a PHP version. Agree on 8.4?', 'yes', 'yesno')) {
+                    $cfg{php_version} = "8.4";
+                } else {
+                    die "...okthen";
+                }                
+            }
+        }
+    } else {
+        tell_user('ERROR', "Invalid or unsupported PHP version set in the installer\n" .
+                           "supported PHP versions: 7.0 - 8.4\n\n");
+        if (ask_user('Try with version 8.4?', 'yes', 'yesno')) {
+            $cfg{php_version} = "8.4";
+        }
+    }
+
+    my @packages = (
+        "cron",
+        "php$cfg{php_version}",
+        "php$cfg{php_version}-cli",
+        "php$cfg{php_version}-common",
+        "php$cfg{php_version}-curl",
+        "php$cfg{php_version}-dev",
+        "php$cfg{php_version}-mysql",
+        "mariadb-server",
+        "apache2",
+        "letsencrypt",
+        "python-is-python3",
+        "python3-certbot-apache",
+        "libapache2-mod-php$cfg{php_version}",
+        "composer",
+    );
+
+    if (ask_user("Do you want to use PHP-FPM? This will use mpm_worker instead of the default mpm_prefork.", 'yes', 'yesno')) {
+        $cfg{php_fpm} = 'true';
+        push @packages, "php$cfg{php_version}-fpm";
+    } else {
+        $cfg{php_fpm} = 'false';
+    }     
+
+    tell_user('INFO', 'Installing ' . @packages . ' packages\n');
+    my $apt_cmd = 'apt install -y ' . join (' ', @packages) . ' 2>&1';
+    tell_user('SYSTEM', `$apt_cmd` . "\n");
+}
+
+#Step: Webserver
+sub step_webserver_configure {
+    my $question = "Enter the location of your webserver's config directory (e.g. /etc/apache2)";
+    $cfg{apache_directory} = ask_user($question, '/etc/apache2', 'input');
+
+    $question = "Please enter the path to where the game will reside (e.g. /var/www/html/example.com/loa)";
+    $cfg{web_root} = ask_user($question, $cfg{web_root} ? $cfg{web_root} : '/var/www/html/kali.local/loa', 'input');
+    $cfg{web_root} =~ s/\/$//;
+
+    $cfg{virthost_conf_file}    = "$cfg{apache_directory}/sites-available/$cfg{$fqdn}.conf";
+    $cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{$fqdn}.conf";
+
+    if ($cfg{os} eq 'linux') {
+        $cfg{composer_runas} = 'www-data';
+        $cfg{apache_runas}   = 'www-data';
+    }
+
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+}
+
+#Step: software
+
+
+
 sub step_sql_configure {
     $cfg{sql_username} = 'user_loa';
     $cfg{sql_password} = gen_random(15);
@@ -426,35 +458,13 @@ sub step_sql_configure {
     handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
-# Step: hostname
-sub step_update_hostname {
-    my $output = `hostnamectl set-hostname $cfg{fqdn} 2>&1 | grep -v Hint`;
-    $output .= `hostnamectl set-hostname $cfg{fqdn} --pretty 2>&1 | grep -v Hint`;
-    chomp (my $hostname = `hostname -f`);
-    if ($hostname eq $cfg{fqdn}) {
-        tell_user('SUCCESS',
-                "Hostname for the system has been successfully set\n" .
-                "Please reboot after\n\tOutput if any: $output\n");
-    } else {
-        tell_user('ERROR', "Something went wrong setting the hostname\nOutput below:\n\t$output");
-
-        if (!ask_user('Continue anyway?', 'yes', 'yesno')) {
-            die "Errors occured during hostname configuration - halting";
-        }
-    }
-}
-
-# Step: apache
-sub step_apache_config {
+sub step_vhost_ssl {
     if (ask_user("Do you want to redirect traffic from http:80 to "
         . "https:443? A valid certificate needs to be set in the "
         . "script configuration!\n- Currently set -\n"
         . "Certificate: $cfg{ssl_fullcer}\n"
         . "Private Key: $cfg{ssl_privkey}\n"
         , 'yes', 'yesno')) {
-
-        tell_user('INFO',   'Enabling mod_rewrite if it isn\'t already');
-        tell_user('SYSTEM', `a2enmod rewrite 2>&1`);
 
         tell_user('INFO', "Enabling rewrite directives in $cfg{virthost_conf_file}");
         `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
@@ -463,21 +473,55 @@ sub step_apache_config {
 
 # Step: Fix permissions
 sub step_fix_permissions {
+
+    # Web root files
     `find $cfg{web_root} -type f -exec chmod 644 {} + 2>&1`;
     `find $cfg{web_root} -type d -exec chmod 755 {} + 2>&1`;
-    `chown -R $cfg{apache_runas}:$cfg{apache_runas} $cfg{web_root} 2>&1`;
+
+    # Configuration files
+    chmod 0600, "$cfg{web_root}/.env";
+    chmod 0600, "$cfg{web_root}/config.ini";
+    chmod 0600, "$cfg{web_root}/config.ini.default";
+
+    # Script files
+    chmod 0600, "$cfg{web_root}/install/AutoInstaller.pl";
+    chmod 0600, "$cfg{web_root}/install/scripts/*.sh";
+
+    # Log files
+    chmod 0640, "$cfg{web_root}/install/setup.log";
+    chmod 0640, "$cfg{web_root}/gamelog.txt";
+
+    # Apache configuration files
+    chmod 0644, "$cfg{apache_directory}/sites-available/*.conf";
+
+    # Templates
+    chmod 0600, "$cfg{web_root}/install/templates/*";
+
+    # Owner/group
+    tell_user('SYSTEM', `chown -R $cfg{apache_runas}:$cfg{apache_runas} $cfg{web_root} 2>&1`);
+
     tell_user('SUCCESS', 'Permissions fixed!');
 }
 
 # Step: step_apache_enables
 sub step_apache_enables {
     my $success = 0;
+    my $mods = 'rewrite ssl ';
+
     tell_user('INFO', 'Enabling required Apache configurations, sites and modules');
 
-    my $conf_output = `a2enconf php$cfg{php_version}-fpm 2>&1`;
-    $success = $? == 0 ? 1 : 0;
+    if ($cfg{php_fpm} eq 'true') {
+        my $conf_output = `a2enconf php$cfg{php_version}-fpm 2>&1`;
+        $success = $? == 0 ? 1 : 0;
 
-    my $mods_output = `a2enmod php$cfg{php_version} rewrite setenvif ssl 2>&1`;
+        my $dismod_output = `a2dismod php* mpm_prefork 2>&1`;
+        $success = $? == 0 ? 1 : 0;
+        $mods .= 'proxy_fcgi setenvif mpm_event';
+    } else {
+        $mods .= "php$cfg{php_version}";
+    }
+    
+    my $mods_output = `a2enmod $mods 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
     my $sites_output = `a2ensite $cfg{fqdn}.conf 2>&1`;
@@ -495,6 +539,7 @@ sub step_apache_enables {
         tell_user('SUCCESS', "Apache configuration completed");
     } else {
         tell_user('ERROR', "There were errors - See above output\n");
+
         if (!ask_user('Continue?', 'no', 'yesno')) {
             die "Quitting at user request\n";
         }
@@ -513,7 +558,69 @@ sub step_php_configure {
 	    'allow_url_fopen'         => "Off",
 	    'allow_url_include'       => "Off",
 	    'session.gc_maxlifetime'  => "600",
-	    'disable_functions'       => "apache_child_terminate, apache_setenv, chdir, chmod, dbase_open, dbmopen, define_syslog_variables, escapeshellarg, escapeshellcmd, eval, exec, filepro, filepro_retrieve, filepro_rowcount, fopen_with_path, fp, fput, ftp_connect, ftp_exec, ftp_get, ftp_login, ftp_nb_fput, ftp_put, ftp_raw, ftp_rawlist, highlight_file, ini_alter, ini_get_all, ini_restore, inject_code, mkdir, move_uploaded_file, mysql_pconnect, openlog, passthru, phpAds_XmlRpc, phpAds_remoteInfo, phpAds_xmlrpcDecode, phpAds_xmlrpcEncode, php_uname, phpinfo, popen, posix_getpwuid, posix_kill, posix_mkfifo posix_mkfifo, posix_setpgid, posix_setsid, posix_setuid, posix_uname, proc_close, proc_get_status, proc_nice, proc_open, proc_terminate, putenv, rename, rmdir, shell_exec, show_source, syslog, system, xmlrpc_entity_decode",
+	    'disable_functions'       => "apache_child_terminate, " .
+									 "apache_setenv, " .
+									 "chdir, " .
+									 "chmod, " .
+									 "dbase_open, " .
+									 "dbmopen, " .
+									 "define_syslog_variables, " .
+									 "escapeshellarg, " .
+									 "escapeshellcmd, " .
+									 "eval, " .
+									 "exec, " .
+									 "filepro, " .
+									 "filepro_retrieve, " .
+									 "filepro_rowcount, " .
+									 "fopen_with_path, " .
+									 "fp, " .
+									 "fput, " .
+									 "ftp_connect, " .
+									 "ftp_exec, " .
+									 "ftp_get, " .
+									 "ftp_login, " .
+									 "ftp_nb_fput, " .
+									 "ftp_put, " .
+									 "ftp_raw, " .
+									 "ftp_rawlist, " .
+									 "highlight_file, " .
+									 "ini_alter, " .
+									 "ini_get_all, " .
+									 "ini_restore, " .
+									 "inject_code, " .
+									 "mkdir, " .
+									 "move_uploaded_file, " .
+									 "mysql_pconnect, " .
+									 "openlog, " .
+									 "passthru, " .
+									 "phpAds_XmlRpc, " .
+									 "phpAds_remoteInfo, " .
+									 "phpAds_xmlrpcDecode, " .
+									 "phpAds_xmlrpcEncode, " .
+									 "php_uname, " .
+									 "phpinfo, " .
+									 "popen, " .
+									 "posix_getpwuid, " .
+									 "posix_kill, " .
+									 "posix_mkfifo posix_mkfifo, " .
+									 "posix_setpgid, " .
+									 "posix_setsid, " .
+									 "posix_setuid, " .
+									 "posix_uname, " .
+									 "proc_close, " .
+									 "proc_get_status, " .
+									 "proc_nice, " .
+									 "proc_open, " .
+									 "proc_terminate, " .
+									 "putenv, " .
+									 "rename, " .
+									 "rmdir, " .
+									 "shell_exec, " .
+									 "show_source, " .
+									 "syslog, " .
+									 "system, " .
+									 "xmlrpc_entity_decode",
+			
 	    'session.cookie_domain'   => $cfg{fqdn},
 	    'session.use_strict_mode' => "1",
 	    'session.use_cookies'     => "1",
@@ -526,11 +633,16 @@ sub step_php_configure {
 
     if ($cfg{os} eq 'linux') {
         chomp($cfg{php_binary} = `which php$cfg{php_version}`);
-        $cfg{php_ini} = "/etc/php/$cfg{php_version}/apache2/php.ini";
+        if ($cfg{php_fpm} eq 'true') {
+            $cfg{php_ini} = "/etc/php/$cfg{php_version}/fpm/php.ini";
+        } else {
+            $cfg{php_ini} = "/etc/php/$cfg{php_version}/apache2/php.ini";
+        }
     } elsif ($cfg{os} eq 'windows') {
         $cfg{php_binary} = 'C:\xampp\php\php.exe';
         $cfg{php_ini} = 'C:\xampp\php\php.ini';
     }
+
     # Binary
     if (ask_user("Located PHP binary at $cfg{php_binary} - is this correct?", 'yes', 'yesno')) {
         tell_user('INFO', "PHP binary set to $cfg{php_binary}");
@@ -568,7 +680,7 @@ sub step_php_configure {
             $ini_contents =~ s/^$key ?= ?.*$/$key=$value/;
             print "Replaced $key with $value\n";
         } else {
-            $ini_contents .= "$key=$value\n";
+            $ini_contents .= "\n$key=$value";
             print "Key not found, added $key=$value\n";
         }
     }
@@ -625,7 +737,10 @@ sub step_generate_templates {
 }
 
 sub step_process_templates {
-    my $cp_cmd;
+    use Term::ReadKey;
+    my $cp_cmd, $sql_cmd, $sqlrpw, $tmp;
+    my $sql_import_result;
+
     if (check_platform() eq 'linux') {
         $cp_cmd = "cp";
     } else {
@@ -633,9 +748,19 @@ sub step_process_templates {
     }
 
     tell_user('INFO', "Importing SQL schema, creating user and granting privileges");
+    
+    ReadMode 'noecho';
+    print "If the root account for the SQL server needs a password,\n";
+    $tmp = ask_user("please enter it now or just hit enter", '', 'input');
+    ReadMode 'normal';
 
-    my $sql_cmd = "mysql -u root < $cfg{sql_template}.ready 2>&1";
-    chomp(my $sql_import_result = `$sql_cmd`);
+    $sqlrpw = '';
+    if ($tmp) {
+        $sqlrpw = "-p $tmp";
+    }
+
+    $sql_cmd = "mysql -u root $sqlrpw < $cfg{sql_template}.ready 2>&1";
+    chomp($sql_import_result = `$sql_cmd`);
     $sql_import_result //= 'Successfully imported database schema';
 
     # LOL
@@ -668,12 +793,18 @@ sub step_process_templates {
     file_write("$cfg{crontab_dir}/$cfg{apache_runas}", "$cfg{crontab_template}.ready");
     tell_user('INFO', "Updating permissions on new crontab to $cfg{apache_runas}:crontab");
     `chown $cfg{apache_runas}:crontab $cfg{crontab_dir}/$cfg{apache_runas}`;
+    chmod 0600, "$cfg{crontab_dir}/$cfg{apache_runas}";
+
     tell_user('SUCCESS', "All template files have been applied");
 }
 
 #Step: start services
 sub step_start_services {
-    my @services = ("mariadb",  "php$cfg{php_version}-fpm",  "apache2");
+    my @services = ("mariadb", "apache2");
+
+    if ($cfg{php_fpm} eq 'true') {
+        push @services, "php$cfg{php_version}-fpm";
+    }
 
     foreach my $service (@services) {
         tell_user('INFO', "Starting $service");
@@ -847,7 +978,7 @@ sub ask_user {
         }
     }
 
-    chomp (my $answer = <STDIN>);
+    chomp(my $answer = <STDIN>);
     print "\n";
 
     if ($answer =~ /[Yy]e?s?/ && $type eq 'yesno') {
@@ -865,7 +996,7 @@ sub ask_user {
     return -1;
 }
 
-sub check_array {
+sub search_array {
     my ($haystack, $needle) = @_;
 
     if (grep /$needle/, @{$haystack}) {
