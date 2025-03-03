@@ -39,7 +39,10 @@
                     break;
                 case 'delete':
                     break;
-                }
+                default:
+                    break;
+            }
+        }
     } else {
         header('Location: /?no_login');
     }
