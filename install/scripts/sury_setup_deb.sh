@@ -1,5 +1,4 @@
 #!/bin/sh
-
 apt-get update
 apt-get -y install lsb-release ca-certificates curl
 curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg

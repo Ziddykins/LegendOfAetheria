@@ -10,6 +10,7 @@ use Data::Dumper;
 use File::Path qw(make_path remove_tree);
 use File::Find;
 use File::Copy;
+use Carp;
 
 $| = 1;
 
@@ -103,6 +104,7 @@ handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 if ($cfg{step} == SOFTWARE) {
     if (ask_user("Install required software?", 'yes', 'yesno')) {
         step_install_software();
+        step_webserver_configure();
         $cfg{step}++;
         handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
@@ -271,7 +273,7 @@ sub step_firstrun {
     my $distro;
 
     if ($os eq 'linux') {
-        my $ver = `uname -v`;
+        my $ver = `lsb_release -i`;
         if ($ver =~ /(debian|ubuntu|kali)/i) {
             $distro = $1;
         } else {
@@ -336,11 +338,11 @@ sub step_install_software {
         my $cmd;
         tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
 
-        if ($cfg{distro} eq 'ubuntu') {
-            $cmd = "/bin/bash $cfg{scripts_dir}/sury_setup_ubnt.sh";
+        if ($cfg{distro} =~ /ubuntu/i) {
+            `chmod +x $cfg{scripts_dir}/sury_setup_ubnt.sh`;
+            $cmd = "/bin/sh $cfg{scripts_dir}/sury_setup_ubnt.sh";
         } elsif ($cfg{distro} =~ /debian|kali/i) {
-            $cmd = "/bin/bash 
-            $cfg{scripts_dir}/sury_setup_deb.sh";
+            $cmd = "/bin/sh $cfg{scripts_dir}/sury_setup_deb.sh";
         } elsif ($cfg{os} eq 'windows') {
             # TODO: implement windows setup
         }
@@ -353,7 +355,6 @@ sub step_install_software {
         tell_user('WARN', "PHP version not specified, attempting to find it...\n");
 
         if ($cfg{os} eq 'linux') {
-            tell_user('SYSTEM', `apt update`);
             chomp(my $ver_output = `php --version | head -n1`);
 
             if ($ver_output =~ /PHP (\d+\.\d+)/) {
@@ -363,7 +364,7 @@ sub step_install_software {
             if ($cfg{php_version}) {
                 tell_user('SUCCESS', "Found PHP version $cfg{php_version}");
             } else {
-                if (ask_user('ERROR', 'Failed to agree on a PHP version. Agree on 8.4?', 'yes', 'yesno')) {
+                if (ask_user('Failed to agree on a PHP version. Agree on 8.4?', 'yes', 'yesno')) {
                     $cfg{php_version} = "8.4";
                 } else {
                     die "...okthen";
@@ -507,27 +508,28 @@ sub step_fix_permissions {
 sub step_apache_enables {
     my $success = 0;
     my $mods = 'rewrite ssl ';
+    my ($conf_output, $dismod_output, $mods_output, $sites_output, $sites_ssl_output);
 
     tell_user('INFO', 'Enabling required Apache configurations, sites and modules');
 
     if ($cfg{php_fpm} eq 'true') {
-        my $conf_output = `a2enconf php$cfg{php_version}-fpm 2>&1`;
+        $conf_output = `a2enconf php$cfg{php_version}-fpm 2>&1`;
         $success = $? == 0 ? 1 : 0;
 
-        my $dismod_output = `a2dismod php* mpm_prefork 2>&1`;
+        $dismod_output = `a2dismod php* mpm_prefork 2>&1`;
         $success = $? == 0 ? 1 : 0;
         $mods .= 'proxy_fcgi setenvif mpm_event';
     } else {
         $mods .= "php$cfg{php_version}";
     }
     
-    my $mods_output = `a2enmod $mods 2>&1`;
+    $mods_output = `a2enmod $mods 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
-    my $sites_output = `a2ensite $cfg{fqdn}.conf 2>&1`;
+    $sites_output = `a2ensite $cfg{fqdn}.conf 2>&1`;
     $success = $? == 0 ? 1 : 0;
 
-    my $sites_ssl_output = `a2ensite ssl-$cfg{fqdn}.conf 2>&1`;
+    $sites_ssl_output = `a2ensite ssl-$cfg{fqdn}.conf 2>&1`;
     $success = !!!$? ? !0 : 0; #lol job security
 
     tell_user('SYSTEM', "          conf result: $conf_output");
@@ -738,7 +740,7 @@ sub step_generate_templates {
 
 sub step_process_templates {
     use Term::ReadKey;
-    my $cp_cmd, $sql_cmd, $sqlrpw, $tmp;
+    my ($cp_cmd, $sql_cmd, $sqlrpw, $tmp);
     my $sql_import_result;
 
     if (check_platform() eq 'linux') {
@@ -774,7 +776,7 @@ sub step_process_templates {
 
     if ($cfg{ssl_enabled}) {
         tell_user('INFO', "Copying over $cfg{virthost_ssl_template}.ready to $cfg{virthost_conf_file_ssl}");
-        file_write($cfg{virthost_conf_file_a}, "$cfg{virthost_ssl_template}.ready", 'file');
+        file_write($cfg{virthost_conf_file_ssl}, "$cfg{virthost_ssl_template}.ready", 'file');
     }
 
     tell_user('INFO', "Copying over $cfg{htaccess_template}.ready to $cfg{web_root}/.htaccess");
