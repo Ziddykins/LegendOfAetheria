@@ -417,8 +417,8 @@ sub step_webserver_configure {
     $cfg{web_root} = ask_user($question, $cfg{web_root} ? $cfg{web_root} : '/var/www/html/kali.local/loa', 'input');
     $cfg{web_root} =~ s/\/$//;
 
-    $cfg{virthost_conf_file}    = "$cfg{apache_directory}/sites-available/$cfg{$fqdn}.conf";
-    $cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{$fqdn}.conf";
+    $cfg{virthost_conf_file}     = "$cfg{apache_directory}/sites-available/$cfg{fqdn}.conf";
+    $cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{fqdn}.conf";
 
     if ($cfg{os} eq 'linux') {
         $cfg{composer_runas} = 'www-data';
@@ -809,8 +809,15 @@ sub step_start_services {
     }
 
     foreach my $service (@services) {
+        my $order = "start $service";
         tell_user('INFO', "Starting $service");
-        tell_user('SYSTEM', `systemctl restart $service`);
+        
+
+        if ($svc_cmd eq 'service') {
+            $order = "$service start";
+        }
+
+        tell_user('SYSTEM', `$cfg{svc_cmd} $order`);
     }
 }
 
