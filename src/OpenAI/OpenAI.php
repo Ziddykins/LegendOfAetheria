@@ -48,7 +48,9 @@ class OpenAI {
 
     public function showPayload() {
         if (isset($this->payload)) {
-            print_r($this->payload);
+            $temp_payload = $this->payload;
+            $temp_payload = preg_replace("{$_ENV['OPENAI_APIKEY']}", '<APIKEY>', $temp_payload);
+            print_r($temp_payload);
         } else {
             echo "Payload Not Set";
         }

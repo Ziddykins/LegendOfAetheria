@@ -243,13 +243,15 @@ session.cache_expire = 30
 
 ### Composer
 
-Open a terminal and navigate to your webroot, then just issue `sudo -u www-data composer --working-dir <GAME_WEB_ROOT> install`
+Open a terminal and navigate to your webroot, then just issue 
+```sudo -u www-data composer --working-dir <GAME_WEB_ROOT> install```
 
 ### Templates
 
 ### CRONJobs
 
 ### Credits
+
     [Bootstrap 5.3](https://github.com/twbs)
     [AdminLTE4](https://github.com/ColorlibHQ/AdminLTE)
     [Tabulator](https://tabulator.info)

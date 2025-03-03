@@ -124,4 +124,4 @@
         </div>
     </div>
 </div>
-<script src="/js/loading-bar.js"></script>
+<!--<script src="/js/loading-bar.js"></script>-->
