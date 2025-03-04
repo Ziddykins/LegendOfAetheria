@@ -25,10 +25,10 @@ use constant {
     OPENAI    => 6,
     TEMPLATES => 7,
     APACHE    => 8,
-    PERMS     => 10,
-    COMPOSER  => 11,
-    CLEANUP   => 12,
-    PERMS     => 13,
+    PERMS     => 9,
+    COMPOSER  => 10,
+    CLEANUP   => 11,
+    PERMS     => 12,
 
     CERTS     => 99, #TODO: implement :D
 };
@@ -96,9 +96,9 @@ if (check_platform() eq 'linux') {
     $cfg{svc_cmd} = 'sc';
 }
 
-
+#####
+$cfg{step} = 3;
 step_firstrun();
-$cfg{step} = SOFTWARE;
 handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 
 if ($cfg{step} == SOFTWARE) {
@@ -249,6 +249,7 @@ sub step_firstrun {
                     tell_user('INFO', 'Continuing script execution from previously ran install');
                     return;
                 } else {
+                    $cfg{step} = SOFTWARE;
                     tell_user('INFO', 'Restarting install from beginning step');
                 }
             }
@@ -387,6 +388,9 @@ sub step_install_software {
         "php$cfg{php_version}-curl",
         "php$cfg{php_version}-dev",
         "php$cfg{php_version}-mysql",
+        "php$cfg{php_version}-xml",
+        "php$cfg{php_version}-intl",
+        "php$cfg{php_version}-mbstring",
         "mariadb-server",
         "apache2",
         "letsencrypt",
@@ -677,9 +681,9 @@ sub step_php_configure {
         close $fh;
     }
 
-    for (my ($key, $value) = each %ini_patch) {
-        if ($ini_contents =~ /^$key ?= ?/) {
-            $ini_contents =~ s/^$key ?= ?.*$/$key=$value/;
+    while (my ($key, $value) = each %ini_patch) {
+        if ($ini_contents =~ /;?$key =/) {
+            $ini_contents =~ s/;?$key ?=.*/$key = $value\n/g;
             print "Replaced $key with $value\n";
         } else {
             $ini_contents .= "\n$key=$value";
@@ -813,7 +817,7 @@ sub step_start_services {
         tell_user('INFO', "Starting $service");
         
 
-        if ($svc_cmd eq 'service') {
+        if ($cfg{svc_cmd} eq 'service') {
             $order = "$service start";
         }
 
