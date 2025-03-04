@@ -14,6 +14,9 @@ use Carp;
 
 $| = 1;
 
+`yes | cpan install Term::ReadKey`;
+`yes | cpan install Config::IniFiles`;
+
 use vars qw/*name *dir *prune/;
 
 use constant {
