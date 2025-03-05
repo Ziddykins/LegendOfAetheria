@@ -39,6 +39,14 @@ web-accessible browser game (provided your A/CNAME records are set up of course!
 The script must be ran as root, so again, be aware of what is going on if you are installing this
 on a machine with existing services (PHP configs, SQL configs, Apache, etc).
 
+### CPAN dependencies
+
+
+```sh
+cpan Config::IniFiles
+cpan Term::ReadKey
+```
+
 ```sh
 cd install
 chmod +x AutoInstaller.pl

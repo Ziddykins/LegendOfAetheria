@@ -1,4 +1,4 @@
-<VirtualHost ###REPL_WEB_FQDN###:80>
+<VirtualHost ###REPL_WEB_FQDN###:###REPL_APACHE_HTTP_PORT###>
 	ServerName ###REPL_WEB_FQDN###
 	ServerAdmin ###REPL_WEB_ADMIN_EMAIL###
 	DocumentRoot ###REPL_WEB_DOCROOT###
