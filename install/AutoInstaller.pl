@@ -5,19 +5,22 @@ use strict;
 use autodie;
 use diagnostics;
 
-use Config::IniFiles;
-use Data::Dumper;
+our $VERSION = "2.6.4.27";
+
+BEGIN {
+    eval { require Config::IniFiles; };
+    eval { require Term::ReadKey; };
+};
+
 use File::Path qw(make_path remove_tree);
+use Data::Dumper;
 use File::Find;
 use File::Copy;
 use Carp;
 
-$| = 1;
-
-`yes | cpan install Term::ReadKey`;
-`yes | cpan install Config::IniFiles`;
-
 use vars qw/*name *dir *prune/;
+
+$| = 1;
 
 use constant {
     FIRSTRUN  => 1,
@@ -43,10 +46,6 @@ use constant {
     CFG_W_DOMAIN => 6,
 };
 
-
-# Autoflush on
-$|++;
-
 *name   = *File::Find::name;
 *dir    = *File::Find::dir;
 *prune  = *File::Find::prune;
@@ -67,8 +66,8 @@ my $question;    # current question to ask the user
 my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
 
 if (!-e $cfg_file && -e 'config.ini.default') {
-    croak("You need to have a config.ini file; either create one" .
-          " or rename the 'config.ini.default' file to 'config.ini' before continuing\n");
+    croak('You need to have a config.ini file; either create one' .
+          ' or rename the "config.ini.default" file to "config.ini" before continuing' . "\n");
 }
 
 tie %ini, 'Config::IniFiles', (
@@ -99,8 +98,7 @@ if (check_platform() eq 'linux') {
     $cfg{svc_cmd} = 'sc';
 }
 
-#####
-$cfg{step} = 3;
+
 step_firstrun();
 handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 
@@ -151,7 +149,6 @@ if ($cfg{step} == OPENAI) {
 }
 
 if ($cfg{step} == TEMPLATES) {
-    # NOCONFIG - Replacements for Templates
     my @replacements = (
         "###REPL_PHP_BINARY###%%%$cfg{php_binary}",
 
@@ -181,7 +178,10 @@ if ($cfg{step} == TEMPLATES) {
 
         "###REPL_OPENAI_APIKEY###%%%$cfg{openai_apikey}",
 
-        "###REPL_PHP_COOKIEDOMAIN###%%%$cfg{fqdn}"
+        "###REPL_PHP_COOKIEDOMAIN###%%%$cfg{fqdn}",
+
+        "###REPL_APACHE_HTTP_PORT###%%%$cfg{apache_http_port}",
+        "###REPL_APACHE_HTTPS_PORT###%%%$cfg{apache_https_port}",
     );
 
     if (ask_user("Generate templates?", 'yes', 'yesno')) {
@@ -245,15 +245,23 @@ sub step_firstrun {
         if (ask_user("Would you like to load the configurations?", 'yes', 'yesno')) {
             %cfg = %{$ini{$fqdn}};
 
-            if ($cfg{step}) {
-                my $question = "Would you like to continue from step " . const_to_name($cfg{step}) .
-                    " or start from the beginning?";
-                if (ask_user($question, '[s]tart over/[c]ontinue', 'input') =~ /[cC]o?n?t?i?n?u?e?/) {
+            if ($cfg{step} > 1) {
+                my $answer = 0;
+
+                while ($answer != 1 and $answer != 2) {
+                    my $question = "What would you like to do:\n"
+                                 . "1. Continue with previous config from step " . const_to_name($cfg{step} - 1) . "\n"
+                                 . "2. Continue with previous config from the beginning\n";
+                    $answer = int(ask_user($question, 'Choice', 'input'));
+                }
+
+                if ($answer == 1) {
                     tell_user('INFO', 'Continuing script execution from previously ran install');
                     return;
                 } else {
                     $cfg{step} = SOFTWARE;
-                    tell_user('INFO', 'Restarting install from beginning step');
+                    tell_user('INFO', 'Restarting install from beginning step with previous configuration');
+                    return;
                 }
             }
         } else {
@@ -262,8 +270,8 @@ sub step_firstrun {
                 $ini{$fqdn} = {};
             } else {
                 tell_user('WARN', "Continuing with loaded configuration");
+                %cfg = %{$ini{$fqdn}};
             }
-            %cfg = %{$ini{$fqdn}};
         }
     } else {
         tell_user('WARN', 'No configuration for this FQDN, creating new entry');
@@ -316,11 +324,11 @@ sub step_firstrun {
                     "the 'install' directory when you run this script.\n\n" .
                     "Specified webroot directory: $cfg{web_root}\n" .
                     "Current location           : $loc_check\n";
-        die $error;
+        croak($error);
     }
 
-    $cfg{template_dir} = $cfg{web_root} . "/install/templates";
-    $cfg{scripts_dir}  = $cfg{web_root} . "/install/scripts";
+    $cfg{template_dir} = $cfg{web_root} . '/install/templates';
+    $cfg{scripts_dir}  = $cfg{web_root} . '/install/scripts';
     $cfg{admin_email}  = "webmaster\@$cfg{fqdn}";
     $cfg{setup_log}    = $cfg{web_root} . '/install/setup.log';
 
@@ -331,11 +339,13 @@ sub step_firstrun {
     $cfg{env_template}          = "$cfg{template_dir}/env.template";
     $cfg{sql_template}          = "$cfg{template_dir}/sql.template";
     $cfg{php_template}          = "$cfg{template_dir}/php.template";
+    $cfg{php_fpm}               = "false";
+    $cfg{step}++;
+
+    return 0;
 }
 
 sub step_install_software {
-    my ($apt_output, $sury_output);
-
     if (-e '/etc/apt/sources.list.d/php.list' || -e '/etc/apt/sources.list.d/ondrej-ubuntu-php-noble.sources') {
         tell_user('INFO', 'Sury repo entries already present');
     } else {
@@ -368,10 +378,10 @@ sub step_install_software {
             if ($cfg{php_version}) {
                 tell_user('SUCCESS', "Found PHP version $cfg{php_version}");
             } else {
-                if (ask_user('Failed to agree on a PHP version. Agree on 8.4?', 'yes', 'yesno')) {
+                if (ask_user('Failed to find a PHP version. Agree on 8.4?', 'yes', 'yesno')) {
                     $cfg{php_version} = "8.4";
                 } else {
-                    die "...okthen";
+                    croak("Couldn't come to a conclusion for PHP version");
                 }                
             }
         }
@@ -413,6 +423,8 @@ sub step_install_software {
     tell_user('INFO', 'Installing ' . @packages . ' packages\n');
     my $apt_cmd = 'apt install -y ' . join (' ', @packages) . ' 2>&1';
     tell_user('SYSTEM', `$apt_cmd` . "\n");
+
+    return 0;
 }
 
 #Step: Webserver
@@ -432,13 +444,15 @@ sub step_webserver_configure {
         $cfg{apache_runas}   = 'www-data';
     }
 
+    $cfg{apache_https_port} = ask_user('Enter apache port for HTTPS', '443', 'input');
+    $cfg{apache_http_port}  = ask_user('Enter apache port for HTTP',   '80', 'input');
+    
     handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+
+    return 0;
 }
 
 #Step: software
-
-
-
 sub step_sql_configure {
     $cfg{sql_username} = 'user_loa';
     $cfg{sql_password} = gen_random(15);
@@ -467,15 +481,38 @@ sub step_sql_configure {
 }
 
 sub step_vhost_ssl {
-    if (ask_user("Do you want to redirect traffic from http:80 to "
+    my $answer;
+    my $options = "1. Keep current SSL and enable HTTP -> HTTPS redirection\n"
+                . "2. Don't enable HTTP -> HTTPS redirection\n"
+                . "3. Update certificate and private key\n"
+                . "4. Skip\n\n"
+                . "0. Exit\n\n";
+
+    print "Do you want to redirect traffic from http:80 to "
         . "https:443? A valid certificate needs to be set in the "
         . "script configuration!\n- Currently set -\n"
         . "Certificate: $cfg{ssl_fullcer}\n"
-        . "Private Key: $cfg{ssl_privkey}\n"
-        , 'yes', 'yesno')) {
+        . "Private Key: $cfg{ssl_privkey}\n\n";
 
+    print $options;
+
+    $answer = int(ask_user('Choice', 1, 'input'));
+    if ($answer == 1) {
         tell_user('INFO', "Enabling rewrite directives in $cfg{virthost_conf_file}");
         `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
+    } elsif ($answer == 3) {
+        my ($cert, $pkey);
+
+        while ((!-e $cert or !-e $pkey) && $answer != 0) {
+            $cert = ask_user('Enter path to certificate', '', 'input');
+            $pkey = ask_user('Enter path to private key', '', 'input');
+        }
+            $cfg{ssl_fullcer} = $cert;
+            $cfg{ssl_privkey} = $pkey;
+
+        
+    } else {
+
     }
 }
 
@@ -914,7 +951,14 @@ sub gen_random {
     my $password;
 
     for (1 .. $length) {
-        $password .= chr(int(rand(94)) + 33);
+        
+        my $num = 0;
+        
+        while (!$num or ($num >= 91 && $num <= 96)) {
+            $num = int(rand(74)) + 48;
+        }
+
+        $password .= chr($num);
     }
 
     $password =~ s/\\/\\\\/g;
