@@ -8,4 +8,12 @@ enum FriendStatus {
     case NONE;
     case BLOCKED;
     case BLOCKED_BY;
+
+    public static function name_to_enum(string $name) {
+        foreach (self::cases() as $case) {
+            if ($case === $name) {
+                return $case;
+            }
+        }
+    }
 }

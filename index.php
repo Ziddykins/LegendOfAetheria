@@ -1,13 +1,13 @@
 <?php
     declare(strict_types = 1);
-    use Game\Abuse\Enums\Type;
+    use Game\System\Enums\AbuseType;
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
 
     require_once 'bootstrap.php';
     session_start();
-    
+
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
         check_csrf($_POST['csrf-token']);
         $email    = $_POST['login-email'];
@@ -117,7 +117,7 @@
                     $account->new();
                     
                     /* Hasn't been found creating multiple accounts */
-                    if (check_abuse(Type::MULTISIGNUP, $account->get_id(), $ip_address, 3)) {
+                    if (check_abuse(AbuseType::MULTISIGNUP, $account->get_id(), $ip_address, 3)) {
                         ban_user($account->get_id(), 3600, "Multiple accounts within allotted time frame");
                         exit();
                     }
@@ -125,8 +125,8 @@
                     /* ya forgin' posts I know it */
                     if (($str < 10 || $def < 10 || $int < 10)) {
                         $ip = $_SERVER['REMOTE_ADDR'];
-                        write_log(Type::POSTMODIFY->name, "Sign-up attributes modified", $ip);
-                        check_abuse(Type::POSTMODIFY, $account->get_id(), $ip, 2);
+                        write_log(AbuseType::TAMPERING->name, "Sign-up attributes modified", $ip);
+                        check_abuse(AbuseType::TAMPERING, $account->get_id(), $ip, 2);
                     }
 
                     if ($account->get_id() === 1) {

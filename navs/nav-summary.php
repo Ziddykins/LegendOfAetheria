@@ -12,6 +12,7 @@
             <div class="container">
                 <div class="d-flex justify-items-center align-items-center">
                     <div class="col">
+                        <?php $ap = $character->stats->get_ap(5); ?>
                         <div class="h3 josefin-slab-text">
                                 <?php if ($ap): ?>
                                     <i class="bi bi-capslock-fill text-success"></i>
@@ -28,13 +29,12 @@
                                 </a>
                                 <script>bootstrap.Modal.Default.backdrop = false; </script>
                                 <?php
-                                    $ap_modal_body .= file_get_contents('html/ap-spend.html');
                                     echo generate_modal('ap-spend', 'success', 'Assign AP', $ap_modal_body, ModalButtonType::OKCancel);
                                 ?>
                             <?php else: ?>
                                 <i class="bi bi-capslock"></i>
                             <?php endif; ?>
-                            <u><?php echo $character->get_name(); ?></u>
+
                         </div>
                     </div>
                     <div class="row float-right">

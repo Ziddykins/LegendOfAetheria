@@ -1,13 +1,10 @@
 <?php
 
-use Game\Abuse\Enums\Type;
+use Game\System\Enums\AbuseType;
 use Game\Character\Enums\FriendStatus;
 use Game\Character\Enums\Races;
-use Game\Monster\Monster;
-use Game\Monster\Enums\Scope;
 use Game\System\Enums\LOAError;
-use Game\Account\Account;
-use Game\Character\Character;
+
 
      /**     * Retrieves a MySQL datetime string based on the provided modifier.
      *
@@ -151,41 +148,62 @@ use Game\Character\Character;
 
         $email = filter_var($email, FILTER_SANITIZE_EMAIL);
 
-        $sql_query    = 'SELECT * FROM tbl_friends WHERE `email_1` = \'' . $account->get_email() . "' AND `email_2` LIKE '%$email%'";
-        $log->debug('Friend status, "us" sql: {$sql_query}');
+        $sql_query = <<<SQL
+            SELECT
+                `count1`,
+                `count2`,
+                `eml1`,
+                `eml2`
+            FROM
+                (SELECT
+                    COUNT(*) AS `count1`,
+                    `email_2` AS `eml1`
+                FROM {$_ENV['SQL_FRND_TBL']}
+                WHERE `email_1` = ? AND `email_2` LIKE ?) tbl1,
+                
+                (SELECT 
+                    COUNT(*) AS `count2`,
+                    `email_2` AS `eml2`
+                FROM {$_ENV['SQL_FRND_TBL']}
+                WHERE `email_1` = ? AND `email_2` LIKE ?) tbl2
+        SQL;
 
-        // deepcode ignore Sqli: Email is sanitized
-        $results_us   = $db->query($sql_query);
-        $count_one    = $results_us->num_rows;
+        print $sql_query;
 
-        $sql_query    = 'SELECT * FROM tbl_friends WHERE `email_2` = \'' . $account->get_email() . "' AND `email_1` LIKE '%$email%'";
-        $log->debug('Friend status, "them" sql: {$sql_query}');
+        $results = $db->execute_query($sql_query, [
+            $_SESSION['email'],
+            "%$email%",
+            "%$email%",
+            $_SESSION['email']
+        ])->fetch_assoc();
 
-        // deepcode ignore Sqli: Email is sanitized
-        $results_them = $db->query($sql_query);
-        $count_two    = $results_them->num_rows;
+        
+        print_r($results);
+        
 
+        $count_one = $results['count1'];
+        $count_two = $results['count2'];
+        $email_2 = $results['eml1'];
+        $email_4 = $results['eml2'];
+        
         $friend_status = FriendStatus::NONE;
         $log->info("Checking friend statuses for $email -> {$friend_status->name}");
 
-        switch (true) {
-            case ($count_one && $count_two):
-                $friend_status = FriendStatus::MUTUAL;
-                break;
-            case ($count_one && !$count_two):
-                if (substr($results_us->fetch_assoc()['email_2'], 0, 3) == '¿b¿') {
-                    $friend_status = FriendStatus::BLOCKED;
-                }
+        if ($count_one && $count_two) {
+            $friend_status = FriendStatus::MUTUAL;
+        } else if ($count_one && !$count_two) {
+            if (substr($email_2, 0, 3) == '¿b¿') {
+                $friend_status = FriendStatus::BLOCKED;
+            } else {
                 $friend_status = FriendStatus::REQUESTED;
-                break;
-            case ($count_two && !$count_one):
-                if (substr($results_them->fetch_assoc()['email_2'], 0, 3) == '¿b¿') {
-                    $friend_status = FriendStatus::BLOCKED_BY;
-                }
-                $friend_status = FriendStatus::REQUEST;
-                break;
-            default:
-                $friend_status = FriendStatus::NONE;
+            }
+        } else if ($count_two && !$count_one) {
+            if (substr($email_4, 0, 3) == '¿b¿') {
+                $friend_status = FriendStatus::BLOCKED_BY;
+            }
+            $friend_status = FriendStatus::REQUEST;
+        } else {
+            $friend_status = FriendStatus::NONE;
         }
         
         return $friend_status;
@@ -300,16 +318,16 @@ use Game\Character\Character;
     /**
      * Checks for potential abuse based on the provided type and data.
      *global $log;
-     * @param Game\Abuse\Enums\Type $type The type of abuse to check for (e.g. MULTISIGNUP)
+     * @param Game\System\Enums\AbuseType $type The type of abuse to check for (e.g. MULTISIGNUP)
      * @param mixed $data Additional data to use in the abuse check (e.g. IP address)
      *
      * @return bool True if abuse is detected, false otherwise
      */
-    function check_abuse(Type $type, $account_id, $ip, $threshold = 1): bool {
+    function check_abuse(AbuseType $type, $account_id, $ip, $threshold = 1): bool {
         global $db, $log;
 
         switch ($type) {
-            case Type::MULTISIGNUP:
+            case AbuseType::MULTISIGNUP:
                 $sql_query = <<<SQL
                                 SELECT `id` FROM {$_ENV['SQL_LOGS_TBL']}
                                 WHERE `type` = ?
@@ -323,7 +341,7 @@ use Game\Character\Character;
                 }
 
                 return false;
-            case Type::POSTMODIFY:
+            case AbuseType::TAMPERING:
                 $sql_query = <<<SQL
                     SELECT `id` FROM {$_ENV['SQL_LOGS_TBL']}
                     WHERE `type` = ? AND `ip` = ?
@@ -455,7 +473,7 @@ use Game\Character\Character;
         return $avatar;
     }
 
-    function safe_serialize($data, bool $unserialize=null): mixed {
+    function safe_serialize($data, ?bool $unserialize=null): mixed {
         if ($unserialize === true) {
             $data = unserialize(base64_decode($data));
         } else {

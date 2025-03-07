@@ -35,8 +35,13 @@
         <script>
                 
             var loa = {
-                u_email: "<?php echo $_SESSION['email']; ?>",
-                u_aid: "<?php echo $_SESSION['account-id']; ?>"
+               u_email: "<?php echo $_SESSION['email']; ?>",
+                 u_aid: "<?php echo $_SESSION['account-id']; ?>",
+                 u_cid: "<?php echo $_SESSION['character-id']; ?>",
+                u_csrf: "<?php echo $_SESSION['csrf-token']; ?>",
+                 u_sid: "<?php echo session_id(); ?>",
+                u_csrf: "<?php echo $_SESSION['csrf-token']; ?>",
+                
             };
         </script>
         <?php endif; ?>
@@ -47,4 +52,3 @@
                 zoom:120%; /* For Chrome, IE, default 100%*/
             }
         </style>
-}

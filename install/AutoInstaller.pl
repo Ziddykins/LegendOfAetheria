@@ -5,7 +5,7 @@ use strict;
 use autodie;
 use diagnostics;
 
-our $VERSION = "2.6.4.27";
+our $VERSION = "2.6.4.28";
 
 BEGIN {
     eval { require Config::IniFiles; };

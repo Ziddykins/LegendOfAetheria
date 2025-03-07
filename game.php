@@ -8,7 +8,7 @@
     session_start();
     require_once "bootstrap.php";
     $system->load_sheet();
-    
+
     gen_csrf_token();    
 
     if (check_session() === true) {

@@ -30,6 +30,47 @@ function close_click() {
     document.getElementById("list-mail-inbox").click();
 }
 
+function send_click() {
+    let recipient_field = document.getElementById("to-field");
+    let subject_field   = document.getElementById("subject-field");
+    let message_field   = document.getElementById("message-field");
+    let important_field = document.getElementById("important-field");
+
+    let message_obj = {
+        to: recipient_field.value,
+        subject: subject_field.value,
+        message: message_field.value,
+        important: important_field.checked,
+        s_aid: loa.u_aid,
+        s_cid: loa.u_cid,
+        s_sid: loa.u_sid,
+        s_csrf: loa.u_csrf
+    };
+
+    let msg_str =  JSON.stringify(message_obj);
+
+    fetch('/mail', {
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        method: 'POST',
+        body: msg_str
+    })
+    .then((response) => {
+        return response.json();
+    }).then((data) => {
+        document.getElementById("status").textContent = `Status: ${data.mail_status}`;
+    }).catch((error) => {
+        document.getElementById("status").textContent = `Status: ${error.mail_status}`;
+    });
+      
+    recipient_field.value = "";
+    subject_field.value = "";
+    message_field.value = "";
+    
+}
+
 function generate_mail_modal(env) {
     let env_body = `<div class="container border border-secondary">
                 <div class="row mb-3">

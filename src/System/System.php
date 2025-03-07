@@ -4,6 +4,7 @@ namespace Game\System;
 class System {
     public $monsters = [];
     private $weather;
+    private $zone_id;
 
     public function __construct($zone_id) {
         $this->zone_id = $zone_id;
