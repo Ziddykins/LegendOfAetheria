@@ -2,17 +2,19 @@
 
 use Game\Account\Account;
 use Game\Character\Character;
-use Game\Mail\MailBox;
-use Game\Mail\Enums\Type;
-
+use Game\Character\Enums\FriendStatus;
+use Game\Mail\MailBox\MailBox;
+use Game\Mail\Folder\Enums\FolderType;
+use Game\Mail\Envelope\Enums\EnvelopeStatus;
 
 $account   = new Account($_SESSION['email']); 
 $Character = new Character($account->get_id(), $_SESSION['character-id']); 
 
 $user_mailbox = new MailBox($account->get_id());
-$user_mailbox->setFocusedFolder(Type::INBOX);
+$user_mailbox->setFocusedFolder(FolderType::INBOX);
 $user_mailbox->populateFocusedFolder();
 $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
+
 
 ?>
 
@@ -43,7 +45,10 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                 </a>
 
                 <div class="d-grid">
-                    <button id="list-mail-compose" class="bg-dark bg-gradient list-group-item list-group-item-action" role="button" data-bs-toggle="list" href="#list-compose" role="tab" aria-controls="list-compose">Compose</button>
+                    <button id="list-mail-compose" class="bg-dark bg-gradient list-group-item list-group-item-action" role="button" data-bs-toggle="list" href="#list-compose" role="tab" aria-controls="list-compose">
+                        Compose
+                    </button>
+                    <div id="status" class="small"></div>
                 </div>
             </div>
         </div>
@@ -57,12 +62,14 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                         </div>
 
                         <?php
-                        
                             for ($i=0; $i<$inbox_count; $i++) {                                
-                                $subject  = $user_mailbox->focusedFolder->envelopes[$i]->subject;
-                                $sender   = $user_mailbox->focusedFolder->envelopes[$i]->sender;
-                                $msg_frag = $user_mailbox->focusedFolder->envelopes[$i]->message;
-                                $date     = $user_mailbox->focusedFolder->envelopes[$i]->date;
+                                $subject    = $user_mailbox->focusedFolder->envelopes[$i]->subject;
+                                $sender     = $user_mailbox->focusedFolder->envelopes[$i]->sender;
+                                $msg_frag   = $user_mailbox->focusedFolder->envelopes[$i]->message;
+                                $date       = $user_mailbox->focusedFolder->envelopes[$i]->date;
+                                $flagstring = $user_mailbox->focusedFolder->envelopes[$i]->status;
+                                
+                                $status_line = EnvelopeStatus::get_status_line($flagstring);
 
                                 echo '<div class="list-group">';
                                 echo '    <a href="#" id="env-id-' . $i . '" class="list-group-item list-group-item-action mb-1 text-truncate ';
@@ -76,7 +83,10 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                                 echo '            <h6 id="env-sub-' . $i . '" class="mb-1">' . $subject . '</h6>';
                                 echo '            <small id="env-date-' . $i . '">' . $date . '</small>';
                                 echo '        </div>';
-                                echo '        <p id="env-from-' . $i . '" class="mb-1">' . $sender . '</p>';
+                                echo '        <div class="d-flex w-100 justify-content-between">';
+                                echo '            <span id="env-from-' . $i . '" class="mb-1">' . $sender . '</span>';
+                                echo "            $status_line";
+                                echo '        </div>';
                                 echo '        <small id="env-frag-' . $i . '" class="col text-truncate">' . $msg_frag . '</small>';
                                 echo '   </a>';
                                 echo '</div>';
@@ -130,14 +140,14 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                                 </div>
                             </div>
 
-                            <div class="col text-end">
+                            <div class="col">
                                 <div id="mail-close" name="mail-close" class="btn btn-close" onclick=close_click()>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col text-end">
+                            <div class="col">
                                 <label for="to-field" class="col-form-label">To:</label>
                             </div>
 
@@ -147,24 +157,29 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col text-end">
+                            <div class="col">
                                 <label for="subject-field" class="col-form-label">Subject:</label>
                             </div>
 
-                            <div class="col-sm-10 pe-5">
+                            <div class="col-sm-10 pe-1">
                                 <input id="subject-field" name="subject-field" type="text" class="form-control">
+                            </div>
+                            
+                            <div class="col-sm-10 pe-5">
+                                <input id="important-field" name="important-field" type="checkbox" value="0" class="form-check-input">
+                                <label for="important-field" class="form-check-label">Important</label>
                             </div>
                         </div>
 
                         <div class="row mb-5">
-                            <div class="col text-end">
+                            <div class="col">
                                 <label for="message-field" class="col-form-label">Message:</label>
                             </div>
 
                             <div class="col-sm-10 pe-5">
                                 <textarea id="message-field" name="message-field" rows="5" class="form-control mb-3"></textarea>
                                 <div class="d-grid gap-1">
-                                    <button id="send-mail" name="send-mail" class="btn btn-primary">Send Mail</button>
+                                    <button id="send-mail" name="send-mail" class="btn btn-primary" onclick=send_click()>Send Mail</button>
                                     <button id="cancel-mail" name="cancel-mail" class="btn btn-secondary" onclick=close_click()>Close</button>
                                 </div>
                             </div>

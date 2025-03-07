@@ -1,7 +1,9 @@
 <?php
-namespace Game\Mail;
+namespace Game\Mail\Folder;
 
-use Game\Mail\Enums\Type;
+use Game\Mail\Folder\Enums\FolderType;
+use Game\Mail\Envelope\Envelope;
+use Game\Mail\Envelope\Enums\EnvelopeStatus;
 
 class Folder {
     public $envelopes = [];
@@ -9,28 +11,28 @@ class Folder {
     public $accountID;
 
     /**
-     * Constructs a new MailFolder instance.
+     * Constructs a new Folder instance using the provided account ID and folder type.
      *
-     * @param int $account_id The ID of the account associated with the folder.
-     * @param \Game\Mail\Enums\Type $folder The type of the folder (default is INBOX).
+     * @param int $account_id The unique identifier for the account associated with the folder.
+     * @param FolderType $folder The folder type to be used. Defaults to FolderType::INBOX.
      */
-    public function __construct($account_id, Type $folder = Type::INBOX) {
+    public function __construct($account_id, FolderType $folder = FolderType::INBOX) {
         $this->accountID  = $account_id;
         $this->folderType = $folder;
     }
 
     /**
-     * Get the count of messages in the current mail folder.
+     * Returns the total number of messages stored in the folder.
      *
      * @return int The number of messages in the folder.
-     *
      */
     public function getMessageCount() {
         return count($this->envelopes);
     }
 
     /**
-     * Retrieves messages from the database and populates the envelopes array.
+     * Retrieves messages from the database based on the account ID and folder type,
+     * instantiates Envelope objects for each record, and populates the envelopes array.
      */
     public function getMessages() {
         global $db;
@@ -38,7 +40,7 @@ class Folder {
             SELECT * FROM {$_ENV['SQL_MAIL_TBL']} 
             WHERE
                 account_id = ? AND
-                folder = ?
+                folder = FIND_IN_SET(?, folder)
         SQL;
 
         $characters = $db->execute_query($sql_query, [ $this->accountID, $this->folderType->name ])->fetch_all(MYSQLI_ASSOC);
@@ -50,7 +52,7 @@ class Folder {
             $envelope->recipient  = $row['to'];
             $envelope->subject    = $row['subject'];
             $envelope->message    = $row['message'];
-            $envelope->folder     = $row['folder'];
+            $envelope->folder     = FolderType::name_to_value($row['folder']);
             $envelope->date       = $row['date'];
             $envelope->status     = $row['status'];
 

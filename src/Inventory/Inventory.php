@@ -9,6 +9,7 @@ use Game\Traits\Enums\Type;
 class Inventory {
     use PropConvert;
     use Propsync;
+    private int $id;
     private int $slotCount;
     private int $currentWeight;
     private int $maxWeight;

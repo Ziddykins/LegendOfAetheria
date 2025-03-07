@@ -2,7 +2,7 @@
 declare(strict_types=1);
 use Game\Account\Account;
 use Game\Character\Character;
-use Game\Abuse\Enums\Type;
+use Game\System\Enums\AbuseType;
 session_start();
 
 require_once "bootstrap.php";
@@ -59,9 +59,9 @@ if (check_session()) {
                     /* ya forgin' posts I know it */
                     if (($str < 10 || $def < 10 || $int < 10)) {
                         $ip = $_SERVER['REMOTE_ADDR'];
-                        write_log(Type::POSTMODIFY->name, "New character attributes modified", $ip);
+                        write_log(AbuseType::TAMPERING->name, "New character attributes modified", $ip);
 
-                        if (check_abuse(Type::POSTMODIFY, $account->get_id(), $ip, 2)) {
+                        if (check_abuse(AbuseType::TAMPERING, $account->get_id(), $ip, 2)) {
                             ban_user($account->get_id(), 3600, "Post modifications");
                         }
                     }

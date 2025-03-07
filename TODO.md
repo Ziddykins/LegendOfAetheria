@@ -2,7 +2,7 @@
 
 ## System
 
-- [ ] Move Abuse under the System namespace
+- [x] Move Abuse under the System namespace
 
 ## Combat
 
@@ -12,7 +12,7 @@
 # Ideas
 
 * [x] **Mail system (in-game)**
-  * [ ] Implement class for users' mailboxes
+  * [x] Implement class for users' mailboxes
 
 * [ ] **Friends list**
   * [ ] Have the cancel request link remove the sql entry
@@ -40,4 +40,6 @@
 
 # AutoInstaller
 
-  - [ ] So much
+  - [ ] Update hosts file
+  - [ ] Script closes before composer/perms, fix
+  - [ ] creation of ssl vhost doesn't happen
