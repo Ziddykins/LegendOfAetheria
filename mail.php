@@ -4,6 +4,7 @@
 
     use Game\Account\Account;
     use Game\Character\Enums\FriendStatus;
+    use Game\Mail\Folder\Enums\FolderType;
 
     require_once "bootstrap.php";
 
@@ -47,7 +48,7 @@
                                 [
                                     $sender_aid,
                                     $sender_cid,
-                                    MailFolderType::INBOX,
+                                    FolderType::INBOX->name,
                                     $recipient,
                                     $_SESSION['email'],
                                     $subject,
