@@ -1,12 +1,15 @@
 <?php
-    function gen_achievements() {
-        global $monster_pool;
+    use Game\Monster\Monster;
+    use Game\Monster\Enums\Scope;
 
+    function gen_achievements() {
+        global $system;
         $intervals = [5, 10, 100, 250, 500, 1000];
         $count = 0;
 
-        foreach ($monster_pool->monsters as $monster) {
+        foreach ($system->monsters as $monster) {
             foreach ($intervals as $interval) {
+                $monster = new Monster(Scope::NONE);
                 $name_ns = str_replace(' ', '', $monster->get_name());
 
                 if ($count++ % 3 == 0) {

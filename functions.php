@@ -150,41 +150,26 @@ use Game\System\Enums\LOAError;
 
         $sql_query = <<<SQL
             SELECT
-                `count1`,
-                `count2`,
-                `eml1`,
-                `eml2`
+                a.`count1`,
+                b.`count2`,
+                a.`eml1`,
+                b.`eml2`
             FROM
-                (SELECT
-                    COUNT(*) AS `count1`,
-                    `email_2` AS `eml1`
-                FROM {$_ENV['SQL_FRND_TBL']}
-                WHERE `email_1` = ? AND `email_2` LIKE ?) tbl1,
-                
-                (SELECT 
-                    COUNT(*) AS `count2`,
-                    `email_2` AS `eml2`
-                FROM {$_ENV['SQL_FRND_TBL']}
-                WHERE `email_1` = ? AND `email_2` LIKE ?) tbl2
+                (SELECT COUNT(*) AS `count1`, `email_1` AS `eml1` FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_1` = ? and `email_2` LIKE ?) AS a,
+                (SELECT COUNT(*) AS `count2`, `email_1` AS `eml2` FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_2` = ? and `email_1` LIKE ?) AS b
         SQL;
-
-        print $sql_query;
 
         $results = $db->execute_query($sql_query, [
             $_SESSION['email'],
             "%$email%",
-            "%$email%",
-            $_SESSION['email']
+            $_SESSION['email'],
+            "%$email%"
         ])->fetch_assoc();
-
-        
-        print_r($results);
-        
 
         $count_one = $results['count1'];
         $count_two = $results['count2'];
-        $email_2 = $results['eml1'];
-        $email_4 = $results['eml2'];
+        $email_1 = $results['eml1'];
+        $email_2 = $results['eml2'];
         
         $friend_status = FriendStatus::NONE;
         $log->info("Checking friend statuses for $email -> {$friend_status->name}");
@@ -192,13 +177,13 @@ use Game\System\Enums\LOAError;
         if ($count_one && $count_two) {
             $friend_status = FriendStatus::MUTUAL;
         } else if ($count_one && !$count_two) {
-            if (substr($email_2, 0, 3) == '¿b¿') {
+            if (substr($email_1, 0, 3) == '¿b¿') {
                 $friend_status = FriendStatus::BLOCKED;
             } else {
                 $friend_status = FriendStatus::REQUESTED;
             }
         } else if ($count_two && !$count_one) {
-            if (substr($email_4, 0, 3) == '¿b¿') {
+            if (substr( $email_2, 0, 3) == '¿b¿') {
                 $friend_status = FriendStatus::BLOCKED_BY;
             }
             $friend_status = FriendStatus::REQUEST;

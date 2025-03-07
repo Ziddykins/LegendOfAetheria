@@ -8,64 +8,31 @@ use Game\Traits\PropSync;
 class Familiar {
     use PropConvert;
     use Propsync;
-    protected $id;
-    protected $characterID;
-    protected $level;
-/*       
-    protected $health;
-    protected $maxHealth;
 
-    protected $mana;
-    protected $maxMana;
-
-    protected $energy;
-    protected $maxEnergy;
-
-    protected $intelligence;
-    protected $strength;
-    protected $defense;
-
-    protected $experience;
-    protected $nextLevel;
-*/
-    protected $eggsOwned;
-    protected $eggsSeen;
-    
-    protected $name;
-    
-    protected $rarity;
-    protected $rarityColor;
-    protected $avatar;
-    protected $lastRoll;
-
-    /* Classes 
-    protected $stats;
-    protected $egg;
-    */ 
-    protected $hatchTime;
-    protected $dateAcquired;
-    protected $hatched;
-
-    protected $table;
+    private int $id;
+    private int $characterID;
+    private int $level;
+    private int $experience;
+    private int $nextLevel;
+    private string $name;
+    private $avatar;
+   
+    private $stats;
 
     public function __construct($characterID, $table) {
         $this->characterID = $characterID;
-        $this->table = $table;
     }
 
     public function registerFamiliar() {
         global $db;
-
-        $sqlQuery = "INSERT INTO " . $this->table . "(`character_id`) VALUES ($this->characterID)";
+        $sqlQuery = "INSERT INTO {$_ENV['SQL_CHAR_TBL']} (`character_id`) VALUES (?)";
         
-        $db->query($sqlQuery);
+        $db->execute_query($sqlQuery, [ $this->characterID ]);
 
-        $sqlQuery = 'SELECT `id` FROM ' . $this->table . 
-            " WHERE `character_id` = $this->characterID";
+        $sqlQuery = "SELECT `id` FROM {$_ENV['SQL_CHAR_TBL']} WHERE `character_id` = ?";
         
-        $result = $db->query($sqlQuery);
-
-        $familiar_id  = $result->fetch_assoc();
+        $result      = $db->execute_query($sqlQuery, [ $this->characterID ])->fetch_assoc();
+        $familiar_id = $result['id'];
 
         $this->dateAcquired = '1970-01-01 00:00:00';
         $this->hatchTime    = '1970-01-01 00:00:00';
@@ -74,8 +41,6 @@ class Familiar {
         $this->rarity       = 'NONE';
         $this->name         = '!Unset!';
         $this->id           = $familiar_id['id'];
-        $this->eggsOwned    = 1;
-        $this->eggsSeen     = 1;
         $this->avatar       = 'img/generated/eggs/egg-unhatched.jpeg';
         $this->level        = 1;
         $this->lastRoll     = 0.00;
@@ -86,7 +51,7 @@ class Familiar {
     public function saveFamiliar() {
         global $db;
 
-        $sqlQuery = 'UPDATE ' . $this->table .' SET ';
+        $sqlQuery ='UPDATE  SET ';
 
         foreach ((Array)$this as $key => $val) {
             if ($key !== 'id' && $key !== 'table') {

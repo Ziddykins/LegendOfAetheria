@@ -27,6 +27,8 @@ class Account {
     private $banned;
     private $muted;
     private $loggedIn;
+    private $eggsOwned;
+    private $eggsSeen;
 
     private $charSlot1;
     private $charSlot2;

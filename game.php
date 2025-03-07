@@ -3,12 +3,13 @@
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
-    use Game\System\System;
+    use Game\Familiar\Familiar;
+
 
     session_start();
     require_once "bootstrap.php";
     $system->load_sheet();
-
+    
     gen_csrf_token();    
 
     if (check_session() === true) {
@@ -19,8 +20,8 @@
         $character->set_id($_SESSION['character-id']);
         $character->load();
 
-        //  $familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
-        //  $familiar->loadFamiliar($character->get_id());
+        //$familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
+        //$familiar->loadFamiliar($character->get_id());
 
         $char_menu_icon = $character->stats->get_hp() > 0 
             ? 'bi-emoji-laughing-fill' 
@@ -335,7 +336,7 @@
                                     $privileges = Privileges::name_to_value($account->get_privileges());
                                             
                                     if ($privileges > Privileges::ADMINISTRATOR->value) {
-                                        $href = $_ENV['ADMIN_PANEL'] . '/dashboard';
+                                        $href = $_ENV['ADMIN_PANEL'];
                                         echo "<li>\n\t\t\t\t\t\t\t\t\t";
                                     
                                         echo "<a class=\"dropdown-item\" href=\"$href\">Administrator</a>";
@@ -364,7 +365,7 @@
                             exit();
                         }
                         
-                        include 'navs/nav-summary.php';
+                        //include('navs/nav-summary.php');
 
                         if (isset($_REQUEST['page'])) {
                             $requested_page = preg_replace('/[^a-z-]+/', '', $_REQUEST['page']);

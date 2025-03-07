@@ -2,13 +2,12 @@
 
 use Game\Account\Account;
 use Game\Character\Character;
-use Game\Character\Enums\FriendStatus;
 use Game\Mail\MailBox\MailBox;
 use Game\Mail\Folder\Enums\FolderType;
 use Game\Mail\Envelope\Enums\EnvelopeStatus;
 
 $account   = new Account($_SESSION['email']); 
-$Character = new Character($account->get_id(), $_SESSION['character-id']); 
+$character = new Character($account->get_id(), $_SESSION['character-id']); 
 
 $user_mailbox = new MailBox($account->get_id());
 $user_mailbox->setFocusedFolder(FolderType::INBOX);
@@ -62,13 +61,19 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                         </div>
 
                         <?php
-                            for ($i=0; $i<$inbox_count; $i++) {                                
+                            for ($i=$inbox_count - 1; $i>=0; $i--) {
                                 $subject    = $user_mailbox->focusedFolder->envelopes[$i]->subject;
                                 $sender     = $user_mailbox->focusedFolder->envelopes[$i]->sender;
                                 $msg_frag   = $user_mailbox->focusedFolder->envelopes[$i]->message;
                                 $date       = $user_mailbox->focusedFolder->envelopes[$i]->date;
                                 $flagstring = $user_mailbox->focusedFolder->envelopes[$i]->status;
                                 
+                                $status_int = EnvelopeStatus::value_from_flagstring($flagstring);
+                                $important  = $status_int & EnvelopeStatus::IMPORTANT->value;
+                                $read       = $status_int & EnvelopeStatus::READ->value;
+                                $replied    = $status_int & EnvelopeStatus::REPLIED->value;
+                                $favorite   = $status_int & EnvelopeStatus::FAVORITE->value;
+
                                 $status_line = EnvelopeStatus::get_status_line($flagstring);
 
                                 echo '<div class="list-group">';
@@ -76,6 +81,10 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
 
                                 if ($i == 0) {
                                     echo 'active';
+                                }
+
+                                if (!$read) {
+                                    echo ' text-bg-dark bg-gradient';
                                 }
 
                                 echo '" aria-current="true">';
@@ -141,18 +150,21 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                             </div>
 
                             <div class="col">
-                                <div id="mail-close" name="mail-close" class="btn btn-close" onclick=close_click()>
+                                <div id="mail-close" name="mail-close" class="btn btn-close float-end" onclick=close_click()>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col">
-                                <label for="to-field" class="col-form-label">To:</label>
+                                <label for="to-field" class="col-form-label">To:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
                             </div>
 
                             <div class="col-sm-10 pe-5">
-                                <input id="to-field" name="to-field" type="text" class="form-control">
+                                <input class="form-control" list="address-book-list" id="address-book" placeholder="Type to search contacts...">
+                                <datalist id="address-book-list">
+                                    
+
                             </div>
                         </div>
 
@@ -161,13 +173,8 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                                 <label for="subject-field" class="col-form-label">Subject:</label>
                             </div>
 
-                            <div class="col-sm-10 pe-1">
+                            <div class="col-sm-10 pe-5  ">
                                 <input id="subject-field" name="subject-field" type="text" class="form-control">
-                            </div>
-                            
-                            <div class="col-sm-10 pe-5">
-                                <input id="important-field" name="important-field" type="checkbox" value="0" class="form-check-input">
-                                <label for="important-field" class="form-check-label">Important</label>
                             </div>
                         </div>
 
@@ -177,7 +184,12 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                             </div>
 
                             <div class="col-sm-10 pe-5">
-                                <textarea id="message-field" name="message-field" rows="5" class="form-control mb-3"></textarea>
+                                    <span class="col mx-auto text-center">
+                                        <input id="important-field" name="important-field" type="checkbox" value="0" class="form-check-input">
+                                        <label for="important-field" class="form-check-label small">Important</label>
+                                    </div>
+                                    <textarea id="message-field" name="message-field" rows="5" class="form-control mb-3"></textarea>
+                                </div>
                                 <div class="d-grid gap-1">
                                     <button id="send-mail" name="send-mail" class="btn btn-primary" onclick=send_click()>Send Mail</button>
                                     <button id="cancel-mail" name="cancel-mail" class="btn btn-secondary" onclick=close_click()>Close</button>
