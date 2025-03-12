@@ -2,13 +2,6 @@ DROP DATABASE IF EXISTS `###REPL_SQL_DB###`;
 CREATE DATABASE `###REPL_SQL_DB###`;
 USE `###REPL_SQL_DB###`;
 
-/*M!999999\- enable the sandbox mode */ 
--- MariaDB dump 10.19-11.4.5-MariaDB, for debian-linux-gnu (x86_64)
---
--- Host: localhost    Database: ###REPL_SQL_DB###
--- ------------------------------------------------------
--- Server version	11.4.5-MariaDB-1-log
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
