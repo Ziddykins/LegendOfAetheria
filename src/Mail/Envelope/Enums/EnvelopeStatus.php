@@ -11,8 +11,8 @@ namespace Game\Mail\Envelope\Enums;
  */
 enum EnvelopeStatus: int {
     public static function get_status_line(string $flagstring): string {
-        $status_line = '<span class="small">';
-        $status_line .= '<i class="text-danger me-1 bi bi-arrow-through-heart';
+        $status_line = '<span class="fs-3">';
+        $status_line .= '<i class="text-danger me-3 bi bi-arrow-through-heart';
         $val = self::value_from_flagstring($flagstring);
 
 
@@ -22,7 +22,7 @@ enum EnvelopeStatus: int {
             $status_line .= '"></i>';
         }
 
-        $status_line .= '<i class="text-primary me-1 bi bi-arrow-down-left-circle';
+        $status_line .= '<i class="text-primary me-3 bi bi-arrow-down-left-circle';
 
         if ($val & EnvelopeStatus::REPLIED->value) {
             $status_line .= '-fill"></i>';
@@ -30,7 +30,7 @@ enum EnvelopeStatus: int {
             $status_line .= '"></i>';
         }
 
-        $status_line .= '<i style="color: #7f03fc" class="me-1 bi bi-exclamation-diamond';
+        $status_line .= '<i style="color: #7f03fc" class="me-3 bi bi-exclamation-diamond';
 
         if ($val & EnvelopeStatus::IMPORTANT->value) {
             $status_line .= '-fill"></i>';

@@ -8,7 +8,7 @@
         if ($action === 'generate') {
             $rarity_name = $familiar->get_rarity();
 
-            $roll = random_float(0, 12);
+            $roll = random_float(0, 12, 2);
             $familiar->generate_egg($familiar, $roll);
             $egg_name = null;
 

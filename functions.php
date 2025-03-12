@@ -93,11 +93,12 @@ use Game\System\Enums\LOAError;
      *
      * @param float $min The minimum value for the generated number.
      * @param float $max The maximum value for the generated number.
+     * @param   int $precision Round to the supplied amount of decimal places.
      *
      * @return float A random floating-point number within the specified range.
      */
-    function random_float($min, $max): float {
-        return $min + mt_rand() / mt_getrandmax() * (abs($max - $min));
+    function random_float($min, $max, $precision): float {
+        return round($min + mt_rand() / mt_getrandmax() * (abs($max - $min)), $precision);
     }
 
     /**
@@ -227,23 +228,42 @@ use Game\System\Enums\LOAError;
      *
      * @return int The count of friend requests. If an unsupported value is provided for $which, the function returns 0.
      */
-    function get_friend_counts($which, $id = 0) {
+    function get_friend_counts($which, int $id = 0, bool $return_list = false) {
         global $db, $account, $log;
-        $sql_query = 'SELECT DISTINCT email FROM ' . $_ENV['SQL_ACCT_TBL'] . ' WHERE `id` <> ' . $account->get_id();
-        $results = $db->query($sql_query);
+        $count = 0;
+        $arr_users = [];
 
-        switch ($which) {
-            case 'requests':
-                $requests = 0;
-                while ($row = $results->fetch_assoc()) {
-                    if (friend_status($row['email']) === FriendStatus::REQUEST->name) {
-                        $requests++;
-                    }
-                }
-                return $requests;
-            default:
-                return -1;
+        $sql_query = <<<SQL
+            SELECT DISTINCT `email`
+            FROM {$_ENV['SQL_ACCT_TBL']}
+            WHERE `id` <> ?
+        SQL;
+        
+        $results = $db->execute_query($sql_query, [ $account->get_id() ])->fetch_all(MYSQLI_ASSOC);
+
+        if (!$results) {
+            return 0;
         }
+        
+        foreach ($results as $result) {
+            $target_status = FriendStatus::name_to_enum(strtoupper($which));
+
+            if (friend_status($result['email']) === $target_status) {
+                $count++;
+
+                if ($return_list) {
+                    array_push($arr_users['emails'], $result['email']);
+                }
+            }
+            
+            $arr_users['count'] = $count;
+
+            if ($return_list) {
+                return $arr_users;
+            }
+            
+        }
+        return $count;
     }
 
     /* TODO: test */

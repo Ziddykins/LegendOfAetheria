@@ -57,7 +57,7 @@ class Monster {
         $stats   = ["level", "hp", "mp", "str", "def", "int", "expAwarded", "goldAwarded"];
         $bases   = [1.0, 10.0, 10.0, 2.0, 2.0, 2.0, 5.0, 5.0];
         $multi   = [0.1,  0.5,  0.5, 0.3, 0.3, 0.3, 0.7, 0.7];
-        $st_dv   = random_float(-0.5, 0.5);
+        $st_dv   = random_float(-0.5, 0.5, 2);
 
         for ($i=0; $i<count($stats); $i++) {
             $calculated_stat = $bases[$i] * (1 + ($player_lvl - 1) * $multi[$i]) + $st_dv * ($player_lvl - 1);
