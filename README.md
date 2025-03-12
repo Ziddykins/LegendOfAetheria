@@ -41,11 +41,10 @@ on a machine with existing services (PHP configs, SQL configs, Apache, etc).
 
 ### CPAN dependencies
 
-
 ```sh
-cpan Config::IniFiles
-cpan Term::ReadKey
-```
+yes | sudo cpan Config::IniFiles
+yes | sudo cpan Term::ReadKey
+```9
 
 ```sh
 cd install
