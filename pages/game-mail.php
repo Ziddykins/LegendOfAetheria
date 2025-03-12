@@ -12,8 +12,13 @@ $character = new Character($account->get_id(), $_SESSION['character-id']);
 $user_mailbox = new MailBox($account->get_id());
 $user_mailbox->setFocusedFolder(FolderType::INBOX);
 $user_mailbox->populateFocusedFolder();
-$inbox_count = $user_mailbox->focusedFolder->getMessageCount();
 
+$inbox_count    = $user_mailbox->focusedFolder->getMessageCount();
+$mutual_friends = get_friend_counts('mutual', 0, true);
+
+if ($mutual_friends) {
+    $mutual_friends = $mutual_friends['emails'];
+}
 
 ?>
 
@@ -161,10 +166,18 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                             </div>
 
                             <div class="col-sm-10 pe-5">
-                                <input class="form-control" list="address-book-list" id="address-book" placeholder="Type to search contacts...">
+                                <input class="form-control" list="address-book-list" id="to-field" placeholder="Type to search contacts...">
                                 <datalist id="address-book-list">
-                                    
-
+                                    <?php
+                                        if ($mutual_friends) {
+                                            foreach ($mutual_friends as $mf) {
+                                                echo '<option value="' . $mf . '">';
+                                            }
+                                        } else {
+                                            echo '<option value="Empty">';
+                                        }
+                                    ?>
+                                </datalist>
                             </div>
                         </div>
 
@@ -187,7 +200,7 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
                                     <span class="col mx-auto text-center">
                                         <input id="important-field" name="important-field" type="checkbox" value="0" class="form-check-input">
                                         <label for="important-field" class="form-check-label small">Important</label>
-                                    </div>
+                                    </span>
                                     <textarea id="message-field" name="message-field" rows="5" class="form-control mb-3"></textarea>
                                 </div>
                                 <div class="d-grid gap-1">
@@ -201,6 +214,3 @@ $inbox_count = $user_mailbox->focusedFolder->getMessageCount();
             </div>
 
             <script src="/js/mail.js" type="text/javascript"></script>
-            
-        
-    

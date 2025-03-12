@@ -77,7 +77,7 @@
 
         // crit
         if ($roll === 100) {
-            $damage *= intval(random_float(0.1, 1.5));
+            $damage *= intval(random_float(0.1, 1.5, 2));
         }
             
         // miss
@@ -111,7 +111,7 @@
                 $out_msg .= "<span class=\"fw-bold text-center bg-text-danger\">{$attacker->get_name()} has been killed!</span><br>";
                 
                 if ($turn == Turn::ENEMY) {
-                    award_player($attacker, $attackee);
+                   //award_player($attacker, $attackee);
                 }
 
                 return;

@@ -19,4 +19,3 @@ require_once PATH_WEBROOT . '/constants.php';
 /* .env */
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
-
