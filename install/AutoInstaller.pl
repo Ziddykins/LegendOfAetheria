@@ -7,6 +7,7 @@ use diagnostics;
 
 our $VERSION = "2.6.4.28";
 
+
 BEGIN {
     eval { require Config::IniFiles; };
     eval { require Term::ReadKey; };
@@ -106,33 +107,33 @@ if ($cfg{step} == SOFTWARE) {
     if (ask_user("Install required software?", 'yes', 'yesno')) {
         step_install_software();
         step_webserver_configure();
-        $cfg{step}++;
         handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
+    $cfg{step}++;
 }
 
 if ($cfg{step} == PHP) {
     if (ask_user("Go through PHP configurations?", 'yes', 'yesno')) {
         step_php_configure();
-        $cfg{step}++;
         handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
+    $cfg{step}++;
 }
 
 if ($cfg{step} == SERVICES) {
     if (ask_user("Start all required services now?", 'yes', 'yesno')) {
         step_start_services();
-        $cfg{step}++;
         handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
+    $cfg{step}++;
 }
 
 if ($cfg{step} == SQL) {
     if (ask_user("Go through SQL configurations?", 'yes', 'yesno')) {
         step_sql_configure();
-        $cfg{step}++;
         handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
+    $cfg{step}++;
 }
 
 if ($cfg{step} == OPENAI) {
@@ -228,10 +229,12 @@ step_start_services();
 if ($cfg{step} == CLEANUP) {
     if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
         clean_up();
-        $cfg{step}++;
         handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
+    $cfg{step}++;
 }
+
+print "\e[35mCOMPLETE\e[0m\n";
 
 sub step_firstrun {
     my $question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
@@ -257,6 +260,7 @@ sub step_firstrun {
 
                 if ($answer == 1) {
                     tell_user('INFO', 'Continuing script execution from previously ran install');
+                    $cfg{step} = 
                     return;
                 } else {
                     $cfg{step} = SOFTWARE;
@@ -590,6 +594,7 @@ sub step_apache_enables {
             die "Quitting at user request\n";
         }
     }
+    
 }
 
 #Step: PHP configurations

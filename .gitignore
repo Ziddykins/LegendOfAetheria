@@ -41,3 +41,4 @@ admin/25654/system/*
 
 admin/25654/css/setup.css
 pages/game-screen.php
+install/config.ini.default
