@@ -345,7 +345,7 @@ sub step_firstrun {
     $cfg{env_template}          = "$cfg{template_dir}/env.template";
     $cfg{sql_template}          = "$cfg{template_dir}/sql.template";
     $cfg{php_template}          = "$cfg{template_dir}/php.template";
-    $cfg{php_fpm}               = "false";
+    $cfg{php_fpm}               = 0;
     $cfg{step}++;
 
     return 0;
@@ -400,7 +400,6 @@ sub step_install_software {
     }
 
     my @packages = (
-        "cron",
         "php$cfg{php_version}",
         "php$cfg{php_version}-cli",
         "php$cfg{php_version}-common",
@@ -410,6 +409,7 @@ sub step_install_software {
         "php$cfg{php_version}-xml",
         "php$cfg{php_version}-intl",
         "php$cfg{php_version}-mbstring",
+        "cron",
         "mariadb-server",
         "apache2",
         "letsencrypt",
@@ -417,13 +417,14 @@ sub step_install_software {
         "python3-certbot-apache",
         "libapache2-mod-php$cfg{php_version}",
         "composer",
+        "openssl"
     );
 
     if (ask_user("Do you want to use PHP-FPM? This will use mpm_worker instead of the default mpm_prefork.", 'yes', 'yesno')) {
-        $cfg{php_fpm} = 'true';
+        $cfg{php_fpm} = 1;
         push @packages, "php$cfg{php_version}-fpm";
     } else {
-        $cfg{php_fpm} = 'false';
+        $cfg{php_fpm} = 0;
     }     
 
     tell_user('INFO', 'Installing ' . @packages . ' packages\n');
@@ -488,37 +489,51 @@ sub step_sql_configure {
 
 sub step_vhost_ssl {
     my $answer;
-    my $options = "1. Keep current SSL and enable HTTP -> HTTPS redirection\n"
-                . "2. Don't enable HTTP -> HTTPS redirection\n"
-                . "3. Update certificate and private key\n"
-                . "4. Skip\n\n"
+    my $options = "1. Generate a self-signed certificate for $cfg{fqdn}\n"
+                . "2. Keep current SSL and enable HTTP -> HTTPS redirection\n"
+                . "3. Don't enable HTTP -> HTTPS redirection\n"
+                . "4. Manually enter certificate and private key locations\n"
+                . "6. Skip\n\n"
                 . "0. Exit\n\n";
 
-    print "Do you want to redirect traffic from http:80 to "
-        . "https:443? A valid certificate needs to be set in the "
-        . "script configuration!\n- Currently set -\n"
-        . "Certificate: $cfg{ssl_fullcer}\n"
-        . "Private Key: $cfg{ssl_privkey}\n\n";
+    if (ask_user("Do you want to enable SSL?", 'y', 'yesno')) {
+        $cfg{ssl_enabled} = 1;
 
-    print $options;
+        print "Do you want to redirect traffic from http:80 to "
+            . "https:443? A valid certificate needs to be set in the "
+            . "script configuration!\n- Currently set -\n"
+            . "Certificate: $cfg{ssl_fullcer}\n"
+            . "Private Key: $cfg{ssl_privkey}\n\n";
 
-    $answer = int(ask_user('Choice', 1, 'input'));
-    if ($answer == 1) {
-        tell_user('INFO', "Enabling rewrite directives in $cfg{virthost_conf_file}");
-        `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
-    } elsif ($answer == 3) {
-        my ($cert, $pkey);
+        print $options;
 
-        while ((!-e $cert or !-e $pkey) && $answer != 0) {
-            $cert = ask_user('Enter path to certificate', '', 'input');
-            $pkey = ask_user('Enter path to private key', '', 'input');
-        }
+        $answer = int(ask_user('Choice', 1, 'input'));
+
+        if ($answer == 1) {
+            my $gen_output = `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/$cfg{fqdn}.key -out /etc/ssl/certs/$cfg{fqdn}.crt -batch`;
+            $cfg{ssl_fullcer} = "/etc/ssl/certs/$cfg{fqdn}.crt";
+            $cfg{ssl_privkey} = "/etc/ssl/private/$cfg{fqdn}.key";
+            `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
+
+            tell_user('SYSTEM', $gen_output);
+            tell_user('SUCCESS', "Generated self-signed certificates and enabled HTTP to HTTPS redirection");
+            tell_user('INFO', "Certificates and private key stored in /etc/ssl/certs and /etc/ssl/private, respectively");
+        } elsif ($answer == 2) {
+            tell_user('INFO', "Enabling rewrite directives in $cfg{virthost_conf_file}");
+            `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
+        } elsif ($answer == 4) {
+            my ($cert, $pkey);
+
+            while ((!-e $cert or !-e $pkey)) {
+                $cert = ask_user('Enter path to certificate', '', 'input');
+                $pkey = ask_user('Enter path to private key', '', 'input');
+            }
             $cfg{ssl_fullcer} = $cert;
             $cfg{ssl_privkey} = $pkey;
-
-        
+            tell_user('SUCCESS', 'Valid certificate and key pair supplied, continuing');
+        }
     } else {
-
+        $cfg{ssl_enabled} = 0;
     }
 }
 
@@ -562,7 +577,7 @@ sub step_apache_enables {
 
     tell_user('INFO', 'Enabling required Apache configurations, sites and modules');
 
-    if ($cfg{php_fpm} eq 'true') {
+    if (int($cfg{php_fpm}) == 1) {
         $conf_output = `a2enconf php$cfg{php_version}-fpm 2>&1`;
         $success = $? == 0 ? 1 : 0;
 
@@ -686,7 +701,7 @@ sub step_php_configure {
 
     if ($cfg{os} eq 'linux') {
         chomp($cfg{php_binary} = `which php$cfg{php_version}`);
-        if ($cfg{php_fpm} eq 'true') {
+        if (int($cfg{php_fpm}) == 1) {
             $cfg{php_ini} = "/etc/php/$cfg{php_version}/fpm/php.ini";
         } else {
             $cfg{php_ini} = "/etc/php/$cfg{php_version}/apache2/php.ini";
@@ -855,7 +870,7 @@ sub step_process_templates {
 sub step_start_services {
     my @services = ("mariadb", "apache2");
 
-    if ($cfg{php_fpm} eq 'true') {
+    if (int($cfg{php_fpm}) == 1) {
         push @services, "php$cfg{php_version}-fpm";
     }
 
