@@ -145,55 +145,19 @@ use Game\System\Enums\LOAError;
      *             - FriendStatus::NONE: There is no friendship relationship between the current user and the specified user.
      *             - LOAError::FRNDS_FRIEND_STATUS_ERROR: An error occurred while determining the friendship status.
      */
-    function friend_status($email): FriendStatus {
-        global $db, $account, $log;
+    function friend_status(int $character_id): FriendStatus {
+        global $db, $log;
 
-        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+        $status    = FriendStatus::NONE;
+        $sql_query = "SELECT * FROM {$_ENV['SQL_FRND_TBL']} WHERE `recipient_id` = ? OR `sender_id` = ?";
+        $results   = $db->execute_query($sql_query, [ $character_id ])->fetch_assoc();
 
-        $sql_query = <<<SQL
-            SELECT
-                a.`count1`,
-                b.`count2`,
-                a.`eml1`,
-                b.`eml2`
-            FROM
-                (SELECT COUNT(*) AS `count1`, `email_1` AS `eml1` FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_1` = ? AND `email_2` LIKE ?) AS a,
-                (SELECT COUNT(*) AS `count2`, `email_1` AS `eml2` FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_2` = ? AND `email_1` LIKE ?) AS b
-        SQL;
-
-        $results = $db->execute_query($sql_query, [
-            $_SESSION['email'],
-            "%$email%",
-            $_SESSION['email'],
-            "%$email%"
-        ])->fetch_assoc();
-
-        $count_one = $results['count1'];
-        $count_two = $results['count2'];
-        $email_1 = $results['eml1'];
-        $email_2 = $results['eml2'];
-        
-        $friend_status = FriendStatus::NONE;
-        $log->info("Checking friend statuses for $email -> {$friend_status->name}");
-
-        if ($count_one && $count_two) {
-            $friend_status = FriendStatus::MUTUAL;
-        } else if ($count_one && !$count_two) {
-            if (substr($email_1, 0, 3) == '¿b¿') {
-                $friend_status = FriendStatus::BLOCKED;
-            } else {
-                $friend_status = FriendStatus::REQUESTED;
-            }
-        } else if ($count_two && !$count_one) {
-            if (substr( $email_2, 0, 3) == '¿b¿') {
-                $friend_status = FriendStatus::BLOCKED_BY;
-            }
-            $friend_status = FriendStatus::REQUEST;
-        } else {
-            $friend_status = FriendStatus::NONE;
+        if ($results) {
+            $status = FriendStatus::name_to_enum($results['friend_status']);
         }
-        
-        return $friend_status;
+
+        $log->info("Friend status between character ID $character_id -> {$status->name}");        
+        return $status;
     }
 
     /**
@@ -207,13 +171,13 @@ use Game\System\Enums\LOAError;
      *
      * @return void
      */
-    function accept_friend_req($email):bool {
-        global $db, $log, $account;
+    function accept_friend_req($sender):bool {
+        global $db, $log;
 
-        if (friend_status($email) === FriendStatus::REQUEST) {
-            $sql_query = 'INSERT INTO tbl_friends (`email_1`, `email_2`) VALUES (?,?)';
-            $db->execute_query($sql_query, [$account->get_email(), $email]);
-            $log->info('Friend request accepted', [ 'email_1' => $account->get_email(), 'email_2' => $email ]);
+        if (friend_status($sender) === FriendStatus::REQUEST_RECV) {
+            $sql_query = "UPDATE {$_ENV['SQL_FRND_TBL']} SET `friend_status` = ? WHERE `recipient_id` = ?";
+            $db->execute_query($sql_query, [ FriendStatus::MUTUAL->value, $_SESSION['character-id'] ]);
+            $log->info('Friend request accepted', [ 'sender' => $sender, 'recipient' => $_SESSION['character-id'] ]);
             return true;
         } else {
             return false;
@@ -232,17 +196,17 @@ use Game\System\Enums\LOAError;
      * @return array|int The count of friend requests. If an unsupported value is provided for $which, the function returns 0.
      */
     function get_friend_counts(FriendStatus $which, int $id = 0, bool $return_list = false): array|int {
-        global $db, $account, $log;
+        global $db, $character;
         $count = 0;
         $arr_users['emails'] = [];
 
         $sql_query = <<<SQL
-            SELECT DISTINCT `email`
-            FROM {$_ENV['SQL_ACCT_TBL']}
+            SELECT DISTINCT `name`
+            FROM {$_ENV['SQL_CHAR_TBL']}
             WHERE `id` <> ?
         SQL;
         
-        $emails = $db->execute_query($sql_query, [ $account->get_id() ])->fetch_all(MYSQLI_ASSOC);
+        $emails = $db->execute_query($sql_query, [ $character->get_id() ])->fetch_all(MYSQLI_ASSOC);
 
         if (!$emails) {
             if ($return_list) {
@@ -534,23 +498,23 @@ use Game\System\Enums\LOAError;
         return true;
     }
 
-function dump_to_html(mixed $obj, ?bool $exit=true): int {
-    echo '<pre>';
-    print_r($obj);
-    
-    if ($exit) {
-        exit();
-    } 
+    function dump_to_html(mixed $obj, ?bool $exit=true): int {
+        echo '<pre>';
+        print_r($obj);
+        
+        if ($exit) {
+            exit();
+        } 
 
-    return 0;
-}
-
-function fix_name_header(string $name): string {
-    $ending_char = substr($name, -1, 1);
-
-    if (preg_match('/[sS]/', $ending_char)) {
-        return "$name'";
+        return 0;
     }
 
-    return "$name's";
-}
+    function fix_name_header(string $name): string {
+        $ending_char = substr($name, -1, 1);
+
+        if (preg_match('/[sS]/', $ending_char)) {
+            return "$name'";
+        }
+
+        return "$name's";
+    }

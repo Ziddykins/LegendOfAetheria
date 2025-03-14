@@ -2,10 +2,10 @@
 namespace Game\Character\Enums;
 
 enum FriendStatus {
-    case MUTUAL;
-    case REQUESTED;
-    case REQUEST;
     case NONE;
+    case REQUEST_SENT;
+    case REQUEST_RECV;
+    case MUTUAL;
     case BLOCKED;
     case BLOCKED_BY;
 
