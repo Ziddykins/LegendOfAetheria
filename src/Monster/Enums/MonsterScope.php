@@ -6,7 +6,7 @@ namespace Game\Monster\Enums;
 #   - Zone monsters are a bit less powerful, but are restricted to zones (maps); any
 #     players in this area will be able to contribute. Leaving the area forefits contribution
 #   - Personal monsters are only visible and attackable by you
-enum Scope: int {
+enum MonsterScope: int {
     case GLOBAL = 0;
     case ZONE = 1;
     case PERSONAL = 2;

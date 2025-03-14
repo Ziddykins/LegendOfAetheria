@@ -771,7 +771,7 @@ sub step_generate_templates {
     $templates{$cfg{sql_template}}          = "$cfg{sql_template}.ready";
     $templates{$cfg{crontab_template}}      = "$cfg{crontab_template}.ready";
     $templates{$cfg{virthost_ssl_template}} = "$cfg{virthost_ssl_template}.ready";
-    $templates{$cfg{virthost_template}}    = "$cfg{virthost_template}.ready";
+    $templates{$cfg{virthost_template}}     = "$cfg{virthost_template}.ready";
 
     while(my ($key, $val) = each %templates) {
         open my $fh, '<', $key;

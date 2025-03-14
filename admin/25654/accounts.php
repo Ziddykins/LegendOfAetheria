@@ -7,7 +7,7 @@
     use Game\Monster\Pool;
     use Game\Account\Enums;
     use Game\Traits\PropConvert;
-    use Game\Inventory\Gems\Gem;
+    use Game\Inventory\Gem;
 
     require_once "../../bootstrap.php";
     require_once "system/functions.php";
@@ -18,12 +18,12 @@
         $character = new Character($account->get_id(), $_SESSION['character-id']);
         $character->load();
 
-        if (isset($_REQUEST['action'])) {
-            $action     = $_REQUEST['action'];
+        if (isset($_POST['action'])) {
+            $action     = $_POST['action'];
             $account_id = null;
 
-            if (isset($_REQUEST['account_id'])) {
-                $account_id = $_REQUEST['account-id'];
+            if (isset($_POST['account_id'])) {
+                $account_id = $_POST['account-id'];
             }
 
             if ($account_id == $_SESSION['account-id']) {

@@ -1,7 +1,7 @@
 <?php
 namespace Game\Inventory\Items;
 
-class Modifiers {
+class ItemModifiers {
     private int $itemID;
     private string $target;
     private array $effects;

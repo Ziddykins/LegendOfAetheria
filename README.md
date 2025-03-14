@@ -251,7 +251,10 @@ session.cache_expire = 30
 ### Composer
 
 Open a terminal and navigate to your webroot, then just issue 
-```sudo -u www-data composer --working-dir <GAME_WEB_ROOT> install```
+
+```sh
+sudo -u www-data composer --working-dir <GAME_WEB_ROOT> install
+```
 
 ### Templates
 

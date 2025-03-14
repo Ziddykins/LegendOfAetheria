@@ -1,7 +1,7 @@
 <?php
 namespace Game\Inventory\Gems;
 
-class Modifiers {
+class GemModifiers {
     private int $gemID;
     private string $target;
     private int $effect;

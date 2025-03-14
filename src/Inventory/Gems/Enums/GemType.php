@@ -2,7 +2,7 @@
 
 namespace Game\Inventory\Gems\Enums;
 
-enum Type {
+enum GemType {
     case AQUAMARINE;
     case BARITE;
     case CHLOROPHANE;
