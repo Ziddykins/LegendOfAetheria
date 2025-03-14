@@ -103,39 +103,33 @@ if (check_platform() eq 'linux') {
 
 
 step_firstrun();
-handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
-
 if ($cfg{step} == SOFTWARE) {
     if (ask_user("Install required software?", 'yes', 'yesno')) {
         step_install_software();
         step_webserver_configure();
     }
-    $cfg{step}++;
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+    next_step();
 }
 
 if ($cfg{step} == PHP) {
     if (ask_user("Go through PHP configurations?", 'yes', 'yesno')) {
         step_php_configure();
     }
-    $cfg{step}++;
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+    next_step();
 }
 
 if ($cfg{step} == SERVICES) {
     if (ask_user("Start all required services now?", 'yes', 'yesno')) {
         step_start_services();
     }
-    $cfg{step}++;
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+    next_step();
 }
 
 if ($cfg{step} == SQL) {
     if (ask_user("Go through SQL configurations?", 'yes', 'yesno')) {
         step_sql_configure();
     }
-    $cfg{step}++;
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+    next_step();
 }
 
 if ($cfg{step} == OPENAI) {
@@ -147,8 +141,7 @@ if ($cfg{step} == OPENAI) {
         $cfg{openai_apikey} = ask_user($question, '', 'input');
     }
 
-    $cfg{step}++;
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+    next_step();
 }
 
 if ($cfg{step} == TEMPLATES) {
@@ -194,8 +187,8 @@ if ($cfg{step} == TEMPLATES) {
     if (ask_user("Process generated templates?", 'yes', 'yesno')) {
         step_process_templates();
     }
-    $cfg{step}++;
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+
+    next_step();
 }
 
 if ($cfg{step} == APACHE) {
@@ -204,37 +197,33 @@ if ($cfg{step} == APACHE) {
     }
 
     if (ask_user("Enable the required Apache conf/mods/sites?", 'yes', 'yesno')) {
-        step_apache_enables();
+        step_apache_enable();
     }
-    $cfg{step}++;
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+
+    next_step();
 }
 
 if ($cfg{step} == PERMS) {
     if (ask_user("Fix all webserver permissions?", 'yes', 'yesno')) {
         step_fix_permissions();
     }
-    $cfg{step}++;
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+    next_step();
 }
 
 if ($cfg{step} == COMPOSER) {
     if (ask_user("Run composer to download required dependencies?", 'yes', 'yesno')) {
         step_composer_pull();
     }
-    $cfg{step}++;
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+    step_start_services();
+    next_step();
 }
-
-step_start_services();
 
 if ($cfg{step} == CLEANUP) {
     if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
         clean_up();
     }
-    $cfg{step}++;
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
-}
+    next_step();
+ }
 
 print "\e[35mCOMPLETE\e[0m\n";
 
@@ -262,7 +251,6 @@ sub step_firstrun {
 
                 if ($answer == 1) {
                     tell_user('INFO', 'Continuing script execution from previously ran install');
-                    $cfg{step} = 
                     return;
                 } else {
                     $cfg{step} = SOFTWARE;
@@ -312,24 +300,20 @@ sub step_firstrun {
     $cfg{os}     = $os;
     $cfg{distro} = $distro;
 
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
-
-    chomp(my $loc_check = `pwd`);
+        chomp(my $loc_check = `pwd`);
     $loc_check =~ s/\/install//;
 
     my $web_root;
     $web_root = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
     $cfg{web_root} = $web_root;
 
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
-
-    if ($loc_check ne $cfg{web_root}) {
+        if ($loc_check ne $cfg{web_root}) {
         my $error = "Setup has determined the files are not in the correct place,\n" .
                     " or you're not in the correct folder. Please move the contents\n" .
                     "of the legendofaetheria folder to your webroot, and make sure you're\n" .
                     "the 'install' directory when you run this script.\n\n" .
                     "Specified webroot directory: $cfg{web_root}\n" .
-                    "Current location           : $loc_check\n";
+                    "Current location           : \e[31m$loc_check\e[0m\n";
         croak($error);
     }
 
@@ -345,8 +329,8 @@ sub step_firstrun {
     $cfg{env_template}          = "$cfg{template_dir}/env.template";
     $cfg{sql_template}          = "$cfg{template_dir}/sql.template";
     $cfg{php_template}          = "$cfg{template_dir}/php.template";
-    $cfg{php_fpm}               = "false";
-    $cfg{step}++;
+    $cfg{php_fpm}               = 0;
+    next_step();
 
     return 0;
 }
@@ -400,7 +384,6 @@ sub step_install_software {
     }
 
     my @packages = (
-        "cron",
         "php$cfg{php_version}",
         "php$cfg{php_version}-cli",
         "php$cfg{php_version}-common",
@@ -410,6 +393,7 @@ sub step_install_software {
         "php$cfg{php_version}-xml",
         "php$cfg{php_version}-intl",
         "php$cfg{php_version}-mbstring",
+        "cron",
         "mariadb-server",
         "apache2",
         "letsencrypt",
@@ -417,13 +401,14 @@ sub step_install_software {
         "python3-certbot-apache",
         "libapache2-mod-php$cfg{php_version}",
         "composer",
+        "openssl"
     );
 
     if (ask_user("Do you want to use PHP-FPM? This will use mpm_worker instead of the default mpm_prefork.", 'yes', 'yesno')) {
-        $cfg{php_fpm} = 'true';
+        $cfg{php_fpm} = 1;
         push @packages, "php$cfg{php_version}-fpm";
     } else {
-        $cfg{php_fpm} = 'false';
+        $cfg{php_fpm} = 0;
     }     
 
     tell_user('INFO', 'Installing ' . @packages . ' packages\n');
@@ -453,9 +438,7 @@ sub step_webserver_configure {
     $cfg{apache_https_port} = ask_user('Enter apache port for HTTPS', '443', 'input');
     $cfg{apache_http_port}  = ask_user('Enter apache port for HTTP',   '80', 'input');
     
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
-
-    return 0;
+        return 0;
 }
 
 #Step: software
@@ -483,42 +466,56 @@ sub step_sql_configure {
 
     $question = "Please enter the SQL port to be used for the database";
     $cfg{sql_port} = ask_user($question, $cfg{sql_port}, 'input');
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
-}
+    
+    }
 
 sub step_vhost_ssl {
     my $answer;
-    my $options = "1. Keep current SSL and enable HTTP -> HTTPS redirection\n"
-                . "2. Don't enable HTTP -> HTTPS redirection\n"
-                . "3. Update certificate and private key\n"
-                . "4. Skip\n\n"
+    my $options = "1. Generate a self-signed certificate for $cfg{fqdn}\n"
+                . "2. Keep current SSL and enable HTTP -> HTTPS redirection\n"
+                . "3. Don't enable HTTP -> HTTPS redirection\n"
+                . "4. Manually enter certificate and private key locations\n"
+                . "6. Skip\n\n"
                 . "0. Exit\n\n";
 
-    print "Do you want to redirect traffic from http:80 to "
-        . "https:443? A valid certificate needs to be set in the "
-        . "script configuration!\n- Currently set -\n"
-        . "Certificate: $cfg{ssl_fullcer}\n"
-        . "Private Key: $cfg{ssl_privkey}\n\n";
+    if (ask_user("Do you want to enable SSL?", 'y', 'yesno')) {
+        $cfg{ssl_enabled} = 1;
 
-    print $options;
+        print "Do you want to redirect traffic from http:80 to "
+            . "https:443? A valid certificate needs to be set in the "
+            . "script configuration!\n- Currently set -\n"
+            . "Certificate: $cfg{ssl_fullcer}\n"
+            . "Private Key: $cfg{ssl_privkey}\n\n";
 
-    $answer = int(ask_user('Choice', 1, 'input'));
-    if ($answer == 1) {
-        tell_user('INFO', "Enabling rewrite directives in $cfg{virthost_conf_file}");
-        `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
-    } elsif ($answer == 3) {
-        my ($cert, $pkey);
+        print $options;
 
-        while ((!-e $cert or !-e $pkey) && $answer != 0) {
-            $cert = ask_user('Enter path to certificate', '', 'input');
-            $pkey = ask_user('Enter path to private key', '', 'input');
-        }
+        $answer = int(ask_user('Choice', 1, 'input'));
+
+        if ($answer == 1) {
+            my $gen_output = `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/$cfg{fqdn}.key -out /etc/ssl/certs/$cfg{fqdn}.crt -batch`;
+            $cfg{ssl_fullcer} = "/etc/ssl/certs/$cfg{fqdn}.crt";
+            $cfg{ssl_privkey} = "/etc/ssl/private/$cfg{fqdn}.key";
+            `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
+
+            tell_user('SYSTEM', $gen_output);
+            tell_user('SUCCESS', "Generated self-signed certificates and enabled HTTP to HTTPS redirection");
+            tell_user('INFO', "Certificates and private key stored in /etc/ssl/certs and /etc/ssl/private, respectively");
+        } elsif ($answer == 2) {
+            tell_user('INFO', "Enabling rewrite directives in $cfg{virthost_conf_file}");
+            `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
+        } elsif ($answer == 4) {
+            my ($cert, $pkey);
+
+            while ((!-e $cert or !-e $pkey)) {
+                $cert = ask_user('Enter path to certificate', '', 'input');
+                $pkey = ask_user('Enter path to private key', '', 'input');
+            }
             $cfg{ssl_fullcer} = $cert;
             $cfg{ssl_privkey} = $pkey;
-
-        
+            tell_user('SUCCESS', 'Valid certificate and key pair supplied, continuing');
+        }
     } else {
-
+        $cfg{ssl_enabled} = 0;
     }
 }
 
@@ -556,38 +553,45 @@ sub step_fix_permissions {
 
 # Step: step_apache_enables
 sub step_apache_enables {
-    my $success = 0;
+    my $success = 1000;
     my $mods = 'rewrite ssl ';
     my ($conf_output, $dismod_output, $mods_output, $sites_output, $sites_ssl_output);
 
     tell_user('INFO', 'Enabling required Apache configurations, sites and modules');
 
-    if ($cfg{php_fpm} eq 'true') {
+    if (int($cfg{php_fpm}) == 1) {
         $conf_output = `a2enconf php$cfg{php_version}-fpm 2>&1`;
-        $success = $? == 0 ? 1 : 0;
+        $success += $?;
 
         $dismod_output = `a2dismod php* mpm_prefork 2>&1`;
-        $success = $? == 0 ? 1 : 0;
+        $success += $?;
+
         $mods .= 'proxy_fcgi setenvif mpm_event';
     } else {
         $mods .= "php$cfg{php_version}";
     }
     
     $mods_output = `a2enmod $mods 2>&1`;
-    $success = $? == 0 ? 1 : 0;
+    $success += $?;
 
-    $sites_output = `a2ensite $cfg{fqdn}.conf 2>&1`;
-    $success = $? == 0 ? 1 : 0;
+    $sites_output = `a2ensite $ 2>&1`;
+    $success += $?;
 
-    $sites_ssl_output = `a2ensite ssl-$cfg{fqdn}.conf 2>&1`;
-    $success = !!!$? ? !0 : 0; #lol job security
+    if ($cfg{ssl_enabled}) {
+        $sites_ssl_output = `a2ensite ssl-$cfg{fqdn}.conf 2>&1`;
+        $success += $?;
+        tell_user('SYSTEM', "    site (ssl) result: $sites_ssl_output");
+    }
 
-    tell_user('SYSTEM', "          conf result: $conf_output");
+    if ($cfg{php_frm}) {
+        tell_user('SYSTEM', "        dismod result: $dismod_output");
+        tell_user('SYSTEM', "          conf result: $conf_output");
+    }
+
     tell_user('SYSTEM', "          mods result: $mods_output");
     tell_user('SYSTEM', "site (non-ssl) result: $sites_output");
-    tell_user('SYSTEM', "    site (ssl) result: $sites_ssl_output");
-
-    if ($success) {
+   
+    if ($success == 1000) {
         tell_user('SUCCESS', "Apache configuration completed");
     } else {
         tell_user('ERROR', "There were errors - See above output\n");
@@ -595,8 +599,7 @@ sub step_apache_enables {
         if (!ask_user('Continue?', 'no', 'yesno')) {
             die "Quitting at user request\n";
         }
-    }
-    
+    }    
 }
 
 #Step: PHP configurations
@@ -686,7 +689,7 @@ sub step_php_configure {
 
     if ($cfg{os} eq 'linux') {
         chomp($cfg{php_binary} = `which php$cfg{php_version}`);
-        if ($cfg{php_fpm} eq 'true') {
+        if (int($cfg{php_fpm}) == 1) {
             $cfg{php_ini} = "/etc/php/$cfg{php_version}/fpm/php.ini";
         } else {
             $cfg{php_ini} = "/etc/php/$cfg{php_version}/apache2/php.ini";
@@ -855,7 +858,7 @@ sub step_process_templates {
 sub step_start_services {
     my @services = ("mariadb", "apache2");
 
-    if ($cfg{php_fpm} eq 'true') {
+    if (int($cfg{php_fpm}) == 1) {
         push @services, "php$cfg{php_version}-fpm";
     }
 
@@ -1167,4 +1170,9 @@ sub merge_hashes {
 sub const_to_name {
     my @names = qw/FIRSTRUN SOFTWARE PHP APACHE ENABLES COMPOSER TEMPLATES SERVICES SQL CRONS CERTS HOSTNAME CLEANUP PERMS/;
     return $names[shift];
+}
+
+sub next_step {
+    print "Moving on to step " . const_to_name(++$cfg{step}) . "\n";
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
