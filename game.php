@@ -3,7 +3,8 @@
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
-    use Game\Familiar\Familiar;
+    use Game\Character\Enums\FriendStatus;
+    //use Game\Familiar\Familiar;
 
 
     session_start();
@@ -303,7 +304,7 @@
                                     <a class="dropdown-item" href="?page=friends">Friends
                                     <?php
                                         $posts = 0;
-                                        $posts = get_friend_counts('posts');
+                                        $posts = get_friend_counts(FriendStatus::REQUEST);
                                         $pill_bg  = 'bg-danger';
 
                                         if (!$posts) {

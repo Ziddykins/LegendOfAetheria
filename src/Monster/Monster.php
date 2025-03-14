@@ -51,7 +51,7 @@ class Monster {
         $this->seed  = bin2hex(random_bytes(8));
     }
 
-    private function scale_monster(Monster $monster, int $player_lvl) {
+    private function scale_monster(Monster $monster, int $player_lvl): Monster {
         global $log;
 
         $stats   = ["level", "hp", "mp", "str", "def", "int", "expAwarded", "goldAwarded"];
@@ -74,7 +74,7 @@ class Monster {
 
 
 
-    public function random_monster(){
+    public function random_monster(): void{
         global $system;
         $monster = $system->monsters[random_int(0, count($system->monsters) - 1)];
         $temp_stats_arr = explode(',', $monster);

@@ -1,14 +1,5 @@
 <?php
-    $header_charname = $character->get_name();
-    
-    if (substr($character->get_name(), -1, 1) == "s") {
-        $header_charname = $character->get_name() . "'";
-    }
-    $header_charname = $character->get_name() . "'s";
-    
-    if (substr($character->get_name(), -1, 1) == "s") {
-        $header_charname = $character->get_name() . "'";
-    }
+
 ?>
     <div class="container">
         <div class="row pt-5">

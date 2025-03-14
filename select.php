@@ -9,10 +9,10 @@ require_once "bootstrap.php";
 
 $account = null;
 
-if (isset($_REQUEST['create-submit']) && $_REQUEST['create-submit'] == 1) {
-    if (isset($_REQUEST['slot']) && $_REQUEST['slot'] > 0 && $_REQUEST['slot'] <= 3) {
-        $slot = $_REQUEST['slot'];
-        $_REQUEST["select-new-$slot"] = 1;
+if (isset($_POST['create-submit']) && $_POST['create-submit'] == 1) {
+    if (isset($_POST['slot']) && $_POST['slot'] > 0 && $_POST['slot'] <= 3) {
+        $slot = $_POST['slot'];
+        $_POST["select-new-$slot"] = 1;
     }
 }
 

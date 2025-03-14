@@ -88,7 +88,7 @@
         $time_sqlformat     = get_mysql_datetime();
         $ip_address         = $_SERVER['REMOTE_ADDR'];
         $verification_code  = strrev(hash('sha256', session_id()));
-        $verification_code .= substr(hash('sha256', strval(rand(0,100))), 0, 15);
+        $verification_code .= substr(hash('sha256', strval(mt_rand(0,100))), 0, 15);
 
         /* Character information */
         $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $_POST['register-character-name']);

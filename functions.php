@@ -1,5 +1,6 @@
 <?php
 
+use Game\Character\Character;
 use Game\System\Enums\AbuseType;
 use Game\Character\Enums\FriendStatus;
 use Game\Character\Enums\Races;
@@ -118,7 +119,7 @@ use Game\System\Enums\LOAError;
 
         switch ($what) {
             case 'unread':
-                $sql_query = "SELECT * FROM {$_ENV['SQL_MAIL_TBL']} WHERE NOT FIND_IN_SET('READ', `status`) AND `account_id` = ?";
+                $sql_query = "SELECT * FROM {$_ENV['SQL_MAIL_TBL']} WHERE NOT FIND_IN_SET('READ', `status`) AND `r_aid` = ?";
                 $result = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->num_rows;
                 return $result;
             default:
@@ -134,7 +135,7 @@ use Game\System\Enums\LOAError;
      *
      * @param string $email The email address of the user to check the friendship status with.
      *
-     * @return int The friendship status between the current user and the specified user.
+     * @return Game\Character\Enums\FriendStatus The friendship status between the current user and the specified user.
      *             The possible return values are:
      *             - FriendStatus::MUTUAL: The current user and the specified user are mutual friends.
      *             - FriendStatus::REQUESTED: The current user has sent a friend request to the specified user.
@@ -156,8 +157,8 @@ use Game\System\Enums\LOAError;
                 a.`eml1`,
                 b.`eml2`
             FROM
-                (SELECT COUNT(*) AS `count1`, `email_1` AS `eml1` FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_1` = ? and `email_2` LIKE ?) AS a,
-                (SELECT COUNT(*) AS `count2`, `email_1` AS `eml2` FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_2` = ? and `email_1` LIKE ?) AS b
+                (SELECT COUNT(*) AS `count1`, `email_1` AS `eml1` FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_1` = ? AND `email_2` LIKE ?) AS a,
+                (SELECT COUNT(*) AS `count2`, `email_1` AS `eml2` FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_2` = ? AND `email_1` LIKE ?) AS b
         SQL;
 
         $results = $db->execute_query($sql_query, [
@@ -206,14 +207,16 @@ use Game\System\Enums\LOAError;
      *
      * @return void
      */
-    function accept_friend_req($email) {
+    function accept_friend_req($email):bool {
         global $db, $log, $account;
 
         if (friend_status($email) === FriendStatus::REQUEST) {
             $sql_query = 'INSERT INTO tbl_friends (`email_1`, `email_2`) VALUES (?,?)';
             $db->execute_query($sql_query, [$account->get_email(), $email]);
-
             $log->info('Friend request accepted', [ 'email_1' => $account->get_email(), 'email_2' => $email ]);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -226,12 +229,12 @@ use Game\System\Enums\LOAError;
      * @param string $which The type of friend-related data to retrieve. Currently, only 'requests' is supported.
      * @param int $id The ID of the account for which to retrieve friend-related data. If not provided, the current user's ID is used.
      *
-     * @return int The count of friend requests. If an unsupported value is provided for $which, the function returns 0.
+     * @return array|int The count of friend requests. If an unsupported value is provided for $which, the function returns 0.
      */
-    function get_friend_counts($which, int $id = 0, bool $return_list = false) {
+    function get_friend_counts(FriendStatus $which, int $id = 0, bool $return_list = false): array|int {
         global $db, $account, $log;
         $count = 0;
-        $arr_users = [];
+        $arr_users['emails'] = [];
 
         $sql_query = <<<SQL
             SELECT DISTINCT `email`
@@ -239,20 +242,26 @@ use Game\System\Enums\LOAError;
             WHERE `id` <> ?
         SQL;
         
-        $results = $db->execute_query($sql_query, [ $account->get_id() ])->fetch_all(MYSQLI_ASSOC);
+        $emails = $db->execute_query($sql_query, [ $account->get_id() ])->fetch_all(MYSQLI_ASSOC);
 
-        if (!$results) {
+        if (!$emails) {
+            if ($return_list) {
+                $arr['count'] = 0;
+                return $arr;
+            }
             return 0;
         }
         
-        foreach ($results as $result) {
-            $target_status = FriendStatus::name_to_enum(strtoupper($which));
-
-            if (friend_status($result['email']) === $target_status) {
+        foreach ($emails as $email) {
+            $target_status = $which;
+            $current_status = friend_status($email['email']);
+            if ($current_status === $target_status) {
                 $count++;
 
                 if ($return_list) {
-                    array_push($arr_users['emails'], $result['email']);
+                    if (isset($email['email'])) {
+                        array_push($arr_users['emails'], $email['email']);
+                    }
                 }
             }
             
@@ -261,7 +270,6 @@ use Game\System\Enums\LOAError;
             if ($return_list) {
                 return $arr_users;
             }
-            
         }
         return $count;
     }
@@ -310,7 +318,7 @@ use Game\System\Enums\LOAError;
      *
      * @return bool True if the email address is valid, false otherwise.
      */
-    function check_valid_email($email) {
+    function check_valid_email($email): bool {
         $sanitized_email = filter_var($email, FILTER_SANITIZE_EMAIL);
         if ($sanitized_email == $email) {
             if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -365,7 +373,7 @@ use Game\System\Enums\LOAError;
     }
 
 
-    function generate_modal($id, $bg_color, $header, $body, ModalButtonType $btn_type) {
+    function generate_modal($id, $bg_color, $header, $body, ModalButtonType $btn_type): string {
         $btn = null;
         if ($btn_type === ModalButtonType::YesNo) {
             $btn  = '<button type="button" class="btn btn-danger"  data-bs-dismiss="modal">No</button>';
@@ -400,7 +408,7 @@ use Game\System\Enums\LOAError;
         return $html;
     }
 
-    function get_monster_count() {
+    function get_monster_count(): int {
         global $system;
         return count($system->monsters);
     }
@@ -511,15 +519,38 @@ use Game\System\Enums\LOAError;
         return true;
     }
 
-    function gen_csrf_token() {
+    function gen_csrf_token(): string {
         return bin2hex(random_bytes(32));
     }
 
-    function check_csrf($req_csrf) {
+    function check_csrf($req_csrf): bool {
         if ($req_csrf != $_SESSION['csrf-token']) {
             $_SESSION = [];
             session_destroy();
             header('Location: /?csrf_fail');
             exit();
         }
+
+        return true;
     }
+
+function dump_to_html(mixed $obj, ?bool $exit=true): int {
+    echo '<pre>';
+    print_r($obj);
+    
+    if ($exit) {
+        exit();
+    } 
+
+    return 0;
+}
+
+function fix_name_header(string $name): string {
+    $ending_char = substr($name, -1, 1);
+
+    if (preg_match('/[sS]/', $ending_char)) {
+        return "$name'";
+    }
+
+    return "$name's";
+}

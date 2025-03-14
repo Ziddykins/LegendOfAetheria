@@ -8,6 +8,8 @@
 
 - [ ] Add functions to add gems to sockets
 - [ ] Figure out a way to keep track of the gem ID's, don't really want a separate table, nor do I wanna iterate through all players' inventories.
+- [ ] Make flee (most important) work along with steal, spell, etc
+- [ ] why only enemies attack?
 
 # Ideas
 
@@ -37,6 +39,8 @@
   * [ ] maybe once per day a golden egg grants boosts or equip
 
 * [ ] Livechat - ~~PHP/MySQL/jQuery/AJAX~~ websockets
+
+
 
 # AutoInstaller
 

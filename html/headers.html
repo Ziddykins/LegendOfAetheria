@@ -32,18 +32,19 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
         <?php if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1): ?>
-        <script>
-                
+        <script>                
             var loa = {
                u_email: "<?php echo $_SESSION['email']; ?>",
                  u_aid: "<?php echo $_SESSION['account-id']; ?>",
-                 u_cid: "<?php echo $_SESSION['character-id']; ?>",
                 u_csrf: "<?php echo $_SESSION['csrf-token']; ?>",
                  u_sid: "<?php echo session_id(); ?>",
-                u_csrf: "<?php echo $_SESSION['csrf-token']; ?>",
-                
             };
         </script>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['character-id'])): ?>
+            <script>
+                loa.u_cid = "<?php echo $_SESSION['character-id']; ?>";
+            </script>
         <?php endif; ?>
 
         <style>
