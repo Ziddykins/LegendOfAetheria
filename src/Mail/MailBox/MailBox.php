@@ -5,16 +5,16 @@ use Game\Mail\Folder\Folder;
 use Game\Mail\Folder\Enums\FolderType;
 
 class MailBox {
-    public $accountID;
+    public $characterID;
     public $focusedFolder;
 
     /**
      * Constructs a new MailBox instance using the provided account ID.
      *
-     * @param int $accountID The unique identifier for the account linked to this mailbox.
+     * @param int $characterID The unique identifier for the account linked to this mailbox.
      */
-    public function __construct(int $accountID) {
-        $this->accountID = $accountID;
+    public function __construct(int $character_id) {
+        $this->characterID = $character_id;
     }
 
     /**
@@ -24,7 +24,7 @@ class MailBox {
      * @return void
      */
     public function setFocusedFolder(FolderType $folder): void {
-        $this->focusedFolder = new Folder($this->accountID, $folder);
+        $this->focusedFolder = new Folder($this->characterID, $folder);
     }
 
     /**

@@ -40,8 +40,8 @@ use Game\Character\Enums\FriendStatus;
         $header_charname = $character->get_name() . "'";
     }
     
-    if ($_REQUEST['page'] == 'friends') {
-        if (isset($_REQUEST['action'])) {
+    if ($_POST['page'] == 'friends') {
+        if (isset($_POST['action'])) {
             [$email, $focused_email, $requested_email] = [null, null, null];
             $posts = ['friends-request-send', 'email', 'focused-request'];
 
@@ -59,44 +59,50 @@ use Game\Character\Enums\FriendStatus;
                 }
             }
 
-            if ($_REQUEST['action'] == 'cancel_request') {
-                // file deepcode ignore Sqli: <please specify a reason of ignoring this>
+        switch ($_POST['action']) {
+            case 'cancel_request':
                 if (friend_status($email) === FriendStatus::REQUESTED) {
-                    $sql_query = 'DELETE FROM `' . $_ENV['SQL_FRND_TBL'] . '` ' .
-                                "WHERE email_1 = ? AND email_2 = ?";
+                    $sql_query = "DELETE FROM {$_ENV['SQL_FRND_TBL']} WHERE email_1 = ? AND email_2 = ?";
                     $db->execute_query($sql_query, [ $account->get_email(), $email ]);
-                    $log->info("Sent friend request deleted", [ 'To' => $email, 'From' => $account->get_email() ]);
+                    $log->info("Sent friend request deleted", ['To' => $email, 'From' => $account->get_email()]);
                 }
-            } else if ($_REQUEST['action'] == 'accept_request') {
-                // file deepcode ignore Sqli: <please specify a reason of ignoring this>
-                if (isset($_REQUEST['btn-accept']) && $_REQUEST['btn-accept'] == "1") {
+                break;
+            case 'accept_request':
+                if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
                     accept_friend_req($focused_email);
-                    $log->info('Friend request accepted', [ 'email_1' => $account->get_email(), 'email_2' => $focused_email]);
+                    $log->info('Friend  accepted', ['email_1' => $account->get_email(), 'email_2' => $focused_email]);
                 }
-            } else if ($_REQUEST['action'] == 'send_request') {
-                if (isset($_REQUEST['friends-send-request']) && $_REQUEST['friends-send-request'] == "1") {
-                    if (isset($_REQUEST['friends-request-send'])) {
-                        if (friend_status($requested_email) == FriendStatus::NONE) {
-                            if (check_valid_email($requested_email)) {
-                                if ($requested_email != $account->get_email()) {
-                                    $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
-                                    $db->execute_query($sql_query, [ $account->get_email(), $requested_email ]);
-                                    $log->info('Friend request sent', [ 'email_1' => $account->get_email(), 'email_2' => $requested_email ]);
+                break;
+            case 'send_request':
+                if (isset($_POST['friends-send-request']) && $_POST['friends-send-request'] == "1") {
+                    if (isset($_POST['friends-request-send'])) {
+                        switch (friend_status($requested_email)) {
+                            case FriendStatus::NONE:
+                                if (check_valid_email($requested_email)) {
+                                    if ($requested_email != $account->get_email()) {
+                                        $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
+                                        $db->execute_query($sql_query, [$account->get_email(), $requested_email]);
+                                        $log->info(
+                                            'Friend request sent',
+                                            ['email_1' => $account->get_email(), 'email_2' => $requested_email]
+                                        );
+                                    } else {
+                                        header('Location: /game?page=friends&error=self_add');
+                                        exit();
+                                    }
                                 } else {
-                                    header('Location: /game?page=friends&error=self_add');
+                                    header('Location: /game?page=friends&error=invalid_email');
                                     exit();
                                 }
-                            } else {
-                                header('Location: /game?page=friends&error=invalid_email');
+                                break;
+                            default:
+                                header('Location: /game?page=friends&error=already_friend');
                                 exit();
-                            }
-                        } else {
-                            header('Location: /game?page=friends&error=already_friend');
-                            exit();
                         }
                     }
                 }
-            }
+                break;
+        }
         }
     }
 ?>

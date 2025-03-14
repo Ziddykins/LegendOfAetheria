@@ -32,22 +32,22 @@
                             $sql_query = <<<SQL
                                 INSERT INTO {$_ENV['SQL_MAIL_TBL']}
                                     (
-                                        `account_id`,
-                                        `character_id`,
                                         `folder`,
                                         `to`,
                                         `from`,
                                         `subject`,
                                         `message`,
-                                        `status`
+                                        `status`,
+                                        `r_aid`,
+                                        `s_aid`,
+                                        `r_cid`,
+                                        `s_cid`
                                     )
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             SQL;
 
                             $db->execute_query($sql_query,
                                 [
-                                    $sender_aid,
-                                    $sender_cid,
                                     FolderType::INBOX->name,
                                     $recipient,
                                     $_SESSION['email'],

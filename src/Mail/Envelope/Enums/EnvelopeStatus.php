@@ -10,11 +10,16 @@ namespace Game\Mail\Envelope\Enums;
  * @package Game\Mail\Envelope\Enums
  */
 enum EnvelopeStatus: int {
+    case NONE      = 1;
+    case READ      = 2;
+    case REPLIED   = 4;
+    case FAVORITE  = 8;
+    case IMPORTANT = 16;
+
     public static function get_status_line(string $flagstring): string {
         $status_line = '<span class="fs-3">';
         $status_line .= '<i class="text-danger me-3 bi bi-arrow-through-heart';
         $val = self::value_from_flagstring($flagstring);
-
 
         if ($val & EnvelopeStatus::FAVORITE->value) {
             $status_line .= '-fill"></i>';
@@ -60,9 +65,4 @@ enum EnvelopeStatus: int {
         }
         return 0;
     }
-
-    case IMPORTANT = 1;
-    case READ      = 2;
-    case REPLIED   = 4;
-    case FAVORITE  = 8;
-};
+}

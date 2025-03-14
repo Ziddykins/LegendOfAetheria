@@ -24,7 +24,6 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
         let text_height = 24;
         let max_lines = Math.round(document.getElementById("battle-log").clientHeight / text_height);
         
-        console.log(`lines ${lines} max_lines ${max_lines}`);
         if (lines >= max_lines) {
             battle_log.innerHTML = "";
         }
@@ -42,14 +41,13 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
             console.log(`got data: ${data}`);
             battle_log.insertAdjacentHTML('afterbegin', data);
         }).catch((error) => {
-            battle_log.innerHTML = battle_log.innerHTML + `${error.message}`;
+            battle_log.insertAdjacentHTML = battle_log.innerHTML + `${error.message}`;
         });
     });
 });
 
 document.querySelectorAll("button").forEach((btn) => {
     if (btn.attributes.getNamedItem("data-loa-monld") != null) {
-
         if (btn.attributes.getNamedItem("data-loa-monld").value == "1") {
             if (mon_loaded == 1) {
                 btn.disabled = false;

@@ -24,8 +24,8 @@ class Envelope {
     /**
      * Constructs a new Envelope instance with the specified sender and recipient.
      *
-     * @param string $sender The email address of the sender.
-     * @param string $recipient The email address of the recipient.
+     * @param string $sender The username of the sender
+     * @param string $recipient The username of the recipient
      */
     public function __construct($sender, $recipient) {
         $this->sender    = $sender;
@@ -34,6 +34,10 @@ class Envelope {
 
     public static function get_statuses(int $value) {
         $statuses = [];
+
+        if ($value & EnvelopeStatus::NONE->value) {
+            $statuses['none'] = 1;
+        }
 
         if ($value & EnvelopeStatus::FAVORITE->value) {
             $statuses['favorite'] = 1;

@@ -52,23 +52,25 @@ use constant {
 *prune  = *File::Find::prune;
 
 sub find_temp;
-sub do_delete ($@);
+sub do_delete($@);
 
-my %def;         # default/example values, unless pulled from users' existing cfg
-my %cfg;         # the focused fqdn's config, a tied hash from Config::IniFiles
-my %glb;         # hash which holds all other required config variables
-my %ini;         # full configuration ini, all domains
-my %sql;         # object containing constant sql table names
-my %clr;         # color constants
+my %def; # default/example values, unless pulled from users' existing cfg
+my %cfg; # the focused fqdn's config, an un-tied hash from Config::IniFiles
+my %glb; # hash which holds all other required config variables
+my %ini; # full configuration ini, all domains
+my %sql; # object containing constant sql table names
+my %clr; # color constants
 
-my $fqdn;        # fully qualified domain name to set up
-my $question;    # current question to ask the user
+my $fqdn;     # fully qualified domain name to set up
+my $question; # current question to ask the user
 
 my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
 
 if (!-e $cfg_file && -e 'config.ini.default') {
-    croak('You need to have a config.ini file; either create one' .
-          ' or rename the "config.ini.default" file to "config.ini" before continuing' . "\n");
+    croak(
+        'You need to have a config.ini file; either create one ' .
+        'or rename the "config.ini.default" file to "config.ini" before continuing' . "\n"
+    );
 }
 
 tie %ini, 'Config::IniFiles', (
@@ -107,33 +109,33 @@ if ($cfg{step} == SOFTWARE) {
     if (ask_user("Install required software?", 'yes', 'yesno')) {
         step_install_software();
         step_webserver_configure();
-        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
     $cfg{step}++;
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 if ($cfg{step} == PHP) {
     if (ask_user("Go through PHP configurations?", 'yes', 'yesno')) {
         step_php_configure();
-        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
     $cfg{step}++;
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 if ($cfg{step} == SERVICES) {
     if (ask_user("Start all required services now?", 'yes', 'yesno')) {
         step_start_services();
-        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
     $cfg{step}++;
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 if ($cfg{step} == SQL) {
     if (ask_user("Go through SQL configurations?", 'yes', 'yesno')) {
         step_sql_configure();
-        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
     $cfg{step}++;
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 if ($cfg{step} == OPENAI) {
@@ -229,9 +231,9 @@ step_start_services();
 if ($cfg{step} == CLEANUP) {
     if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
         clean_up();
-        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
     }
     $cfg{step}++;
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
 
 print "\e[35mCOMPLETE\e[0m\n";
@@ -252,7 +254,7 @@ sub step_firstrun {
                 my $answer = 0;
 
                 while ($answer != 1 and $answer != 2) {
-                    my $question = "What would you like to do:\n"
+                    $question = "What would you like to do:\n"
                                  . "1. Continue with previous config from step " . const_to_name($cfg{step} - 1) . "\n"
                                  . "2. Continue with previous config from the beginning\n";
                     $answer = int(ask_user($question, 'Choice', 'input'));
@@ -602,84 +604,84 @@ sub step_php_configure {
     my $ini_contents;
     my $template_file;
     my %ini_patch = (
-        'expose_php'              => "off",
-	    'error_reporting'         => "E_NONE",
-	    'display_errors'          => "Off",
-	    'display_startup_errors'  => "Off",
-	    'allow_url_fopen'         => "Off",
-	    'allow_url_include'       => "Off",
-	    'session.gc_maxlifetime'  => "600",
-	    'disable_functions'       => "apache_child_terminate, " .
-									 "apache_setenv, " .
-									 "chdir, " .
-									 "chmod, " .
-									 "dbase_open, " .
-									 "dbmopen, " .
-									 "define_syslog_variables, " .
-									 "escapeshellarg, " .
-									 "escapeshellcmd, " .
-									 "eval, " .
-									 "exec, " .
-									 "filepro, " .
-									 "filepro_retrieve, " .
-									 "filepro_rowcount, " .
-									 "fopen_with_path, " .
-									 "fp, " .
-									 "fput, " .
-									 "ftp_connect, " .
-									 "ftp_exec, " .
-									 "ftp_get, " .
-									 "ftp_login, " .
-									 "ftp_nb_fput, " .
-									 "ftp_put, " .
-									 "ftp_raw, " .
-									 "ftp_rawlist, " .
-									 "highlight_file, " .
-									 "ini_alter, " .
-									 "ini_get_all, " .
-									 "ini_restore, " .
-									 "inject_code, " .
-									 "mkdir, " .
-									 "move_uploaded_file, " .
-									 "mysql_pconnect, " .
-									 "openlog, " .
-									 "passthru, " .
-									 "phpAds_XmlRpc, " .
-									 "phpAds_remoteInfo, " .
-									 "phpAds_xmlrpcDecode, " .
-									 "phpAds_xmlrpcEncode, " .
-									 "php_uname, " .
-									 "phpinfo, " .
-									 "popen, " .
-									 "posix_getpwuid, " .
-									 "posix_kill, " .
-									 "posix_mkfifo posix_mkfifo, " .
-									 "posix_setpgid, " .
-									 "posix_setsid, " .
-									 "posix_setuid, " .
-									 "posix_uname, " .
-									 "proc_close, " .
-									 "proc_get_status, " .
-									 "proc_nice, " .
-									 "proc_open, " .
-									 "proc_terminate, " .
-									 "putenv, " .
-									 "rename, " .
-									 "rmdir, " .
-									 "shell_exec, " .
-									 "show_source, " .
-									 "syslog, " .
-									 "system, " .
-									 "xmlrpc_entity_decode",
+        'expose_php'              => 'off',
+	    'error_reporting'         => 'E_NONE',
+	    'display_errors'          => 'Off',
+	    'display_startup_errors'  => 'Off',
+	    'allow_url_fopen'         => 'Off',
+	    'allow_url_include'       => 'Off',
+	    'session.gc_maxlifetime'  => 600,
+	    'disable_functions'       => 'apache_child_terminate, ' .
+									 'apache_setenv, ' .
+									 'chdir, ' .
+									 'chmod, ' .
+									 'dbase_open, ' .
+									 'dbmopen, ' .
+									 'define_syslog_variables, ' .
+									 'escapeshellarg, ' .
+									 'escapeshellcmd, ' .
+									 'eval, ' .
+									 'exec, ' .
+									 'filepro, ' .
+									 'filepro_retrieve, ' .
+									 'filepro_rowcount, ' .
+									 'fopen_with_path, ' .
+									 'fp, ' .
+									 'fput, ' .
+									 'ftp_connect, ' .
+									 'ftp_exec, ' .
+									 'ftp_get, ' .
+									 'ftp_login, ' .
+									 'ftp_nb_fput, ' .
+									 'ftp_put, ' .
+									 'ftp_raw, ' .
+									 'ftp_rawlist, ' .
+									 'highlight_file, ' .
+									 'ini_alter, ' .
+									 'ini_get_all, ' .
+									 'ini_restore, ' .
+									 'inject_code, ' .
+									 'mkdir, ' .
+									 'move_uploaded_file, ' .
+									 'mysql_pconnect, ' .
+									 'openlog, ' .
+									 'passthru, ' .
+									 'phpAds_XmlRpc, ' .
+									 'phpAds_remoteInfo, ' .
+									 'phpAds_xmlrpcDecode, ' .
+									 'phpAds_xmlrpcEncode, ' .
+									 'php_uname, ' .
+									 'phpinfo, ' .
+									 'popen, ' .
+									 'posix_getpwuid, ' .
+									 'posix_kill, ' .
+									 'posix_mkfifo posix_mkfifo, ' .
+									 'posix_setpgid, ' .
+									 'posix_setsid, ' .
+									 'posix_setuid, ' .
+									 'posix_uname, ' .
+									 'proc_close, ' .
+									 'proc_get_status, ' .
+									 'proc_nice, ' .
+									 'proc_open, ' .
+									 'proc_terminate, ' .
+									 'putenv, ' .
+									 'rename, ' .
+									 'rmdir, ' .
+									 'shell_exec, ' .
+									 'show_source, ' .
+									 'syslog, ' .
+									 'system, ' .
+									 'xmlrpc_entity_decode',
 			
 	    'session.cookie_domain'   => $cfg{fqdn},
-	    'session.use_strict_mode' => "1",
-	    'session.use_cookies'     => "1",
-	    'session.cookie_lifetime' => "14400",
-	    'session.cookie_secure'   => "1",
-	    'session.cookie_httponly' => "1",
-	    'session.cookie_samesite' => "Strict",
-	    'session.cache_expire'    => '30',
+	    'session.use_strict_mode' => 1,
+	    'session.use_cookies'     => 1,
+	    'session.cookie_lifetime' => 14400,
+	    'session.cookie_secure'   => 1,
+	    'session.cookie_httponly' => 1,
+	    'session.cookie_samesite' => 'Strict',
+	    'session.cache_expire'    => 30,
     );
 
     if ($cfg{os} eq 'linux') {
@@ -698,7 +700,7 @@ sub step_php_configure {
     if (ask_user("Located PHP binary at $cfg{php_binary} - is this correct?", 'yes', 'yesno')) {
         tell_user('INFO', "PHP binary set to $cfg{php_binary}");
     } else {
-        $cfg{php_binary} = ask_user("PHP binary not found. Please enter the path to the PHP binary", '', 'input');
+        $cfg{php_binary} = ask_user('PHP binary not found. Please enter the path to the PHP binary', '', 'input');
 
         if (!-e $cfg{php_binary}) {
             tell_user('ERROR', "PHP binary not found at $cfg{php_binary}");
@@ -710,7 +712,7 @@ sub step_php_configure {
     if (ask_user("PHP ini file is set to $cfg{php_ini} - is this correct?", 'yes', 'yesno')) {
         tell_user('INFO', "PHP ini file set to $cfg{php_ini}");
     } else {
-        $cfg{php_ini} = ask_user("Please enter the path to the PHP ini file", $cfg{php_ini}, 'input');
+        $cfg{php_ini} = ask_user('Please enter the path to the PHP ini file', $cfg{php_ini}, 'input');
 
         if (!-e $cfg{php_ini}) {
             tell_user('ERROR', "PHP ini file not found at $cfg{php_ini}");

@@ -76,12 +76,12 @@
 
         <div class="container border border-1 ">
             <div class="row">
-                <div class="col pt-3 lh-1">
+                <div class="col pt-3 lh-1 text-center">
                     <?php if ($mon_loaded): ?>
                         <?php echo $character->get_name(); ?>
                         <?php echo '<br><hr>'; ?>
                         <div class="d-flex justify-content-evenly">
-                            <img class="rounded-circle me-2" src="/img/avatars/<?php echo $character->get_avatar(); ?>" width="150" height="150" />
+                            <img class="rounded-circle me-2 mb-3" src="/img/avatars/<?php echo $character->get_avatar(); ?>" width="150" height="150" />
                             <div class="d-grid align-items-start">
                                 <span class="d-grid align-items-center small mb-3">
                                     <span class="flex-grow-1 text-center">HP</span>
@@ -177,8 +177,8 @@
 
 
     <div class="container-fluid border border-1 mb-1 overflow-hidden" style="max-height: 65.0vh!important; height: 65.0vh;">
-        <div class="d-flex">
-            <div id="battle-log" name="battle-log" class="lh-1 flex-row-reverse h-100">
+        <div class="d-flex" style="height: 65.0vh;">
+            <div id="battle-log" name="battle-log" class="lh-1 flex-fill flex-row-reverse h-100">
                     
             </div>
         </div>
