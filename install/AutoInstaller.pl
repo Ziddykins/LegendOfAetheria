@@ -272,24 +272,24 @@ sub step_firstrun {
     $cfg{fqdn} = $fqdn;
 
     my $os = check_platform();
-    my $distro;
 
     if ($os eq 'linux') {
         my $ver = `lsb_release -i`;
         my $ver2 = `cat /etc/os-release | grep '^ID'`;
 
         if ($ver =~ /(debian|ubuntu|kali)/i) {
-            $distro = $1;
-        } elsif ($ver2 =~ /(alpine)/i) {
-            $distro = 'alpine';
+            $cfg{distro} = $1;
             $cfg{software} = 'deb';
+        } elsif ($ver2 =~ /(alpine)/i) {
+            $cfg{distro} = 'alpine';
+            $cfg{software} = 'alp';
         } else {
             if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
                 die "Unsupported distro, exiting\n";
             }
-            $distro = "unsupported";
+            $cfg{distro} = "unsupported";
         }
-        tell_user('INFO', "$distro found to be the current distribution");
+        tell_user('INFO', "$cfg{distro} found to be the current distribution");
         %def = %{$ini{lin_examples}};
     } else {
         %def = %{$ini{win_examples}};
@@ -299,7 +299,7 @@ sub step_firstrun {
     merge_hashes(\%cfg, \%glb);
 
     $cfg{os}     = $os;
-    $cfg{distro} = $distro;
+    $cfg{distro} = $cfg{distro};
 
         chomp(my $loc_check = `pwd`);
     $loc_check =~ s/\/install//;
@@ -448,7 +448,7 @@ sub step_webserver_configure {
     $cfg{apache_https_port} = ask_user('Enter apache port for HTTPS', '443', 'input');
     $cfg{apache_http_port}  = ask_user('Enter apache port for HTTP',   '80', 'input');
     
-        return 0;
+    return 0;
 }
 
 #Step: software
