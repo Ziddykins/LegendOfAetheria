@@ -7,7 +7,6 @@ use diagnostics;
 
 our $VERSION = "2.6.4.28";
 
-
 BEGIN {
     eval { require Config::IniFiles; };
     eval { require Term::ReadKey; };
@@ -35,8 +34,6 @@ use constant {
     PERMS     => 9,
     COMPOSER  => 10,
     CLEANUP   => 11,
-    PERMS     => 12,
-
     CERTS     => 99, #TODO: implement :D
 };
 
@@ -197,7 +194,7 @@ if ($cfg{step} == APACHE) {
     }
 
     if (ask_user("Enable the required Apache conf/mods/sites?", 'yes', 'yesno')) {
-        step_apache_enable();
+        step_apache_enables();
     }
 
     next_step();
@@ -225,7 +222,7 @@ if ($cfg{step} == CLEANUP) {
     next_step();
  }
 
-print "\e[35mCOMPLETE\e[0m\n";
+print "\e[33mCOMPLETE\e[0m\n";
 
 sub step_firstrun {
     my $question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
@@ -521,33 +518,45 @@ sub step_vhost_ssl {
 
 # Step: Fix permissions
 sub step_fix_permissions {
-
     # Web root files
     `find $cfg{web_root} -type f -exec chmod 644 {} + 2>&1`;
     `find $cfg{web_root} -type d -exec chmod 755 {} + 2>&1`;
 
     # Configuration files
     chmod 0600, "$cfg{web_root}/.env";
-    chmod 0600, "$cfg{web_root}/config.ini";
-    chmod 0600, "$cfg{web_root}/config.ini.default";
+    chmod 0600, "$cfg{web_root}/install/config.ini";
+    chmod 0600, "$cfg{web_root}/install/config.ini.default";
 
     # Script files
     chmod 0600, "$cfg{web_root}/install/AutoInstaller.pl";
-    chmod 0600, "$cfg{web_root}/install/scripts/*.sh";
+
+    opendir my $sd, $cfg{scripts_dir};
+    while (readdir($sd)) {
+        next if $_ =~ /^\./;
+        chmod 0600, "scripts/$_";
+    }
+    closedir $sd;
 
     # Log files
     chmod 0640, "$cfg{web_root}/install/setup.log";
     chmod 0640, "$cfg{web_root}/gamelog.txt";
 
     # Apache configuration files
-    chmod 0644, "$cfg{apache_directory}/sites-available/*.conf";
+    chmod 0644, $cfg{virthost_conf_file};
+    if ($cfg{enable_ssl}) {
+        chmod 0644, $cfg{virthost_conf_file_ssl};
+    }
 
-    # Templates
-    chmod 0600, "$cfg{web_root}/install/templates/*";
+    # Template directory
+    opendir my $td, $cfg{template_dir};
+    while (readdir($td)) {
+        next if $_ =~ /^\./;
+        chmod 0600, "templates/$_";
+    }
+    closedir $td;
 
     # Owner/group
     tell_user('SYSTEM', `chown -R $cfg{apache_runas}:$cfg{apache_runas} $cfg{web_root} 2>&1`);
-
     tell_user('SUCCESS', 'Permissions fixed!');
 }
 
@@ -747,12 +756,14 @@ sub step_php_configure {
 # Step: composer
 sub step_composer_pull {
     if (ask_user("Composer is going to download/install these as $cfg{composer_runas} - continue?", 'yes', 'yesno')) {
-        my $cmd = "sudo -u $cfg{composer_runas} composer --working-dir \"$cfg{web_root}\" install";
-        my $cmd_output = `$cmd 2>&1`;
+        my $cmd = "sudo -u $cfg{composer_runas} composer --working-dir \"$cfg{web_root}\" install 2>/dev/null;";
+        $cmd .= "sudo -u $cfg{composer_runas} composer --working-dir \"$cfg{web_root}\" update 2>/dev/null";
+        
+        my $cmd_output = `$cmd`;
         tell_user('SYSTEM', $cmd_output);
     }
 }
-
+                                           
 # Step: Template imports
 sub step_generate_templates {
     my @replacements = @{$_[0]};
@@ -796,6 +807,7 @@ sub step_process_templates {
     use Term::ReadKey;
     my ($cp_cmd, $sql_cmd, $sqlrpw, $tmp);
     my $sql_import_result;
+    my $crontab_output;
 
     if (check_platform() eq 'linux') {
         $cp_cmd = "cp";
@@ -836,20 +848,10 @@ sub step_process_templates {
     tell_user('INFO', "Copying over $cfg{htaccess_template}.ready to $cfg{web_root}/.htaccess");
     file_write("$cfg{web_root}/.htaccess", "$cfg{htaccess_template}.ready", 'file');
 
-    tell_user('INFO', "Copying over $cfg{crontab_template} to $cfg{crontab_dir}/$cfg{apache_runas}");
-
-    if (!-d $cfg{crontab_dir}) {
-        make_path($cfg{crontab_dir});
-    }
-
-    if (-e "$cfg{crontab_dir}/$cfg{apache_runas}") {
-        unlink("$cfg{crontab_dir}/$cfg{apache_runas}");
-    }
-
-    file_write("$cfg{crontab_dir}/$cfg{apache_runas}", "$cfg{crontab_template}.ready");
-    tell_user('INFO', "Updating permissions on new crontab to $cfg{apache_runas}:crontab");
-    `chown $cfg{apache_runas}:crontab $cfg{crontab_dir}/$cfg{apache_runas}`;
-    chmod 0600, "$cfg{crontab_dir}/$cfg{apache_runas}";
+    tell_user('INFO', "Installing our cronjobs under user $cfg{apache_runas}");
+    
+    $crontab_output = `(sudo -u $cfg{apache_runas} crontab -l; cat $cfg{crontab_template}.ready; echo;) | sudo -u $cfg{apache_runas} crontab -`;
+    tell_user('SYSTEM', $crontab_output);
 
     tell_user('SUCCESS', "All template files have been applied");
 }
@@ -930,8 +932,8 @@ sub clean_up {
         $cmd = "mysql -u root -e 'DROP DATABASE $cfg{sql_database}; DROP USER $cfg{sql_username};'";
         tell_user('SYSTEM', `$cmd`);
 
-        tell_user("INFO", "Removing our crontab at $cfg{crontab_dir}/$cfg{apache_runas}");
-        unlink("$cfg{crontab_dir}/$cfg{apache_runas}");
+        tell_user("INFO", "Removing our crontab entries");
+        my $crontab_output = `(sudo -u $cfg{apache_runas} crontab -l; cat $cfg{crontab_template}.ready | grep -v 'cron.php' ; echo;) | sudo -u $cfg{apache_runas} crontab -`;
     }
 
     tell_user('SUCCESS', 'Cleaned up all of our temp files!');
@@ -1168,11 +1170,11 @@ sub merge_hashes {
 }
 
 sub const_to_name {
-    my @names = qw/FIRSTRUN SOFTWARE PHP APACHE ENABLES COMPOSER TEMPLATES SERVICES SQL CRONS CERTS HOSTNAME CLEANUP PERMS/;
+    my @names = qw/FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER CLEANUP/;
     return $names[shift];
 }
 
 sub next_step {
-    print "Moving on to step " . const_to_name(++$cfg{step}) . "\n";
+    print "Moving on to step " . const_to_name($cfg{step}++) . "\n";
     handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }

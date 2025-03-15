@@ -304,7 +304,7 @@
                                     <a class="dropdown-item" href="?page=friends">Friends
                                     <?php
                                         $posts = 0;
-                                        $posts = get_friend_counts(FriendStatus::REQUEST);
+                                        $posts = get_friend_counts(FriendStatus::REQUEST_RECV);
                                         $pill_bg  = 'bg-danger';
 
                                         if (!$posts) {
