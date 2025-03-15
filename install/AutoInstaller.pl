@@ -277,8 +277,13 @@ sub step_firstrun {
 
     if ($os eq 'linux') {
         my $ver = `lsb_release -i`;
+        my $ver2 = `cat /etc/os-release | grep '^ID'`;
+
         if ($ver =~ /(debian|ubuntu|kali)/i) {
             $distro = $1;
+        } elsif ($ver2 =~ /(alpine)/i) {
+            $distro = 'alpine';
+            $dist_software = 'alp';
         } else {
             if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
                 die "Unsupported distro, exiting\n";
