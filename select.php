@@ -139,7 +139,7 @@ if (check_session()) {
         </div>
     </div>
 
-    <span class="d-grid sticky-bottom">
+    <span class="d-grid sticky-bottom w-100">
         <a href="/logout"><button id="signout-button" name="signout-button" type="button" role="button" class="btn btn-sm btn-dark bg-gradient">Sign Out</button></a>
     </span>
 

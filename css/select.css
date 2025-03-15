@@ -1,3 +1,9 @@
+div.character-select {
+    -moz-transform: scale(1.2); /* for Firefox, default 1*/
+    transform: scale(1.2);
+    zoom:120%; /* For Chrome, IE, default 100%*/
+}
+
 body {
     background: url('../img/backgrounds/select-bg.svg') no-repeat center center fixed;
     background-size: cover;

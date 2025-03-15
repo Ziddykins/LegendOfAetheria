@@ -43,5 +43,25 @@ function do_dumpin() {
     echo -e "\e[0;32m Finished\e[0m";
 }
 
+echo "whatcha wanna do?";
+echo "1. dump tables for sql templates";
+echo "2. make a random admin directory";
+echo "3. make perms & g/uids all devvy";
+read CHOICE;
 
-do_dumpin;
+if [[ $CHOICE -eq "1" ]]; then
+    do_dumpin;
+elif [[ $CHOICE -eq "2" ]]; then
+    make_admin;
+elif [[ $CHOICE -eq "3" ]]; then
+    find ../.. -type f -exec chmod 0664 {} \+;
+    find ../.. -type d -exec chmod 0775 {} \+;
+    echo "enter ya username";
+    read USRNM;
+    chown -R www-data:$USRNM ../..
+else
+    echo "no?";
+fi
+
+
+

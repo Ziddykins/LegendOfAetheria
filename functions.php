@@ -1,6 +1,5 @@
 <?php
 
-use Game\Character\Character;
 use Game\System\Enums\AbuseType;
 use Game\Character\Enums\FriendStatus;
 use Game\Character\Enums\Races;
