@@ -3,7 +3,6 @@
 use warnings;
 use strict;
 use autodie;
-use diagnostics;
 
 our $VERSION = "2.6.4.28";
 
@@ -283,7 +282,7 @@ sub step_firstrun {
             $distro = $1;
         } elsif ($ver2 =~ /(alpine)/i) {
             $distro = 'alpine';
-            $dist_software = 'alp';
+            $cfg{software} = 'deb';
         } else {
             if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
                 die "Unsupported distro, exiting\n";
@@ -386,24 +385,33 @@ sub step_install_software {
     }
 
     my @packages = (
-        "php$cfg{php_version}",
-        "php$cfg{php_version}-cli",
-        "php$cfg{php_version}-common",
-        "php$cfg{php_version}-curl",
-        "php$cfg{php_version}-dev",
-        "php$cfg{php_version}-mysql",
-        "php$cfg{php_version}-xml",
-        "php$cfg{php_version}-intl",
-        "php$cfg{php_version}-mbstring",
-        "cron",
-        "mariadb-server",
-        "apache2",
-        "letsencrypt",
-        "python-is-python3",
-        "python3-certbot-apache",
-        "libapache2-mod-php$cfg{php_version}",
-        "composer",
-        "openssl"
+		"deb:php$cfg{php_version}",
+		"deb:php$cfg{php_version}-cli",
+		"deb:php$cfg{php_version}-common",
+		"deb:php$cfg{php_version}-curl",
+		"deb:php$cfg{php_version}-dev",
+		"deb:php$cfg{php_version}-mysql",
+		"deb:php$cfg{php_version}-xml",
+		"deb:php$cfg{php_version}-intl",
+		"deb:php$cfg{php_version}-mbstring",
+		"deb:cron",
+		"deb:mariadb-server",
+		"deb:apache2",
+		"deb:letsencrypt",
+		"deb:python-is-python3",
+		"deb:python3-certbot-apache",
+		"deb:libapache2-mod-php$cfg{php_version}",
+		"deb:composer",
+		"deb:openssl",
+		"alp:lsb_release",
+		"alp:php83",
+		"alp:php83-{cli,common,curl,dev,xml,intl,mbstring,apache2}",
+		"alp:mariadb",
+		"alp:apache2",
+		"alp:certbot",
+		"alp:composer",
+		"alp:openssl",
+		"alp:certbot-apache",
     );
 
     if (ask_user("Do you want to use PHP-FPM? This will use mpm_worker instead of the default mpm_prefork.", 'yes', 'yesno')) {
