@@ -280,13 +280,14 @@ sub step_firstrun {
     $cfg{web_root} = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
 
     if ($loc_check ne $cfg{web_root}) {
-    my $error = "Setup has determined the files are not in the correct place,\n" .
-                " or you're not in the correct folder. Please move the contents\n" .
-                "of the legendofaetheria folder to your webroot, and make sure you're\n" .
-                "the 'install' directory when you run this script.\n\n" .
-                "Specified webroot directory: $cfg{web_root}\n" .
-                "Current location           : \e[31m$loc_check\e[0m\n";
-    croak($error);
+        my $error = "Setup has determined the files are not in the correct place,\n" .
+                    " or you're not in the correct folder. Please move the contents\n" .
+                    "of the legendofaetheria folder to your webroot, and make sure you're\n" .
+                    "the 'install' directory when you run this script.\n\n" .
+                    "Specified webroot directory: $cfg{web_root}\n" .
+                    "Current location           : \e[31m$loc_check\e[0m\n";
+        croak($error);
+    }
 
     $cfg{template_dir} = $cfg{web_root} . '/install/templates';
     $cfg{scripts_dir}  = $cfg{web_root} . '/install/scripts';
@@ -409,7 +410,7 @@ sub step_install_software {
     my $sw_cmd = "$cfg{pm_cmd} " . join (' ', grep { /$cfg{software}/ } @packages) . ' >/dev/null 2>&1';
     tell_user('INFO', "Installing software with command: $sw_cmd");
     
-    my $sw_output = `$apt_cmd`;
+    my $sw_output = `$sw_cmd`;
     if ($? == 0) {
         tell_user('SUCCESS', 'All necessary software has been installed');
     } else {
@@ -1063,7 +1064,7 @@ sub ask_user {
         return 1;
     } elsif ($answer =~ /[Nn]o?/ && $type eq 'yesno') {
         return 0;
-    } elsif (($answer eq '' or !$answer) && type eq 'yesno') {
+    } elsif (($answer eq '' or !$answer) && $type eq 'yesno') {
         if ($default eq 'y') {                             
             return 1;
         } else {
@@ -1232,7 +1233,7 @@ sub get_sysinfo {
 
         if ($cfg{distro} =~ /debian|ubuntu|kali/) {
             $cfg{software} = 'deb';
-        } elsif ($distro eq 'alpine') {
+        } elsif ($cfg{distro} eq 'alpine') {
             $cfg{software} = 'alp';
         }
     } else {
