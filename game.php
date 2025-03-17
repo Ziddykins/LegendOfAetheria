@@ -11,9 +11,11 @@
     require_once "bootstrap.php";
     $system->load_sheet();
     
-    gen_csrf_token();    
-
     if (check_session() === true) {
+        if (!isset($_SESSION['csrf-token'])) {
+            $_SESSION['csrf-token'] = gen_csrf_token();
+        }
+        
         $account = new Account($_SESSION['email']);
         $account->load();
 
@@ -62,9 +64,9 @@
     }
 ?>
 
-<?php include('html/opener.html'); ?>
+<?php include 'html/opener.html'; ?>
     <head>
-        <?php include('html/headers.html'); ?>
+        <?php include 'html/headers.html'; ?>
     </head>
         
     <body class="main-font" data-bs-theme="dark"> 
@@ -197,7 +199,7 @@
                                         <li>
                                             <?php
                                                 $rest_disabled = '';
-                                                if ($character->stats->get_hp() === $character->stats->get_maxHp()) {
+                                                if ($character->stats->get_hp() === $character->stats->get_maxHP()) {
                                                     $rest_disabled = 'disabled';
                                                 } else {
                                                     $rest_disabled = '';
@@ -368,8 +370,8 @@
                         
                         //include('navs/nav-summary.php');
 
-                        if (isset($_REQUEST['page'])) {
-                            $requested_page = preg_replace('/[^a-z-]+/', '', $_REQUEST['page']);
+                        if (isset($_GET['page'])) {
+                            $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
                             if (file_exists("pages/game-$requested_page.php")) {
                                 $page_uri = "pages/game-$requested_page.php";
                             } else {

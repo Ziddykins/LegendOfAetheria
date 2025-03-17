@@ -3,9 +3,9 @@
     $cur_mp = $character->stats->get_mp();
     $cur_ep = $character->stats->get_ep();
 
-    $max_hp = $character->stats->get_maxHp();
-    $max_mp = $character->stats->get_maxMp();
-    $max_ep = $character->stats->get_maxEp();
+    $max_hp = $character->stats->get_maxHP();
+    $max_mp = $character->stats->get_maxMP();
+    $max_ep = $character->stats->get_maxEP();
 
     $ep_icon  = 'bi-battery-full';
     $ep_color = 'success';

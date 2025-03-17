@@ -5,7 +5,7 @@ use Exception;
 use Game\Character\Stats;
 use Game\Inventory\Inventory;
 use Game\Monster\Monster;
-use Game\Monster\Enums\Scope;
+use Game\Monster\Enums\MonsterScope;
 use Game\System\Enums\LOAError;
 use Game\Traits\Enums\Type;
 use Game\Traits\PropConvert;
@@ -216,9 +216,11 @@ trait PropSync {
             $max_value = null;
             
             if (isset($this->$prop)) {
-                $str_max_prop = "max" . ucfirst($prop);
-                $cur_value = (int)$this->$prop;
-                $max_value = (int)$this->$str_max_prop;
+                if (array_search($prop, ['hp', 'mp', 'ep']) == true) {
+                    $str_max_prop = "max" . strtoupper($prop);
+                    $cur_value = (int)$this->$prop;
+                    $max_value = (int)$this->$str_max_prop;
+                }
             } else {
                 return;
             }
@@ -264,6 +266,5 @@ trait PropSync {
                 throw new Exception('Current value is not numeric!');
             }
         }
-      
     }
 }

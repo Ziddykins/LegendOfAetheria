@@ -1,9 +1,9 @@
 <?php
 namespace Game\Monster;
+use Game\Monster\Enums\MonsterScope;
 use Game\Traits\PropConvert;
 use Game\Traits\PropSync;
 use Game\Traits\Enums\Type;
-use Game\Monster\Enums\Scope;
 use Game\Monster\Stats;
 use Game\Character\Character;
 
@@ -46,7 +46,7 @@ class Monster {
         return $this->propSync($method, $params, Type::MONSTER);
     }
 
-    public function __construct(Scope $scope) {
+    public function __construct(MonsterScope $scope) {
         $this->scope = $scope;
         $this->seed  = bin2hex(random_bytes(8));
     }
@@ -75,6 +75,7 @@ class Monster {
 
 
     public function random_monster(): void{
+        global $db;
         global $system;
         $monster = $system->monsters[random_int(0, count($system->monsters) - 1)];
         $temp_stats_arr = explode(',', $monster);

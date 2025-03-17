@@ -57,7 +57,6 @@
                                             <i class="bi bi-door-open-fill"></i> Login
                                         </button>
                                     </div>
-                                    <input id="csrf-token" name="csrf-token" type="hidden" value="<?php echo $_SESSION['csrf-token']; ?>" />
                                 </form>
                             </div>
 
@@ -262,7 +261,6 @@
                                             };
                                         });
                                     </script>
-                                    <input id="csrf-token" name="csrf-token" type="hidden" value="<?php echo $_SESSION['csrf-token']; ?>" />
                                 </form>
                             </div>
                         

@@ -17,7 +17,7 @@ use Game\Character\Enums\FriendStatus;
     
     /* Populate global $requests array with incoming requests */
     $recvreqs = $db->execute_query(
-        "SELECT * FROM {$_ENV['SQL_FRND_TBL']} WHERE `email_2` = ? or `email_1` = ?",
+        "SELECT * FROM {$_ENV['SQL_FRND_TBL']} WHERE `sender_id` = ? or `recipient_id` = ?",
         [ $account->get_email(), $account->get_email() ]
     );
     
@@ -40,7 +40,13 @@ use Game\Character\Enums\FriendStatus;
         $header_charname = $character->get_name() . "'";
     }
     
-    if ($_POST['page'] == 'friends') {
+    if (isset($_POST['page']) && $_POST['page']
+    
+    
+    
+    
+    
+    == 'friends') {
         if (isset($_POST['action'])) {
             [$email, $focused_email, $requested_email] = [null, null, null];
             $posts = ['friends-request-send', 'email', 'focused-request'];

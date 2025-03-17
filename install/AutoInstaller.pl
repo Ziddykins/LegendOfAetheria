@@ -308,7 +308,7 @@ sub step_firstrun {
 }
 
 sub step_install_software {
-    if ($cfg{pm} =~ /^apt/) {
+    if ($cfg{pm_cmd} =~ /^apt/) {
         if (-e '/etc/apt/sources.list.d/php.list' || -e '/etc/apt/sources.list.d/ondrej-ubuntu-php-noble.sources') {
             tell_user('INFO', 'Sury repo entries already present');
         } else {
@@ -408,6 +408,7 @@ sub step_install_software {
     tell_user('INFO', 'Installing ' . @packages . ' packages\n');
     
     my $sw_cmd = "$cfg{pm_cmd} " . join (' ', grep { /$cfg{software}/ } @packages) . ' >/dev/null 2>&1';
+    $sw_cmd =~ s/$cfg{software}://g;
     tell_user('INFO', "Installing software with command: $sw_cmd");
     
     my $sw_output = `$sw_cmd`;
@@ -493,7 +494,7 @@ sub step_vhost_ssl {
         $answer = int(ask_user('Choice', 1, 'input'));
 
         if ($answer == 1) {
-            my $gen_output = `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/$cfg{fqdn}.key -out /etc/ssl/certs/$cfg{fqdn}.crt -batch`;
+            my $gen_output = `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/$cfg{fqdn}.key -out /etc/ssl/certs/$cfg{fqdn}.crt -subj '/CN=$cfg{fqdn}/O=$cfg{fqdn}/C=ZA' -batch`;
             $cfg{ssl_fullcer} = "/etc/ssl/certs/$cfg{fqdn}.crt";
             $cfg{ssl_privkey} = "/etc/ssl/private/$cfg{fqdn}.key";
             `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
@@ -1194,37 +1195,77 @@ sub next_step {
 
 sub get_sysinfo {
     $cfg{os} = check_platform();
-    if ($cfg{os} eq 'linux') {        
+    if ($cfg{os} eq 'linux') {
+        my @supported_distros_kinda = (
+            "redhat:yum:-y install",
+            "arch:pacman:-S",
+            "gentoo:emerge:-tv",
+            "SuSE:zypper:in",
+            "debian:apt-get:-y install",
+            "alpine:apk:add",
+            "kali:apt-get:-y install"
+        );
+
         chomp(my $check_docker = `mount | grep 'overlay on / type' -ao`);
         chomp(my $init_system = `SYSTEMD=\$(strings /sbin/init | grep systemd | wc -l); INITD=\$(strings /sbin/init | grep init.d | wc -l); if [ "\$SYSTEMD" -gt "0" ]; then echo "systemd"; elif [ "\$INITD" -gt "0" ]; then echo "initd"; else echo "other"; fi`);
         $cfg{init_system} = $init_system;
 
-        foreach my $combo ("redhat:yum:-y install", "arch:pacman", "gentoo:emerge", "SuSE:zypp", "debian:apt-get:-y install", "alpine:apk:add") {
+        foreach my $combo (@supported_distros_kinda) {
             my ($distro, $pm, $args) = split ':', $combo;
+
+            tell_user('INFO', "Checking for $distro...");
             
+            tell_user('INFO', "Checking for /etc/$distro-release...");
             if (-e "/etc/$distro-release") {
                 $cfg{distro} = $distro;
                 $cfg{pm_cmd} = "$pm $args";
-                tell_user('SUCCESS', "Your distribution was found to be $distro, so we will use $pm to manage the software on this machine");
+            }
+
+            tell_user('INFO', '/etc/os-release');            
+            if (-e "/etc/os-release" && !$cfg{distro}) {
+                open my $fh, '<', '/etc/os-release';
+                my @lines = <$fh>;
+                close $fh;
                 
-                if (ask_user('Is this correct?', 'y', 'yesno')) {
-                    last;
+                foreach my $line (@lines) {
+                    if ($line =~ /^ID=$distro/ || $line =~ /^LIKE=$distro/) {
+                        $cfg{distro} = $distro;
+                        $cfg{pm_cmd} = "$pm $args";
+                    }
+                }
+            }
+
+            tell_user('INFO', 'Checking output of lsb_release if exists...');
+            if (!$cfg{distro}) {
+                my $lsb_check = `lsb_release -i`;
+                if ($lsb_check =~ /$distro/) {
+                    $cfg{distro} = $distro;
+                    $cfg{pm_cmd} = "$pm $args";
                 }
             }
         }
 
-        if (!$cfg{distro} or $cfg{distro} eq '') {
-            if (!ask_user("Unsupported distro, try anyway?", 'n', 'yesno')) {
-                handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
-                die "Unsupported distro, exiting\n";
+        if ($cfg{distro}) {
+            tell_user('SUCCESS', "Your distribution was found to be $cfg{distro}, so we will use $cfg{pm_cmd} to install software on this machine");
+
+            if (!ask_user('Is this correct?', 'y', 'yesno')) {
+                die "Unrecoverable error: Unable to determine distribution and package manager information\n";
             }
-            $cfg{distro} = "unsupported";
+        } else {
+            tell_user('ERROR', 'Unable to determine distro');
             
+            if (ask_user('Is your distro debian-based, which uses apt-get?', 'n', 'yesno')) {
+                $cfg{distro} = 'debian';
+                $cfg{software} = 'deb';
+                $cfg{pm_cmd} = 'apt-get install -y';
+            } else {
+                die "Unrecoverable error: Unable to determine distribution and package manager information\n";
+            }
         }
 
         if ($check_docker || $cfg{init_system} eq 'init') {
             $cfg{svc_cmd} = 'service';
-        } elsif ($cfg{svc_cmd} eq 'systemd') {
+        } elsif ($cfg{init_system} eq 'systemd') {
             $cfg{svc_cmd} = 'systemctl';
         } else {
             tell_user('ERROR', 'Unable to determine what init system is used (e.g. "service" or "systemctl") to start services. Please enter below.');
@@ -1240,5 +1281,4 @@ sub get_sysinfo {
         $cfg{svc_cmd} = 'sc';
         $cfg{pm_cmd} = 'choco install';
     }
-    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }

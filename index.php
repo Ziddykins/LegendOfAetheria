@@ -9,7 +9,6 @@
     session_start();
 
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
-        check_csrf($_POST['csrf-token']);
         $email    = $_POST['login-email'];
         $password = $_POST['login-password'];
         $account  = null;
@@ -79,8 +78,6 @@
             exit();
         }
     } else if (isset($_POST['register-submit']) && $_POST['register-submit'] == 1) {
-        check_csrf($_POST['csrf-token']);
-
         /* Account information */
         $email              = $_POST['register-email'];
         $password           = $_POST['register-password'];
@@ -153,9 +150,9 @@
                     $character->stats->set_def((int) $def);
 
                     $character->stats->set_hp(100);
-                    $character->stats->set_maxHp(100);
+                    $character->stats->set_maxHP(100);
                     $character->stats->set_mp(100);
-                    $character->stats->set_maxMp(100);
+                    $character->stats->set_maxMP(100);
  
                     //$character->stats->set_status(CharacterStatus::HEALTHY);
 
@@ -169,8 +166,7 @@
             exit();
         }
     }
-    $_SESSION['csrf-token'] = gen_csrf_token();
-    
+   
     include 'html/opener.html';
 ?>
 

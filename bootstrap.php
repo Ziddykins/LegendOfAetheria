@@ -6,7 +6,7 @@ use Game\System\System;
 $system = new System(0);
 
 define('PATH_WEBROOT',   '/var/www/html/kali.local/loa');
-define('PATH_ADMINROOT', PATH_WEBROOT . '/admin/25654');
+define('PATH_ADMINROOT', PATH_WEBROOT . '/admini/strator');
 define('WEB_ADMINROOT', '/admin/25654');
 
 /* Funcs etc */
