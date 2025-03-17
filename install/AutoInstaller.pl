@@ -17,10 +17,9 @@ use File::Find;
 use File::Copy;
 use Carp;
 
-use vars qw/*name *dir *prune/;
 
+# ==================================[ cfg-start ]==================================== #
 $| = 1;
-
 use constant {
     FIRSTRUN  => 1,
     SOFTWARE  => 2,
@@ -43,6 +42,7 @@ use constant {
     CFG_W_DOMAIN => 6,
 };
 
+use vars qw/*name *dir *prune/;
 *name   = *File::Find::name;
 *dir    = *File::Find::dir;
 *prune  = *File::Find::prune;
@@ -78,7 +78,9 @@ tie %ini, 'Config::IniFiles', (
 
 %clr = %{$ini{colors}};
 %sql = %{$ini{sql_tables}};
+# ===================================[ cfg-end ]===================================== #
 
+# ==================================[ main-start ]=================================== #
 if ($ENV{'USER'} ne 'root') {
     die $clr{red} . 'This script must be ran as root, not ',
         $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
@@ -88,7 +90,7 @@ get_sysinfo();
 step_firstrun();
 
 if ($cfg{step} == SOFTWARE) {
-    if (ask_user("Install required software?", 'yes', 'yesno')) {
+    if (ask_user("Install required software?", 'y', 'yesno')) {
         step_install_software();
         step_webserver_configure();
     }
@@ -96,28 +98,28 @@ if ($cfg{step} == SOFTWARE) {
 }
 
 if ($cfg{step} == PHP) {
-    if (ask_user("Go through PHP configurations?", 'yes', 'yesno')) {
+    if (ask_user("Go through PHP configurations?", 'y', 'yesno')) {
         step_php_configure();
     }
     next_step();
 }
 
 if ($cfg{step} == SERVICES) {
-    if (ask_user("Start all required services now?", 'yes', 'yesno')) {
+    if (ask_user("Start all required services now?", 'y', 'yesno')) {
         step_start_services();
     }
     next_step();
 }
 
 if ($cfg{step} == SQL) {
-    if (ask_user("Go through SQL configurations?", 'yes', 'yesno')) {
+    if (ask_user("Go through SQL configurations?", 'y', 'yesno')) {
         step_sql_configure();
     }
     next_step();
 }
 
 if ($cfg{step} == OPENAI) {
-    $cfg{openai_enable} = ask_user("Enable OpenAI features? API key required", 'no', 'yesno');
+    $cfg{openai_enable} = ask_user("Enable OpenAI features? API key required", 'n', 'yesno');
     $cfg{openai_apikey} = 'unset';
 
     if ($cfg{openai_enable}) {
@@ -164,11 +166,11 @@ if ($cfg{step} == TEMPLATES) {
         "###REPL_APACHE_HTTPS_PORT###%%%$cfg{apache_https_port}",
     );
 
-    if (ask_user("Generate templates?", 'yes', 'yesno')) {
+    if (ask_user("Generate templates?", 'y', 'yesno')) {
         step_generate_templates(\@replacements);
     }
 
-    if (ask_user("Process generated templates?", 'yes', 'yesno')) {
+    if (ask_user("Process generated templates?", 'y', 'yesno')) {
         step_process_templates();
     }
 
@@ -176,11 +178,11 @@ if ($cfg{step} == TEMPLATES) {
 }
 
 if ($cfg{step} == APACHE) {
-    if (ask_user("Perform necessary apache updates?", 'yes', 'yesno')) {
+    if (ask_user("Perform necessary apache updates?", 'y', 'yesno')) {
         step_vhost_ssl();
     }
 
-    if (ask_user("Enable the required Apache conf/mods/sites?", 'yes', 'yesno')) {
+    if (ask_user("Enable the required Apache conf/mods/sites?", 'y', 'yesno')) {
         step_apache_enables();
     }
 
@@ -188,14 +190,14 @@ if ($cfg{step} == APACHE) {
 }
 
 if ($cfg{step} == PERMS) {
-    if (ask_user("Fix all webserver permissions?", 'yes', 'yesno')) {
+    if (ask_user("Fix all webserver permissions?", 'y', 'yesno')) {
         step_fix_permissions();
     }
     next_step();
 }
 
 if ($cfg{step} == COMPOSER) {
-    if (ask_user("Run composer to download required dependencies?", 'yes', 'yesno')) {
+    if (ask_user("Run composer to download required dependencies?", 'y', 'yesno')) {
         step_composer_pull();
     }
     step_start_services();
@@ -203,14 +205,16 @@ if ($cfg{step} == COMPOSER) {
 }
 
 if ($cfg{step} == CLEANUP) {
-    if (ask_user("Clean up temp files?", 'yes', 'yesno')) {
+    if (ask_user("Clean up temp files?", 'y', 'yesno')) {
         clean_up();
     }
     next_step();
  }
 
 print "\e[33mCOMPLETE\e[0m\n";
+# ===================================[ main-end ]=================================== #
 
+# ==================================[ steps-start ]================================= #
 sub step_firstrun {
     my $question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
     $fqdn = ask_user($question, '', 'input');
@@ -220,7 +224,7 @@ sub step_firstrun {
 
         tell_user('INFO', "The FQDN '" . $cfg{fqdn} . "' has an existing configuration file");
 
-        if (ask_user("Would you like to load the configurations?", 'yes', 'yesno')) {
+        if (ask_user("Would you like to load the configurations?", 'y', 'yesno')) {
             %cfg = %{$ini{$fqdn}};
 
             if ($cfg{step} > 1) {
@@ -243,7 +247,7 @@ sub step_firstrun {
                 }
             }
         } else {
-            if (ask_user("Are you sure? This will wipe the current config for this FQDN", 'yes', 'yesno')) {
+            if (ask_user("Are you sure? This will wipe the current config for this FQDN", 'y', 'yesno')) {
                 delete $ini{$fqdn};
                 $ini{$fqdn} = {};
             } else {
@@ -261,8 +265,7 @@ sub step_firstrun {
 
 
 
-        }
-        tell_user('INFO', "$cfg{distro} found to be the current distribution");
+    if ($cfg{os} eq 'linux') {
         %def = %{$ini{lin_examples}};
     } else {
         %def = %{$ini{win_examples}};
@@ -271,25 +274,19 @@ sub step_firstrun {
     merge_hashes(\%cfg, \%def);
     merge_hashes(\%cfg, \%glb);
 
-    $cfg{os}     = $os;
-    $cfg{distro} = $cfg{distro};
-
-        chomp(my $loc_check = `pwd`);
+    chomp(my $loc_check = `pwd`);
     $loc_check =~ s/\/install//;
 
-    my $web_root;
-    $web_root = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
-    $cfg{web_root} = $web_root;
+    $cfg{web_root} = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
 
-        if ($loc_check ne $cfg{web_root}) {
-        my $error = "Setup has determined the files are not in the correct place,\n" .
-                    " or you're not in the correct folder. Please move the contents\n" .
-                    "of the legendofaetheria folder to your webroot, and make sure you're\n" .
-                    "the 'install' directory when you run this script.\n\n" .
-                    "Specified webroot directory: $cfg{web_root}\n" .
-                    "Current location           : \e[31m$loc_check\e[0m\n";
-        croak($error);
-    }
+    if ($loc_check ne $cfg{web_root}) {
+    my $error = "Setup has determined the files are not in the correct place,\n" .
+                " or you're not in the correct folder. Please move the contents\n" .
+                "of the legendofaetheria folder to your webroot, and make sure you're\n" .
+                "the 'install' directory when you run this script.\n\n" .
+                "Specified webroot directory: $cfg{web_root}\n" .
+                "Current location           : \e[31m$loc_check\e[0m\n";
+    croak($error);
 
     $cfg{template_dir} = $cfg{web_root} . '/install/templates';
     $cfg{scripts_dir}  = $cfg{web_root} . '/install/scripts';
@@ -310,24 +307,25 @@ sub step_firstrun {
 }
 
 sub step_install_software {
-    if (-e '/etc/apt/sources.list.d/php.list' || -e '/etc/apt/sources.list.d/ondrej-ubuntu-php-noble.sources') {
-        tell_user('INFO', 'Sury repo entries already present');
-    } else {
-        my $cmd;
-        tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
+    if ($cfg{pm} =~ /^apt/) {
+        if (-e '/etc/apt/sources.list.d/php.list' || -e '/etc/apt/sources.list.d/ondrej-ubuntu-php-noble.sources') {
+            tell_user('INFO', 'Sury repo entries already present');
+        } else {
+            my $cmd;
+            tell_user('INFO', 'Sury PHP repositories not found, adding necessary entries');
 
-        if ($cfg{distro} =~ /ubuntu/i) {
-            `chmod +x $cfg{scripts_dir}/sury_setup_ubnt.sh`;
-            $cmd = "/bin/sh $cfg{scripts_dir}/sury_setup_ubnt.sh";
-        } elsif ($cfg{distro} =~ /debian|kali/i) {
-            $cmd = "/bin/sh $cfg{scripts_dir}/sury_setup_deb.sh";
-        } elsif ($cfg{os} eq 'windows') {
-            # TODO: implement windows setup
+            if ($cfg{distro} =~ /ubuntu/i) {
+                `chmod +x $cfg{scripts_dir}/sury_setup_ubnt.sh`;
+                $cmd = "/bin/sh $cfg{scripts_dir}/sury_setup_ubnt.sh";
+            } elsif ($cfg{distro} =~ /debian|kali/i) {
+                $cmd = "/bin/sh $cfg{scripts_dir}/sury_setup_deb.sh";
+            } elsif ($cfg{os} eq 'windows') {
+                # TODO: implement windows setup
+            }
+            tell_user('SYSTEM', `$cmd`);
         }
-        tell_user('SYSTEM', `$cmd`);
+        tell_user('INFO', 'Updating system packages');
     }
-
-    tell_user('INFO', 'Updating system packages');
 
     if (!$cfg{php_version}) {
         tell_user('WARN', "PHP version not specified, attempting to find it...\n");
@@ -342,8 +340,15 @@ sub step_install_software {
             if ($cfg{php_version}) {
                 tell_user('SUCCESS', "Found PHP version $cfg{php_version}");
             } else {
-                if (ask_user('Failed to find a PHP version. Agree on 8.4?', 'yes', 'yesno')) {
-                    $cfg{php_version} = "8.4";
+                my $t_phpv;
+                if ($cfg{distro} eq 'alpine') {
+                    $t_phpv = "8.3";
+                } else {
+                    $t_phpv = "8.4";
+                }
+
+                if (ask_user("Failed to find a PHP version. Agree on $t_phpv?", 'y', 'yesno')) {
+                    $cfg{php_version} = "$t_phpv";
                 } else {
                     croak("Couldn't come to a conclusion for PHP version");
                 }                
@@ -352,11 +357,16 @@ sub step_install_software {
     } else {
         tell_user('ERROR', "Invalid or unsupported PHP version set in the installer\n" .
                            "supported PHP versions: 7.0 - 8.4\n\n");
-        if (ask_user('Try with version 8.4?', 'yes', 'yesno')) {
+        if (ask_user('Try with version 8.4?', 'y', 'yesno')) {
             $cfg{php_version} = "8.4";
         }
     }
 
+    my $alp_phpv = 83;
+    if ($cfg{distro} eq 'alpine') {
+        ($alp_phpv = $cfg{php_version}) =~ s/\.//;
+    }
+        
     my @packages = (
 		"deb:php$cfg{php_version}",
 		"deb:php$cfg{php_version}-cli",
@@ -377,8 +387,8 @@ sub step_install_software {
 		"deb:composer",
 		"deb:openssl",
 		"alp:lsb_release",
-		"alp:php83",
-		"alp:php83-{cli,common,curl,dev,xml,intl,mbstring,apache2}",
+		"alp:php$cfg{php_version}",
+		"alp:php$cfg{php_version}-{cli,common,curl,dev,xml,intl,mbstring,apache2}",
 		"alp:mariadb",
 		"alp:apache2",
 		"alp:certbot",
@@ -387,22 +397,29 @@ sub step_install_software {
 		"alp:certbot-apache",
     );
 
-    if (ask_user("Do you want to use PHP-FPM? This will use mpm_worker instead of the default mpm_prefork.", 'yes', 'yesno')) {
+    if (ask_user("Do you want to use PHP-FPM? This will use mpm_worker instead of the default mpm_prefork.", 'y', 'yesno')) {
         $cfg{php_fpm} = 1;
-        push @packages,  $cfg{software} eq 'deb' ? "deb:php$cfg{php_version}-fpm" : "alp:php83-fpm"
+        push @packages,  $cfg{software} eq 'deb' ? "deb:php$cfg{php_version}-fpm" : "alp:php$cfg{php_version}-fpm"
     } else {
         $cfg{php_fpm} = 0;
     }     
 
     tell_user('INFO', 'Installing ' . @packages . ' packages\n');
     
-    #$apt_cmd = 'apt install -y ' . join (' ', grep { /$cfg{software}/ } @packages) . ' 2>&1';
-    #tell_user('SYSTEM', `$apt_cmd` . "\n");
+    my $sw_cmd = "$cfg{pm_cmd} " . join (' ', grep { /$cfg{software}/ } @packages) . ' >/dev/null 2>&1';
+    tell_user('INFO', "Installing software with command: $sw_cmd");
+    
+    my $sw_output = `$apt_cmd`;
+    if ($? == 0) {
+        tell_user('SUCCESS', 'All necessary software has been installed');
+    } else {
+        tell_user('ERROR', 'There were errors installing the software');
+        tell_user('ERROR', $sw_output);
+    }
 
     return 0;
 }
 
-#Step: Webserver
 sub step_webserver_configure {
     my $question = "Enter the location of your webserver's config directory (e.g. /etc/apache2)";
     $cfg{apache_directory} = ask_user($question, '/etc/apache2', 'input');
@@ -425,7 +442,6 @@ sub step_webserver_configure {
     return 0;
 }
 
-#Step: software
 sub step_sql_configure {
     $cfg{sql_username} = 'user_loa';
     $cfg{sql_password} = gen_random(15);
@@ -503,7 +519,6 @@ sub step_vhost_ssl {
     }
 }
 
-# Step: Fix permissions
 sub step_fix_permissions {
     # Web root files
     `find $cfg{web_root} -type f -exec chmod 644 {} + 2>&1`;
@@ -547,7 +562,6 @@ sub step_fix_permissions {
     tell_user('SUCCESS', 'Permissions fixed!');
 }
 
-# Step: step_apache_enables
 sub step_apache_enables {
     my $success = 1000;
     my $mods = 'rewrite ssl ';
@@ -592,13 +606,12 @@ sub step_apache_enables {
     } else {
         tell_user('ERROR', "There were errors - See above output\n");
 
-        if (!ask_user('Continue?', 'no', 'yesno')) {
+        if (!ask_user('Continue?', 'n', 'yesno')) {
             die "Quitting at user request\n";
         }
     }    
 }
 
-#Step: PHP configurations
 sub step_php_configure {
     my $ini_contents;
     my $template_file;
@@ -696,7 +709,7 @@ sub step_php_configure {
     }
 
     # Binary
-    if (ask_user("Located PHP binary at $cfg{php_binary} - is this correct?", 'yes', 'yesno')) {
+    if (ask_user("Located PHP binary at $cfg{php_binary} - is this correct?", 'y', 'yesno')) {
         tell_user('INFO', "PHP binary set to $cfg{php_binary}");
     } else {
         $cfg{php_binary} = ask_user('PHP binary not found. Please enter the path to the PHP binary', '', 'input');
@@ -708,7 +721,7 @@ sub step_php_configure {
     }
 
     # INI file
-    if (ask_user("PHP ini file is set to $cfg{php_ini} - is this correct?", 'yes', 'yesno')) {
+    if (ask_user("PHP ini file is set to $cfg{php_ini} - is this correct?", 'y', 'yesno')) {
         tell_user('INFO', "PHP ini file set to $cfg{php_ini}");
     } else {
         $cfg{php_ini} = ask_user('Please enter the path to the PHP ini file', $cfg{php_ini}, 'input');
@@ -740,9 +753,8 @@ sub step_php_configure {
     file_write($cfg{php_ini}, $ini_contents, 'data');
 }
 
-# Step: composer
 sub step_composer_pull {
-    if (ask_user("Composer is going to download/install these as $cfg{composer_runas} - continue?", 'yes', 'yesno')) {
+    if (ask_user("Composer is going to download/install these as $cfg{composer_runas} - continue?", 'y', 'yesno')) {
         my $cmd = "sudo -u $cfg{composer_runas} composer --working-dir \"$cfg{web_root}\" install 2>/dev/null;";
         $cmd .= "sudo -u $cfg{composer_runas} composer --working-dir \"$cfg{web_root}\" update 2>/dev/null";
         
@@ -751,7 +763,6 @@ sub step_composer_pull {
     }
 }
                                            
-# Step: Template imports
 sub step_generate_templates {
     my @replacements = @{$_[0]};
     my $copy_output;
@@ -843,7 +854,6 @@ sub step_process_templates {
     tell_user('SUCCESS', "All template files have been applied");
 }
 
-#Step: start services
 sub step_start_services {
     my @services = ("mariadb", "apache2");
 
@@ -864,7 +874,8 @@ sub step_start_services {
     }
 }
 
-## INTERNAL SCRIPT FUNCTIONS ##
+# ====================================[ steps-end ]====================================== #
+# ==================================[ internal-start ]=================================== #
 sub replace_in_file {
     my ($search, $replace, $file_in, $file_out) = @_;
 
@@ -1028,7 +1039,15 @@ sub ask_user {
     print "$date $prompt\n";
 
     if ($type eq 'yesno') {
-        print "[$clr{green}y$clr{reset}/$clr{red}n$clr{reset}]> ";
+        my ($yes, $no) = ("$clr{green}y$clr{reset}", "$clr{red}n$clr{reset}");
+
+        if ($default && $default eq 'y') {
+            $yes = "[$clr{green}y$clr{reset}]";
+        } elsif ($default && $default eq 'n') {
+            $no = "[$clr{red}n$clr{reset}]";
+        }
+
+        print "[$yes / $no]>";        
     } elsif ($type eq 'input') {
         if ($default) {
             print "[$clr{yellow}$default$clr{reset}]> ";
@@ -1045,7 +1064,7 @@ sub ask_user {
     } elsif ($answer =~ /[Nn]o?/ && $type eq 'yesno') {
         return 0;
     } elsif (($answer eq '' or !$answer) && type eq 'yesno') {
-        if ($default eq 'y') {
+        if ($default eq 'y') {                             
             return 1;
         } else {
             return 0;
@@ -1194,7 +1213,8 @@ sub get_sysinfo {
         }
 
         if (!$cfg{distro} or $cfg{distro} eq '') {
-            if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
+            if (!ask_user("Unsupported distro, try anyway?", 'n', 'yesno')) {
+                handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
                 die "Unsupported distro, exiting\n";
             }
             $cfg{distro} = "unsupported";
@@ -1215,7 +1235,9 @@ sub get_sysinfo {
         } elsif ($distro eq 'alpine') {
             $cfg{software} = 'alp';
         }
+    } else {
+        $cfg{svc_cmd} = 'sc';
+        $cfg{pm_cmd} = 'choco install';
     }
-} else {
-    $cfg{svc_cmd} = 'sc';
+    handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
