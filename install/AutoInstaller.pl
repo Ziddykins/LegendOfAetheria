@@ -64,8 +64,8 @@ my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
 
 if (!-e $cfg_file && -e 'config.ini.default') {
     croak(
-        'You need to have a config.ini file; either create one ' .
-        'or rename the "config.ini.default" file to "config.ini" before continuing' . "\n"
+        'You need to have a config.ini file; either create one or rename the' .
+        "'config.ini.default' file to 'config.ini' before continuing\n"
     );
 }
 
@@ -84,21 +84,9 @@ if ($ENV{'USER'} ne 'root') {
         $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
 }
 
-
-if (check_platform() eq 'linux') {
-    chomp(my $check_docker = `mount | grep 'overlay on / type' -ao`);
-
-    if ($check_docker) {
-        $cfg{svc_cmd} = 'service';
-    } else {
-        $cfg{svc_cmd} = 'systemctl';
-    }
-} else {
-    $cfg{svc_cmd} = 'sc';
-}
-
-
+get_sysinfo();
 step_firstrun();
+
 if ($cfg{step} == SOFTWARE) {
     if (ask_user("Install required software?", 'yes', 'yesno')) {
         step_install_software();
@@ -271,19 +259,8 @@ sub step_firstrun {
 
     $cfg{fqdn} = $fqdn;
 
-    my $os = check_platform();
-    my $distro;
 
-    if ($os eq 'linux') {
-        my $ver = `lsb_release -i`;
-        if ($ver =~ /(debian|ubuntu|kali)/i) {
-            $distro = $1;
-            $cfg{software} = 'deb';
-        } else {
-            if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
-                die "Unsupported distro, exiting\n";
-            }
-            $distro = "unsupported";
+
         }
         tell_user('INFO', "$distro found to be the current distribution");
         %def = %{$ini{lin_examples}};
@@ -412,14 +389,15 @@ sub step_install_software {
 
     if (ask_user("Do you want to use PHP-FPM? This will use mpm_worker instead of the default mpm_prefork.", 'yes', 'yesno')) {
         $cfg{php_fpm} = 1;
-        push @packages, "php$cfg{php_version}-fpm";
+        push @packages,  $cfg{software} eq 'deb' ? "deb:php$cfg{php_version}-fpm" : "alp:php83-fpm"
     } else {
         $cfg{php_fpm} = 0;
     }     
 
     tell_user('INFO', 'Installing ' . @packages . ' packages\n');
-    my $apt_cmd = 'apt install -y ' . join (' ', @packages) . ' 2>&1';
-    tell_user('SYSTEM', `$apt_cmd` . "\n");
+    
+    #$apt_cmd = 'apt install -y ' . join (' ', grep { /$cfg{software}/ } @packages) . ' 2>&1';
+    #tell_user('SYSTEM', `$apt_cmd` . "\n");
 
     return 0;
 }
@@ -1053,7 +1031,7 @@ sub ask_user {
         print "[$clr{green}y$clr{reset}/$clr{red}n$clr{reset}]> ";
     } elsif ($type eq 'input') {
         if ($default) {
-           print "[$clr{yellow}$default$clr{reset}]> ";
+            print "[$clr{yellow}$default$clr{reset}]> ";
         } else {
             print "$clr{yellow}enter$clr{reset}> ";
         }
@@ -1066,6 +1044,12 @@ sub ask_user {
         return 1;
     } elsif ($answer =~ /[Nn]o?/ && $type eq 'yesno') {
         return 0;
+    } elsif (($answer eq '' or !$answer) && type eq 'yesno') {
+        if ($default eq 'y') {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     if (($answer eq '' or !$answer) && $type eq 'input') {
@@ -1186,4 +1170,52 @@ sub const_to_name {
 sub next_step {
     print "Moving on to step " . const_to_name($cfg{step}++) . "\n";
     handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
+}
+
+sub get_sysinfo {
+    $cfg{os} = check_platform();
+    if ($cfg{os} eq 'linux') {        
+        chomp(my $check_docker = `mount | grep 'overlay on / type' -ao`);
+        chomp(my $init_system = `SYSTEMD=\$(strings /sbin/init | grep systemd | wc -l); INITD=\$(strings /sbin/init | grep init.d | wc -l); if [ "\$SYSTEMD" -gt "0" ]; then echo "systemd"; elif [ "\$INITD" -gt "0" ]; then echo "initd"; else echo "other"; fi`);
+        $cfg{init_system} = $init_system;
+
+        foreach my $combo ("redhat:yum:-y install", "arch:pacman", "gentoo:emerge", "SuSE:zypp", "debian:apt-get:-y install", "alpine:apk:add") {
+            my ($distro, $pm, $args) = split ':', $combo;
+            
+            if (-e "/etc/$distro-release") {
+                $cfg{distro} = $distro;
+                $cfg{pm_cmd} = "$pm $args";
+                tell_user('SUCCESS', "Your distribution was found to be $distro, so we will use $pm to manage the software on this machine");
+                
+                if (ask_user('Is this correct?', 'y', 'yesno')) {
+                    last;
+                }
+            }
+        }
+
+        if (!$cfg{distro} or $cfg{distro} eq '') {
+            if (!ask_user("Unsupported distro, try anyway?", 'no', 'yesno')) {
+                die "Unsupported distro, exiting\n";
+            }
+            $cfg{distro} = "unsupported";
+            
+        }
+
+        if ($check_docker || $cfg{init_system} eq 'init') {
+            $cfg{svc_cmd} = 'service';
+        } elsif ($cfg{svc_cmd} eq 'systemd') {
+            $cfg{svc_cmd} = 'systemctl';
+        } else {
+            tell_user('ERROR', 'Unable to determine what init system is used (e.g. "service" or "systemctl") to start services. Please enter below.');
+            $cfg{svc_cmd} = ask_user('Which init system do you use?', '', 'input');
+        }
+
+        if ($cfg{distro} =~ /debian|ubuntu|kali/) {
+            $cfg{software} = 'deb';
+        } elsif ($distro eq 'alpine') {
+            $cfg{software} = 'alp';
+        }
+    }
+} else {
+    $cfg{svc_cmd} = 'sc';
 }
