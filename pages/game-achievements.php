@@ -1,6 +1,6 @@
 <?php
+    use Game\Monster\Enums\MonsterScope;
     use Game\Monster\Monster;
-    use Game\Monster\Enums\Scope;
 
     function gen_achievements() {
         global $system;
@@ -9,7 +9,7 @@
 
         foreach ($system->monsters as $monster) {
             foreach ($intervals as $interval) {
-                $monster = new Monster(Scope::NONE);
+                $monster = new Monster(MonsterScope::NONE);
                 $name_ns = str_replace(' ', '', $monster->get_name());
 
                 if ($count++ % 3 == 0) {
@@ -27,7 +27,7 @@
                                     <div class="card-body">
                                         <h5 class="card-title">' . $monster->get_name() . '</h5>
                                         <p class="card-text">Kill ' . $interval . ' ' . $monster->get_name() . '\'s</p>
-                                        <p class="card-text"><small class="text-body-secondary"><div class="ldBar" data-value="' . rand(0,100) . '"></div></small></p>
+                                        <p class="card-text"><small class="text-body-secondary"><div class="ldBar" data-value="' . mt_rand(0,100) . '"></div></small></p>
                                     </div>
                                 </div>
                             </div>

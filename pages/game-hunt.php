@@ -1,5 +1,5 @@
 <?php
-    use Game\Monster\Enums\Scope;
+    use Game\Monster\Enums\MonsterScope;
     use Game\Monster\Monster;
 
     require_once "functions.php";
@@ -16,10 +16,10 @@
     if (isset($_POST['hunt-new-monster']) && $_POST['hunt-new-monster'] == 1) {
         check_csrf($_POST['csrf-token']);
         if (!$mon_loaded) {
-            $monster = new Monster(Scope::PERSONAL);
+            $monster = new Monster(MonsterScope::PERSONAL);
             
             $monster->new();
-            $monster->load(Scope::PERSONAL);
+            $monster->load(MonsterScope::PERSONAL);
             $monster->random_monster();
             $character->set_monster($monster);
         }
@@ -85,17 +85,17 @@
                             <div class="d-grid align-items-start">
                                 <span class="d-grid align-items-center small mb-3">
                                     <span class="flex-grow-1 text-center">HP</span>
-                                    <span id="player-hp" name="player-hp" class="flex-grow-1 text-center"><?php echo $character->stats->get_hp(); echo ' / '; echo $character->stats->get_maxHp(); ?></span>
+                                    <span id="player-hp" name="player-hp" class="flex-grow-1 text-center"><?php echo $character->stats->get_hp(); echo ' / '; echo $character->stats->get_maxHP(); ?></span>
                                 </span>
 
                                 <span class="d-grid align-items-center small mb-3">
                                     <span class="flex-grow-1 text-center">MP</span>
-                                    <span class="flex-grow-1 text-center"><?php echo $character->stats->get_ep(); echo ' / '; echo $character->stats->get_maxEp(); ?></span>
+                                    <span class="flex-grow-1 text-center"><?php echo $character->stats->get_ep(); echo ' / '; echo $character->stats->get_maxEP(); ?></span>
                                 </span>
 
                                 <span class="d-grid align-items-center small">
                                     <span class="flex-grow-1 text-center">EP</span>                                    
-                                    <span class="flex-grow-1 text-center"><?php echo $character->stats->get_mp(); echo ' / '; echo $character->stats->get_maxMp(); ?></span>
+                                    <span class="flex-grow-1 text-center"><?php echo $character->stats->get_mp(); echo ' / '; echo $character->stats->get_maxMP(); ?></span>
                                     
                                 </span>
                             </div>

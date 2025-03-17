@@ -149,13 +149,17 @@ use Game\System\Enums\LOAError;
 
         $status    = FriendStatus::NONE;
         $sql_query = "SELECT * FROM {$_ENV['SQL_FRND_TBL']} WHERE `recipient_id` = ? OR `sender_id` = ?";
-        $results   = $db->execute_query($sql_query, [ $character_id ])->fetch_assoc();
+        $results   = $db->execute_query($sql_query, [ $character_id, $character_id ])->fetch_assoc();
 
         if ($results) {
             $status = FriendStatus::name_to_enum($results['friend_status']);
         }
 
-        $log->info("Friend status between character ID $character_id -> {$status->name}");        
+        if ($status == null) {
+            $status = FriendStatus::NONE;
+        }
+
+        //$log->warning("Friend status between character ID $character_id -> {$status->name}");        
         return $status;
     }
 
@@ -197,17 +201,17 @@ use Game\System\Enums\LOAError;
     function get_friend_counts(FriendStatus $which, int $id = 0, bool $return_list = false): array|int {
         global $db, $character;
         $count = 0;
-        $arr_users['emails'] = [];
+        $arr_users['ids'] = [];
 
         $sql_query = <<<SQL
-            SELECT DISTINCT `name`
+            SELECT DISTINCT `id`
             FROM {$_ENV['SQL_CHAR_TBL']}
             WHERE `id` <> ?
         SQL;
         
-        $emails = $db->execute_query($sql_query, [ $character->get_id() ])->fetch_all(MYSQLI_ASSOC);
+        $ids = $db->execute_query($sql_query, [ $character->get_id() ])->fetch_all(MYSQLI_ASSOC);
 
-        if (!$emails) {
+        if (!$ids) {
             if ($return_list) {
                 $arr['count'] = 0;
                 return $arr;
@@ -215,15 +219,15 @@ use Game\System\Enums\LOAError;
             return 0;
         }
         
-        foreach ($emails as $email) {
+        foreach ($ids as $id) {
             $target_status = $which;
-            $current_status = friend_status($email['email']);
+            $current_status = friend_status($id['id']);
             if ($current_status === $target_status) {
                 $count++;
 
                 if ($return_list) {
                     if (isset($email['email'])) {
-                        array_push($arr_users['emails'], $email['email']);
+                        array_push($arr_users['ids'], $id['id']);
                     }
                 }
             }
@@ -463,19 +467,22 @@ use Game\System\Enums\LOAError;
         global $db, $log;
             
         if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
+            $log->warning("Sessions var 'logged-in' not set to 1", [ print_r($_SESSION, true) ] );
             return false;
         }
      
-        $sql_query = "SELECT `session_id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE`id` = ?";
+        $sql_query = "SELECT `session_id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
         $result = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc();
         
-        if ($result === null) {
+        if (!$result) {
+            $log->warning("session_id not found");
             return false;
         }
 
         $session = $result['session_id'];
         
         if ($session != session_id()) {
+            $log->warning("Session ID in db doesn't match browser session id", [ 'SessionDB' => $session, 'SessionBrowser' => session_id() ]);
             return false;
         }
 

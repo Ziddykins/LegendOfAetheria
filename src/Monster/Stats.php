@@ -12,11 +12,11 @@ class Stats {
 
 
     private int $hp     = 100;
-    private int $maxHp  = 100;
+    private int $maxHP  = 100;
     private int $mp     = 100;
-    private int $maxMp  = 100;
+    private int $maxMP  = 100;
     private int $ep     = 100;
-    private int $maxEp  = 100;
+    private int $maxEP  = 100;
 
     private int $str    = 10;
     private int $int    = 10;

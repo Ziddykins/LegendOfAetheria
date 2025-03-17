@@ -11,7 +11,7 @@ enum FriendStatus {
 
     public static function name_to_enum(string $name) {
         foreach (self::cases() as $case) {
-            if ($case === $name) {
+            if ($case->name === $name) {
                 return $case;
             }
         }

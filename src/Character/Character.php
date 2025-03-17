@@ -84,9 +84,9 @@ class Character {
                             </div>
 
                             <div class="col">
-                                <div>'. $stats->get_hp() . ' / ' . $stats->get_maxHp() . '</div>
-                                <div>'. $stats->get_mp() . ' / ' . $stats->get_maxMp() . '</div>
-                                <div>'. $stats->get_ep() . ' / ' . $stats->get_maxEp() . '</div>
+                                <div>'. $stats->get_hp() . ' / ' . $stats->get_maxHP() . '</div>
+                                <div>'. $stats->get_mp() . ' / ' . $stats->get_maxMP() . '</div>
+                                <div>'. $stats->get_ep() . ' / ' . $stats->get_maxEP() . '</div>
                                 <div>'. $stats->get_ap() . '</div>
                                 <div>'. $stats->get_exp() . '</div>
                                 <div>'. $stats->get_maxExp() . '</div>

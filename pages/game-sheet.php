@@ -7,9 +7,9 @@
     $cur_mp       = $character->stats->get_mp();
     $cur_ep       = $character->stats->get_ep();
 
-    $max_hp       = $character->stats->get_maxHp();
-    $max_mp       = $character->stats->get_maxMp();
-    $max_ep       = $character->stats->get_maxEp();
+    $max_hp       = $character->stats->get_maxHP();
+    $max_mp       = $character->stats->get_maxMP();
+    $max_ep       = $character->stats->get_maxEP();
 
     if (50 >= $cur_hp / $max_hp * 100) {
         $hp_textcolor = 'text-white';
@@ -55,7 +55,7 @@
                                         <span id="hp" name="hp"   
                                             class="ldBar label-center <?php echo $hp_textcolor; ?>"
                                             data-value="<?php echo $character->stats->get_hp(); ?>"
-                                            data-max="<?php echo $character->stats->get_maxHp(); ?>"
+                                            data-max="<?php echo $character->stats->get_maxHP(); ?>"
                                             data-preset="bubble"
                                             data-pattern-size="120"
                                         >
@@ -64,7 +64,7 @@
                                         <span id="mp" name="mp"
                                             class="ldBar label-center <?php echo $mp_textcolor; ?>"
                                             data-value="<?php echo $character->stats->get_mp(); ?>"
-                                            data-max="<?php echo $character->stats->get_maxMp(); ?>"
+                                            data-max="<?php echo $character->stats->get_maxMP(); ?>"
                                             data-preset="stripe"
                                             data-pattern-size="120"
                                         >
@@ -73,7 +73,7 @@
                                         <span id="ep" name="ep"   
                                             class="ldBar label-center <?php echo $ep_textcolor; ?>"
                                             data-value="<?php echo $character->stats->get_ep(); ?>"
-                                            data-max="<?php echo $character->stats->get_maxEp(); ?>"
+                                            data-max="<?php echo $character->stats->get_maxEP(); ?>"
                                             data-preset="energy"
                                             data-pattern-size="120"
                                         >
