@@ -262,7 +262,7 @@ sub step_firstrun {
 
 
         }
-        tell_user('INFO', "$distro found to be the current distribution");
+        tell_user('INFO', "$cfg{distro} found to be the current distribution");
         %def = %{$ini{lin_examples}};
     } else {
         %def = %{$ini{win_examples}};
@@ -272,7 +272,7 @@ sub step_firstrun {
     merge_hashes(\%cfg, \%glb);
 
     $cfg{os}     = $os;
-    $cfg{distro} = $distro;
+    $cfg{distro} = $cfg{distro};
 
         chomp(my $loc_check = `pwd`);
     $loc_check =~ s/\/install//;
@@ -422,7 +422,7 @@ sub step_webserver_configure {
     $cfg{apache_https_port} = ask_user('Enter apache port for HTTPS', '443', 'input');
     $cfg{apache_http_port}  = ask_user('Enter apache port for HTTP',   '80', 'input');
     
-        return 0;
+    return 0;
 }
 
 #Step: software
