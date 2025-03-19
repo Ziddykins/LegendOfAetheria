@@ -4,7 +4,7 @@ namespace Game\System\Enums;
 enum Weather {
     public static function random(): self {
         $count = count(self::cases()) - 1;
-        return self::cases()[rand(0, $count)];
+        return self::cases()[mt_rand(0, $count)];
     }
 
     public static function name_to_value(string $name): string {

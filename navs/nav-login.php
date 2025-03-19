@@ -297,7 +297,7 @@
                                                 <button class="btn btn-primary mb-3" id="contact-submit" name="contact-submit" value="1">
                                                     🤍 Submit
                                                 </button>
-                                                <input id="csrf-token" name="csrf-token" type="hidden" value="<?php echo $_SESSION['csrf-token']; ?>" />
+                                               
                                             </form>
                                         </div>
                                     </div>

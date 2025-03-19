@@ -24,6 +24,9 @@
                 <a class="list-group-item list-group-item-action " id="list-chat-list" data-bs-toggle="list" href="#list-chat" role="tab" aria-controls="list-chat">
                     Chat
                 </a>
+                <a class="list-group-item list-group-item-action " id="list-visuals-list" data-bs-toggle="list" href="#list-visuals" role="tab" aria-controls="list-visuals">
+                    Visuals
+                </a>
             </div>
         </div>
 
@@ -54,6 +57,39 @@
                             
                         </div>
                     </div>
+                    <div class="row text-center">
+                        <button id="save-settings" name="save-settings" class="btn btn-primary" type="button" onclick="save_settings('ip_lock')">Save</button>
+                        <div id="status-msg" name="status-msg" class="text-center text-success"></div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade show active" id="list-visuals" role="tabpanel" aria-labelledby="list-visuals-list">
+                    <div class="row text-center">
+                        <div class="col">
+                            <h3>
+                                <?php fix_name_header($_SESSION['name']); ?> Visual Settings
+                            </h3>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="d-flex align-items-center">
+                                <label for="sidebar-type">Sidebar:</label>
+                                <select id="sidebar-type" name="sidebar-type" class="form-select" aria-label="Sidebar Dropdown Menu">
+                                    <option selected disabled value="-1"></option>
+                                    <option disabled value="-2">-- Classic --</option>
+                                    <option value="1">Classic side menu</option>
+                                    <option disabled value="-3">-- AdminLTE Varients --</option>
+                                    <option value="2">Default side menu</option>
+                                    <option value="3">Collapsed side menu</option>
+                                    <option value="4">Fixed complete side menu</option>
+                                    <option value="5">Mini side menu</option>
+                                    <option value="6">Unfixed side menu</option>
+                                </select>
+                            </div>
+
+
                     <div class="row text-center">
                         <button id="save-settings" name="save-settings" class="btn btn-primary" type="button" onclick="save_settings('ip_lock')">Save</button>
                         <div id="status-msg" name="status-msg" class="text-center text-success"></div>

@@ -3,14 +3,13 @@ namespace Game\Monster;
 use Game\Monster\Enums\MonsterScope;
 use Game\Traits\PropConvert;
 use Game\Traits\PropSync;
-use Game\Traits\Enums\Type;
+use Game\Traits\Enums\PropType;
 use Game\Monster\Stats;
 use Game\Character\Character;
 
 class Monster {
     use PropConvert;
     use Propsync;
-
     private ?int $id;
     private int $accountID;
     private int $characterID;
@@ -43,7 +42,7 @@ class Monster {
             return;
         }
         
-        return $this->propSync($method, $params, Type::MONSTER);
+        return $this->propSync($method, $params, PropType::MONSTER);
     }
 
     public function __construct(MonsterScope $scope) {

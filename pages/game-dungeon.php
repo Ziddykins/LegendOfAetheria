@@ -6,7 +6,7 @@
         $db->query($sql_query);
 
         echo 'Reset';
-    } else if ($_REQUEST['action'] === 'challenge') {
+    } elseif ($_REQUEST['action'] === 'challenge') {
         /* TODO: Implement - maybe manipulate hunt layout */
     } else {
         echo 'Unknown action! Click <a href="#">here</a> to continue fighting on floor ' . $character->get_floor();

@@ -77,7 +77,7 @@
             header('Location: /?failed_login');
             exit();
         }
-    } else if (isset($_POST['register-submit']) && $_POST['register-submit'] == 1) {
+    } elseif (isset($_POST['register-submit']) && $_POST['register-submit'] == 1) {
         /* Account information */
         $email              = $_POST['register-email'];
         $password           = $_POST['register-password'];

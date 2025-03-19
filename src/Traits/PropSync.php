@@ -2,18 +2,17 @@
 namespace Game\Traits;
 
 use Exception;
+use Game\Account\Settings;
 use Game\Character\Stats;
 use Game\Inventory\Inventory;
-use Game\Monster\Monster;
-use Game\Monster\Enums\MonsterScope;
 use Game\System\Enums\LOAError;
-use Game\Traits\Enums\Type;
-use Game\Traits\PropConvert;
+use Game\Traits\Enums\PropType;
+
 
 trait PropSync {
 
     
-    private function propSync($method, $params, Type $type) {
+    private function propSync($method, $params, PropType $type) {
         global $db, $log;
         $table = null;
         $prop  = null;
@@ -37,19 +36,20 @@ trait PropSync {
         }
 
         switch ($type) {
-            case Type::CSTATS;
-            case Type::CHARACTER:
-            case Type::INVENTORY;
+            case PropType::CSTATS:
+            case PropType::CHARACTER:
+            case PropType::INVENTORY:
                 $table = $_ENV['SQL_CHAR_TBL'];
                 break;
-            case Type::ACCOUNT;
+            case PropType::ACCOUNT:
+            case PropType::SETTINGS:
                 $table = $_ENV['SQL_ACCT_TBL'];
                 break;
-            case Type::FAMILIAR:
+            case PropType::FAMILIAR:
                 $table = $_ENV['SQL_FMLR_TBL'];
                 break;
-            case Type::MONSTER:
-            case Type::MSTATS;
+            case PropType::MONSTER:
+            case PropType::MSTATS:
                 $table = $_ENV['SQL_MNST_TBL'];
                 break;
             default:
@@ -76,9 +76,9 @@ trait PropSync {
             $this->$prop = $params[0];
 
             switch ($type) {
-                case Type::CSTATS:
-                case Type::MSTATS:
-                    $tbl = $type == Type::MSTATS
+                case PropType::CSTATS:
+                case PropType::MSTATS:
+                    $tbl = $type == PropType::MSTATS
                         ? $tbl = $_ENV['SQL_MNST_TBL']
                         : $tbl = $_ENV['SQL_CHAR_TBL'];
 
@@ -87,13 +87,19 @@ trait PropSync {
                     $sql_query = "UPDATE $tbl SET `stats` = ? WHERE `id` = ?";
                     $db->execute_query($sql_query, [ $srl_data, $this->id ]);
                     return;
-                case Type::INVENTORY:
+                case PropType::INVENTORY:
                     $id = $this->id;
                     $srl_data = safe_serialize($this);
                     $sql_query = "UPDATE {$_ENV['SQL_CHAR_TBL']} SET `inventory` = ? WHERE `id` = ?";
                     $db->execute_query($sql_query, [ $srl_data, $_SESSION['character-id'] ]);
                     return;
-                case Type::MONSTER:
+                case PropType::SETTINGS:
+                    $id = $this->accountID;
+                    $srl_data = safe_serialize($this);
+                    $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `settings` = ? WHERE `id` = ?";
+                    $db->execute_query($sql_query, [ $srl_data, $this->id ]);
+                    return;
+                case PropType::MONSTER:
                     if (isset($params[1]) && $params[1] === 'false') {
                         return;
                     }
@@ -106,7 +112,7 @@ trait PropSync {
                         $params[0] = $params[0]->value;
                     }
                     break;
-                case Type::CHARACTER:
+                case PropType::CHARACTER:
                     $id = $this->id;
 
                     if ($prop === 'monster') {
@@ -114,7 +120,12 @@ trait PropSync {
                     }
                     
                     break;
-
+                case PropType::ACCOUNT:
+                    $id = $this->id;
+                    if ($prop === 'settings') {
+                        $params[0] = safe_serialize($params[0]);
+                    }
+                    break;
             }
 
             $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";    
@@ -123,13 +134,19 @@ trait PropSync {
             $focused_id = null;
 
             switch ($type) {
-                case Type::ACCOUNT:
+                case PropType::ACCOUNT:
                     $accountID  = getNextTableID($_ENV['SQL_ACCT_TBL']);
-                    $sql_query  = "INSERT INTO $table (id, email) VALUES (?, ?)";
+                    
+                    $tmp_settings = new Settings($accountID);
+                    $this->set_settings($tmp_settings);
+                    $srl_data = safe_serialize($tmp_settings);
+
+                    $sql_query  = "INSERT INTO $table (`id`, `email`, `settings`) VALUES (?, ?, ?)";
                     $this->id = $accountID;
-                    $db->execute_query($sql_query, [$accountID, $this->email]);
+                    $db->execute_query($sql_query, [ $accountID, $this->email, $srl_data ] );
+
                     return $accountID;
-                case Type::CHARACTER:
+                case PropType::CHARACTER:
                     if (isset($params[0])) {
                         $next_slot = $params[0];
                     } else {
@@ -161,7 +178,7 @@ trait PropSync {
                     $db->execute_query($act_query, [$this->id, $this->accountID]);
 
                     return $char_id;
-                case Type::MONSTER:
+                case PropType::MONSTER:
                     $table     = $_ENV['SQL_MNST_TBL'];
                     $sql_query = "INSERT INTO $table (`id`, `account_id`, `character_id`, `scope`, `seed`, `stats`) VALUES (?, ?, ?, ?, ?, ?)";
                     $next_id   = getNextTableID($table);
@@ -182,7 +199,9 @@ trait PropSync {
         } elseif (strcmp($action, 'load') === 0) { /*LOAD*/
             $tmp_obj = null;
 
-            if ($type === Type::MONSTER) {
+
+
+            if ($type === PropType::MONSTER) {
                 $scope = $params[0];
                 $sql_query = "SELECT * FROM {$_ENV['SQL_MNST_TBL']} WHERE `scope` = ?";
                 $tmp_obj = $db->execute_query($sql_query, [ $scope->value]);
@@ -199,7 +218,7 @@ trait PropSync {
                 }
             }
 
-            if ($type == Type::CHARACTER) {
+            if ($type == PropType::CHARACTER) {
                 $tmp_inv     = safe_serialize($tmp_obj['inventory'], true);
                 $tmp_stats   = safe_serialize($tmp_obj['stats'],     true);
 
@@ -210,7 +229,12 @@ trait PropSync {
 
                 $this->inventory = $tmp_inv;
                 $this->stats     = $tmp_stats;
+            } elseif ($type == PropType::ACCOUNT) {
+                $tmp_settings = safe_serialize($tmp_obj['settings'], true);
+                $this->settings = $tmp_settings;
             }
+                
+
         } elseif (preg_match('/sub|add|mul|div|exp|mod/', $action)) {
             $cur_value = null;
             $max_value = null;
