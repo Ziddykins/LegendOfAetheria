@@ -164,7 +164,7 @@
                         data: JSON.stringify(document.getElementById("character-description").textContent)
                     };
                     do_ajax = 1;
-                } else if (id == "#generate-icon") {
+                } elseif (id == "#generate-icon") {
                     url = "openai";
                     data = { 
                         characterID: <?php echo $character->get_id(); ?>,

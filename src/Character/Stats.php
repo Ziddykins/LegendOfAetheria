@@ -2,7 +2,7 @@
 namespace Game\Character;
 use Game\Traits\PropConvert;
 use Game\Traits\PropSync;
-use Game\Traits\Enums\Type;
+use Game\Traits\Enums\PropType;
 
 class Stats {
     use PropConvert;
@@ -34,6 +34,6 @@ class Stats {
     }
     public function __call($method, $params): mixed {
         global $log;
-        return $this->propSync($method, $params, Type::CSTATS);
+        return $this->propSync($method, $params, PropType::CSTATS);
     }
 }

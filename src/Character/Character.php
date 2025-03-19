@@ -2,7 +2,7 @@
 namespace Game\Character;
 use Game\Inventory\Inventory;
 use Game\Monster\Monster;
-use Game\Traits\Enums\Type;
+use Game\Traits\Enums\PropType;
 use Game\Traits\PropConvert;
 use Game\Traits\PropSync;
 
@@ -45,7 +45,7 @@ class Character {
             return -1;
         }
         
-        return $this->propSync($method, $params, Type::CHARACTER);
+        return $this->propSync($method, $params, PropType::CHARACTER);
     }
 
     private function getNextCharSlotID($accountID): int {

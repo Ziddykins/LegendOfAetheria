@@ -20,7 +20,7 @@ function do_dumpin() {
     echo -e "\e[0;32m - Adding SQL user drops, creates and grants + flushing privs\e[0m";
     echo "DROP USER IF EXISTS ###REPL_SQL_USER###;
           CREATE USER ###REPL_SQL_USER###;
-          GRANT SELECT, INSERT, UPDATE, DELETE PRIVILEGES ON ###REPL_SQL_DB###.* TO ###REPL_SQL_USER### IDENTIFIED BY '###REPL_SQL_PASS###';
+          GRANT SELECT, INSERT, UPDATE, DELETE ON ###REPL_SQL_DB###.* TO ###REPL_SQL_USER### IDENTIFIED BY '###REPL_SQL_PASS###';
           FLUSH PRIVILEGES;" >> /tmp/db.sql;
 
     echo -e "\e[0;32m - Making schema replacements for templates\e[0m";

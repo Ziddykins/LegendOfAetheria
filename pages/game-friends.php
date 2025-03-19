@@ -28,9 +28,9 @@ use Game\Character\Enums\FriendStatus;
 
             if ($status_in == FriendStatus::REQUEST) {
                 array_push($requests, $row);
-            } else if ($status_in == FriendStatus::MUTUAL) {
+            } elseif ($status_in == FriendStatus::MUTUAL) {
                 array_push($friends, $row);
-            } else if ($status_out == FriendStatus::REQUESTED) {
+            } elseif ($status_out == FriendStatus::REQUESTED) {
                 array_push($requested, $row);
             }
         }

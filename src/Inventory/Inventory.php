@@ -4,7 +4,7 @@ namespace Game\Inventory;
 use Game\Inventory\Items\Item;
 use Game\Traits\PropConvert;
 use Game\Traits\PropSync;
-use Game\Traits\Enums\Type;
+use Game\Traits\Enums\PropType;
 
 class Inventory {
     use PropConvert;
@@ -35,7 +35,7 @@ class Inventory {
             return;
         }
         
-        return $this->propSync($method, $params, Type::CHARACTER);
+        return $this->propSync($method, $params, PropType::CHARACTER);
     }
 
     private function spacesLeft() {

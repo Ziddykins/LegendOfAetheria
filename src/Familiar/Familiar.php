@@ -63,7 +63,7 @@ class Familiar {
                 
                 if (is_numeric($val)) {
                     $sqlQuery .= $val;
-                } else if (!isset($val)) {
+                } elseif (!isset($val)) {
                     $sqlQuery .= 'null';
                 } else {
                     $sqlQuery .= "'$val'";
@@ -86,7 +86,7 @@ class Familiar {
             );
 
             return $html;
-        } else if ($which === 'current') {
+        } elseif ($which === 'current') {
             $build_timer = '<script>init_egg_timer("' . $this->hatchTime . 
                 '", "egg-timer");</script>';
             

@@ -3,7 +3,7 @@ namespace Game\Account;
 
 use Game\Traits\PropConvert;
 use Game\Traits\PropSync;
-use Game\Traits\Enums\Type;
+use Game\Traits\Enums\PropType;
 
 class Account {
     use PropConvert;
@@ -29,6 +29,8 @@ class Account {
     private $loggedIn;
     private $eggsOwned;
     private $eggsSeen;
+
+    private $settings;
 
     private $charSlot1;
     private $charSlot2;
@@ -60,7 +62,7 @@ class Account {
             return;
         }
 
-        return $this->propSync($method, $params, Type::ACCOUNT);
+        return $this->propSync($method, $params, PropType::ACCOUNT);
     }
     
     public static function checkIfExists($email): int {

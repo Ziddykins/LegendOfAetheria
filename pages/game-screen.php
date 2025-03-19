@@ -32,11 +32,19 @@
 
     <div id="img-container" name="img-container" class="d-flex">
         <script>
+            function getRndInteger(min, max) {
+                return Math.floor(Math.random() * (max - min + 1) ) + min;
+            }
+
             var cors_proxies = [
-                //'html https://cors-proxy.htmldriven.com/?url=',
-               // 'html https://corsproxy.io/?url=',
+                //tml https://cors-proxy.htmldriven.com/?url=',
+                //tml https://cors-proxy.htmldriven.com/?url='
+               //tml https://corsproxy.io/?url=',
+               //tml https://corsproxy.io/?url='
                 'html https://api.allorigins.win/get?url=',
-                'html https://thingproxy.freeboard.io/fetch/'
+                'html https://api.allorigins.win/get?url='
+                //'html https://thingproxy.freeboard.io/fetch/',
+                //'html https://thingproxy.freeboard.io/fetch/'
             ];
 
             var proxy_count = cors_proxies.length;
@@ -56,7 +64,7 @@
                     id += String.fromCharCode(Math.floor(Math.random() * (127 - 33)) + 33);
                 }
                 id = id.replace(/[^0-9A-Za-z]/g, '');
-                id = id.substring(0, 12);
+                id = id.substring(0, getRndInteger(6, 8));
                 return id;
             }
  
@@ -66,17 +74,26 @@
 
                 console.log(`fetching ${idz} with ${proxy_url}`);
 
-                const response = await fetch(`${proxy_url}https://prnt.sc/${idz}`);
+                const response = await fetch(`${proxy_url}https://prnt.sc/${idz}`).catch((error) => { console.error(error); });
+                
+                if (!response) {
+                    console.log("no");
+                    return;
+                }
                 const data = await response.json();
                 const woop = data.contents
                 const parser  = new DOMParser();
                 const doc     = parser.parseFromString(woop, "text/html");
-                const img_ele = doc.querySelector(".image-container");
+                const img_ele = doc.querySelector(".screenshot-image");
 
                 if (img_ele != null) {
-                    success += 1;
-                    document.getElementById("img-container").after(img_ele);
-                    console.log("Found positive result");
+                    if (!img_ele.src.match(/211be8ff/)) {
+                        success += 1;
+                        document.getElementById("img-container").after(img_ele);
+                        console.log("Found positive result");
+                    } else {
+                        console.log("screenshot removed");
+                    }
                 } else {
                     fail += 1;
                     console.log(`${idz}: no results`);
