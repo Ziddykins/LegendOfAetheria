@@ -2,6 +2,7 @@
   font-family: 'Material Symbols Sharp';
   font-style: normal;
   font-weight: 100;
+  font-size: 24px;
   src: url(https://fonts.gstatic.com/s/materialsymbolssharp/v145/gNNBW2J8Roq16WD5tFNRaeLQk6-SHQ_R00k4c2_whPnoY9ruReaU4bHmz74m0ZkGH-VBYe1x0TV6x4yFH8F-H5OdzEL3sVTgJtfbYxOLojCOJ1f7-w.ttf) format('truetype');
 }
 
@@ -130,10 +131,12 @@
 
 
 .material-symbols-sharp {
+  font-variation-settings: 'FILL' 0, 'wght' 100, 'GRAD' -25, 'opsz' 24;
+
   font-family: 'Material Symbols Sharp';
   font-weight: normal;
   font-style: normal;
-  font-size: 16px;
+  font-size: 24px;
   line-height: 1;
   letter-spacing: normal;
   text-transform: none;
