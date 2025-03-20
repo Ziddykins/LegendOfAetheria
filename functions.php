@@ -456,9 +456,6 @@ use Game\System\Enums\LOAError;
     function safe_serialize($data, ?bool $unserialize=null): mixed {
         global $log;
         if ($unserialize === true) {
-            echo '<pre>';
-            $k = print_r(debug_backtrace(), true);
-            $log->info("Unserialize called", [ 'Backtrace' => $k ]);
             $data = unserialize(base64_decode($data));
         } else {
             $data = base64_encode(serialize($data));

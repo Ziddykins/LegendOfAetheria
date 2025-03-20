@@ -20,12 +20,12 @@ if (check_session()) {
     $account = new Account($_SESSION['email']);
     $account->load();
 
-    if (isset($_REQUEST)) {
+    if (isset($_POST)) {
         $action    = null;
         $slot      = null;
         $char_slot = null;
 
-        foreach ($_REQUEST as $key => $value) {
+        foreach ($_POST as $key => $value) {
             $matches = null;
 
             if (preg_match('/^select-(load|delete|new)-(\d+)/', $key, $matches)) {
@@ -47,12 +47,12 @@ if (check_session()) {
                 header('Location: /game');
                 exit();
             case 'new':
-                $char_name    = $_REQUEST['create-character-name'];
-                $char_race    = validate_race($_REQUEST['race-select']);
-                $char_avatar = validate_avatar('avatar-' . $_REQUEST['avatar-select'] . '.webp');
-                $str     = $_REQUEST['str-ap'];
-                $int     = $_REQUEST['int-ap'];
-                $def     = $_REQUEST['def-ap'];
+                $char_name    = $_POST['create-character-name'];
+                $char_race    = validate_race($_POST['race-select']);
+                $char_avatar = validate_avatar('avatar-' . $_POST['avatar-select'] . '.webp');
+                $str     = $_POST['str-ap'];
+                $int     = $_POST['int-ap'];
+                $def     = $_POST['def-ap'];
                 $next_char_id = getNextTableID($_ENV['SQL_CHAR_TBL']);
 
                 if ($str + $def + $int === MAX_ASSIGNABLE_AP) {

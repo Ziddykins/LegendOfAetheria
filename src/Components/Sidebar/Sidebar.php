@@ -5,7 +5,7 @@ use Game\Components\Sidebar\Enums\SidebarType;
 class Sidebar {
     private SidebarType $type;
     
-    public function render() {
+    public function render(): string {
         return "";
     }
 }
