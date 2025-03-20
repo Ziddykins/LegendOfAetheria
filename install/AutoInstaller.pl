@@ -12,14 +12,33 @@ BEGIN {
 };
 
 use File::Path qw(make_path remove_tree);
+use Getopt::Long;
 use Data::Dumper;
 use File::Find;
 use File::Copy;
 use Carp;
 
+GetOptions(
+    'f|fqdn=s' => \my $opt_fqdn,
+    's|step=s' => \my $opt_step,
+    'o|only'   => \my $opt_only,
+    'l|list-steps' => sub { for (1 .. 11) { print "[$_: ", const_to_name($_), "] "; } exit; },
+    'h|help'   => \&help,
+    'v|version' => sub { print "AutoInstaller.pl v$VERSION\n"; exit; },
+);
+
+if ($opt_step =~ /[a-z]/i) {
+    my $t_step = name_to_const(uc $opt_step);
+    if ($t_step) {
+        $opt_step = $t_step;
+    } else {
+        die "Invalid step name - Please either supply the step name or number (check --list-steps)\n";
+    }
+}
 
 # ==================================[ cfg-start ]==================================== #
 $| = 1;
+
 use constant {
     FIRSTRUN  => 1,
     SOFTWARE  => 2,
@@ -58,6 +77,8 @@ my %sql; # object containing constant sql table names
 my %clr; # color constants
 
 my $fqdn;     # fully qualified domain name to set up
+$fqdn = $opt_fqdn if $opt_fqdn;
+
 my $question; # current question to ask the user
 
 my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
@@ -87,7 +108,13 @@ if ($ENV{'USER'} ne 'root') {
 }
 
 get_sysinfo();
-step_firstrun();
+
+if (!$opt_step) {
+    step_firstrun();
+} else {
+    %cfg = %{$ini{$opt_fqdn}};
+    $cfg{step} = $opt_step;
+}
 
 if ($cfg{step} == SOFTWARE) {
     if (ask_user("Install required software?", 'y', 'yesno')) {
@@ -211,13 +238,16 @@ if ($cfg{step} == CLEANUP) {
     next_step();
  }
 
-print "\e[33mCOMPLETE\e[0m\n";
+print "\n\n$clr{yellow}-----$clr{red}=$clr{grey}<$clr{green}COMPLETE$clr{grey}>$clr{red}=$clr{yellow}-----$clr{reset}\n\n";
+
 # ===================================[ main-end ]=================================== #
 
 # ==================================[ steps-start ]================================= #
 sub step_firstrun {
     my $question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
-    $fqdn = ask_user($question, '', 'input');
+
+    # If fqdn was supplied as an argument, skip the question
+    $fqdn //= ask_user($question, '', 'input');
 
     if ($ini{$fqdn}) {
         %cfg = %{$ini{$fqdn}};
@@ -232,7 +262,7 @@ sub step_firstrun {
 
                 while ($answer != 1 and $answer != 2) {
                     $question = "What would you like to do:\n"
-                                 . "1. Continue with previous config from step " . const_to_name($cfg{step} - 1) . "\n"
+                                 . "1. Continue with previous config from step " . const_to_name($cfg{step}) . "\n"
                                  . "2. Continue with previous config from the beginning\n";
                     $answer = int(ask_user($question, 'Choice', 'input'));
                 }
@@ -527,12 +557,12 @@ sub step_fix_permissions {
     `find $cfg{web_root} -type d -exec chmod 755 {} + 2>&1`;
 
     # Configuration files
-    chmod 0600, "$cfg{web_root}/.env";
-    chmod 0600, "$cfg{web_root}/install/config.ini";
-    chmod 0600, "$cfg{web_root}/install/config.ini.default";
+    chmod 0600, "$cfg{web_root}/.env" if -e "$cfg{web_root}/.env";
+    chmod 0600, "$cfg{web_root}/install/config.ini" if -e "$cfg{web_root}/install/config.ini";
+    chmod 0600, "$cfg{web_root}/install/config.ini.default" if -e "$cfg{web_root}/install/config.ini.default";
 
     # Script files
-    chmod 0600, "$cfg{web_root}/install/AutoInstaller.pl";
+    chmod 0600, "$cfg{web_root}/install/AutoInstaller.pl" if -e "$cfg{web_root}/install/AutoInstaller.pl";
 
     opendir my $sd, $cfg{scripts_dir};
     while (readdir($sd)) {
@@ -542,13 +572,13 @@ sub step_fix_permissions {
     closedir $sd;
 
     # Log files
-    chmod 0640, "$cfg{web_root}/install/setup.log";
-    chmod 0640, "$cfg{web_root}/gamelog.txt";
+    chmod 0640, "$cfg{web_root}/install/setup.log" if -e "$cfg{web_root}/install/setup.log";
+    chmod 0640, "$cfg{web_root}/gamelog.txt" if -e "$cfg{web_root}/gamelog.txt";
 
     # Apache configuration files
-    chmod 0644, $cfg{virthost_conf_file};
+    chmod 0644, $cfg{virthost_conf_file} if -e $cfg{virthost_conf_file};
     if ($cfg{enable_ssl}) {
-        chmod 0644, $cfg{virthost_conf_file_ssl};
+        chmod 0644, $cfg{virthost_conf_file_ssl} if -e $cfg{virthost_conf_file_ssl};
     }
 
     # Template directory
@@ -1184,11 +1214,37 @@ sub merge_hashes {
 }
 
 sub const_to_name {
-    my @names = qw/FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER CLEANUP/;
+    my @names = qw/PAD FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER CLEANUP/;
     return $names[shift];
 }
 
+sub name_to_const {
+    my $name = shift;
+    
+    my %names = (
+        'PAD'       => 0,
+        'FIRSTRUN'  => 1,
+        'SOFTWARE'  => 2,
+        'PHP'       => 3,
+        'SERVICES'  => 4,
+        'SQL'       => 5,
+        'OPENAI'    => 6,
+        'TEMPLATES' => 7,
+        'APACHE'    => 8,
+        'PERMS'     => 9,
+        'COMPOSER'  => 10,
+        'CLEANUP'   => 11
+    );
+
+    return $names{$name};    
+}
+
 sub next_step {
+    if ($opt_only) {
+        print "Only running step $cfg{step}\n";
+        exit 0;
+    }
+
     print "Moving on to step " . const_to_name($cfg{step}++) . "\n";
     handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
 }
@@ -1213,15 +1269,11 @@ sub get_sysinfo {
         foreach my $combo (@supported_distros_kinda) {
             my ($distro, $pm, $args) = split ':', $combo;
 
-            tell_user('INFO', "Checking for $distro...");
-            
-            tell_user('INFO', "Checking for /etc/$distro-release...");
             if (-e "/etc/$distro-release") {
                 $cfg{distro} = $distro;
                 $cfg{pm_cmd} = "$pm $args";
             }
 
-            tell_user('INFO', '/etc/os-release');            
             if (-e "/etc/os-release" && !$cfg{distro}) {
                 open my $fh, '<', '/etc/os-release';
                 my @lines = <$fh>;
@@ -1235,7 +1287,6 @@ sub get_sysinfo {
                 }
             }
 
-            tell_user('INFO', 'Checking output of lsb_release if exists...');
             if (!$cfg{distro}) {
                 my $lsb_check = `lsb_release -i`;
                 if ($lsb_check =~ /$distro/) {
@@ -1281,4 +1332,16 @@ sub get_sysinfo {
         $cfg{svc_cmd} = 'sc';
         $cfg{pm_cmd} = 'choco install';
     }
+}
+
+sub help {
+    print "Usage: $0 [options]\n\n";
+    print "Options:\n";
+    print "  -h, --help\t\tShow this help message and exit\n";
+    print "  -v, --version\t\tShow version information and exit\n";
+    print "  -c, --config\t\tSpecify a configuration file to use\n";
+    print "  -f, --fqdn\t\tSpecify a domain to use\n";
+    print "  -s, --step\t\tSpecify a step to start at\n";
+    print "  -l, --list-steps\tList the available steps to supply to -s/--step\n";
+    exit 0;
 }
