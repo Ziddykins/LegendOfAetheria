@@ -3,7 +3,8 @@ namespace Game\Account;
 use Game\Traits\PropConvert;
 use Game\Traits\PropSync;
 use Game\Traits\Enums\PropType;
-use Game\Account\Enums\SidebarType;
+use Game\Components\Sidebar\Enums\SidebarType;
+use Game\Components\Sidebar\Sidebar;
 
 
 class Settings {
