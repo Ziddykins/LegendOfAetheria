@@ -291,9 +291,10 @@
             
                     <li class="nav-item">
                         <a href="/game?page=Abandoned" class="nav-link">
-                        <span class="nav-icon material-symbols-sharp">backspace</span>
-                        <p class="align-self-center">Abandoned</p>
-                    </a>
+                            <span class="nav-icon material-symbols-sharp">backspace</span>
+                            <p class="align-self-center">Abandoned</p>
+                        </a>
+                    </li>
                 </li>
 
                 <li class="nav-item">

@@ -15335,6 +15335,7 @@ fieldset:disabled .btn {
 
 .sidebar-menu .menu-open>.nav-treeview {
     display: block
+    
 }
 
 .sidebar-menu .menu-open>.nav-link .nav-arrow {
@@ -16122,7 +16123,7 @@ body:not(.app-loaded) .app-sidebar {
     --lte-sidebar-hover-bg: rgba(255, 255, 255, 0.1);
     --lte-sidebar-color: #c2c7d0;
     --lte-sidebar-hover-color: #fff;
-    --lte-sidebar-active-color: #fff;
+    --lte-sidebar-active-color: #69b127;
     --lte-sidebar-menu-active-bg: rgba(255, 255, 255, 0.1);
     --lte-sidebar-menu-active-color: #fff;
     --lte-sidebar-submenu-bg: transparent;

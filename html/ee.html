@@ -26,8 +26,10 @@ let clickCount = 0;
 function handleEasterEgg() {
     clickCount++;
     const dot = document.querySelector('.ee-dot');
+    var num = parseInt(Math.random()%100*100);
+    console.log(`${clickCount} -> ${num}`);
     
-    if (clickCount === parseInt(Math.random()%100*100)) {
+    if (clickCount === num) {
         dot.style.backgroundColor = 'rgba(255, 0, 0, 0.5)';
         console.log("Easter egg activated!");
         

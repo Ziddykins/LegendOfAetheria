@@ -145,18 +145,18 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.josefin-slab-text {
+.josefinslab {
   font-family: "Josefin Slab", serif;
   font-optical-sizing: auto;
-  font-weight: 100;
+  font-weight: 400;
   font-style: normal;
 }
 
-/*.main-font {
+.main-font {
   font-family: "Syne Mono", monospace;
   font-weight: 100;
   font-style: normal;
-}*/
+}
 
 .afacad-flux-loa {
   font-family: "Afacad Flux", serif;
@@ -174,9 +174,9 @@
   font-style: normal;
 }
 
-.main-font {
+.jacquarda {
   font-family: "Jacquarda Bastarda 9", serif;
   font-weight: 100;
-  font-size: 18px;
+  font-size: 24px;
   font-style: normal;
 }

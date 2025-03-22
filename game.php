@@ -78,15 +78,16 @@
                     <?php include $sidebar_rel_link; ?>
 
                     <div id="content" name="content" class="container border border-danger" style="flex-shrink: 1;">
+
                     <?php
                             $privileges = Privileges::name_to_value($account->get_privileges());
                             
                             if ($privileges == Privileges::UNVERIFIED->value) {
-                                include('html/verify.html');
+                                include 'html/verify.html';
                                 exit();
                             }
                             
-                            include('navs/nav-summary.php');
+                            include 'navs/nav-summary.php';
 
                             if (isset($_GET['page'])) {
                                 $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
