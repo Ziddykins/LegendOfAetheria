@@ -36,4 +36,8 @@ class Stats {
         global $log;
         return $this->propSync($method, $params, PropType::CSTATS);
     }
+
+    public function jsonSerialize(): array {
+        return get_object_vars($this);
+    }
 }

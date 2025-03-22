@@ -70,7 +70,7 @@
         <?php include 'html/headers.html'; ?>
     </head>
         
-    <body class="main-font  bg-body-tertiary" data-bs-theme="<?php echo $color_mode; ?>"> 
+    <body class="main-font bg-body-tertiary" data-bs-theme="<?php echo $color_mode; ?>"> 
         <div class="container-fluid border">
             <div class="app-wrapper layout-fixed sidebar-expand-lg">
                 <div class="row flex-nowrap" style="min-height: 99.5vh!important;">

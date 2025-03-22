@@ -3,6 +3,7 @@ declare(strict_types=1);
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\System\Enums\AbuseType;
+use Game\Components\Cards\CharacterSelect\CharacterSelectCard;
 session_start();
 
 require_once "bootstrap.php";
@@ -127,12 +128,12 @@ if (check_session()) {
         <div class="container">
             <div class="d-flex justify-content-center">
                 <?php
+               
                 for ($i = 1; $i < 4; $i++) {
                     $char_slot = "get_charSlot$i";
                     $char_id   = $account->$char_slot();
-
-                    $card_html = Character::genSelectCard($char_id, $i);
-                    echo $card_html;
+                    $card = new CharacterSelectCard($char_id, $i);
+                    echo $card->render();
                 }
                 ?>
             </div>

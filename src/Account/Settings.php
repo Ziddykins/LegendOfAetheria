@@ -15,7 +15,7 @@ class Settings {
 
     public function __construct($accountID) {
         $this->accountID = $accountID;
-        $this->sideBar = SidebarType::LTE_DEFAULT;
+        $this->sideBar = SidebarType::LTE_MINI;
         $this->colorMode = 'dark';
     }
 

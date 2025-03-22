@@ -36,7 +36,7 @@
 
 .material-symbols-sharp {
   font-family: 'Material Symbols Sharp';
-  font-weight: normal;
+  font-weight: 100;
   font-style: normal;
   font-size: 16px;
   line-height: 1;
@@ -58,7 +58,7 @@
 
 .main-font {
   font-family: "Syne Mono", monospace;
-  font-weight: 400;
+  font-weight: 100;
   font-style: normal;
 }
 

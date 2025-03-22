@@ -24,10 +24,19 @@
             $character->set_monster($monster);
         }
     }
+
+    if (isset($_POST['flee-monster']) && $_POST['flee-monster'] == 1) {
+        check_csrf($_POST['csrf-token']);
+        if ($mon_loaded) {
+            $character->set_monster(null);
+        }
+    }
+
+
      
     if ($mon_loaded) {
         $mon_name  = $monster->get_name();
-        $mon_hp    = $monster->stats->get_hp();
+        $mon_hp    = $monster->stats->get_hp() - 50;
         $mon_maxHP = $monster->stats->get_maxHP();
         $mon_mp    = $monster->stats->get_mp();
         $mon_maxMP = $monster->stats->get_maxMP();
@@ -37,6 +46,9 @@
         $mon_dl    = $monster->get_dropLevel();
         $mon_avatar = '/img/enemies/' . str_replace(' ', '', $monster->get_name()) . '.png';
     }
+
+    $monster->stats->set_hp(180);
+    $character->stats->set_hp(0);
 ?>
     <script src="node_modules/smooth-scrollbar/dist/smooth-scrollbar.js" type="text/javascript"></script>
 
@@ -53,12 +65,12 @@
                             <div class="d-grid align-items-start">
                                 <span class="d-grid align-items-center small mb-3">
                                     <span class="flex-grow-1 text-center">HP</span>
-                                    <span id="player-hp" name="player-hp" class="flex-grow-1 text-center"><?php echo "$mon_hp / $mon_maxHP"; ?></span>
+                                    <span id="monster-hp" name="monster-hp" class="flex-grow-1 text-center"><?php echo "$mon_hp / $mon_maxHP"; ?></span>
                                 </span>
 
                                 <span class="d-grid align-items-center small mb-3">
                                     <span class="flex-grow-1 text-center">MP</span>
-                                    <span class="flex-grow-1 text-center"><?php echo "$mon_mp / $mon_maxMP"; ?></span>
+                                    <span id="monster-mp" name="monster-mp" class="flex-grow-1 text-center"><?php echo "$mon_mp / $mon_maxMP"; ?></span>
                                 </span>
 
                                 <span c7lass="d-grid align-items-center small mb-3">
@@ -90,12 +102,12 @@
 
                                 <span class="d-grid align-items-center small mb-3">
                                     <span class="flex-grow-1 text-center">MP</span>
-                                    <span class="flex-grow-1 text-center"><?php echo $character->stats->get_ep(); echo ' / '; echo $character->stats->get_maxEP(); ?></span>
+                                    <span id="player-mp" name="player-mp" class="flex-grow-1 text-center"><?php echo $character->stats->get_mp(); echo ' / '; echo $character->stats->get_maxMP(); ?></span>
                                 </span>
 
                                 <span class="d-grid align-items-center small">
                                     <span class="flex-grow-1 text-center">EP</span>                                    
-                                    <span class="flex-grow-1 text-center"><?php echo $character->stats->get_mp(); echo ' / '; echo $character->stats->get_maxMP(); ?></span>
+                                    <span id="player-ep" name="player-ep" class="flex-grow-1 text-center"><?php echo $character->stats->get_ep(); echo ' / '; echo $character->stats->get_maxEP(); ?></span>
                                     
                                 </span>
                             </div>
@@ -148,18 +160,26 @@
 
                 <div class="row mb-3">
                     <div class="d-flex w-100">
-                        <button class="btn btn-sm me-2 btn-primary border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Entice</button>
-                        <button class="btn btn-sm btn-primary border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Capture</button>
+                        <button class="btn btn-sm me-2 btn-primary border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">
+                            Entice
+                        </button>
+                        
+                        <button class="btn btn-sm btn-primary border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">
+                            Capture
+                        </button>
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <form id="new-mon" name="new-mon" action="/game?page=hunt&action=flee&scope=personal" method="post">
-                        <div class="d-flex w-100">
-                            <button class="btn btn-sm me-2 btn-warning border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Steal</button>
-                            <button class="btn btn-sm btn-danger  border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">Flee</button>
-                        </div>
-                    </form>
+                    <div class="d-flex w-100">
+                        <button class="btn btn-sm me-2 btn-warning border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1" onclick=update_hud()>
+                            Steal
+                        </button>
+                        
+                        <button id="flee-monster" name="flee-monster" class="btn btn-sm btn-danger  border-black flex-fill" style="width: calc(100% + 20px);" data-loa-monld="1">
+                            Flee
+                        </button>
+                    </div>
                 </div>
 
                 <div class="row mb-3">

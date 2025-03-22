@@ -63,3 +63,31 @@ document.querySelectorAll("button").forEach((btn) => {
         }
     }
 });
+
+function update_hud() {
+    fetch(`/hud?action=hud&csrf-token=${loa.u_csrf}`, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json'
+        },
+        method: 'GET',
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        let monster_stats = data.monster;
+        let player_stats  = data.player;
+        let player_hp = document.getElementById("player-hp");
+        let player_mp = document.getElementById("player-mp");
+        let player_ep = document.getElementById("player-ep");
+        let monster_hp = document.getElementById("monster-hp");
+        let monster_mp = document.getElementById("monster-mp");
+
+        player_hp.textContent  = player_stats.hp  + ' / ' + player_stats.maxHP;
+        player_mp.textContent  = player_stats.mp  + ' / ' + player_stats.maxMP;
+        player_ep.textContent  = player_stats.ep  + ' / ' + player_stats.maxEP;
+        monster_hp.textContent = monster_stats.hp + ' / ' + monster_stats.maxHP;
+        monster_mp.textContent = monster_stats.mp + ' / ' + monster_stats.maxMP;
+    }).catch((error) => {
+        console.error(error);
+    });
+}
