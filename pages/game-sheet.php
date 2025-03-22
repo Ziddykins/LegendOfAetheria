@@ -34,7 +34,7 @@
                     <div class="col-4">
                         <img src="img/avatars/<?php echo $character->get_avatar(); ?>" class="img-fluid rounded m-3" alt="character-avatar">
                     </div>
-
+                    
                     <div class="col-6">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo $character->get_name(); ?></h5>
@@ -42,6 +42,7 @@
                                 <div class="row mb-3">
                                     <div class="col-4 truncate">
                                         Health
+                                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i>WEEEE</a>
                                     </div>
                                     <div class="col-4 truncate">
                                         Mana

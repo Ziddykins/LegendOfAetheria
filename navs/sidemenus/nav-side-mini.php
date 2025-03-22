@@ -1,18 +1,15 @@
-<?php
-$char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'skull';
-?>
-
-<aside id="sidebar" name="sidebar" class="app-sidebar shadow overflow-hidden" data-bs-theme="<?php echo $color_mode; ?>">
+<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
     <div class="sidebar-brand">
-        <a href="./index.php" class="brand-link">
-            <img src="/img/logos/logo-banner-no-bg.webp" alt="Legend of Aetheria Logo" class="brand-image img-fluid">
+        <a href="../index.html" class="brand-link">
+            <img src="../../../dist/assets/img/AdminLTELogo.png" alt="AdminLTE Logo"
+                class="brand-image opacity-75 shadow">
+            <span class="brand-text fw-light">AdminLTE 4</span>
         </a>
     </div>
-
     <div class="sidebar-wrapper">
-        <nav>
+        <nav class="mt-2">
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
-                <li class="nav-item menu-open">
+            <li class="nav-item menu-open">
                     <li class="nav-item">
                         <li class="nav-header">
                             <a href="#" class="nav-link">
@@ -386,8 +383,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                         <span class="nav-icon material-symbols-sharp">cheer</span>
                         <p class="align-self-center">Friends</p>
                     </a>
-                </li>
-                    
+                </li>                    
                 <li class="nav-item">
                     <a href="/select" class="nav-link">
                         <span class="nav-icon material-symbols-sharp">group</span>
