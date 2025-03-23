@@ -3,7 +3,8 @@
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
-    
+    use Game\Components\Sidebar\Enums\SidebarType;
+      
     //use Game\Familiar\Familiar;
 
 
@@ -25,6 +26,7 @@
         $character->set_id($_SESSION['character-id']);
         $character->load();
 
+        $account->get_settings()->set_sideBar(SidebarType::LTE_DEFAULT);
         $sidebar_rel_link = $account->get_settings()->get_sideBar()->value;
 
         //$familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);

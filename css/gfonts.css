@@ -132,7 +132,7 @@
 .material-symbols-sharp {
   font-variation-settings: 'FILL' 0, 'wght' 100, 'GRAD' -25, 'opsz' 24;
   font-family: 'Material Symbols Sharp';
-  font-weight: 100 !important;
+  font-weight: 100;
   font-style: normal;
   font-size: 24px;
   line-height: 1;
