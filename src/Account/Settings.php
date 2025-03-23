@@ -9,13 +9,13 @@ class Settings {
     use PropSync;
     use PropConvert;
 
-    private int $accountID;
+    private int $id;
     private string $colorMode;
     private SidebarType $sideBar;
 
     public function __construct($accountID) {
-        $this->accountID = $accountID;
-        $this->sideBar = SidebarType::LTE_MINI;
+        $this->id = $accountID;
+        $this->sideBar = SidebarType::LTE_DEFAULT;
         $this->colorMode = 'dark';
     }
 

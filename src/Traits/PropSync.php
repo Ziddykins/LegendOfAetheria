@@ -69,8 +69,10 @@ trait PropSync {
         if (strcmp($action, "get") === 0) { /* GET */
             return $this->$prop;
         } elseif (strcmp($action, 'set') === 0) { /* SET */
+
             $table_col = $this->clsprop_to_tblcol($prop);
             $sql_query = null;
+        
             $id = $this->id;
 
             $this->$prop = $params[0];
@@ -94,7 +96,7 @@ trait PropSync {
                     $db->execute_query($sql_query, [ $srl_data, $_SESSION['character-id'] ]);
                     return;
                 case PropType::SETTINGS:
-                    $id = $this->accountID;
+                    $id = $this->id;
                     $srl_data = safe_serialize($this);
                     $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `settings` = ? WHERE `id` = ?";
                     $db->execute_query($sql_query, [ $srl_data, $this->id ]);
