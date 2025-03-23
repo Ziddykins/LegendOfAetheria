@@ -1,12 +1,3 @@
-@font-face {
-  font-family: 'Material Symbols Sharp';
-
-  font-style: normal;
-  font-weight: 100;
-  font-size: 24px;
-  src: url(https://fonts.gstatic.com/s/materialsymbolssharp/v145/gNNBW2J8Roq16WD5tFNRaeLQk6-SHQ_R00k4c2_whPnoY9ruReaU4bHmz74m0ZkGH-VBYe1x0TV6x4yFH8F-H5OdzEL3sVTgJtfbYxOLojCOJ1f7-w.ttf) format('truetype');
-}
-
 /* latin-ext */
 @font-face {
   font-family: 'Syne Mono';
@@ -129,10 +120,17 @@
 }
 
 
-.material-symbols-sharp {
-  font-variation-settings: 'FILL' 0, 'wght' 100, 'GRAD' -25, 'opsz' 24;
+/* fallback */
+@font-face {
   font-family: 'Material Symbols Sharp';
-  font-weight: 100;
+  font-style: normal;
+  font-weight: 100 700;
+  src: url(/css/fonts/material-symbols-sharp.woff2) format('woff2');
+}
+
+.material-symbols-sharp {
+  font-family: 'Material Symbols Sharp';
+  font-weight: 100 700 !important;
   font-style: normal;
   font-size: 24px;
   line-height: 1;
@@ -142,8 +140,10 @@
   white-space: nowrap;
   word-wrap: normal;
   direction: ltr;
-  -webkit-font-smoothing: antialiased;
+  -moz-font-feature-settings: 'liga';
+  -moz-osx-font-smoothing: grayscale;
 }
+
 
 .josefinslab {
   font-family: "Josefin Slab", serif;
