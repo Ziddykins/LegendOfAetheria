@@ -154,12 +154,6 @@
                                 $inventory = new Inventory($character['id']);
                                 $stats     = safe_serialize($character['stats'], true);
                                 $inventory = safe_serialize($character['inventory'], true);
-                                
-                                echo  '<pre>';
-                                print_r($inventory);    
-                                
-                                exit();
-                                array_push($row_data, $json_act);
                             }
 
                             function sanitize_for_table($row_obj): string {
@@ -167,7 +161,8 @@
                                 $json_act = preg_replace('/"(.*?) ":("?.*?"?),/', '$1:$2, ', $json_act);
                                 $json_act = preg_replace('/, "(.*?)":/', ', $1:', $json_act);
                                 $json_act = str_replace("null", '"null"', $json_act);
-
+                                
+                                array_push($row_data, $json_act);
                                 return $json_act;
                             }
                         ?>
@@ -182,8 +177,8 @@
             var tbl_data = [<?php echo join(",", $row_data); ?>];
             var table = new Tabulator("#characters-tbl", {
                 height:"70.0vh",
-                layout:"fitDataColumns",
-                rowHeight: 30,
+                layout:"fitData",
+                rowHeight: Math.round(visualViewport.height / 20, 0),
                 groupBy: "privileges",
                 columns: [<?php echo join(",", $col_data); ?>],
                 data: tbl_data,

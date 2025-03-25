@@ -26,6 +26,8 @@ class Character {
     private $floor = 1;
     private $description = 'None Provided';
 
+    private $dateCreated;
+
     /* class Monster */
     public $monster;
 

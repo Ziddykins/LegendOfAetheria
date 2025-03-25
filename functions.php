@@ -23,7 +23,7 @@ use Game\System\Enums\LOAError;
         $amount   = substr($modifier, 1);
         $modifier = "$operand$amount";
 
-        return date("Y-m-d H:i:s", strtotime("$modifier"));
+        return date("Y-m-d H:i:s", strtotime((string) $modifier));
     }
 
     /**
@@ -455,13 +455,15 @@ use Game\System\Enums\LOAError;
 
     function safe_serialize($data, ?bool $unserialize=null): mixed {
         global $log;
+        $ret_data = null;
+
         if ($unserialize === true) {
-            $data = unserialize(base64_decode($data));
+            $ret_data = unserialize(base64_decode($data));
         } else {
-            $data = base64_encode(serialize($data));
+            $ret_data = base64_encode(serialize($data));
         }
 
-        return $data;
+        return $ret_data;
     }
 
     function check_session(): bool {

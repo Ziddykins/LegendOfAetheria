@@ -30,15 +30,7 @@ $('a[id^="menu-anchor"]').on('click', function (e) {
 });
 
 $(document).ready(function(){
-    let query =  new URLSearchParams(location.search);
 
-    if (document.body.contains(document.getElementById('login-email'))) {
-        document.getElementById('login-email').focus();
-    };
-
-    if (query.has('do_register') && query.has('email')) {
-        document.getElementById("register-password").focus();
-    }
 });
 
 const Default = {
@@ -59,4 +51,15 @@ document.addEventListener("DOMContentLoaded", function() {
             },
         });
     }
+
+
+    let query =  new URLSearchParams(location.search);
+    if (document.body.contains(document.getElementById('login-email'))) {
+        document.getElementById('login-email').focus();
+    };
+
+    if (query.has('do_register') && query.has('email')) {
+        document.getElementById("register-password").focus();
+    }
 });
+

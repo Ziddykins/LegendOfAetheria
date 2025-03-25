@@ -59,3 +59,20 @@ function set_theme(theme) {
     var hidden_el = document.getElementById("profile-theme");
     hidden_el.value = theme;
 }
+
+function collapse_all() {
+    document.querySelectorAll('li[id$="anchor"],ul[id$="list"]').forEach((e) => {
+        e.classList.remove('menu-open');
+
+        if (e.tagName == 'UL') {
+            e.style.display = 'none';
+        }
+    });
+}
+
+function expand_all() {
+    document.querySelectorAll('li[id$="anchor"],ul[id$="list"]').forEach((e) => {
+        e.classList.add('menu-open');
+        e.style.display = '';
+    });
+}

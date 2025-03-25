@@ -47,7 +47,7 @@
         header('Location: /?no_login');
     }
 
-    function clsprop_to_tblcol($property) {
+    function clsprop_to_tblcol($property): string|null {
         $property = preg_replace('/[^a-zA-Z_1-3]/', '', $property);
         $out = null;
         $check_double = null;

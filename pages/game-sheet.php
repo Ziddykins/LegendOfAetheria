@@ -42,7 +42,6 @@
                                 <div class="row mb-3">
                                     <div class="col-4 truncate">
                                         Health
-                                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i>WEEEE</a>
                                     </div>
                                     <div class="col-4 truncate">
                                         Mana
@@ -117,7 +116,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="card-text"><small class="text-body-secondary">Character created on <?php echo $account->get_dateRegistered(); ?></small></p>
+                            <p class="card-text"><small class="text-body-secondary">Character created on <?php echo $character->get_dateCreated(); ?></small></p>
                         </div>
                     </div>
                 </div>
