@@ -63,13 +63,16 @@
         
     }
     
-    function revive_all_players() {
+    function revive_all_players(): void {
         global $db, $log;
         
         $sql_query  = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']} WHERE hp = 0";
-        $characters = $db->execute_query($sql_query)->fetch_all();
+        $characters = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
 
-        foreach ($characters as $character) {
+        foreach ($characters as $t_character) {
+            $character = new Character($t_character['account-id'], $t_character['id']);
+            $character->load();
+
             $character->stats->set_hp(
                 $character->stats->get_maxHP()
             );

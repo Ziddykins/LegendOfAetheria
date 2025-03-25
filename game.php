@@ -35,32 +35,6 @@
         $_SESSION['name'] = $character->get_name();
         $cur_floor        = $character->get_floor();
         $avatar           = $character->get_avatar();
-        
-
-        /* Check if the user has clicked the apply button on the profile tab */
-        if (isset($_POST['profile-apply']) && $_POST['profile-apply'] == 1) {
-            check_csrf($_POST['csrf-token']);
-            $old_password     = $_POST['profile-old-password'];
-            $new_password     = $_POST['profile-new-password'];
-            $confirm_password = $_POST['profile-confirm-password'];
-            $account_email    = $_SESSION['email'];
-
-            /* Old password matches current */
-            if (password_verify($old_password, $account->get_password())) {
-                if ($new_password === $confirm_password) {
-                    $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-                    $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `password` = ? WHERE `email` = ?";
-                    $db->execute_query($sql_query);
-         
-                    session_regenerate_id();
-                    header('Location: /logout?action=pw_reset&result=pass');
-                    exit();
-                }
-            } else {
-                header('Location: /game?page=profile&action=pw_reset&result=fail');
-                exit();
-            }
-        }
     } else {
         header('Location: /?no_login');
         exit();

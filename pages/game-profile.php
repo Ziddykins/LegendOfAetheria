@@ -1,20 +1,43 @@
 <?php
+    /* Check if the user has clicked the apply button on the profile tab */
+    if (isset($_POST['profile-apply']) && $_POST['profile-apply'] == 1) {
+        check_csrf($_POST['csrf-token']);
+        $old_password     = $_POST['profile-old-password'];
+        $new_password     = $_POST['profile-new-password'];
+        $confirm_password = $_POST['profile-confirm-password'];
+        $account_email    = $_SESSION['email'];
 
+        /* Old password matches current */
+        if (password_verify($old_password, $account->get_password())) {
+            if ($new_password === $confirm_password) {
+                $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
+                $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `password` = ? WHERE `email` = ?";
+                $db->execute_query($sql_query);
+        
+                session_regenerate_id();
+                header('Location: /logout?action=pw_reset&result=pass');
+                exit();
+            }
+        } else {
+            header('Location: /game?page=profile&action=pw_reset&result=fail');
+            exit();
+        }
+    }
 ?>
     <div class="container">
         <div class="row pt-5">
             <div class="col">
                 <div class="list-group" id="list-tab" role="tablist">
-                    <a class="list-group-item list-group-item-action active " id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">
+                    <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">
                         Account
                     </a>
-                    <a class="list-group-item list-group-item-action " id="lislt-profile-list" data-bs-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">
+                    <a class="list-group-item list-group-item-action" id="list-profile-list" data-bs-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">
                         Character
                     </a>
-                    <a class="list-group-item list-group-item-action " id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">
+                    <a class="list-group-item list-group-item-action" id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">
                         Messages / Mail
                     </a>
-                    <a class="list-group-item list-group-item-action " id="list-chat-list" data-bs-toggle="list" href="#list-chat" role="tab" aria-controls="list-chat">
+                    <a class="list-group-item list-group-item-action" id="list-chat-list" data-bs-toggle="list" href="#list-chat" role="tab" aria-controls="list-chat">
                         Chat
                     </a>
                 </div>

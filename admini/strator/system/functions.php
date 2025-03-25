@@ -1,4 +1,6 @@
 <?php
+
+use Game\Character\Character;
     /**
      * Get a list of new members registered between two dates.
      *
@@ -6,13 +8,13 @@
      * @param string $end_date The end date.
      * @return array Returns an array of new member accounts.
      */
-    function get_new_members($start_date, $end_date) {
+    function get_new_members($days) {
         global $db;
 
-        $query = "SELECT * FROM `tbl_accounts` WHERE `date_registered` BETWEEN ? AND ? ORDER BY `date_registered` ASC LIMIT 8";
-        $accounts = $db->execute_query($query, [$start_date, $end_date])->fetch_all(MYSQLI_ASSOC);
+        $sql_query = "SELECT * FROM `tbl_characters` WHERE `date_created` BETWEEN (NOW() - INTERVAL $days DAY) AND NOW() ORDER BY `date_created` ASC LIMIT 8";
+        $characters = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
 
-        return $accounts;
+        return $characters;
     }
 
     /**
@@ -22,13 +24,11 @@
      * @param string $end_date The end date.
      * @return int Returns the count of new member accounts.
      */
-    function new_members_count($days = 7) {
+    function new_members_count($days = 30): int {
         global $db;
 
-        $query = "SELECT * FROM `tbl_accounts` WHERE `date_registered` BETWEEN (NOW() - INTERVAL $days DAY) AND NOW() ORDER BY `date_registered` ASC";
-        $accounts = $db->execute_query($query)->fetch_all();
-
-        return count($accounts);
+        $query = "SELECT COUNT(`id`) FROM {$_ENV['SQL_CHAR_TBL']} WHERE `date_created` BETWEEN (NOW() - INTERVAL $days DAY) AND NOW()";
+        return $db->execute_query($query)->fetch_column();        
     }
 
     /**
@@ -36,20 +36,21 @@
      *
      * @param array $accounts The array of new member accounts.
      */
-    function populate_new_members($accounts) {
-        foreach ($accounts as $account) {
-            $character = null;
-            
-            if ($account['char_slot1'] > 0) {
-                $character = new Game\Character\Character($account['id'], $account['char_slot1']);
-                $character->load();
+    function populate_new_members($days = 30) {
+        global $db;
+        $out_str = '';
+        
+        $characters = get_new_members(30);
 
+        foreach ($characters as $character) {
+            $t_aid = $character['account_id'];
+            $t_cid = $character['id'];
+            $char = new Character($t_aid, $t_cid);
+            $char->load();
 
-            echo '<div class="col-3 p-2"><img class="img-fluid object-fit-sm-contain rounded-circle mx-auto" style="height: 100px; width: 100px;" src="/img/avatars/' . $character->get_avatar() . '" alt="User Image">' .
-                 '<a class="btn fw-bold fs-7 text-secondary text-truncate w-100 p-0" href="/users?id=' .
-                 $account['id'] . '">' . $character->get_name() . '</a>' .
-                 '<div class="fs-8">' . $account['date_registered'] . '</div></div>';
-            }
+            echo '<div class="col-3 p-2"><img class="img-fluid object-fit-sm-contain rounded-circle mx-auto" style="height: 100px; width: 100px;" src="/img/avatars/' . $char->get_avatar() . '" alt="User Image">' .
+                 '<a class="btn fw-bold fs-7 text-secondary text-truncate w-100 p-0" href="/users?id=' . $t_cid . '">' .
+                 $char->get_name() . '</a><div class="fs-8">' . $char->get_dateCreated()  . '</div></div>';
         }
     }
 

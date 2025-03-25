@@ -26,11 +26,11 @@ use Game\Character\Enums\FriendStatus;
             $status_in  = friend_status($row['email_1']);
             $status_out = friend_status($row['email_2']);
 
-            if ($status_in == FriendStatus::REQUEST) {
+            if ($status_in == FriendStatus::REQUEST_RECV) {
                 array_push($requests, $row);
             } elseif ($status_in == FriendStatus::MUTUAL) {
                 array_push($friends, $row);
-            } elseif ($status_out == FriendStatus::REQUESTED) {
+            } elseif ($status_out == FriendStatus::REQUEST_SENT) {
                 array_push($requested, $row);
             }
         }
@@ -40,13 +40,7 @@ use Game\Character\Enums\FriendStatus;
         $header_charname = $character->get_name() . "'";
     }
     
-    if (isset($_POST['page']) && $_POST['page']
-    
-    
-    
-    
-    
-    == 'friends') {
+    if (isset($_POST['page']) && $_POST['page']  == 'friends') {
         if (isset($_POST['action'])) {
             [$email, $focused_email, $requested_email] = [null, null, null];
             $posts = ['friends-request-send', 'email', 'focused-request'];
@@ -67,7 +61,7 @@ use Game\Character\Enums\FriendStatus;
 
         switch ($_POST['action']) {
             case 'cancel_request':
-                if (friend_status($email) === FriendStatus::REQUESTED) {
+                if (friend_status($email) === FriendStatus::REQUEST_SENT) {
                     $sql_query = "DELETE FROM {$_ENV['SQL_FRND_TBL']} WHERE email_1 = ? AND email_2 = ?";
                     $db->execute_query($sql_query, [ $account->get_email(), $email ]);
                     $log->info("Sent friend request deleted", ['To' => $email, 'From' => $account->get_email()]);

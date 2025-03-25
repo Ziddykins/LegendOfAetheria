@@ -31,8 +31,7 @@
     <div class="card-body p-0">
         <div class="row text-center m-1">
             <?php
-                $new_accounts = get_new_members($start_date, $end_date);
-                populate_new_members($new_accounts);
+                echo populate_new_members(30);
             ?>
         </div>
     </div>
