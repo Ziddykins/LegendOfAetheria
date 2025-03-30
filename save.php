@@ -1,10 +1,7 @@
 <?php
     declare(strict_types = 1);
+    use Game\Account\Account;
     session_start();
-    require 'vendor/autoload.php';
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-    $dotenv->safeLoad();
-
     require_once "bootstrap.php";
 
     $account = new Account($_SESSION['email']);

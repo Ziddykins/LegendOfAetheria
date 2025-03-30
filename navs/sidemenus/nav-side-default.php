@@ -6,7 +6,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
 ?>
 
 <aside id="sidebar" name="sidebar" class="app-sidebar shadow overflow-hidden" data-bs-theme="<?php echo $color_mode; ?>">
-    <div class="sidebar-brand me-4">
+    <div class="sidebar-brand mb-3">
         <a href="./index.php" class="brand-link">
             <img src="/img/logos/logo-banner-no-bg.webp" alt="Legend of Aetheria Logo" class="brand-image img-fluid">
         </a>
@@ -16,7 +16,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
 
     <div class="sidebar-wrapper">
         <nav>
-            <ul class="nav sidebar-menu flex-column ms-n3" data-lte-toggle="treeview" role="menu" data-accordion="false">
+            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
                 <li class="nav-item">
                     <li id="character-anchor" name="character-anchor" class="nav-item menu-open">
                         <a href="#" class="nav-link">
@@ -27,14 +27,14 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     
                         <ul id="character-list" name="character-list" class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="/game?page=sheet" class="nav-link align-items-center">
+                                <a href="/game?page=sheet" class="nav-link align-items-center ms-2">
                                     <span class="nav-icon material-symbols-sharp">mist</span>
                                     <p class="align-self-center text-warning opacity-50">Sheet</p>
                                 </a>
                             </li>
                     
                             <li id="inventory-anchor" name="inventory-anchor" class="nav-item">
-                                <a href="#" class="nav-link align-items-center">
+                                <a href="#" class="nav-link align-items-center ms-2">
                                     <span class="nav-icon material-symbols-sharp">inventory_2</span>
                                     <p class="align-self-center text-warning opacity-50 fw-bold">Inventory</p>
                                     <i class="nav-arrow bi bi-chevron-right"></i>
@@ -42,15 +42,15 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                             
                                 <ul id="inventory-list" name="inventory-list" class="nav nav-treeview">
                                     <li class="nav-item">
-                                        <a href="/game?page=Equipment" class="nav-link align-items-center">
-                                            <span class="nav-icon material-symbols-sharp ms-2">colorize</span>
+                                        <a href="/game?page=Equipment" class="nav-link align-items-center ms-4">
+                                            <span class="nav-icon material-symbols-sharp">colorize</span>
                                             <p class="align-self-center text-warning opacity-50">Equipment</p>
                                         </a>
                                     </li>
                                     
                                     <li id="items-anchor" name="items-anchor" class="nav-item">
-                                        <a href="#" class="nav-link">
-                                            <span class="nav-icon material-symbols-sharp ms-2">handyman</span>
+                                        <a href="#" class="nav-link ms-4">
+                                            <span class="nav-icon material-symbols-sharp">handyman</span>
                                             <p class="align-self-center text-warning opacity-50 fw-bold">Items</p>
                                             <i class="nav-arrow bi bi-chevron-right"></i>
                                         </a>
@@ -58,14 +58,14 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                                         <ul id="items-list" name="items-list" class="nav nav-treeview">
                                             <li class="nav-item">
                                                 <a href="/game?page=Questitems" class="nav-link justify-items-center">
-                                                    <span class="nav-icon material-symbols-sharp ms-4">deployed_code_alert</span>
+                                                    <span class="nav-icon material-symbols-sharp ms-5">deployed_code_alert</span>
                                                     <p class="align-self-center text-warning opacity-50">Quest Items</p>
                                                 </a>
                                             </li>
 
                                             <li class="nav-item">
                                                 <a href="/game?page=Consumables" class="nav-link">
-                                                    <span class="nav-icon material-symbols-sharp ms-4">grocery</span>
+                                                    <span class="nav-icon material-symbols-sharp ms-5">grocery</span>
                                                     <p class="align-self-center text-warning opacity-50">Consumables</p>
                                                 </a>
                                             </li>
@@ -74,21 +74,21 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                                 </ul>
 
                                 <li class="nav-item">
-                                    <a href="/game?page=skills" class="nav-link">
+                                    <a href="/game?page=skills" class="nav-link ms-2">
                                         <span class="nav-icon material-symbols-sharp">hotel_class</span>
                                         <p class="align-self-center text-warning opacity-50">Skills</p>
                                     </a>
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=spells" class="nav-link">
+                                    <a href="/game?page=spells" class="nav-link ms-2">
                                         <span class="nav-icon material-symbols-sharp">book</span>
                                         <p class="align-self-center text-warning opacity-50">Spells</p>
                                     </a>
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=train" class="nav-link">
+                                    <a href="/game?page=train" class="nav-link ms-2">
                                         <span class="nav-icon material-symbols-sharp">fitness_center</span>
                                         <p class="align-self-center text-warning opacity-50">Train</p>
                                     </a>
@@ -344,7 +344,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     
                     <ul id="mail-list" name="mail-list" class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/game?page=Compose" class="nav-link">
+                            <a href="/game?page=compose" class="nav-link">
                                 <span class="nav-icon material-symbols-sharp ms-2">forward_to_inbox</span>
                                 <p class="align-self-center text-warning opacity-50">Compose</p>
                             </a>

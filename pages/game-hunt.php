@@ -33,7 +33,7 @@
     }
 
 
-     
+
     if ($mon_loaded) {
         $mon_name  = $monster->get_name();
         $mon_hp    = $monster->stats->get_hp() - 50;
@@ -46,9 +46,6 @@
         $mon_dl    = $monster->get_dropLevel();
         $mon_avatar = '/img/enemies/' . str_replace(' ', '', $monster->get_name()) . '.png';
     }
-
-    $monster->stats->set_hp(180);
-    $character->stats->set_hp(0);
 ?>
     <script src="node_modules/smooth-scrollbar/dist/smooth-scrollbar.js" type="text/javascript"></script>
 

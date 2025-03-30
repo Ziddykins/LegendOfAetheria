@@ -19,7 +19,7 @@ class Settings {
         $this->colorMode = 'dark';
     }
 
-    public function __call($method, $params): mixed {
+    public function __call($method, $params) {
         if ($method === 'propSync') {
             return 0;
         }

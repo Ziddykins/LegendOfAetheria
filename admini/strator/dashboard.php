@@ -158,7 +158,7 @@
 
                         <div class="d-flex flex-wrap align-items-evenly">
                             <div id="direct-chat-container" class="mb-3 ms-3">
-                                <?php include PATH_ADMINROOT . '/widgets/globalchat.html' ?>
+                                <?php include PATH_ADMINROOT . '/widgets/globalchat.php' ?>
                             </div>
 
                             <div class="mb-3 ms-3">

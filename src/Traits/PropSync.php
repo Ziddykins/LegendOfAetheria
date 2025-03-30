@@ -242,54 +242,54 @@ trait PropSync {
             $max_value = null;
             
             if (isset($this->$prop)) {
-                if (array_search($prop, ['hp', 'mp', 'ep']) == true) {
+                if (in_array($prop, ['hp', 'mp', 'ep'], true)) {
                     $str_max_prop = "max" . strtoupper($prop);
-                    $cur_value = (int)$this->$prop;
-                    $max_value = (int)$this->$str_max_prop;
+
+                    $cur_value = $this->$prop ?? 0; // Default to 0 if property is not set
+                    $max_value = $this->$str_max_prop ?? PHP_INT_MAX; // Default to max int if max property is not set
+
+                    if (is_numeric($cur_value)) {
+                        $new_value = $cur_value;
+
+                        switch ($action) {
+                            case 'add':
+                                $new_value += $params[0];
+                                break;
+                            case 'sub':
+                                $new_value -= $params[0];
+                                break;
+                            case 'mul':
+                                $new_value *= $params[0];
+                                break;
+                            case 'div':
+                                if ($params[0] == 0) {
+                                    throw new Exception('Division by zero in PropModder');
+                                }
+                                $new_value /= $params[0];
+                                break;
+                            case 'exp':
+                                $new_value **= $params[0];
+                                break;
+                            case 'mod':
+                                if ($params[0] == 0) {
+                                    throw new Exception('Modulo by zero in PropModder');
+                                }
+                                $new_value %= $params[0];
+                                break;
+                            default:
+                                throw new Exception('Unknown PropModder action');
+                        }
+
+                        $new_value = min($new_value, $max_value); // Ensure it does not exceed max value
+                        $new_value = max($new_value, 0); // Ensure it does not go below 0
+
+                        $this->$prop = $new_value; // Set the new value
+                    } else {
+                        throw new Exception('Current value is not numeric!');
+                    }
                 }
             } else {
                 return;
-            }
-
-            if (is_numeric($cur_value)) {
-                $new_value = $cur_value;
-
-                
-                switch ($action) {
-                    case 'add':
-                        $new_value += $params[0];
-                        break;
-                    case 'sub':
-                        $new_value -= $params[0];
-                        break;
-                    case 'mul':
-                        $new_value *= $params[0];
-                        break;
-                    case 'div':
-                        if (!$params[0]) {
-                            return;
-                        }
-                        $new_value /= $params[0];
-
-                        break;
-                    case 'exp':
-                        $new_value **= $params[0];
-                        break;
-                    case 'mod':
-                        if (!$params[0]) {
-                            return;
-                        }
-                        $new_value %= $params[0];
-                        break;
-                    default:
-                        throw new Exception('Unknown PropModder');
-                }
-                $func = "set_$prop";
-
-                $new_value = min($new_value, $max_value);
-                $this->$func($new_value);
-            } else {
-                throw new Exception('Current value is not numeric!');
             }
         }
     }

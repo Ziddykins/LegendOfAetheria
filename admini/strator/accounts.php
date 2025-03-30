@@ -157,12 +157,14 @@
                 <div class="app-content">
                     <div class="container-fluid">
                         <div id="accounts-tbl">
+                            
+
                         <?php
                             $refl = new ReflectionClass($account);
                             $props = $refl->getProperties();
                             $columns_data  = [];
                             
-                            $accounts = $db->execute_query("SELECT * FROM `tbl_accounts`")->fetch_all(MYSQLI_ASSOC);
+                            $accounts = $db->execute_query("SELECT * FROM `tbl_accounts` ORDER BY `privileges` DESC")->fetch_all(MYSQLI_ASSOC);
                             $row_data = [];
                             $col_data = [];
 
@@ -180,7 +182,7 @@
                                 if ($conv_prop == 'logged_on') {
                                     $col .= ", editor:\"input\"";
                                 }
-                                              
+
                                 $col .= '}';
                                 //$col .= 'width:125}';
                                 array_push($col_data, $col);
@@ -202,6 +204,9 @@
                                 $json_act = str_replace("null", '"null"', $json_act);
                                 array_push($row_data, $json_act);
                             }
+                            
+
+                            
                         ?>
 
                     </div>
