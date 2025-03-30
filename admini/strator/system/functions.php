@@ -1,5 +1,6 @@
 <?php
 
+use Game\Account\Account;
 use Game\Character\Character;
     /**
      * Get a list of new members registered between two dates.
@@ -57,7 +58,7 @@ use Game\Character\Character;
     /**
      * Get the full name of an account.
      *
-     * @param Account $account The account array.
+     * @param \Game\Account\Account $account The account array.
      * @return string Returns the full name of the account.
      */
     function get_full_name(Account $account) {
@@ -210,4 +211,61 @@ use Game\Character\Character;
             echo "===================SERVER===========================";
             print_r($_SERVER);
             echo "====================END=============================";
+        }
+        function gen_column_dta($class_obj): array {
+            $refl = new ReflectionClass($class_obj);
+            $props = $refl->getProperties();
+            $col_data = [];
+
+            foreach ($props as $prop) {
+                $conv_prop = clsprop_to_tblcol($prop->name);
+                $col = "{title:\"{$conv_prop}\", field:\"{$conv_prop}\", cellEdited:function(cell) {cell.getData();} ";
+                $col .= '}';
+                array_push($col_data, $col);
+            }
+
+            return $col_data;
+        }
+
+        function gen_globalchat_html(array $messages): string {
+            $html = null;
+
+            foreach ($messages as $message) {
+                $tmp_aid = Character::getAccountID($message['character_id']);
+                $char_obj = new Character($tmp_aid, $message['character_id']);
+                $char_obj->load();
+
+
+                $avatar = $char_obj->get_avatar();
+                $sender = $char_obj->get_name();
+
+                $direction = "left";
+                $opdir = "right";
+                $div_dir = '';
+                
+                if ($message['id'] % 2 == 0) {
+                    $direction = "right";
+                    $div_dir = "right";
+                    $opdir = "left";
+                }
+
+
+
+                $html .= '<div class="d-flex"><div class="direct-chat-msg ' . $div_dir . '">';
+                $html .= '    <div class="direct-chat-infos clearfix">';
+                $html .= "        <span class=\"direct-chat-name float-$direction\">$sender</span>";
+                $html .= "        <span class=\"direct-chat-timestamp float-$opdir\">{$message['when']}</span>";
+                $html .= "    </div>";
+                $html .= "    <img class=\"direct-chat-img\" src=\"../../img/avatars/$avatar\" alt=\"message user image\" />";
+                $html .= '    <div class="direct-chat-text">';
+                $html .= "        {$message['message']}";
+                $html .= '    </div>';
+                $html .= '</div></div>';
+            }
+
+            return $html;
+        }
+
+        function add_global_message($character_id, $message) {
+
         }

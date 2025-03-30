@@ -26,8 +26,8 @@
 
 <p></p>
 
-<div class="container text-center d-flex justify-content-center align-items-center">
-    <div class="row">
+<div class="container-fluid text-center d-flex justify-content-center align-items-center">
+    <div class="row w-100">
         <div class="col">
             <div class="card mb-3" style="max-width: 700px;">
                 <div class="row g-0">

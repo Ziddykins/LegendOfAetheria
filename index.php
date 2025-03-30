@@ -74,8 +74,9 @@
                 //write_log('MULTISIGNUP', $message, $ip);
             }
 
-            header('Location: /?failed_login');
-            exit();
+            $email = preg_replace('/[^a-zA-Z0-9_@.-]+/', '', $_POST['login-email']);
+            setcookie("email", $email);
+            header("Location: /?failed_login");
         }
     } elseif (isset($_POST['register-submit']) && $_POST['register-submit'] == 1) {
         /* Account information */
@@ -153,7 +154,7 @@
                     $character->stats->set_maxHP(100);
                     $character->stats->set_mp(100);
                     $character->stats->set_maxMP(100);
- 
+
                     //$character->stats->set_status(CharacterStatus::HEALTHY);
 
                     //send_mail($email, $account);
@@ -166,7 +167,7 @@
             exit();
         }
     }
-   
+
     include 'html/opener.html';
 ?>
 
@@ -176,8 +177,6 @@
     </head>
 
     <body data-bs-theme="dark" class="main-font">
-
-
         <div class="d-flex align-items-center min-vh-100" style="min-width: 60%;">
             <div id="login-container" class="container shadow border border-round border-1 border-tertiary" style="max-width:550px; width: 100%;">
                 <div class="row">
@@ -195,7 +194,17 @@
             </div>
         </div>
 
-        <?php include 'html/footers.html'; ?>
+        <?php if (isset($_COOKIES['email'])): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                let up = new URLSearchParams(window.location.search);
 
+                if (up.has('failed_login')) {
+                    document.getElementById('login-email').value = decodeURIComponent(document.cookie).split(';')[0].split('=')[1];
+                }
+            });
+        </script>
+        <?php endif; ?>
+        <?php include 'html/footers.html'; ?>
     </body>
 </html>

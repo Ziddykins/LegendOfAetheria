@@ -12,4 +12,10 @@
         <script src="/admini/strator/js/popper.min.js"></script>
         <script src="/admini/strator/js/floating-ui-core.js"></script>
         <script src="/admini/strator/js/floating-ui-dom.js"></script>
-        
+
+        <!-- Init any tooltips -->
+        <script type="text/javascript">
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        </script>
+
