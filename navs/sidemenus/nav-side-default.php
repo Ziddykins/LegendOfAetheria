@@ -1,5 +1,22 @@
 <?php
 use Game\Account\Enums\Privileges;
+use Game\Account\Account;
+use Game\Character\Character;
+use Game\Mail\Folder\Enums\FolderType;
+use Game\Mail\MailBox\MailBox;
+
+$account   = new Account($_SESSION['email']); 
+$character = new Character($account->get_id(), $_SESSION['character-id']); 
+$character->load();
+$folders = [];
+
+foreach (["OUTBOX", "INBOX", "DELETED", "DRAFTS"] as $type) {
+    $folder = FolderType::name_to_enum($type);
+    $folders[$type] = MailBox::getFolderCount(
+        FolderType::name_to_enum($type),
+        $character->get_id()
+    );
+}
 
 $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'skull';
 
@@ -7,6 +24,10 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
 
 <aside id="sidebar" name="sidebar" class="app-sidebar shadow overflow-hidden" data-bs-theme="<?php echo $color_mode; ?>">
     <div class="sidebar-brand mb-3">
+    <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+            <i class="bi bi-list"></i>
+        </a>
+    
         <a href="./index.php" class="brand-link">
             <img src="/img/logos/logo-banner-no-bg.webp" alt="Legend of Aetheria Logo" class="brand-image img-fluid">
         </a>
@@ -359,30 +380,50 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
 
                             <ul id="folder-list" name="folder-list" class="nav nav-treeview">
                                 <li class="nav-items">
-                                    <a href="/game?page=Inbox" class="nav-link">
+                                    <a href="/game?page=inbox" class="nav-link align-items-center">
                                         <span class="nav-icon material-symbols-sharp ms-4">inbox</span>
                                         <p class="align-self-center text-warning opacity-50">Inbox</p>
+                                    <?php if ($folders['INBOX']): ?>
+                                        <span class="nav-badge badge text-bg-danger me-3"><?php echo $folders['INBOX']; ?></span>
+                                    <?php else: ?>
+                                        <span class="nav-badge badge text-bg-secondary me-3">0</span>
+                                    <?php endif; ?>
                                     </a>
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=Outbox" class="nav-link">
+                                    <a href="/game?page=outbox" class="nav-link">
                                         <span class="nav-icon material-symbols-sharp ms-4">outbox</span>
                                         <p class="align-self-center text-warning opacity-50">Outbox</p>
+                                    <?php if ($folders['OUTBOX']): ?>
+                                        <span class="nav-badge badge text-bg-danger me-3"><?php echo $folders['OUTBOX']; ?></span>
+                                    <?php else: ?>
+                                        <span class="nav-badge badge text-bg-secondary me-3">0</span>
+                                    <?php endif; ?>
                                     </a>
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=Deleted" class="nav-link">
+                                    <a href="/game?page=deleted" class="nav-link">
                                         <span class="nav-icon material-symbols-sharp ms-4">cancel_presentation</span>
                                         <p class="align-self-center text-warning opacity-50">Deleted</p>
+                                    <?php if ($folders['DELETED']): ?>
+                                        <span class="nav-badge badge text-bg-danger me-3"><?php echo $folders['DELETED']; ?></span>
+                                    <?php else: ?>
+                                        <span class="nav-badge badge text-bg-secondary me-3">0</span>
+                                    <?php endif; ?>
                                     </a>
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=Drafts" class="nav-link">
+                                    <a href="/game?page=drafts" class="nav-link align-items-center-">
                                         <span class="nav-icon material-symbols-sharp ms-4">mark_as_unread</span>
                                         <p class="align-self-center text-warning opacity-50">Drafts</p>
+                                        <?php if ($folders['DRAFTS']): ?>
+                                        <span class="nav-badge badge text-bg-danger me-3"><?php echo $folders['DRAFTS']; ?></span>
+                                        <?php else: ?>
+                                        <span class="nav-badge badge text-bg-secondary me-3">0</span>
+                                        <?php endif; ?>
                                     </a>
                                 </li>
                             </ul>
@@ -399,13 +440,14 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
             
                 <li id="account-anchor" name="account-anchor"  class="nav-item">
                     <a href="#" class="nav-link">
-                        <span class="nav-icon material-symbols-sharp">account_balance</span>
+                        <span class="nav-icon material-symbols-sharp">person_pin</span>
                         <p class="align-self-center fw-bold shadow fw-bold">Account</p>
                         <i class="nav-arrow bi bi-chevron-right"></i>
                     </a>
                     
                     <ul id="account-list" name="account-list" class="nav nav-treeview">
-                        <li class="nav-item">
+                        <li
+                        -+ class="nav-item">
                             <a href="/game?page=Profile" class="nav-link">
                                 <span class="nav-icon material-symbols-sharp ms-2">assignment_ind</span>
                                 <p class="align-self-center text-warning opacity-50">Profile</p>
@@ -439,6 +481,13 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                                 <p class="align-self-center text-warning opacity-50">Character Select</p>
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a href="/game?page=acct-settings" class="nav-link">
+                                <span class="material-symbols-sharp ms-2">settings_account_box</span>
+                                <p class="align-self-center text-warning opacity-50">Settings</p>
+                            </a>
+                        </li>                        
                     </ul>
                 </li>
             </ul>

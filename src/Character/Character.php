@@ -39,7 +39,11 @@ class Character {
 
     public function __construct($accountID, $characterID = null) {
         $this->accountID = $accountID;
-        $this->id = $characterID;
+        
+        if ($characterID) {
+            $this->id = $characterID;
+            $this->load();
+        }
     }
 
     public function __call($method, $params): mixed {

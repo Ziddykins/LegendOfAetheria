@@ -156,7 +156,7 @@
     const SELECTOR_SIDEBAR_EXPAND = `[class*="${CLASS_NAME_SIDEBAR_EXPAND}"]`;
     const SELECTOR_SIDEBAR_TOGGLE = '[data-lte-toggle="sidebar"]';
     const Defaults = {
-        sidebarBreakpoint: 992
+        sidebarBreakpoint: 922
     };
     /**
      * Class Definition

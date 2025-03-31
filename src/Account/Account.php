@@ -45,6 +45,7 @@ class Account {
             
             if ($id) {
                 $this->id = $id;
+                $this->load();
             }
         }
     }
