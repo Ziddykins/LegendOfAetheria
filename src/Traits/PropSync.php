@@ -3,10 +3,12 @@ namespace Game\Traits;
 
 use Exception;
 use Game\Account\Settings;
+use Game\Account\Enums\Privileges;
 use Game\Character\Stats;
 use Game\Inventory\Inventory;
 use Game\System\Enums\LOAError;
 use Game\Traits\Enums\PropType;
+
 
 
 trait PropSync {
@@ -130,7 +132,16 @@ trait PropSync {
                     break;
             }
 
-            $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";    
+            $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";  
+            
+            if (is_object($params[0])) {
+                if (is_numeric($params[0]->value)) {
+                    $params[0] = $params[0]->value;
+                } else {
+                    $params[0] = safe_serialize($params[0]);
+                }
+            }
+
             $db->execute_query($sql_query, [ $params[0], $id ]);
         } elseif (strcmp($action, 'new') === 0) { /*NEW*/
             $focused_id = null;
@@ -201,8 +212,6 @@ trait PropSync {
         } elseif (strcmp($action, 'load') === 0) { /*LOAD*/
             $tmp_obj = null;
 
-
-
             if ($type === PropType::MONSTER) {
                 $scope = $params[0];
                 $sql_query = "SELECT * FROM {$_ENV['SQL_MNST_TBL']} WHERE `scope` = ?";
@@ -215,8 +224,14 @@ trait PropSync {
             foreach ($tmp_obj as $key => $value) {
                 $key = $this->tblcol_to_clsprop($key);
 
-                if ($value !== null || $value !== 'NULL') {
-                    $this->$key = $value;
+                if ($value !== null && $value !== 'NULL') {
+                    if ($key == 'privileges') {
+                        $log->debug("Privileges", [ 'Privileges' => $this->$key, 'Value' => $value  ]);
+                        $this->$key = Privileges::name_to_enum($value);
+                        $log->debug("Privileges", [ 'NowPrivileges' => $this->$key, 'NowValue' => $value, 'PrivName' => $this->$key->name, 'PrivVal' => $this->$key->value  ]);
+                    } else {
+                        $this->$key = $value;
+                    }
                 }
             }
 

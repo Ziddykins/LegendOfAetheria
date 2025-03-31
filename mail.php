@@ -50,10 +50,14 @@
                                 [
                                     FolderType::INBOX->name,
                                     $recipient,
-                                    $_SESSION['email'],
+                                    $_SESSION['name'],
                                     $subject,
                                     $msg_body,
-                                    $important
+                                    $important ? 'IMPORTANT' : 'NONE',
+                                    $recipient_aid,
+                                    $sender_aid,
+                                    $recipient_cid,
+                                    $sender_cid                                    
                                 ]
                             );
                             echo '{"mail_status": "Email sent!"}';

@@ -25,4 +25,12 @@ enum FolderType {
         }
         throw new Error("Not valid backing member of enum FolderType");
     }
+
+    public static function name_to_enum(string $folder) {
+        foreach (self::cases() as $f_name) {
+            if ($f_name->name == $folder) {
+                return $f_name;
+            }
+        }
+    }
 }

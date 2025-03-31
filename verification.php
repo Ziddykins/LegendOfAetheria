@@ -19,8 +19,8 @@
         exit();
     }
     
-    if (isset($_REQUEST['code'])) {
-        $verification_code = $_REQUEST['code'];
+    if (isset($_POST['code'])) {
+        $verification_code = $_POST['code'];
         $sql_query = "SELECT `id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `verification_code` = ? AND `email` = ?";
         $results = $db->execute_query($sql_query, [ $verification_code, $account->get_email() ]);
                 
@@ -29,9 +29,9 @@
             set privileges to a registered user
         */
         if ($results->num_rows) {
-            $current_privs = Privileges::name_to_value($account->get_privileges());
+            $current_privs = $account->get_privileges()->value;
             
-            if ($account->get_verified() === 'True' || $current_privs >= Privileges::USER) {
+            if ($account->get_verified() === 'True' || $current_privs >= Privileges::USER->value) {
                 $query_path = "/game?already_verified=1&email={$account->get_email()}";
                 header("Location: $query_path");
                 exit();

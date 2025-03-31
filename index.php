@@ -22,7 +22,6 @@
 
         if ($account_id > 0) {
             $account = new Account($email);
-            $account->load($account_id);
         } else {
             $log->warning('Attempted login with a non-existing account', [ 'Email' => $email ]);
             header("Location: /?do_register&email=$email");

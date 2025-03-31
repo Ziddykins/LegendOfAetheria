@@ -20,6 +20,14 @@ enum Privileges: int {
         throw new \ValueError("$name is not a valid backing value for enum " . self::class);
     }
 
+    public static function value_to_enum(int $value): Privileges {
+        foreach (self::cases() as $privilege) {
+            if ($value == $privilege->value) {
+                return $privilege;
+            }
+        }
+    }
+
     case BANNED = 1;
     case MUTED = 2;
     case UNREGISTERED = 4;
