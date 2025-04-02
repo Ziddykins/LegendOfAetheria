@@ -14,11 +14,8 @@
     require_once "bootstrap.php";
 
     $account = new Account($_SESSION['email']);
-    $account->load();
-
     $character = new Character($account->get_id(), $_SESSION['character-id']);
-    $character->load();
-
+    
     $monster = $character->get_monster();
     $ch_name = $character->get_name();
     $mn_name = $monster->get_name();
@@ -39,12 +36,19 @@
             if ($action === 'attack') {
                 if ($character->stats->get_ep() > 0) {
                     if ($character->stats->get_hp() > 0) {
-                        $out_msg = '<div class="small text-warning"><-}====[ <span class="text-primary">Player</span> Turn ]====={-></div><br>';
-                        do_turn(Turn::PLAYER);
-                        $character->stats->sub_ep(1);
-                        $out_msg = '<div class="small text-warning"><-}====[ <span class="text-danger">Enemy</span> Turn ]====={-></div><br>';
-                        do_turn(Turn::ENEMY);
-                        echo $out_msg;
+                        $roll = roll(1, 100);
+
+                        if ($roll > 50) {
+                            $out_msg = '<div class="small text-warning"><-}====[ <span class="text-primary">Player</span> Turn ]====={-></div><br>';
+                            do_turn(Turn::PLAYER);
+                            echo $out_msg;
+                        } else {
+                            $out_msg = '<div class="small text-warning"><-}====[ <span class="text-danger">Enemy</span> Turn ]====={-></div><br>';
+                            do_turn(Turn::ENEMY);
+                            echo $out_msg;
+                        }
+                            $character->stats->sub_ep(1);
+                        
                         return true;
                     } else {
                         http_response_code(401);

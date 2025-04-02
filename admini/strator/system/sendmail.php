@@ -2,6 +2,7 @@
     use PHPMailer\PHPMailer\PHPMailer;
     use PHPMailer\PHPMailer\SMTP;
     use PHPMailer\PHPMailer\Exception;
+    use Game\Account\Account;
 
     require_once 'functions.php';
 

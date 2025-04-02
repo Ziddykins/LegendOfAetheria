@@ -32,7 +32,7 @@ class Envelope {
         $this->recipient = $recipient;
     }
 
-    public static function get_statuses(int $value) {
+    public static function get_statuses(int $value): array {
         $statuses = [];
 
         if ($value & EnvelopeStatus::NONE->value) {
@@ -50,5 +50,6 @@ class Envelope {
         if ($value & EnvelopeStatus::REPLIED->value) {
             $statuses['replied'] = 1;
         }
-    }
+        return $statuses;
+    }    
 }

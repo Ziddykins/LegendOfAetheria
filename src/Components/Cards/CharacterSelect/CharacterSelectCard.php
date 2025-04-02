@@ -26,7 +26,7 @@ class CharacterSelectCard {
                 </div>
 
                 <div class="card-body">
-                    <p class="card-text">' . $character['name'] . ' the Lv. ' . $character['level'] . ' ' . $character['race']  . '</p>
+                    <p class="card-text">' . $character['name'] . '<br>the Lv. ' . $character['level'] . ' ' . $character['race']  . '</p>
                     <div class="small" style="font-size: 12px;">
                         <div class="row">
                             <div class="col-3 text-white">

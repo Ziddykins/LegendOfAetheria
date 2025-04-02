@@ -3,14 +3,14 @@ document.querySelectorAll("ul[id$='drop-menu']").forEach((menu) => {
     let short = which == 'attack' ? 'atk' : 'spl';
 
     document.getElementById(`${which}-drop-menu`).querySelectorAll("li").forEach((li) => {
-	    li.addEventListener("click", (e) => {
-		    document.getElementById(`hunt-${which}-btn`).textContent = e.target.textContent;
+        li.addEventListener("click", (e) => {
+            document.getElementById(`hunt-${which}-btn`).textContent = e.target.textContent;
             document.getElementById(`hunt-${which}-btn`).value = e.target.attributes.getNamedItem(`data-loa-${short}`);
-	    });
+        });
     });
 });
 
-document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
+document.querySelectorAll("button[id^='hunt']").forEach(async (btn) => {
     let which = btn.id.split("-")[1];
 
     if (which == 'new') {
@@ -23,7 +23,7 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
         let lines = document.getElementById("battle-log").querySelectorAll("span").length;
         let text_height = 24;
         let max_lines = Math.round(document.getElementById("battle-log").clientHeight / text_height);
-        
+
         if (lines >= max_lines) {
             battle_log.innerHTML = "";
         }
@@ -35,14 +35,13 @@ document.querySelectorAll("button[id^='hunt']").forEach((btn) => {
             },
             method: 'POST',
             body: `action=${which}&type=${atk_type}&csrf-token=${csrf_token}`
-        })
-        .then((response) => response.text())
-        .then((data) => {
-            console.log(`got data: ${data}`);
-            battle_log.insertAdjacentHTML('afterbegin', data);
-        }).catch((error) => {
-            battle_log.insertAdjacentHTML = battle_log.innerHTML + `${error.message}`;
-        });
+        }).then((response) => response.text()).then(async(data) => {
+                console.log(`got data: ${data}`);
+                battle_log.insertAdjacentHTML('afterbegin', data);
+                await update_hud();
+            }).catch((error) => {
+                battle_log.insertAdjacentHTML = battle_log.innerHTML + `${error.message}`;
+            });
     });
 });
 
@@ -64,7 +63,7 @@ document.querySelectorAll("button").forEach((btn) => {
     }
 });
 
-function update_hud() {
+async function update_hud() {
     fetch(`/hud?action=hud&csrf-token=${loa.u_csrf}`, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -72,22 +71,22 @@ function update_hud() {
         },
         method: 'GET',
     })
-    .then((response) => response.json())
-    .then((data) => {
-        let monster_stats = data.monster;
-        let player_stats  = data.player;
-        let player_hp = document.getElementById("player-hp");
-        let player_mp = document.getElementById("player-mp");
-        let player_ep = document.getElementById("player-ep");
-        let monster_hp = document.getElementById("monster-hp");
-        let monster_mp = document.getElementById("monster-mp");
+        .then((response) => response.json())
+        .then((data) => {
+            let monster_stats = data.monster;
+            let player_stats = data.player;
+            let player_hp = document.getElementById("player-hp");
+            let player_mp = document.getElementById("player-mp");
+            let player_ep = document.getElementById("player-ep");
+            let monster_hp = document.getElementById("monster-hp");
+            let monster_mp = document.getElementById("monster-mp");
 
-        player_hp.textContent  = player_stats.hp  + ' / ' + player_stats.maxHP;
-        player_mp.textContent  = player_stats.mp  + ' / ' + player_stats.maxMP;
-        player_ep.textContent  = player_stats.ep  + ' / ' + player_stats.maxEP;
-        monster_hp.textContent = monster_stats.hp + ' / ' + monster_stats.maxHP;
-        monster_mp.textContent = monster_stats.mp + ' / ' + monster_stats.maxMP;
-    }).catch((error) => {
-        console.error(error);
-    });
+            player_hp.textContent = player_stats.hp + ' / ' + player_stats.maxHP;
+            player_mp.textContent = player_stats.mp + ' / ' + player_stats.maxMP;
+            player_ep.textContent = player_stats.ep + ' / ' + player_stats.maxEP;
+            monster_hp.textContent = monster_stats.hp + ' / ' + monster_stats.maxHP;
+            monster_mp.textContent = monster_stats.mp + ' / ' + monster_stats.maxMP;
+        }).catch((error) => {
+            console.error(error);
+        });
 }
