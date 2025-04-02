@@ -1,75 +1,118 @@
 <?php
-    $ip_lock_checked = '';
-    $ip_hidden       = 'invisible';
-
-    if ($account->get_ipLock() === 'True') {
-        $ip_lock_checked = 'checked';
-        $ip_hidden = '';
-    }
+    extract([
+        'ip_lock_checked' => $account->get_ipLock() === 'True' ? 'checked' : '',
+        'ip_hidden' => $account->get_ipLock() === 'True' ? '' : 'invisible'
+    ]);
 ?>
 
-<div class="d-flex">
-    <div class="container w-25">
-        <div class="row text-center">
-            <div class="col">
-                <h3>
-                    <?php fix_name_header($_SESSION['name']); ?> Account Settings
-                </h3>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col text-center">
-                <div class="form-check form-switch mb-3 d-flex">
-                    <input class="form-check-input align-self-center" type="checkbox" role="switch" id="ip-lock-switch" <?php echo $ip_lock_checked; ?>>
-                    <label class="form-check-label" for="ip-lock-switch">IP lock Account</label>
-                    <div class="small">
-                        <abbr title="An IP lock account can only be accessed by the IP provided in the textbox below" class="initialism align-self-center">[ ? ]</abbr>
-                    </div>
+<div class="container-fluid py-4">
+    <div class="row justify-content-center g-4 mx-auto" style="max-width: 1200px">
+        <!-- Account Settings Card -->
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header border-0">
+                    <h3 class="card-title h5 mb-0">Account Settings</h3>
                 </div>
-                <input id="ip-lock-address" name="ip-lock-address" class="mb-3 <?php echo $ip_hidden; ?>" type="text" minlength="7" maxlength="15" size="15" pattern="^[0-9]{1,3}\.(?:[0-9]{1,3}\.){2}[0-9]{1,3}$" value="<?php echo $account->get_ipLockAddr(); ?>" />
+                <div class="card-body">
+                    <form id="ip-lock-form" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="ip-lock-switch" <?php echo $ip_lock_checked; ?>>
+                                    <label class="form-check-label" for="ip-lock-switch">IP Lock</label>
+                                </div>
+                                <span class="badge" data-bs-toggle="tooltip" title="IP lock restricts account access to specified IP">
+                                    <span class="material-symbols-outlined">shield</span>
+                                </span>
+                            </div>
+                            <div class="ip-lock-input-group">
+                                <input id="ip-lock-address" name="ip-lock-address" 
+                                       class="form-control form-control-sm <?php echo $ip_hidden; ?>"
+                                       type="text" 
+                                       pattern="^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                                       placeholder="Enter IP address"
+                                       value="<?php echo $account->get_ipLockAddr(); ?>" 
+                                       required>
+                                <div class="invalid-feedback">Please enter a valid IP address</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visual Settings Card -->
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header border-0">
+                    <h3 class="card-title h5 mb-0">Visual Settings</h3>
+                </div>
+                <div class="card-body">
+                    <form id="visual-settings-form" class="needs-validation" novalidate>
+                        <div class="form-group mb-3">
+                            <label for="sidebar-type" class="form-label">Sidebar Style</label>
+                            <select id="sidebar-type" name="sidebar-type" class="form-select" aria-label="Sidebar Dropdown Menu">
+                                <option selected disabled value="-1">Select sidebar style</option>
+                                <optgroup label="Classic">
+                                    <option value="CLASSIC">Classic side menu</option>
+                                </optgroup>
+                                <optgroup label="AdminLTE Variants">
+                                    <option value="LTE_DEFAULT">Default side menu</option>
+                                    <option value="LTE_COLLAPSED">Collapsed side menu</option>
+                                    <option value="LTE_FIXED">Fixed complete side menu</option>
+                                    <option value="LTE_MINI">Mini side menu</option>
+                                    <option value="LTE_UNFIXED">Unfixed side menu</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="theme-type" class="form-label">Theme</label>
+                            <select id="theme-type" name="theme-type" class="form-select" aria-label="Theme Dropdown Menu">
+                                <option selected disabled value="-1">Select theme</option>
+                                <option value="LIGHT">Light theme</option>
+                                <option value="DARK">Dark theme</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="font-type" class="form-label">Font</label>
+                            <select id="font-type" name="font-type" class="form-select" aria-label="Font Dropdown Menu">
+                                <option selected disabled value="-1">Select font</option>
+                                <optgroup label="Sans Serif">
+                                    <option value="Roboto" style="font-family: 'Roboto'">Roboto</option>
+                                    <option value="Open-Sans" style="font-family: 'Open Sans'">Open Sans</option>
+                                    <option value="Lato" style="font-family: 'Lato'">Lato</option>
+                                </optgroup>
+                                <optgroup label="Serif">
+                                    <option value="Merriweather" style="font-family: 'Merriweather'">Merriweather</option>
+                                    <option value="PT-Serif" style="font-family: 'PT Serif'">PT Serif</option>
+                                </optgroup>
+                                <optgroup label="Display">
+                                    <option value="Montserrat" style="font-family: 'Montserrat'">Montserrat</option>
+                                    <option value="Poppins" style="font-family: 'Poppins'">Poppins</option>
+                                </optgroup>
+                            </select>
+                            <div class="mt-2 p-2 border rounded" id="font-preview" style="min-height: 50px">
+                                The quick brown fox jumps over the lazy dog
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="container w-25">
-        <div class="row text-center">
-            <div class="col">
-                <h3>
-                    <?php fix_name_header($_SESSION['name']); ?> Visual Settings
-                </h3>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <label for="sidebar-type" class="me-3">Sidebar:</label>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <select id="sidebar-type" name="sidebar-type" class="form-select" aria-label="Sidebar Dropdown Menu">
-                    <option selected disabled value="-1"></option>
-                    <option disabled value="-2">-- Classic --</option>
-                    <option value="CLASSIC">Classic side menu</option>
-                    <option disabled value="-3">-- AdminLTE Varients --</option>
-                    <option value="LTE_DEFAULT">Default side menu</option>
-                    <option value="LTE_COLLAPSED">Collapsed side menu</option>
-                    <option value="LTE_FIXED">Fixed complete side menu</option>
-                    <option value="LTE_MINI">Mini side menu</option>
-                    <option value="LTE_UNFIXED">Unfixed side menu</option>
-                </select>
-            </div>
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <button id="save-settings" type="submit" class="btn btn-primary px-4 position-relative">
+                <span class="material-symbols-outlined me-2">save</span>Save
+                <span class="spinner-border spinner-border-sm d-none position-absolute" 
+                      role="status" aria-hidden="true"></span>
+            </button>
+            <div id="status-msg" class="mt-3 text-success"></div>
         </div>
     </div>
 </div>
 
-<div class="text-center">
-    <button id="save-settings" name="save-settings" class="btn btn-primary" type="button" onclick="save_settings('ip_lock')">
-        Save
-    </button>
-</div>
-<div class="row text-center">
-    <div id="status-msg" name="status-msg" class="text-center text-success"></div>
-</div>
+<script src="/js/settings.js"></script>

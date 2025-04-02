@@ -297,8 +297,9 @@ trait PropSync {
 
                         $new_value = min($new_value, $max_value); // Ensure it does not exceed max value
                         $new_value = max($new_value, 0); // Ensure it does not go below 0
-
-                        $this->$prop = $new_value; // Set the new value
+                        
+                        $prop_str = "set_$prop";
+                        $this->$prop_str($new_value); // Set the new value
                     } else {
                         throw new Exception('Current value is not numeric!');
                     }

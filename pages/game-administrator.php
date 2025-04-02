@@ -184,21 +184,21 @@ $dalle_models = [
 
 $user_privs = Privileges::name_to_enum($account->get_privileges());
 
-if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) {
+if (isset($_POST['gen-images']) && $_POST['gen-images'] == 1) {
     global $system;
     $count  = 0;
     $prompt = null;
 
-    if (isset($_REQUEST['image-prompt'])) {
-        $prompt = htmlentities($_REQUEST['image-prompt']);
+    if (isset($_POST['image-prompt'])) {
+        $prompt = htmlentities($_POST['image-prompt']);
     } else {
         $prompt = "Generate an image of a monster";
     }
     
     $count++;
     
-    $type   = $_REQUEST['type'];
-    $model = $_REQUEST['model'];
+    $type   = $_POST['type'];
+    $model = $_POST['model'];
     $count  = 1;
 
     $endpoint = 'https://api.openai.com/v1/images/generations';
@@ -234,10 +234,6 @@ if (isset($_REQUEST['gen-images']) && $_REQUEST['gen-images'] == 1) {
     }
 
         $json_obj = json_decode($response);
-
-        echo '<pre>';
-        print_r($json_obj);
-        exit();
         $filename = explode("/", $json_obj->data[0]->url)[-1];
         echo "<img src='" . $json_obj->data[0]->url . "'></img><br>";
         $img_file = 'img/generated/';

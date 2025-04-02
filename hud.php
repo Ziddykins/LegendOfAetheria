@@ -6,15 +6,18 @@
     session_start();
 
     $character = new Character($_SESSION['account-id'], $_SESSION['character-id']);
-    $character->load();
+    
 
     check_csrf($_GET['csrf-token']);
     
     if (isset($_GET['action']) && $_GET['action'] == 'hud') {
         $payload = [
             'player' => $character->stats->jsonSerialize(),
-            'monster' => $character->get_monster()->stats->jsonSerialize()
         ];
+
+        if ($character->get_monster()) {
+            $payload['monster'] = $character->get_monster()->stats->jsonSerialize();
+        };
 
         echo json_encode($payload);
         exit(0);

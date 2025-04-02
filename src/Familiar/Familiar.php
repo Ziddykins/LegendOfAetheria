@@ -5,6 +5,8 @@ use Game\Inventory\Enums\ObjectRarity;
 use Game\Traits\PropConvert;
 use Game\Traits\PropSync;
 
+require_once "bootstrap.php";
+
 class Familiar {
     use PropConvert;
     use Propsync;
@@ -34,17 +36,12 @@ class Familiar {
         $result      = $db->execute_query($sqlQuery, [ $this->characterID ])->fetch_assoc();
         $familiar_id = $result['id'];
 
-        $this->dateAcquired = '1970-01-01 00:00:00';
-        $this->hatchTime    = '1970-01-01 00:00:00';
-        $this->rarityColor  = '#000';
-        $this->hatched      = 'False';
-        $this->rarity       = 'NONE';
+        
         $this->name         = '!Unset!';
         $this->id           = $familiar_id['id'];
         $this->avatar       = 'img/generated/eggs/egg-unhatched.jpeg';
         $this->level        = 1;
-        $this->lastRoll     = 0.00;
-    
+
         $this->saveFamiliar(); 
     }
 
@@ -82,30 +79,30 @@ class Familiar {
     public function getCard($which = 'current') {
         if ($which === 'empty') {
             $html = file_get_contents(
-                PATH_WEBROOTECTORY . 'html/card-egg-none.html'
+                PATH_WEBROOT . 'html/card-egg-none.html'
             );
 
             return $html;
         } elseif ($which === 'current') {
-            $build_timer = '<script>init_egg_timer("' . $this->hatchTime . 
+            //$build_timer = '<script>init_egg_timer("' . $this->hatchTime . 
                 '", "egg-timer");</script>';
             
-            $html = "$build_timer\n";
+           // $html = "$build_timer\n";
             
-            $html .= file_get_contents(
-                PATH_WEBROOTECTORY . 'html/card-egg-current.html'
-            );
+            //$html .= file_get_contents(
+             //   PATH_WEBROOTECTORY . 'html/card-egg-current.html'
+           // );
             
-            $html .= "\n";
+            //$html .= "\n";
 
-            return $html;
+            //return $html;
         }
     }
 
     public function loadFamiliar($characterID) {
         global $db, $log;
 
-        $sqlQuery = "SELECT * FROM " . $this->table . " WHERE `character_id` = ?";
+        $sqlQuery = "SELECT * FROM {$_ENV['SQL_FMLR_TBL']} WHERE `character_id` = ?";
         $result = $db->execute_query($sqlQuery, [ $characterID ]);
 
         if ($result->num_rows === 0) {
@@ -182,7 +179,7 @@ class Familiar {
         $familiar->set_level(1);
         
         $familiar->set_rarityColor($rarity_color);
-        $familiar->set_rarity($rarity->name);
+        $familiar->set_rarity($rarity);
         $familiar->set_lastRoll($rarity_roll);
         
         $familiar->set_dateAcquired(get_mysql_datetime());
@@ -205,7 +202,7 @@ class Familiar {
         }
 
         if (strncasecmp($method, "set_", 4) === 0) {
-            $sqlQuery =  'UPDATE ' . $this->table . ' ';
+            $sqlQuery =  "UPDATE {$_ENV['SQL_FMLR_TBL']} ";
             $table_col = $this->clsprop_to_tblcol($var);
 
             if (is_int($params[0])) {

@@ -36,7 +36,7 @@
 
     if ($mon_loaded) {
         $mon_name  = $monster->get_name();
-        $mon_hp    = $monster->stats->get_hp() - 50;
+        $mon_hp    = $monster->stats->get_hp();
         $mon_maxHP = $monster->stats->get_maxHP();
         $mon_mp    = $monster->stats->get_mp();
         $mon_maxMP = $monster->stats->get_maxMP();
@@ -204,5 +204,4 @@
 
 <script>var mon_loaded = <?php echo $mon_loaded; ?>;</script>
 <script>var csrf_token = "<?php echo $_SESSION['csrf-token']; ?>";</script>
-<script>var player_hp = <?php echo $character->stats->get_hp(); ?>;</script>
 <script src="/js/battle.js"></script>

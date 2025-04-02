@@ -26,6 +26,7 @@ enum Privileges: int {
                 return $privilege;
             }
         }
+        return Privileges::UNREGISTERED;
     }
 
     case BANNED = 1;

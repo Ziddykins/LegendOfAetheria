@@ -8,7 +8,7 @@
 
 ?>
 
-<div class="pb-3 mb-3 ms-3 border border-success shadow" style="background: rgba(0,25,0,0.5);">
+<div class="d-flex pe-2 pb-2 ps-2 w-100 border border-success shadow align-content-center">
     <div class="text-center">
         <span data-bs-toggle="tooltip" data-bs-title="Expand All" class="nav-icon material-symbols-sharp mt-3 border" style="cursor: pointer;" onclick=expand_all()>
             unfold_more
