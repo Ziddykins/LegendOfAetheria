@@ -2,13 +2,11 @@
 namespace Game\Character;
 use Game\Inventory\Inventory;
 use Game\Monster\Monster;
-use Game\Traits\Enums\PropType;
-use Game\Traits\PropConvert;
-use Game\Traits\PropSync;
+use Game\Traits\PropManager\Enums\PropType;
+use Game\Traits\PropManager\PropManager;
 
 class Character {
-    use PropConvert;
-    use Propsync;
+    use PropManager;
     
     private $id;
     private $accountID;
@@ -46,12 +44,25 @@ class Character {
         }
     }
 
-    public function __call($method, $params): mixed {
-        if ($method == 'propSync') {
-            return -1;
+    public function __call($method, $params) {
+        global $db, $log;
+
+        /* If it's a get, this is true */
+        if (!count($params)) {
+            $params = null;
         }
-        
-        return $this->propSync($method, $params, PropType::CHARACTER);
+
+        /* Avoid loops with propSync triggering itself */
+        if ($method == 'propSync' || $method == 'propMod') {
+            $log->debug("$method loop");
+            return;
+        }
+
+        if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
+            return $this->propMod($method, $params);
+        } else {
+            return $this->propSync($method, $params, PropType::CHARACTER);
+        }
     }
 
     private function getNextCharSlotID($accountID): int {
@@ -60,7 +71,7 @@ class Character {
         return intval($db->execute_query($sqlQuery, [ $accountID ])->fetch_assoc()['free_slot']);
     }
 
-    public static function getAccountID($characterID) {
+    public static function getAccountID($characterID): int {
         global $db;
         $sql_query = "SELECT `account_id` FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
         $result = $db->execute_query($sql_query, [ $characterID ])->fetch_column();

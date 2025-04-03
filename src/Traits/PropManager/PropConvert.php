@@ -1,5 +1,5 @@
 <?php
-namespace Game\Traits;
+namespace Game\Traits\PropManager;
 
 trait PropConvert {
     private function clsprop_to_tblcol($property) {
@@ -10,9 +10,8 @@ trait PropConvert {
         for ($i=0; $i<strlen($property); $i++) {
             if ($i == 0 && ctype_upper($property[$i])) {
                 $out .= strtolower($property[$i]);
-                 continue;
+                continue;
             }
-
 
             if (isset($property[$i+1])) {
                 $check_double = $property[$i] . $property[$i + 1];

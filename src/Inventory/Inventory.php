@@ -2,13 +2,12 @@
 namespace Game\Inventory;
 
 use Game\Inventory\Items\Item;
-use Game\Traits\PropConvert;
-use Game\Traits\PropSync;
-use Game\Traits\Enums\PropType;
+use Game\Traits\PropManager\Enums\PropType;
+use Game\Traits\PropManager\PropManager;
+
 
 class Inventory {
-    use PropConvert;
-    use Propsync;
+    use PropManager;
     private int $id;
     private int $slotCount;
     private int $currentWeight;
@@ -31,11 +30,16 @@ class Inventory {
     }
 
     public function __call($method, $params) {
-        if ($method == 'propSync') {
+        if ($method == 'propSync' || $method == 'propMod') {
             return;
         }
-        
-        return $this->propSync($method, $params, PropType::CHARACTER);
+
+        switch ($method) {
+            case 'propSync':
+                return $this->propSync($method, $params, PropType::INVENTORY);
+            case 'propMod':
+                return $this->propMod($method, $params);
+        }
     }
 
     private function spacesLeft() {

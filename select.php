@@ -1,23 +1,24 @@
 <?php
 declare(strict_types=1);
+session_start();
+
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\System\Enums\AbuseType;
 use Game\Components\Cards\CharacterSelect\CharacterSelectCard;
-session_start();
 
 require_once "bootstrap.php";
 
 $account = null;
 
-if (isset($_POST['create-submit']) && $_POST['create-submit'] == 1) {
-    if (isset($_POST['slot']) && $_POST['slot'] > 0 && $_POST['slot'] <= 3) {
-        $slot = $_POST['slot'];
-        $_POST["select-new-$slot"] = 1;
-    }
-}
-
 if (check_session()) {
+    if (isset($_POST['create-submit']) && $_POST['create-submit'] == 1) {
+        if (isset($_POST['slot']) && $_POST['slot'] > 0 && $_POST['slot'] <= 3) {
+            $slot = $_POST['slot'];
+            $_POST["select-new-$slot"] = 1;
+        }
+    }
+    
     $account = new Account($_SESSION['email']);
     $account->load();
 

@@ -1,12 +1,14 @@
 <?php
     declare(strict_types = 1);
+    session_start();
+    
     use Game\System\Enums\AbuseType;
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
 
     require_once 'bootstrap.php';
-    session_start();
+    
 
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
         $email    = $_POST['login-email'];
@@ -22,6 +24,7 @@
 
         if ($account_id > 0) {
             $account = new Account($email);
+            $account->add_credits(11);
         } else {
             $log->warning('Attempted login with a non-existing account', [ 'Email' => $email ]);
             header("Location: /?do_register&email=$email");
@@ -50,9 +53,8 @@
             $_SESSION['email']         = $account->get_email();
             $_SESSION['account-id']    = $account->get_id();
             $_SESSION['selected-slot'] = -1;
-
             $account->set_sessionID(session_id());
-                        
+
             header('Location: /select');
             exit();
         } else {
@@ -112,13 +114,13 @@
 
                     $account = new Account($email);
                     $account->new();
-                    
+
                     /* Hasn't been found creating multiple accounts */
                     if (check_abuse(AbuseType::MULTISIGNUP, $account->get_id(), $ip_address, 3)) {
                         ban_user($account->get_id(), 3600, "Multiple accounts within allotted time frame");
                         exit();
                     }
-                    
+
                     /* ya forgin' posts I know it */
                     if (($str < 10 || $def < 10 || $int < 10)) {
                         $ip = $_SERVER['REMOTE_ADDR'];
@@ -186,7 +188,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <?php require_once 'navs/nav-login.php'; ?>
                 </div>
