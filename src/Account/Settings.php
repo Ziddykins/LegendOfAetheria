@@ -1,13 +1,13 @@
 <?php
 namespace Game\Account;
-use Game\Traits\PropConvert;
-use Game\Traits\PropSync;
-use Game\Traits\Enums\PropType;
+
+use Exception;
+use Game\Traits\PropManager\PropManager;
+use Game\Traits\PropManager\Enums\PropType;
 use Game\Components\Sidebar\Enums\SidebarType;
 
 class Settings {
-    use PropSync;
-    use PropConvert;
+    use PropManager;
 
     private int $id;
     private string $colorMode;
@@ -20,10 +20,23 @@ class Settings {
     }
 
     public function __call($method, $params) {
-        if ($method === 'propSync') {
-            return 0;
+        global $db, $log;
+
+        /* If it's a get, this is true */
+        if (!count($params)) {
+            $params = null;
         }
 
-        return $this->propSync($method, $params, PropType::SETTINGS);
+        /* Avoid loops with propSync triggering itself */
+        if ($method == 'propSync' || $method == 'propMod') {
+            $log->debug("$method loop");
+            return;
+        }
+
+        if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
+            return $this->propMod($method, $params);
+        } else {
+            return $this->propSync($method, $params, PropType::SETTINGS);
+        }
     }
 }

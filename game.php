@@ -54,7 +54,7 @@
                         <div id="content" name="content" class="border border-danger h-100">
                             <?php
                                 $privileges = $account->get_privileges()->value;
-                                
+                                 
                                 if ($privileges == Privileges::UNVERIFIED->value) {
                                     include 'html/verify.html';
                                     exit();

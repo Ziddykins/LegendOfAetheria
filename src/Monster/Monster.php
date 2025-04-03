@@ -1,15 +1,12 @@
 <?php
 namespace Game\Monster;
 use Game\Monster\Enums\MonsterScope;
-use Game\Traits\PropConvert;
-use Game\Traits\PropSync;
-use Game\Traits\Enums\PropType;
+use Game\Traits\PropManager\PropManager;
+use Game\Traits\PropManager\Enums\PropType;
 use Game\Monster\Stats;
-use Game\Character\Character;
 
 class Monster {
-    use PropConvert;
-    use Propsync;
+    use PropManager;
     private ?int $id;
     private int $accountID;
     private int $characterID;
@@ -38,11 +35,16 @@ class Monster {
     * @return mixed The value of the property if a getter is called, or void if a setter is called.
     */
     public function __call($method, $params) {
-        if ($method == 'propSync') {
+        if ($method == 'propSync' || $method == 'propMod') {
             return;
         }
-        
-        return $this->propSync($method, $params, PropType::MONSTER);
+
+        switch ($method) {
+            case 'propSync':
+                return $this->propSync($method, $params, PropType::MONSTER);
+            case 'propMod':
+                return $this->propMod($method, $params);
+        }
     }
 
     public function __construct(MonsterScope $scope) {

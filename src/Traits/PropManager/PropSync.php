@@ -1,30 +1,21 @@
 <?php
-namespace Game\Traits;
+namespace Game\Traits\PropManager;
 
-use Exception;
 use Game\Account\Settings;
 use Game\Account\Enums\Privileges;
 use Game\Character\Stats;
 use Game\Inventory\Inventory;
 use Game\System\Enums\LOAError;
-use Game\Traits\Enums\PropType;
+use Game\Traits\PropManager\Enums\PropType;
 
 
 
 trait PropSync {
-
-    
     private function propSync($method, $params, PropType $type) {
         global $db, $log;
-        $table = null;
-        $prop  = null;
-
-        /* Anything before the underscore, in the sent method is considered
-           to be the "action" (set_, get_, init, etc), and the target/property
-           is after the underscore (email, accountID, etc)
-        */
+        $table  = null;
+        $prop   = null;
         $offset = strpos($method, "_");
-        // offset = length in this case
         $action = substr($method, 0, $offset);
 
         if ($offset === false) {
@@ -67,8 +58,10 @@ trait PropSync {
         } else {
             $log_str = $params[0];
         }
-        
+        $log->debug("PropSync", ["Method" => $method, "Params" => print_r($params, true), "Action" => $action]);
+
         if (strcmp($action, "get") === 0) { /* GET */
+            $log->debug("PropSync ($action): " . $log_str);
             return $this->$prop;
         } elseif (strcmp($action, 'set') === 0) { /* SET */
 
@@ -211,7 +204,6 @@ trait PropSync {
             }
         } elseif (strcmp($action, 'load') === 0) { /*LOAD*/
             $tmp_obj = null;
-
             if ($type === PropType::MONSTER) {
                 $scope = $params[0];
                 $sql_query = "SELECT * FROM {$_ENV['SQL_MNST_TBL']} WHERE `scope` = ?";
@@ -249,63 +241,6 @@ trait PropSync {
             } elseif ($type == PropType::ACCOUNT) {
                 $tmp_settings = safe_serialize($tmp_obj['settings'], true);
                 $this->settings = $tmp_settings;
-            }
-                
-
-        } elseif (preg_match('/sub|add|mul|div|exp|mod/', $action)) {
-            $cur_value = null;
-            $max_value = null;
-            
-            if (isset($this->$prop)) {
-                if (in_array($prop, ['hp', 'mp', 'ep'], true)) {
-                    $str_max_prop = "max" . strtoupper($prop);
-
-                    $cur_value = $this->$prop ?? 0; // Default to 0 if property is not set
-                    $max_value = $this->$str_max_prop ?? PHP_INT_MAX; // Default to max int if max property is not set
-
-                    if (is_numeric($cur_value)) {
-                        $new_value = $cur_value;
-
-                        switch ($action) {
-                            case 'add':
-                                $new_value += $params[0];
-                                break;
-                            case 'sub':
-                                $new_value -= $params[0];
-                                break;
-                            case 'mul':
-                                $new_value *= $params[0];
-                                break;
-                            case 'div':
-                                if ($params[0] == 0) {
-                                    throw new Exception('Division by zero in PropModder');
-                                }
-                                $new_value /= $params[0];
-                                break;
-                            case 'exp':
-                                $new_value **= $params[0];
-                                break;
-                            case 'mod':
-                                if ($params[0] == 0) {
-                                    throw new Exception('Modulo by zero in PropModder');
-                                }
-                                $new_value %= $params[0];
-                                break;
-                            default:
-                                throw new Exception('Unknown PropModder action');
-                        }
-
-                        $new_value = min($new_value, $max_value); // Ensure it does not exceed max value
-                        $new_value = max($new_value, 0); // Ensure it does not go below 0
-                        
-                        $prop_str = "set_$prop";
-                        $this->$prop_str($new_value); // Set the new value
-                    } else {
-                        throw new Exception('Current value is not numeric!');
-                    }
-                }
-            } else {
-                return;
             }
         }
     }

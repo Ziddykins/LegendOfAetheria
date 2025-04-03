@@ -41,9 +41,19 @@ const Default = {
 
 document.addEventListener("DOMContentLoaded", function() {
     const sidebarWrapper = document.querySelector("#sidebar");
-   
+    const contentWrapper = document.querySelector("#content");
+
     if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
         OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+            scrollbars: {
+                theme: Default.scrollbarTheme,
+                autoHide: Default.scrollbarAutoHide,
+                clickScroll: Default.scrollbarClickScroll,
+            },
+        });
+    }
+    if (contentWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
+        OverlayScrollbarsGlobal.OverlayScrollbars(contentWrapper, {
             scrollbars: {
                 theme: Default.scrollbarTheme,
                 autoHide: Default.scrollbarAutoHide,

@@ -1,13 +1,12 @@
 <?php
 namespace Game\Account;
 
-use Game\Traits\PropConvert;
-use Game\Traits\PropSync;
-use Game\Traits\Enums\PropType;
+use Game\Traits\PropManager\PropManager;
+
+use Game\Traits\PropManager\Enums\PropType;
 
 class Account {
-    use PropConvert;
-    use Propsync;
+    use PropManager;
     
     private $id;
     private $email;
@@ -59,11 +58,16 @@ class Account {
         }
 
         /* Avoid loops with propSync triggering itself */
-        if ($method == 'propSync') {
+        if ($method == 'propSync' || $method == 'propMod') {
+            $log->debug("$method loop");
             return;
         }
 
-        return $this->propSync($method, $params, PropType::ACCOUNT);
+        if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
+            return $this->propMod($method, $params);
+        } else {
+            return $this->propSync($method, $params, PropType::ACCOUNT);
+        }
     }
     
     public static function checkIfExists($email): int {

@@ -1,9 +1,7 @@
 <?php
     declare(strict_types = 1);
     use Game\Account\Account;
-    use Game\Account\Enums\Privileges;
     use Game\Character\Character;
-    use Game\Monster\Pool;
     use Game\Battle\Enums\Turn;
 
     $verbs = ["attacks", "pummels", "strikes", "assaults", "blugeons", "ambushes", "beats", "besieges", "blasts", "bombards", "charges", "harms", "hits", "hurts", "infiltrates", "invades", "raids", "stabs", "storms", "strikes"];

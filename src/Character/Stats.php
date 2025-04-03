@@ -1,13 +1,10 @@
 <?php
 namespace Game\Character;
-use Game\Traits\PropConvert;
-use Game\Traits\PropSync;
-use Game\Traits\Enums\PropType;
+use Game\Traits\PropManager\PropManager;
+use Game\Traits\PropManager\Enums\PropType;
 
 class Stats {
-    use PropConvert;
-    use Propsync;
-    
+    use PropManager;
     private int $id;
 
     private int $hp     = 100;
@@ -31,10 +28,25 @@ class Stats {
     public function __construct ($characterID = 0) {
         $this->id = $characterID;
 
-    }
-    public function __call($method, $params): mixed {
-        global $log;
-        return $this->propSync($method, $params, PropType::CSTATS);
+    }    public function __call($method, $params) {
+        global $db, $log;
+
+        /* If it's a get, this is true */
+        if (!count($params)) {
+            $params = null;
+        }
+
+        /* Avoid loops with propSync triggering itself */
+        if ($method == 'propSync' || $method == 'propMod') {
+            $log->debug("$method loop");
+            return;
+        }
+
+        if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
+            return $this->propMod($method, $params);
+        } else {
+            return $this->propSync($method, $params, PropType::CSTATS);
+        }
     }
 
     public function jsonSerialize(): array {
