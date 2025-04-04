@@ -3,8 +3,7 @@
     use Game\Account\Account;
     use Game\Character\Character;
  
-     session_start();
-
+     
     require_once '../../bootstrap.php';
     require_once 'system/functions.php';
 

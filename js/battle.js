@@ -64,7 +64,7 @@ document.querySelectorAll("button").forEach((btn) => {
 });
 
 async function update_hud() {
-    fetch(`/hud?action=hud&csrf-token=${loa.u_csrf}`, {
+    fetch(`/hud?action=get&csrf-token=${loa.u_csrf}`, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Accept': 'application/json'

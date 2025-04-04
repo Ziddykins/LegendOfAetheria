@@ -1,15 +1,11 @@
 <?php
-    declare(strict_types = 1);
-    session_start();
-    
+    require_once 'bootstrap.php';
+
     use Game\System\Enums\AbuseType;
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
-
-    require_once 'bootstrap.php';
     
-
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
         $email    = $_POST['login-email'];
         $password = $_POST['login-password'];

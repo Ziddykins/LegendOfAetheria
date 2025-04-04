@@ -1,8 +1,7 @@
 <?php
     declare(strict_types = 1);
     use Game\Account\Account;
-    session_start();
-    require_once "bootstrap.php";
+        require_once "bootstrap.php";
 
     $account = new Account($_SESSION['email']);
     $account->load();

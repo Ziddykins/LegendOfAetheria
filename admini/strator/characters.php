@@ -1,7 +1,6 @@
 <?php
     declare(strict_types = 1);
-    session_start();
-    use Game\Account\Account;
+        use Game\Account\Account;
     use Game\Character\Character;
     use Game\Character\Stats;
     use Game\Inventory\Inventory;

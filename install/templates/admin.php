@@ -5,8 +5,7 @@
     use Game\Character\Character;
     use Game\Monster\Pool;
     use Game\Account\Enums;
-    session_start();
-
+    
     require_once "bootstrap.php";
 
     if (check_session() === true) {

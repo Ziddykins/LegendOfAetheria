@@ -1,6 +1,5 @@
 <?php
-    session_start();
-
+    
     $_SESSION = [];
     
     setcookie(session_name(), '', time() - 100, '/', $_SERVER['HTTP_HOST'], true, true);

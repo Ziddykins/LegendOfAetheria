@@ -7,8 +7,7 @@
     $verbs = ["attacks", "pummels", "strikes", "assaults", "blugeons", "ambushes", "beats", "besieges", "blasts", "bombards", "charges", "harms", "hits", "hurts", "infiltrates", "invades", "raids", "stabs", "storms", "strikes"];
     $adverbs = [ "clumsily", "lazily", "spastically", "carefully", "precisely" ];
 
-    session_start();
-
+    
     require_once "bootstrap.php";
 
     $account = new Account($_SESSION['email']);
