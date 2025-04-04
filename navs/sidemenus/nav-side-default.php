@@ -12,6 +12,7 @@ $folders = [];
 
 foreach (["OUTBOX", "INBOX", "DELETED", "DRAFTS"] as $type) {
     $folder = FolderType::name_to_enum($type);
+
     $folders[$type] = MailBox::getFolderCount(
         FolderType::name_to_enum($type),
         $character->get_id()
@@ -22,8 +23,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
 
 ?>
 
-<aside id="sidebar" class="app-sidebar shadow overflow-hidden" data-bs-theme="<?php echo $color_mode; ?>" 
-       style="width: 230px; min-width: 230px; background: rgba(33, 37, 41, 0.95); height: 100vh;">
+<aside id="sidebar" class="app-sidebar shadow overflow-hidden" data-bs-theme="<?php echo $color_mode; ?>" style="width: 230px; min-width: 230px; height: 100vh;">
     <div class="sidebar-brand d-flex align-items-center mb-3">
         <a href="/game" class="brand-link ms-2">
             <img src="/img/logos/logo-banner-no-bg.webp" alt="Legend of Aetheria Logo" class="brand-image img-fluid">
@@ -33,7 +33,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
         </a>
     </div>
 
-    <div class="d-flex justify-content-center mb-3">
+    <div class="d-flex justify-items-center text-center mb-3">
         <?php include 'navs/sidemenus/nav-quicknav.php'; ?>
     </div>
 

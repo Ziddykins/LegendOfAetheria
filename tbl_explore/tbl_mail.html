@@ -1,15 +1,17 @@
 <pre>
-+------------+----------------------------------+------+-----+---------+-------+
-| Field      | Type                             | Null | Key | Default | Extra |
-+------------+----------------------------------+------+-----+---------+-------+
-| id         | int(9) unsigned                  | NO   | PRI | NULL    |       |
-| account_id | int(9) unsigned                  | NO   | UNI | NULL    |       |
-| folder     | enum('Inbox','Outbox','Deleted') | NO   |     | NULL    |       |
-| to         | varchar(50)                      | NO   |     | NULL    |       |
-| from       | varchar(50)                      | NO   |     | NULL    |       |
-| subject    | varchar(50)                      | NO   |     | NULL    |       |
-| message    | longtext                         | NO   |     | NULL    |       |
-| date       | datetime                         | NO   |     | NULL    |       |
-| read       | enum('True','False')             | NO   |     | False   |       |
-| important  | enum('True','False')             | NO   |     | False   |       |
-+------------+----------------------------------+------+-----+---------+-------+
++---------+-----------------------------------------------------+------+-----+---------------------+-------------------------------+
+| Field   | Type                                                | Null | Key | Default             | Extra                         |
++---------+-----------------------------------------------------+------+-----+---------------------+-------------------------------+
+| id      | int(9) unsigned                                     | NO   | PRI | NULL                | auto_increment                |
+| s_aid   | int(9) unsigned                                     | NO   |     | NULL                |                               |
+| s_cid   | int(9) unsigned                                     | NO   |     | NULL                |                               |
+| r_aid   | int(9) unsigned                                     | NO   |     | NULL                |                               |
+| r_cid   | int(9) unsigned                                     | NO   |     | NULL                |                               |
+| folder  | enum('INBOX','DRAFTS','OUTBOX','DELETED')           | NO   |     | NULL                |                               |
+| to      | varchar(50)                                         | NO   |     | NULL                |                               |
+| from    | varchar(50)                                         | NO   |     | NULL                |                               |
+| subject | varchar(50)                                         | NO   |     | NULL                |                               |
+| message | longtext                                            | NO   |     | NULL                |                               |
+| date    | datetime                                            | NO   |     | current_timestamp() | on update current_timestamp() |
+| status  | set('NONE','READ','REPLIED','FAVORITE','IMPORTANT') | YES  |     | NULL                |                               |
++---------+-----------------------------------------------------+------+-----+---------------------+-------------------------------+

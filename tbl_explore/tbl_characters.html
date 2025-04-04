@@ -1,28 +1,22 @@
 <pre>
-+-------------+---------------------+------+-----+--------------------+----------------+
-| Field       | Type                | Null | Key | Default            | Extra          |
-+-------------+---------------------+------+-----+--------------------+----------------+
-| id          | int(9) unsigned     | NO   | PRI | NULL               | auto_increment |
-| account_id  | int(9) unsigned     | NO   |     | NULL               |                |
-| name        | varchar(50)         | YES  |     | NULL               |                |
-| race        | varchar(50)         | YES  |     | NULL               |                |
-| avatar      | varchar(50)         | YES  |     | avatar-unknown.jpg |                |
-| str         | bigint(20) unsigned | YES  |     | 10                 |                |
-| int         | bigint(20) unsigned | YES  |     | 10                 |                |
-| def         | bigint(20) unsigned | YES  |     | 10                 |                |
-| x           | int(9)              | YES  |     | 0                  |                |
-| y           | int(9)              | YES  |     | 0                  |                |
-| location    | varchar(127)        | YES  |     | The Shrine         |                |
-| hp          | bigint(20) unsigned | YES  |     | 100                |                |
-| max_hp      | bigint(20) unsigned | YES  |     | 100                |                |
-| mp          | bigint(20) unsigned | YES  |     | 100                |                |
-| max_mp      | bigint(20) unsigned | YES  |     | 100                |                |
-| ep          | int(9) unsigned     | YES  |     | 100                |                |
-| max_ep      | int(9) unsigned     | YES  |     | 100                |                |
-| alignment   | int(9)              | YES  |     | 5                  |                |
-| gold        | bigint(20) unsigned | YES  |     | 1000               |                |
-| exp         | bigint(20) unsigned | YES  |     | 0                  |                |
-| floor       | int(9) unsigned     | YES  |     | 1                  |                |
-| description | text                | YES  |     | 'None Provided'    |                |
-| ap          | int(9) unsigned     | YES  |     | 0                  |                |
-+-------------+---------------------+------+-----+--------------------+----------------+
++--------------+---------------------+------+-----+---------------------+----------------+
+| Field        | Type                | Null | Key | Default             | Extra          |
++--------------+---------------------+------+-----+---------------------+----------------+
+| id           | int(9) unsigned     | NO   | PRI | NULL                | auto_increment |
+| account_id   | int(9) unsigned     | NO   |     | NULL                |                |
+| level        | int(9) unsigned     | YES  |     | 1                   |                |
+| name         | varchar(50)         | YES  |     | NULL                |                |
+| race         | varchar(50)         | YES  |     | NULL                |                |
+| avatar       | varchar(50)         | YES  |     | avatar-unknown.jpg  |                |
+| x            | int(9)              | YES  |     | 0                   |                |
+| y            | int(9)              | YES  |     | 0                   |                |
+| location     | varchar(127)        | YES  |     | The Shrine          |                |
+| alignment    | int(9)              | YES  |     | 5                   |                |
+| gold         | bigint(20) unsigned | YES  |     | 1000                |                |
+| floor        | int(9) unsigned     | YES  |     | 1                   |                |
+| description  | text                | YES  |     | 'None Provided'     |                |
+| stats        | blob                | YES  |     | NULL                |                |
+| inventory    | blob                | YES  |     | NULL                |                |
+| monster      | blob                | YES  |     | NULL                |                |
+| date_created | datetime            | YES  |     | current_timestamp() |                |
++--------------+---------------------+------+-----+---------------------+----------------+

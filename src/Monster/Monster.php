@@ -35,15 +35,23 @@ class Monster {
     * @return mixed The value of the property if a getter is called, or void if a setter is called.
     */
     public function __call($method, $params) {
+        global $db, $log;
+
+        /* If it's a get, this is true */
+        if (!count($params)) {
+            $params = null;
+        }
+
+        /* Avoid loops with propSync triggering itself */
         if ($method == 'propSync' || $method == 'propMod') {
+            $log->debug("$method loop");
             return;
         }
 
-        switch ($method) {
-            case 'propSync':
-                return $this->propSync($method, $params, PropType::MONSTER);
-            case 'propMod':
-                return $this->propMod($method, $params);
+        if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
+            return $this->propMod($method, $params);
+        } else {
+            return $this->propSync($method, $params, PropType::MSTATS);
         }
     }
 
@@ -76,7 +84,6 @@ class Monster {
 
 
     public function random_monster(): void{
-        global $db;
         global $system;
         $monster = $system->monsters[random_int(0, count($system->monsters) - 1)];
         $temp_stats_arr = explode(',', $monster);
