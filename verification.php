@@ -2,8 +2,7 @@
     declare(strict_types = 1);
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
-    session_start();
-    require 'vendor/autoload.php';
+        require 'vendor/autoload.php';
 
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();

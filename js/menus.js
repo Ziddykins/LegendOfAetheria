@@ -41,7 +41,7 @@ const Default = {
 
 document.addEventListener("DOMContentLoaded", function() {
     const sidebarWrapper = document.querySelector("#sidebar");
-    const contentWrapper = document.querySelector("#content");
+    const osInstance = OverlayScrollbarsGlobal.OverlayScrollbars(document.querySelector('#content'), {});
 
     if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
         OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {

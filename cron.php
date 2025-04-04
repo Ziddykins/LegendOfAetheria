@@ -8,8 +8,7 @@
 
     require_once "functions.php";
 
-    session_start();
-
+    
     if (!isset($argv)) {
         echo 'Access to cron.php directly is not allowed!<br>';
         exit(LOAError::CRON_HTTP_DIRECT_ACCESS->name);
