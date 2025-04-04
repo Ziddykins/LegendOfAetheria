@@ -1,10 +1,10 @@
 <pre>
-+---------+---------------------------------------+------+-----+---------------------+----------------+
-| Field   | Type                                  | Null | Key | Default             | Extra          |
-+---------+---------------------------------------+------+-----+---------------------+----------------+
-| id      | int(10) unsigned                      | NO   | PRI | NULL                | auto_increment |
-| date    | datetime                              | YES  |     | current_timestamp() |                |
-| type    | enum('FAILED_LOGIN','LOGIN','LOGOUT') | YES  |     | NULL                |                |
-| message | varchar(255)                          | YES  |     | NULL                |                |
-| ip      | varchar(50)                           | YES  |     | NULL                |                |
-+---------+---------------------------------------+------+-----+---------------------+----------------+
++---------+------------------+------+-----+---------------------+----------------+
+| Field   | Type             | Null | Key | Default             | Extra          |
++---------+------------------+------+-----+---------------------+----------------+
+| id      | int(10) unsigned | NO   | PRI | NULL                | auto_increment |
+| date    | datetime         | YES  |     | current_timestamp() |                |
+| type    | varchar(255)     | YES  |     | NULL                |                |
+| message | varchar(255)     | YES  |     | NULL                |                |
+| ip      | varchar(50)      | YES  |     | NULL                |                |
++---------+------------------+------+-----+---------------------+----------------+

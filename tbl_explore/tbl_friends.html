@@ -1,9 +1,10 @@
 <pre>
-+---------+-----------------+------+-----+---------------------+----------------+
-| Field   | Type            | Null | Key | Default             | Extra          |
-+---------+-----------------+------+-----+---------------------+----------------+
-| id      | int(9) unsigned | NO   | PRI | NULL                | auto_increment |
-| email_1 | varchar(255)    | NO   |     | NULL                |                |
-| email_2 | varchar(255)    | NO   |     | NULL                |                |
-| created | timestamp       | NO   |     | current_timestamp() |                |
-+---------+-----------------+------+-----+---------------------+----------------+
++---------------+----------------------------------------------------+------+-----+---------+-------------------------------+
+| Field         | Type                                               | Null | Key | Default | Extra                         |
++---------------+----------------------------------------------------+------+-----+---------+-------------------------------+
+| id            | int(9) unsigned                                    | NO   | PRI | NULL    | auto_increment                |
+| sender_id     | int(9) unsigned                                    | NO   |     | NULL    |                               |
+| recipient_id  | int(9) unsigned                                    | NO   |     | NULL    |                               |
+| friend_status | set('NONE','REQUEST_SENT','REQUEST_RECV','MUTUAL') | YES  |     | NONE    |                               |
+| timestamp     | datetime                                           | YES  |     | NULL    | on update current_timestamp() |
++---------------+----------------------------------------------------+------+-----+---------+-------------------------------+

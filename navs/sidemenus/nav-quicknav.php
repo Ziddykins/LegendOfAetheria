@@ -8,7 +8,7 @@
 
 ?>
 
-<div class="d-flex pe-2 pb-2 ps-2 w-100 border border-success shadow align-content-center">
+<div class="d-flex pe-2 pb-2 ps-2 shadow-sm justify-content-evenly" style="width: 90%;">
     <div class="text-center">
         <span data-bs-toggle="tooltip" data-bs-title="Expand All" class="nav-icon material-symbols-sharp mt-3 border" style="cursor: pointer;" onclick=expand_all()>
             unfold_more
@@ -29,8 +29,7 @@
         <a href="/game?page=profile">
             <span class="nav-icon material-symbols-sharp mt-3 border" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Character Profile">
                 demography
-            </span>
-        </a>
+            </span></a>
         
         <span data-bs-toggle="tooltip" data-bs-title="Collapse All" class="nav-icon material-symbols-sharp mt-3 border" style="cursor: pointer;" onclick=collapse_all()>
             unfold_less
