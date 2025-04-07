@@ -1,0 +1,13 @@
+<?php
+    define('MAIN_SITE_BASEURL', '###REPL_PROTOCOL######REPL_WEB_DOCROOT###');
+    define('SYSTEM_EMAIL_ADDRESS', "###REPL_WEB_ADMIN_EMAIL###");
+    define('WEBROOT', '###REPL_WEB_FQDN###');
+    
+	define('UPLOAD_DIRECTORY', WEBROOT . '/uploads');
+    define('LOG_DIRECTORY', WEBROOT . '/system/logs');
+	define('WHITELABEL_DIRECTORY', UPLOAD_DIRECTORY . '/whitelabel');
+	define('TEMP_DIRECTORY', UPLOAD_DIRECTORY . '/temp');
+	
+	define('RELATIVE_UPLOAD_DIRECTORY', '/uploads');
+	define('RELATIVE_WHITELABEL_DIRECTORY', '/uploads/whitelabel');
+	define('RELATIVE_SYSTEM_DIRECTORY', '/system');

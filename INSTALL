@@ -30,15 +30,29 @@
 
 
 
-Debian/Ubuntu
---------------
-```sh
+Debian/Ubuntu/Alpine
+--------------------
+sudo cpan Term::ReadKey
+sudo cpan Config::IniFiles
 cd install
+
+** if ubuntu **
+bash scripts/sury_setup_ubnt.sh
+
+** if debian **
+bash scripts/sury_setup_debian.sh
+
+
+bash scripts/perldeps.sh
+mv config.ini.example config.ini
 chmod +x AutoInstaller.pl
-./AutoInstaller.pl```
-
-
+./AutoInstaller.pl
 
 Windows
---------------
+--------------------
 Soon
+
+Mac
+--------------------
+Probably do-able, but not tested.
+If you want to try, please let me know how it goes.

@@ -158,6 +158,11 @@ if ($cfg{step} == OPENAI) {
 }
 
 if ($cfg{step} == TEMPLATES) {
+    tell_user('INFO', "I'ma let you run some templates, but first I just needa know...");
+    if (ask_user("Do you want to enable SSL?", 'y', 'yesno')) {
+        step_vhost_ssl();
+    }
+    
     my @replacements = (
         "###REPL_PHP_BINARY###%%%$cfg{php_binary}",
 
@@ -184,6 +189,7 @@ if ($cfg{step} == TEMPLATES) {
         "###REPL_SQL_TBL_GLOBALS###%%%$sql{tbl_globals}",
         "###REPL_SQL_TBL_BANNED###%%%$sql{tbl_banned}",
         "###REPL_SQL_TBL_GLOBALCHAT%%%$sql{tbl_globalchat}",
+        
 
         "###REPL_OPENAI_APIKEY###%%%$cfg{openai_apikey}",
 
@@ -205,10 +211,6 @@ if ($cfg{step} == TEMPLATES) {
 }
 
 if ($cfg{step} == APACHE) {
-    if (ask_user("Perform necessary apache updates?", 'y', 'yesno')) {
-        step_vhost_ssl();
-    }
-
     if (ask_user("Enable the required Apache conf/mods/sites?", 'y', 'yesno')) {
         step_apache_enables();
     }
@@ -238,7 +240,7 @@ if ($cfg{step} == CLEANUP) {
     next_step();
  }
 
-print "\n\n$clr{yellow}-----$clr{red}=$clr{grey}<$clr{green}COMPLETE$clr{grey}>$clr{red}=$clr{yellow}-----$clr{reset}\n\n";
+print "$clr{green}All steps completed$clr{reset}\n";
 
 # ===================================[ main-end ]=================================== #
 
@@ -331,6 +333,7 @@ sub step_firstrun {
     $cfg{env_template}          = "$cfg{template_dir}/env.template";
     $cfg{sql_template}          = "$cfg{template_dir}/sql.template";
     $cfg{php_template}          = "$cfg{template_dir}/php.template";
+    $cfg{constants_template}    = "$cfg{template_dir}/constants.template";
     $cfg{php_fpm}               = 0;
     next_step();
 
@@ -819,6 +822,7 @@ sub step_generate_templates {
     $templates{$cfg{crontab_template}}      = "$cfg{crontab_template}.ready";
     $templates{$cfg{virthost_ssl_template}} = "$cfg{virthost_ssl_template}.ready";
     $templates{$cfg{virthost_template}}     = "$cfg{virthost_template}.ready";
+    $templates{$cfg{constants_template}}    = "$cfg{constants_template}.ready";
 
     while(my ($key, $val) = each %templates) {
         open my $fh, '<', $key;
@@ -873,13 +877,16 @@ sub step_process_templates {
     tell_user('INFO', "Copying over $cfg{virthost_template}.ready to $cfg{virthost_conf_file}");
     file_write($cfg{virthost_conf_file}, "$cfg{virthost_template}.ready", 'file');
 
-    if ($cfg{ssl_enabled}) {
+    if (int($cfg{ssl_enabled}) == 1) {
         tell_user('INFO', "Copying over $cfg{virthost_ssl_template}.ready to $cfg{virthost_conf_file_ssl}");
         file_write($cfg{virthost_conf_file_ssl}, "$cfg{virthost_ssl_template}.ready", 'file');
     }
 
     tell_user('INFO', "Copying over $cfg{htaccess_template}.ready to $cfg{web_root}/.htaccess");
     file_write("$cfg{web_root}/.htaccess", "$cfg{htaccess_template}.ready", 'file');
+
+    tell_user('INFO', "Copying over $cfg{constants_template}.ready to $cfg{web_root}/constants.php");
+    file_write("$cfg{web_root}/constants.php", "$cfg{constants_template}.ready", 'file');
 
     tell_user('INFO', "Installing our cronjobs under user $cfg{apache_runas}");
     
@@ -1262,7 +1269,12 @@ sub get_sysinfo {
             "SuSE:zypper:in",
             "debian:apt-get:-y install",
             "alpine:apk:add",
-            "kali:apt-get:-y install"
+            "kali:apt-get:-y install",
+            "ubuntu:apt-get:-y install",
+            "linuxmint:apt-get:-y install",
+            "centos:yum:-y install",
+            "fedora:dnf:-y install",
+            "slackware:slackpkg:install",
         );
 
         chomp(my $check_docker = `mount | grep 'overlay on / type' -ao`);
@@ -1275,18 +1287,24 @@ sub get_sysinfo {
             if (-e "/etc/$distro-release") {
                 $cfg{distro} = $distro;
                 $cfg{pm_cmd} = "$pm $args";
+                tell_user('INFO', "Found $distro-release file");
+                last;
             }
 
-            if (-e "/etc/os-release" && !$cfg{distro}) {
+            if (-e "/etc/os-release") {
                 open my $fh, '<', '/etc/os-release';
                 my @lines = <$fh>;
                 close $fh;
                 
+                my $found = 0;
                 foreach my $line (@lines) {
                     if ($line =~ /^ID=$distro/ || $line =~ /^LIKE=$distro/) {
                         $cfg{distro} = $distro;
                         $cfg{pm_cmd} = "$pm $args";
+                        tell_user('INFO', "Found $distro in /etc/os-release");
+                        $found = 1;
                     }
+                    last if $found;
                 }
             }
 
@@ -1295,6 +1313,8 @@ sub get_sysinfo {
                 if ($lsb_check =~ /$distro/) {
                     $cfg{distro} = $distro;
                     $cfg{pm_cmd} = "$pm $args";
+                    tell_user('INFO', "Found $distro in lsb_release");
+                    last;
                 }
             }
         }
