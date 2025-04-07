@@ -1,3 +1,9 @@
+# REM <Directory ###REPL_WEB_DOCROOT###>
+# REM     Options -Indexes
+# REM    AllowOverride All
+# REM    Require all granted
+# REM </Directory>
+
 <VirtualHost ###REPL_WEB_FQDN###:###REPL_APACHE_HTTP_PORT###>
 	ServerName ###REPL_WEB_FQDN###
 	ServerAdmin ###REPL_WEB_ADMIN_EMAIL###

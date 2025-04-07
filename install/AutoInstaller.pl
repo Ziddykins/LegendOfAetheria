@@ -161,10 +161,9 @@ if ($cfg{step} == TEMPLATES) {
     my @replacements = (
         "###REPL_PHP_BINARY###%%%$cfg{php_binary}",
 
-        "###REPL_WEB_ROOT###%%%$cfg{web_root}",
+        "###REPL_WEB_DOCROOT###%%%$cfg{web_root}",
         "###REPL_WEB_ADMIN_EMAIL###%%%$cfg{admin_email}",
         "###REPL_WEB_FQDN###%%%$cfg{fqdn}",
-        "###REPL_WEB_DOCROOT###%%%$cfg{web_root}",
         "###REPL_WEB_SSL_FULLCER###%%%$cfg{ssl_fullcer}",
         "###REPL_WEB_SSL_PRIVKEY###%%%$cfg{ssl_privkey}",
 
@@ -504,7 +503,8 @@ sub step_sql_configure {
 
 sub step_vhost_ssl {
     my $answer;
-    my $options = "1. Generate a self-signed certificate for $cfg{fqdn}\n"
+    my $options = "1. Generate a self-signed certificate for $cfg{fqdn} and\n"
+                . "   enable HTTP -> HTTPS Redirection\n"
                 . "2. Keep current SSL and enable HTTP -> HTTPS redirection\n"
                 . "3. Don't enable HTTP -> HTTPS redirection\n"
                 . "4. Manually enter certificate and private key locations\n"
@@ -513,6 +513,7 @@ sub step_vhost_ssl {
 
     if (ask_user("Do you want to enable SSL?", 'y', 'yesno')) {
         $cfg{ssl_enabled} = 1;
+        `sed -i 's/# REM //' $cfg{virthost_conf_file_ssl}`;
 
         print "Do you want to redirect traffic from http:80 to "
             . "https:443? A valid certificate needs to be set in the "
@@ -549,6 +550,7 @@ sub step_vhost_ssl {
         }
     } else {
         $cfg{ssl_enabled} = 0;
+        `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
     }
 }
 
