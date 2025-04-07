@@ -69,6 +69,7 @@ tbl_chats=tbl_chats
 tbl_monsters=tbl_monsters
 tbl_logs=tbl_logs
 tbl_banned=tbl_banned
+tbl_globalchat=tbl_globalchat
 
 [colors]
 red=[31m

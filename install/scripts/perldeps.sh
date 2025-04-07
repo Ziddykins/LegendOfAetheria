@@ -1,3 +1,4 @@
 #!/bin/bash
 
-yes | cpan Term::ReadKey && yes | cpan Config::IniFiles && echo -e "\e[33mSuccess"
+echo -e "\n\n\n\n\ninstall Term::ReadKey" | cpan
+echo -e "\n\n\n\n\ninstall Config::IniFiles" | cpan
