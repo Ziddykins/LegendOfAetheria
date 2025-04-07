@@ -498,11 +498,13 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                             </a>
                         </li>                        
                     </ul>
+                    <div class="pb-5 mb-5 d-flex w-100">
+                        <a href="/logout" class="btn btn-danger shadow align-content-center">                          <span class="material-symbols-outlined">move_item</span>
+                            Sign out
+                        </a>
+                    </div>
                 </li>
-            <div class="mt-auto p-3">
-                <a href="/logout" class="btn btn-danger w-100 shadow">Sign out</a>
-            </div>
-        </ul>
+            </ul>
         </nav>
     </div>
 </aside>

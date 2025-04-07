@@ -184,6 +184,7 @@ if ($cfg{step} == TEMPLATES) {
         "###REPL_SQL_TBL_LOGS###%%%$sql{tbl_logs}",
         "###REPL_SQL_TBL_GLOBALS###%%%$sql{tbl_globals}",
         "###REPL_SQL_TBL_BANNED###%%%$sql{tbl_banned}",
+        "###REPL_SQL_TBL_GLOBALCHAT%%%$sql{tbl_globalchat}",
 
         "###REPL_OPENAI_APIKEY###%%%$cfg{openai_apikey}",
 

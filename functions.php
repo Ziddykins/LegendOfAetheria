@@ -470,7 +470,7 @@ use Game\System\Enums\LOAError;
         global $db, $log;
             
         if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
-            $log->warning("Sessions var 'logged-in' not set to 1", [ print_r($_SESSION, true) ] );
+            $log->warning("Sessions var 'logged-in' not set to 1", [ print_r($_SESSION, true), print_r(debug_backtrace(), true) ] );
             return false;
         }
      

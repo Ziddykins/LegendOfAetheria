@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "smooth-scrollbar": "^8.8.4"
+    "overlayscrollbars": "^2.11.1"
   }
 }

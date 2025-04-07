@@ -7,6 +7,8 @@ use Game\Character\Stats;
 use Game\Inventory\Inventory;
 use Game\System\Enums\LOAError;
 use Game\Traits\PropManager\Enums\PropType;
+use ReflectionClass;
+use ReflectionEnum;
 
 
 
@@ -204,26 +206,20 @@ trait PropSync {
             }
         } elseif (strcmp($action, 'load') === 0) { /*LOAD*/
             $tmp_obj = null;
-            if ($type === PropType::MONSTER) {
-                $scope = $params[0];
-                $sql_query = "SELECT * FROM {$_ENV['SQL_MNST_TBL']} WHERE `scope` = ?";
-                $tmp_obj = $db->execute_query($sql_query, [ $scope->value]);
-            } else {
-                $sql_query = "SELECT * FROM $table WHERE `id` = ?";
-                $tmp_obj = $db->execute_query($sql_query, [ $this->id ])->fetch_assoc();
-            }
+            $sql_query = "SELECT * FROM $table WHERE `id` = ?";
+            $tmp_obj = $db->execute_query($sql_query, [ $this->id ])->fetch_assoc();
             
             foreach ($tmp_obj as $key => $value) {
                 $key = $this->tblcol_to_clsprop($key);
 
+                
                 if ($value !== null && $value !== 'NULL') {
-                    if ($key == 'privileges') {
-                        $log->debug("Privileges", [ 'Privileges' => $this->$key, 'Value' => $value  ]);
-                        $this->$key = Privileges::name_to_enum($value);
-                        $log->debug("Privileges", [ 'NowPrivileges' => $this->$key, 'NowValue' => $value, 'PrivName' => $this->$key->name, 'PrivVal' => $this->$key->value  ]);
-                    } else {
-                        $this->$key = $value;
+                    if (array_search($key, ['inventory', 'settings', 'stats', 'monster']) == false) {
                     }
+                    if ($key == 'privileges') {
+                        $this->$key = Privileges::name_to_enum($value);
+                    }
+                    $this->$key = $value;
                 }
             }
 
@@ -240,7 +236,12 @@ trait PropSync {
                 $this->stats     = $tmp_stats;
             } elseif ($type == PropType::ACCOUNT) {
                 $tmp_settings = safe_serialize($tmp_obj['settings'], true);
+                $tmp_privs    = Privileges::name_to_enum($tmp_obj['privileges']);
+                $this->privileges = $tmp_privs;
                 $this->settings = $tmp_settings;
+            } elseif ($type == PropType::MONSTER) {
+                $tmp_stats = safe_serialize($tmp_obj['stats'], true);
+                $this->stats = $tmp_stats;
             }
         }
     }

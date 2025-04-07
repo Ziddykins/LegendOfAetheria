@@ -1,3 +1,4 @@
++
 # To Do List
 
 ## System
@@ -46,5 +47,9 @@
 # AutoInstaller
 
   - [ ] Update hosts file
-  - [ ] Script closes before composer/perms, fix
+  - [x] Script closes before composer/perms, fix
   - [ ] creation of ssl vhost doesn't happen
+
+# Select Character (select.php)
+
+  - [ ] Fix avatar display not showing preview image
