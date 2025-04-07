@@ -51,7 +51,7 @@ use constant {
     PERMS     => 9,
     COMPOSER  => 10,
     CLEANUP   => 11,
-    CERTS     => 99, #TODO: implement :D
+    HOSTS     => 12,
 };
 
 use constant {
@@ -83,7 +83,9 @@ my $question; # current question to ask the user
 
 my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
 
-if (!-e $cfg_file && -e 'config.ini.default') {
+if (!-e $cfg_file) {
+    croak('No config specified, no default config found');
+} elsif (!-e $cfg_file && -e 'config.ini.default') {
     croak(
         'You need to have a config.ini file; either create one or rename the' .
         "'config.ini.default' file to 'config.ini' before continuing\n"
@@ -161,6 +163,7 @@ if ($cfg{step} == TEMPLATES) {
     tell_user('INFO', "I'ma let you run some templates, but first I just needa know...");
     if (ask_user("Do you want to enable SSL?", 'y', 'yesno')) {
         step_vhost_ssl();
+        
     }
     
     my @replacements = (
@@ -198,6 +201,12 @@ if ($cfg{step} == TEMPLATES) {
         "###REPL_APACHE_HTTP_PORT###%%%$cfg{apache_http_port}",
         "###REPL_APACHE_HTTPS_PORT###%%%$cfg{apache_https_port}",
     );
+
+    if ($cfg{ssl_enabled}) {
+        push @replacements, "###REPL_PROTOCOL###%%%https";
+    } else {
+        push @replacements, "###REPL_PROTOCOL###%%%http";
+    }
 
     if (ask_user("Generate templates?", 'y', 'yesno')) {
         step_generate_templates(\@replacements);
@@ -238,7 +247,14 @@ if ($cfg{step} == CLEANUP) {
         clean_up();
     }
     next_step();
- }
+}
+
+if ($cfg{step} == HOSTS) {
+    if (ask_user("Update hosts file?", 'y', 'yesno')) {
+        step_update_hosts();
+    }
+    next_step();
+}
 
 print "$clr{green}All steps completed$clr{reset}\n";
 
@@ -916,6 +932,26 @@ sub step_start_services {
     }
 }
 
+sub step_update_hosts {
+    my @hosts = `cat /etc/hosts | awk '{print \$1}' | sort | uniq`;
+    tell_user('Found these available IPs, please select or enter an IP for the server to resolve $cfg{fqdn} to');
+
+    for (my $i=0; $i<@hosts; $i++) {
+        tell_user($i . ". $hosts[$i]\n");
+    }
+    my $choice = ask_user('Enter an IP: ', '', 'input');
+
+    if ($choice =~ /[0-9]+/) {
+        $choice = $hosts[$choice];
+    }
+
+    if (ask_user("Writing: '$choice\t$cfg{fqdn}' to $cfg{hosts_file}, okay?")) {
+        open my $fh, '>>', $cfg{hosts_file};
+        print $fh "$choice\t$cfg{fqdn}\n";
+        close $fh;
+    }
+}
+
 # ====================================[ steps-end ]====================================== #
 # ==================================[ internal-start ]=================================== #
 sub replace_in_file {
@@ -937,8 +973,6 @@ sub replace_in_file {
     }
 
     print "[" . substr($file_in, -5, 5) . " -> " . substr($file_out, -5, 5) . "] $search -> $replace\n";
-
-    open $fh, '>', $file_out;
     print $fh @contents;
     close $fh;
 }
@@ -991,7 +1025,7 @@ sub find_temp {
         'php.list$'
     );
 
-    if (grep /$file/, @files_to_remove) {
+    if (/$file/, @files_to_remove) {
         tell_user("SUCCESS", "Removed temp file $file");
 #        unlink($file);
         print "unlink($file) :o\n";
