@@ -1,5 +1,5 @@
 <?php
-    define('MAIN_SITE_BASEURL', '###REPL_PROTOCOL######REPL_WEB_DOCROOT###');
+    define('MAIN_SITE_BASEURL', '###REPL_PROTOCOL###://###REPL_WEB_FQDN###');
     define('SYSTEM_EMAIL_ADDRESS', "###REPL_WEB_ADMIN_EMAIL###");
     define('WEBROOT', '###REPL_WEB_FQDN###');
     

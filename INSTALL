@@ -32,21 +32,19 @@
 
 Debian/Ubuntu/Alpine
 --------------------
-sudo cpan Term::ReadKey
-sudo cpan Config::IniFiles
 cd install
 
 ** if ubuntu **
-bash scripts/sury_setup_ubnt.sh
+sudo bash scripts/sury_setup_ubnt.sh
 
 ** if debian **
-bash scripts/sury_setup_debian.sh
+sudo bash scripts/sury_setup_debian.sh
 
 
-bash scripts/perldeps.sh
+sudo bash scripts/perldeps.sh
 mv config.ini.example config.ini
 chmod +x AutoInstaller.pl
-./AutoInstaller.pl
+sudo ./AutoInstaller.pl
 
 Windows
 --------------------
