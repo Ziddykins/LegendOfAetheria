@@ -1,158 +1,105 @@
-<div?php
-    $hp_textcolor = $mp_textcolor = $ep_textcolor = 'text-black';
+<?php
+    include 'snippets/snip-charstats.php';
 
-    $cur_hp = $character->stats->get_hp();
-    $cur_mp = $character->stats->get_mp();
-    $cur_ep = $character->stats->get_ep();
-
-    $max_hp = $character->stats->get_maxHP();
-    $max_mp = $character->stats->get_maxMP();
-    $max_ep = $character->stats->get_maxEP();
-
-    $hp_textcolor = ($cur_hp / $max_hp * 100 <d= 50) ? 'text-white' : $hp_textcolor;
-    $mp_textcolor = ($cur_mp / $max_mp * 100 <= 50) ? 'text-white' : $mp_textcolor;
-    $ep_textcolor = ($cur_ep / $max_ep * 100 <= 50) ? 'text-white' : $ep_textcolor;
 ?>
-
-<p></p>
-
-<div class="container text-center d-flex justify-content-center align-items-center">
-    <div class="row">
-        <div class="col">
-            <div class="card mb-3" style="max-width: 700px;">
-                <div class="row g-0">
-                    <div class="col-4">
-                        <img src="img/avatars/<?= $character->get_avatar(); ?>" class="img-fluid rounded m-3" alt="character-avatar">
+        <div class="d-flex justify-content-center">
+            <div class="card ps-3 mb-3 pt-3" style="max-width: 700px;">
+                <div class="card-title lead">
+                    <?php echo "$char_name the level $char_level $char_race"; ?>
+                    
+                    <span class="small text-body-secondary float-end pe-3" style="font-size: 10px;">
+                        Character created <?php echo $character->get_dateCreated(); ?>
+                    </span>
+                    
+                </div>
+                <div class="hr">
+                <div class="d-flex">                
+                    <div class="flex-shrink-0">
+                        <img src="img/avatars/<?php echo $char_avatar; ?>" class="img-fluid rounded m-3" alt="character-avatar" style="width: 256px; height:256px;">
+                        <div class="small mb-3 pe-3 text-center">
+                            <?php echo "$char_location ($cur_x, $cur_y)"; ?>
+                        </div>
                     </div>
                     
-                    <div class="col-6">
-                        <div class="card-body">
-                            <h5 class="card-title"><?= $character->get_name(); ?></h5>
-                            <div class="container">
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        Name:
-                                    </div>
+                    <div class="card-body">
+                        <div class="flex-grow-1">
+                            <div class="container shadow-sm border">
+                                <div class="row mb-3 mt-3 text-center fw-bold">
+                                    <div class="col">HP:</div>
+                                    <div class="col">MP:</div>
+                                    <div class="col">EP:</div>
                                 </div>
 
                                 <div class="row mb-3">
-                                    <div class="col-4">
-                                        EP:
+                                    <div class="col">
+                                        <span id="hp" name="hp" class="ldBar label-center" data-value="<?php echo $cur_hp; ?>" data-max="<?php echo $max_hp; ?>" data-type="stroke" data-content="hp" data-stroke="red"></span>
                                     </div>
-                                    
-                                    <div class="col-4">
-                                        <span id="ep" name="ep" class="ldBar label-center <?= $ep_textcolor; ?>"
-                                            data-value="<?= $cur_ep; ?>"
-                                            data-max="<?= $max_ep; ?>"
-                                            data-preset="energy"
-                                            data-pattern-size="120">
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        EP:
-                                    </div>
-                                    
-                                    <div class="col-4">
-                                        <span id="ep" name="ep" class="ldBar label-center <?= $ep_textcolor; ?>"
-                                            data-value="<?= $cur_ep; ?>"
-                                            data-max="<?= $max_ep; ?>"
-                                            data-preset="energy"
-                                            data-pattern-size="120">
-                                        </span>
-                                    </div>
-                                </div>
 
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        EP:
+                                    <div class="col">
+                                        <span id="mp" name="mp" class="ldBar label-center" data-max="<?php echo $cur_mp; ?>" data-type="stroke" data-content="mp" data-stroke="blue"></span>
                                     </div>
-                                    
-                                    <div class="col-4">
-                                        <span id="ep" name="ep" class="ldBar label-center <?= $ep_textcolor; ?>"
-                                            data-value="<?= $cur_ep; ?>"
-                                            data-max="<?= $max_ep; ?>"
-                                            data-preset="energy"
-                                            data-pattern-size="120">
-                                        </span>
-                                    </div>
-                                </div>
 
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        Level:
+                                    <div class="col">
+                                        <span id="ep" name="ep" class="ldBar label-center" data-value="<?php echo $cur_ep; ?>" data-max="<?php echo $max_ep; ?>" data-type="stroke" data-content="ep" data-stroke="yellow"></span>
                                     </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        Race:
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        X, Y:
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        Location:
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        Alignment:
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        Gold:
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        Floor:
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        
-                                    </div>
-                                </div>
-                                
-
-                                <hr style="opacity: .25; align-self: center;">
-                                
-                                <div class="row mb-3">
-                                    <div class="col text-truncate">Strength</div>
-                                    <div class="col text-truncate">Defense</div>
-                                    <div class="col text-truncate">Intelligence</div>
-                                </div>
-                                <div class="row mb-3 fs-1">
-                                    <div class="col-4"><i class="bi bi-hammer"></i></div>
-                                    <div class="col-4 fs-1"><i class="bi bi-shield-fill"></i></div>
-                                    <div class="col-4 fs-1"><i class="bi bi-journal-bookmark-fill"></i></div>
-                                </div>
-                                <div class="row mb-3 fs-1">
-                                    <div class="col-4"><?= $character->stats->get_str(); ?></div>
-                                    <div class="col-4 fs-1"><?= $character->stats->get_def(); ?></div>
-                                    <div class="col-4 fs-1"><?= $character->stats->get_int(); ?></div>
                                 </div>
                             </div>
-                            <p class="card-text"><small class="text-body-secondary">Character created on <?= $character->get_dateCreated(); ?></small></p>
+
+                            <div class="container border shadow-sm">
+                                <div class="row mb-3 mt-3">
+                                    <span class="col">
+                                        <i class="bi bi-hammer me-3"></i>
+                                        <span class="d-none d-md-inline">Strength</span>
+                                    </span>
+                                    <span class="col"><?php echo $char_str; ?></span>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <span class="col">
+                                        <i class="bi bi-shield-fill me-3"></i>
+                                        <span class="d-none d-md-inline">Defense</span>
+                                    </span>
+                                    <span class="col"><?php echo $char_def; ?></span>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <span class="col">
+                                        <i class="bi bi-journal-bookmark-fill me-3"></i>
+                                        <span class="d-none d-md-inline small">Intelligence</span>
+                                    </span>
+                                    <span class="col"><?php echo $char_int; ?></span>
+                                </div>
+                            </div>
+                            
+                            <div class="container border shadow-sm">
+                                <div class="row mb-3 mt-3">
+                                    <div class="col">
+                                        Alignment: <?php echo $char_align; ?>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        Gold&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <?php echo $character->get_gold(); ?>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        Floor&nbsp;&nbsp;&nbsp;&nbsp;: <?php echo $character->get_floor(); ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-<script src="/js/loading-bar.js"></script>
+        
+        <script src="/js/loading-bar.js"></script>

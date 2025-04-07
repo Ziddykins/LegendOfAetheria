@@ -10,9 +10,8 @@
         foreach ($system->monsters as $monster) {
             foreach ($intervals as $interval) {
                 $monster = new Monster(MonsterScope::NONE);
-                echo '<pre>';
-                print_r($monster);
-                $name_ns = preg_replace('/ /', '', $monster->get_name());
+
+                $name_ns = preg_replace('/ /', '', $monster['name']);
 
                 if ($count++ % 3 == 0) {
                     echo '<br>';

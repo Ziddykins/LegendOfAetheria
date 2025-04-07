@@ -22,7 +22,7 @@
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 
-    if ($_SERVER['SCRIPT_NAME'] !== '/index.php') {
+    if ($_SERVER['SCRIPT_NAME'] !== '/index.php' && $_SERVER['SCRIPT_NAME'] !== '/cron.php') {
         if (check_session() === true) {
             if (!isset($_SESSION['csrf-token'])) {
                 $_SESSION['csrf-token'] = gen_csrf_token();

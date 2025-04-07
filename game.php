@@ -7,6 +7,7 @@
     use Game\Character\Character;
     use Game\Components\Sidebar\Enums\SidebarType;
     use Game\System\System;
+    use Game\Account\Settings;
     //use Game\Familiar\Familiar;
 
     $system = new System(0);

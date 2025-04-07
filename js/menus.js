@@ -29,9 +29,12 @@ $('a[id^="menu-anchor"]').on('click', function (e) {
     e.target.classList.add('text-white');
 });
 
-$(document).ready(function(){
-
-});
+var { 
+    OverlayScrollbars, 
+    ScrollbarsHidingPlugin, 
+    SizeObserverPlugin, 
+    ClickScrollPlugin
+} = OverlayScrollbarsGlobal;
 
 const Default = {
     scrollbarTheme: "os-theme-light",
@@ -41,9 +44,26 @@ const Default = {
 
 document.addEventListener("DOMContentLoaded", function() {
     const sidebarWrapper = document.querySelector("#sidebar");
-    const osInstance = OverlayScrollbarsGlobal.OverlayScrollbars(document.querySelector('#content'), {});
+    var elements = document.querySelectorAll('#sidebar,#main-section');
 
-    if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
+    elements.forEach((element) => {
+        const style = window.getComputedStyle(element);
+        console.log(element);
+        const isScrollable = style.overflow === 'auto' || style.overflow === 'scroll' || style.overflowY === 'auto' || style.overflowY === 'scroll' || style.overflowX === 'auto' || style.overflowX === 'scroll';
+
+        if (isScrollable || element === document.body) {
+            OverlayScrollbarsGlobal.OverlayScrollbars(element, {
+                scrollbars: {
+                    theme: Default.scrollbarTheme,
+                    autoHide: Default.scrollbarAutoHide,
+                    clickScroll: Default.scrollbarClickScroll,
+                },
+            });
+        }
+    });
+
+
+    /*if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
         OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
             scrollbars: {
                 theme: Default.scrollbarTheme,
@@ -51,8 +71,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 clickScroll: Default.scrollbarClickScroll,
             },
         });
-    }
-    if (contentWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
+    }*/
+    /*if (contentWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined") {
         OverlayScrollbarsGlobal.OverlayScrollbars(contentWrapper, {
             scrollbars: {
                 theme: Default.scrollbarTheme,
@@ -60,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 clickScroll: Default.scrollbarClickScroll,
             },
         });
-    }
+    }*/
 
 
     let query =  new URLSearchParams(location.search);

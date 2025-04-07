@@ -1,5 +1,7 @@
 <?php
     declare(strict_types = 1);
+    require_once "bootstrap.php";
+    
     use Game\Account\Account;
     use Game\Character\Character;
     use Game\Battle\Enums\Turn;
@@ -7,12 +9,10 @@
     $verbs = ["attacks", "pummels", "strikes", "assaults", "blugeons", "ambushes", "beats", "besieges", "blasts", "bombards", "charges", "harms", "hits", "hurts", "infiltrates", "invades", "raids", "stabs", "storms", "strikes"];
     $adverbs = [ "clumsily", "lazily", "spastically", "carefully", "precisely" ];
 
-    
-    require_once "bootstrap.php";
-
     $account = new Account($_SESSION['email']);
     $character = new Character($account->get_id(), $_SESSION['character-id']);
-    
+    $character->stats->set_str(1000);
+    $character->stats->set_hp(10000);
     $monster = $character->get_monster();
     $ch_name = $character->get_name();
     $mn_name = $monster->get_name();
@@ -61,28 +61,32 @@
         }
     }
 
-    function do_turn(Turn $current) {
-        global $monster, $character;
-        [$attacker, $attackee] = [ $character, $monster ];
+    function do_turn(Turn $current): void {
+        global $monster, $character, $log;
+
+        [ $attacker, $attackee ] = [ $character, $monster ];
         $roll = roll(1, 100);
         [ $attack, $defense, $damage ] = [ null, null, null ];
 
         if ($current == Turn::ENEMY) {
-            $attacker = $monster;
-            $attackee = $character;
+            [ $attacker, $attackee ] = [ $monster, $character ];
         }
 
         $attack  = roll(0, $attacker->stats->get_str());
         $defense = roll(0, $attackee->stats->get_def());
         $damage  = $defense - $attack;
 
-        // crit
+        $log->debug("Attack: $attack, Defense: $defense, Damage: $damage (" . $current->name . ")");
+
+        // critr
         if ($roll === 100) {
             $damage *= intval(random_float(0.1, 1.5, 2));
+            $log->debug("Critical Hit! Damage: $damage (" . $current->name . ")");
         }
             
         // miss
         if ($roll === 0) {
+            $log->debug("Missed Attack! (" . $current->name . ")");
             attack_missed($attacker, $attackee, 1, $current);
         }
 
@@ -100,7 +104,6 @@
         $atk_verb = $verbs[array_rand($verbs)];
         $atk_adverb = $adverbs[array_rand($adverbs)];
         
-
         $out_msg .= "<span class=\"{$colors[0]}\">{$attacker->get_name()} $atk_adverb $atk_verb {$attackee->get_name()} but misses!</span><br>";
 
         if ($offguard) {
@@ -145,5 +148,5 @@
     }
 
     function roll($min, $max): int {
-        return random_int($min, $max);
+        return random_int(intval($min), intval($max));
     }

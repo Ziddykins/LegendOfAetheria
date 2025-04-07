@@ -20,7 +20,7 @@ class Monster {
     private int $goldAwarded;
     private string $monsterClass;
     
-    public Stats $stats;
+    public $stats;
 
     /**
     * Magic method to handle dynamic getters and setters for the Monster class properties.
@@ -51,7 +51,7 @@ class Monster {
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
             return $this->propMod($method, $params);
         } else {
-            return $this->propSync($method, $params, PropType::MSTATS);
+            return $this->propSync($method, $params, PropType::MONSTER);
         }
     }
 
