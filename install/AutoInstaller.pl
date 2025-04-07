@@ -933,13 +933,26 @@ sub step_start_services {
 }
 
 sub step_update_hosts {
-    my @hosts = `cat /etc/hosts | awk '{print \$1}' | sort | uniq`;
+    my @hosts;
+    open my $fh, '<', '/etc/hosts';
+    my @lines = <$fh>;
+    close $fh;
+
+    foreach my $line (@lines) {
+        chomp $line;
+        $line =~ s/#.*//;
+        next if $line =~ /^$/;
+        $line =~ s/(.*?)[ \t].*/$1/;
+        push @hosts, $line;
+    }
+
     tell_user('Found these available IPs, please select or enter an IP for the server to resolve $cfg{fqdn} to');
 
     for (my $i=0; $i<@hosts; $i++) {
         tell_user($i . ". $hosts[$i]\n");
     }
-    my $choice = ask_user('Enter an IP: ', '', 'input');
+    
+    my $choice = ask_user('Enter a choice from above or specify your own IP: ', '', 'input');
 
     if ($choice =~ /[0-9]+/) {
         $choice = $hosts[$choice];
