@@ -55,20 +55,27 @@
                                 include 'navs/nav-summary.php';
 
                                 if (isset($_GET['page'])) {
+                                    $requested_page = null;
+                                    $requestion_sub = null;
+                                    $page_string    = null;
+                                    
                                     $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
+                                    $page_string = "pages/";
 
-                                    if (file_exists("pages/game-$requested_page.php")) {
-                                        $page_uri = "pages/game-$requested_page.php";
+                                    if (isset($_GET['sub'])) {
+                                        $requested_sub = preg_replace('/[^a-z-]+/', '', $_GET['sub']);
+                                        $page_string .= "$requested_sub/$requested_page.php";
                                     } else {
-                                        $page_uri = "pages/game-sheet.php";
+                                        $page_string .= "pages/character/sheet.php";
                                     }
-                                    include (string) $page_uri;
-                                } else {
-                                    $page_uri = 'pages/game-sheet.php';
-                                    include $page_uri;
-                                }   
-                            ?>
-                        
+
+                                    if (file_exists($page_string)) {
+                                        include "$page_string";
+                                    } else {
+                                        include "pages/character/sheet.php";
+                                    }
+                                }
+                            ?>                        
                     </div>
                     <div id="chatbox-bottom" name="chatbox-bottom" class="position-absolute bottom-0 text-center overflow-hidden border-top" style="transition: all 0.3s ease-in-out; height: 10px; background: rgba(5,5,5,0.6); width: calc(75% + 73px); margin-left: -4px">
                         <div id="chat-handle" class="border-bottom bg-body-tertiary" style="height: 15px;">
