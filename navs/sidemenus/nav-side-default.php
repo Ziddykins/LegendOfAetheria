@@ -42,7 +42,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
             <ul class="nav sidebar-menu flex-column flex-grow-1" data-lte-toggle="treeview" role="menu">
                 <!-- Character Section -->
                 <li id="character-anchor" class="nav-item menu-open">
-                    <a href="#" class="nav-link d-flex align-items-center px-2">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined"><?php echo $char_menu_icon; ?></i>
                         <p class="ms-2">Character</p>
                         <i class="ms-auto bi bi-chevron-right"></i>
@@ -51,14 +51,14 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     <ul id="character-list" class="nav nav-treeview">
                         <!-- Character submenu items -->
                         <li class="nav-item">
-                            <a href="/game?page=char-profile" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=character&sub=profile" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">person</i>
                                 <p class="ms-2">Profile</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/game?page=sheet" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=character&sub=sheet" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">mist</i>
                                 <p class="ms-2">Sheet</p>
                             </a>
@@ -129,7 +129,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                 </li>
 
                 <li id="familiar-anchor" class="nav-item">
-                    <a href="#" class="nav-link d-flex align-items-center px-2">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined">raven</i>
                         <p class="ms-2">Familiar</p>
                         <i class="ms-auto bi bi-chevron-right"></i>
@@ -160,7 +160,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                 </li>
             
                 <li id="location-anchor" class="nav-item">
-                    <a href="#" class="nav-link d-flex align-items-center px-2">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined">public</i>
                         <p class="ms-2">Location</p>
                         <i class="ms-auto bi bi-chevron-right"></i>
@@ -205,7 +205,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                 </li>
             
                 <li id="economy-anchor" class="nav-item">
-                    <a href="#" class="nav-link d-flex align-items-center px-2">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined">monitoring</i>
                         <p class="ms-2">Economy</p>
                         <i class="ms-auto bi bi-chevron-right"></i>
@@ -298,7 +298,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                 </li>
                 
                 <li id="dungeon-anchor" class="nav-item">
-                    <a href="#" class="nav-link d-flex align-items-center px-2">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined">widgets</i>
                         <p class="ms-2">Dungeon</p>
                         <i class="ms-auto bi bi-chevron-right"></i>
@@ -329,7 +329,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                 </li>
 
                 <li id="quests-anchor" class="nav-item">
-                    <a href="#" class="nav-link d-flex align-items-center px-2">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined">volcano</i>
                         <p class="ms-2">Quests</p>
                         <i class="ms-auto bi bi-chevron-right"></i>
@@ -367,7 +367,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                 </li>
 
                 <li id="mail-anchor" class="nav-item">
-                    <a href="#" class="nav-link d-flex align-items-center px-2">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined">alternate_email</i>
                         <p class="ms-2">Mail</p>
                         <i class="ms-auto bi bi-chevron-right"></i>
@@ -449,7 +449,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                 </li>
             
                 <li id="account-anchor" class="nav-item">
-                    <a href="#" class="nav-link d-flex align-items-center px-2">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined">person_pin</i>
                         <p class="ms-2">Account</p>
                         <i class="ms-auto bi bi-chevron-right"></i>
@@ -477,11 +477,44 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                             </a>
                         </li>
             
-                        <li class="nav-item">
-                            <a href="/game?page=friends" class="nav-link d-flex align-items-center ps-3">
+                        <li id="friends-anchor" class="nav-item">
+                            <a href="#" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">cheer</i>
                                 <p class="ms-2">Friends</p>
+                                <i class="ms-auto bi bi-chevron-right"></i>
                             </a>
+                            
+                            <ul id="friends-list" class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="/game?page=friends" class="nav-link d-flex align-items-center ps-4">
+                                        <i class="nav-icon material-symbols-outlined">handshake</i>
+                                        <p class="ms-2">Mutual</p>
+                                        <span class="nav-badge badge text-bg-success ms-auto me-3">0</span>
+                                        <span class="nav-badge badge text-bg-secondary ms-auto me-3">0</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/game?page=friends" class="nav-link d-flex align-items-center ps-4">
+                                        <i class="nav-icon material-symbols-outlined">person_add</i>
+                                        <p class="ms-2">Send Request</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/game?page=friends" class="nav-link d-flex align-items-center ps-4">
+                                        <i class="nav-icon material-symbols-outlined">emoji_people</i>
+                                        <p class="ms-2">Received</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/game?page=friends" class="nav-link d-flex align-items-center ps-4">
+                                        <i class="nav-icon material-symbols-outlined">person_cancel</i>
+                                        <p class="ms-2">Blocked</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                             
                         <li class="nav-item">
@@ -498,9 +531,13 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                             </a>
                         </li>                        
                     </ul>
-                    <div class="pb-5 mb-5 d-flex w-100">
-                        <a href="/logout" class="btn btn-danger shadow align-content-center">                          <span class="material-symbols-outlined">move_item</span>
-                            Sign out
+                    <div class="pb-5 mb-5 mt-5 d-flex w-100 align-content-center justify-content-center">
+                        <a href="/logout" class="btn bg-dark-subtle shadow">
+                            <span class="d-flex align-content-around">
+                                <span class="material-symbols-outlined float-start">move_item</span>
+                                <span class="float-end">&nbsp;&nbsp;&nbsp;Sign out</span>
+                            </span>
+
                         </a>
                     </div>
                 </li>
