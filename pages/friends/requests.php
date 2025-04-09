@@ -1,3 +1,10 @@
+<?php
+    if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
+        accept_friend_req($focused_email);
+        $log->info('Friend  accepted', ['email_1' => $account->get_email(), 'email_2' => $focused_email]);
+    }
+?>
+
 <div class="row mb-3">
                         <div class="col">
                             <h3><?php echo $header_charname; ?> Requests</h3>

@@ -40,7 +40,7 @@ class Character {
         
         if ($characterID) {
             $this->id = $characterID;
-            $this->load();
+            $this->load($this->id);
         }
     }
 

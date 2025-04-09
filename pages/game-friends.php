@@ -61,46 +61,13 @@ use Game\Character\Enums\FriendStatus;
 
         switch ($_POST['action']) {
             case 'cancel_request':
-                if (friend_status($email) === FriendStatus::REQUEST_SENT) {
-                    $sql_query = "DELETE FROM {$_ENV['SQL_FRND_TBL']} WHERE email_1 = ? AND email_2 = ?";
-                    $db->execute_query($sql_query, [ $account->get_email(), $email ]);
-                    $log->info("Sent friend request deleted", ['To' => $email, 'From' => $account->get_email()]);
-                }
+
                 break;
             case 'accept_request':
-                if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
-                    accept_friend_req($focused_email);
-                    $log->info('Friend  accepted', ['email_1' => $account->get_email(), 'email_2' => $focused_email]);
-                }
+
                 break;
             case 'send_request':
-                if (isset($_POST['friends-send-request']) && $_POST['friends-send-request'] == "1") {
-                    if (isset($_POST['friends-request-send'])) {
-                        switch (friend_status($requested_email)) {
-                            case FriendStatus::NONE:
-                                if (check_valid_email($requested_email)) {
-                                    if ($requested_email != $account->get_email()) {
-                                        $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
-                                        $db->execute_query($sql_query, [$account->get_email(), $requested_email]);
-                                        $log->info(
-                                            'Friend request sent',
-                                            ['email_1' => $account->get_email(), 'email_2' => $requested_email]
-                                        );
-                                    } else {
-                                        header('Location: /game?page=friends&error=self_add');
-                                        exit();
-                                    }
-                                } else {
-                                    header('Location: /game?page=friends&error=invalid_email');
-                                    exit();
-                                }
-                                break;
-                            default:
-                                header('Location: /game?page=friends&error=already_friend');
-                                exit();
-                        }
-                    }
-                }
+                
                 break;
             }
         }

@@ -44,7 +44,7 @@ const Default = {
 
 document.addEventListener("DOMContentLoaded", function() {
     const sidebarWrapper = document.querySelector("#sidebar");
-    var elements = document.querySelectorAll('#sidebar,#main-section');
+  //  var elements = document.querySelectorAll('#sidebar,#main-section,#inbox-list');
 
     elements.forEach((element) => {
         const style = window.getComputedStyle(element);

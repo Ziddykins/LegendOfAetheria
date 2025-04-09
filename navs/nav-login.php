@@ -159,7 +159,7 @@
                                                     echo "";
                                                 ?>
 
-                                            </select>
+                                                </select>
                                         </div>
                                         
                                         <div id="avatar-img" name="avatar-img" class="justify-content-center align-items-center d-flex invisible">
@@ -297,7 +297,6 @@
                                                 <button class="btn btn-primary mb-3" id="contact-submit" name="contact-submit" value="1">
                                                     🤍 Submit
                                                 </button>
-                                               
                                             </form>
                                         </div>
                                     </div>

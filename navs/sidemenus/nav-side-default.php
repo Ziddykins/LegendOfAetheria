@@ -1,5 +1,5 @@
 <?php
-use Game\Account\Enums\Privileges;
+require_once "bootstrap.php";
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\Mail\Folder\Enums\FolderType;
@@ -7,7 +7,6 @@ use Game\Mail\MailBox\MailBox;
 
 $account   = new Account($_SESSION['email']); 
 $character = new Character($account->get_id(), $_SESSION['character-id']); 
-$character->load();
 $folders = [];
 
 foreach (["OUTBOX", "INBOX", "DELETED", "DRAFTS"] as $type) {
@@ -51,14 +50,14 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     <ul id="character-list" class="nav nav-treeview">
                         <!-- Character submenu items -->
                         <li class="nav-item">
-                            <a href="/game?page=character&sub=profile" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=profile&sub=character"" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">person</i>
                                 <p class="ms-2">Profile</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/game?page=character&sub=sheet" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=sheet&sub=character"" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">mist</i>
                                 <p class="ms-2">Sheet</p>
                             </a>
@@ -168,35 +167,35 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                 
                     <ul id="location-list" class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/game?page=hunt" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=hunt&sub=system" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">cruelty_free</i>
                                 <p class="ms-2">Hunt</p>
                             </a>
                         </li>
                         
                         <li class="nav-item">
-                            <a href="/game?page=Map" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=map&sub=system" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">map</i>
                                 <p class="ms-2">Map</p>
                             </a>
                         </li>
                     
                         <li class="nav-item">
-                            <a href="/game?page=Explore" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=explore&sub=system" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">forest</i>
                                 <p class="ms-2">Explore</p>
                             </a>
                         </li>
                     
                         <li class="nav-item">
-                            <a href="/game?page=Zone" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=zone&sub=system" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">rocket</i>
                                 <p class="ms-2">Zone</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/game?page=Rest" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=rest&sub=system" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">offline_bolt</i>
                                 <p class="ms-2">Rest</p>
                             </a>
@@ -375,7 +374,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     
                     <ul id="mail-list" class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/game?page=compose" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=compose&sub=mail" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">forward_to_inbox</i>
                                 <p class="ms-2">Compose</p>
                             </a>
@@ -390,7 +389,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
 
                             <ul id="folder-list" class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/game?page=inbox" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=inbox&sub=mail" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">inbox</i>
                                         <p class="ms-2">Inbox</p>
                                     <?php if ($folders['INBOX']): ?>
@@ -402,7 +401,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=outbox" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=outbox&sub=mail" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">outbox</i>
                                         <p class="ms-2">Outbox</p>
                                     <?php if ($folders['OUTBOX']): ?>
@@ -414,7 +413,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=deleted" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=deleted&sub=mail" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">cancel_presentation</i>
                                         <p class="ms-2">Deleted</p>
                                     <?php if ($folders['DELETED']): ?>
@@ -426,7 +425,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=drafts" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=drafts&sub=mail" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">mark_as_unread</i>
                                         <p class="ms-2">Drafts</p>
                                         <?php if ($folders['DRAFTS']): ?>
@@ -440,7 +439,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                         </li>
 
                         <li class="nav-item">
-                            <a href="/game?page=mail-settings" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=settings&sub=mail" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">inbox_customize</i>
                                 <p class="ms-2">Settings</p>
                             </a>
@@ -448,8 +447,9 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     </ul>
                 </li>
             
-                <li id="account-anchor" class="nav-item">
-                    <a href="#" class="nav-link d-flex align-items-center ps-2">
+                <li id="account-anchor" class="nav-item">-
+                    
+                <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined">person_pin</i>
                         <p class="ms-2">Account</p>
                         <i class="ms-auto bi bi-chevron-right"></i>
@@ -457,21 +457,21 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     
                     <ul id="account-list" class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/game?page=acct-profile" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=profile&sub=account"" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">assignment_ind</i>
                                 <p class="ms-2">Profile</p>
                             </a>
                         </li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=Awards" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=awards&sub=account" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">workspace_premium</i>
                                 <p class="ms-2">Awards</p>
                             </a>
                         </li>
                     
                         <li class="nav-item">
-                            <a href="/game?page=achievements" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=achievements&sub=account" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">military_tech</i>
                                 <p class="ms-2">Achievements</p>
                             </a>
@@ -486,7 +486,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                             
                             <ul id="friends-list" class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/game?page=friends" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=mutual&sub=friends" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">handshake</i>
                                         <p class="ms-2">Mutual</p>
                                         <span class="nav-badge badge text-bg-success ms-auto me-3">0</span>
@@ -495,21 +495,21 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                                 </li>
 
                                 <li class="nav-item">
-                                    <a href="/game?page=friends" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=requested&sub=friends" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">person_add</i>
                                         <p class="ms-2">Send Request</p>
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a href="/game?page=friends" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=requests&sub=friends" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">emoji_people</i>
                                         <p class="ms-2">Received</p>
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a href="/game?page=friends" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=blocked&sub=friends" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">person_cancel</i>
                                         <p class="ms-2">Blocked</p>
                                     </a>
@@ -545,3 +545,29 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
         </nav>
     </div>
 </aside>
+<div id="sidebar-sliver" style="position: fixed; left: 0; top: 0; width: 10px; height: 100vh; z-index: 999; cursor: pointer; display: none;" 
+    onclick="document.body.classList.remove('sidebar-collapse'); document.body.classList.add('sidebar-open');"></div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+       const sidebar = document.getElementById("sidebar");
+       const sliver = document.getElementById("sidebar-sliver");
+       
+       const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+             if (mutation.target.classList.contains("sidebar-collapse")) {
+                sliver.style.display = "block";
+                console.log("SIDEBAR CLOSED");
+             } else {
+                sliver.style.display = "none";
+                console.log("SIDEBAR OPEN");
+             }
+          });
+       });
+
+       observer.observe(document.body, {
+          attributes: true,
+          attributeFilter: ["class"]
+       });
+    });
+</script>
