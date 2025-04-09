@@ -4,7 +4,7 @@
 
     require_once "functions.php";
     
-
+    $character->stats->set_ep(10000);
     [$mon_name, $mon_avatar, $mon_hp, $mon_maxHP, $mon_mp, $mon_maxMP, $mon_str, $mon_int, $mon_def] = [null, null, null, null, null, null, null, null, null];
     $monster = $character->get_monster();
     $mon_loaded = 0;

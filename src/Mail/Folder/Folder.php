@@ -95,7 +95,7 @@ class Folder {
 
             $status_line = EnvelopeStatus::get_status_line($flagstring);
 
-            $html .= '<div class="list-group">';
+            $html .= '<div class="list-group w-50">';
             $html .= "    <a href=\"#\" id=\"env-id-$i\" class=\"list-group-item list-group-item-action mb-1 text-truncate ";
 
             if ($i == 0) {

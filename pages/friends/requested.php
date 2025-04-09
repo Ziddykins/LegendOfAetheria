@@ -1,4 +1,40 @@
                     
+<?php
+    if (friend_status($email) === FriendStatus::REQUEST_SENT) {
+        $sql_query = "DELETE FROM {$_ENV['SQL_FRND_TBL']} WHERE email_1 = ? AND email_2 = ?";
+        $db->execute_query($sql_query, [ $account->get_email(), $email ]);
+        $log->info("Sent friend request deleted", ['To' => $email, 'From' => $account->get_email()]);
+    }
+
+    if (isset($_POST['friends-send-request']) && $_POST['friends-send-request'] == "1") {
+        if (isset($_POST['friends-request-send'])) {
+            switch (friend_status($requested_email)) {
+                case FriendStatus::NONE:
+                    if (check_valid_email($requested_email)) {
+                        if ($requested_email != $account->get_email()) {
+                            $sql_query = "INSERT INTO tbl_friends (email_1, email_2) VALUES (?,?)";
+                            $db->execute_query($sql_query, [$account->get_email(), $requested_email]);
+                            $log->info(
+                                'Friend request sent',
+                                ['email_1' => $account->get_email(), 'email_2' => $requested_email]
+                            );
+                        } else {
+                            header('Location: /game?page=friends&error=self_add');
+                            exit();
+                        }
+                    } else {
+                        header('Location: /game?page=friends&error=invalid_email');
+                        exit();
+                    }
+                    break;
+                default:
+                    header('Location: /game?page=friends&error=already_friend');
+                    exit();
+            }
+        }
+    }
+?>
+
 <form id='form-send-friends-request' name='form-send-friends-request' action='/game?page=friends&action=send_request' method='POST'>
                         <div class="row">
                             <div class="col">

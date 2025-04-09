@@ -8,19 +8,20 @@ use Game\Components\Cards\CharacterSelect\CharacterSelectCard;
 
 require_once "bootstrap.php";
 
-$account = null;
+
 
 if (check_session()) {
+    $account = new Account($_SESSION['email']);
+    $character = new Character($account->get_id());
+
     if (isset($_POST['create-submit']) && $_POST['create-submit'] == 1) {
         if (isset($_POST['slot']) && $_POST['slot'] > 0 && $_POST['slot'] <= 3) {
             $slot = $_POST['slot'];
             $_POST["select-new-$slot"] = 1;
+            
         }
     }
     
-    $account = new Account($_SESSION['email']);
-    $account->load();
-
     if (isset($_POST)) {
         $action    = null;
         $slot      = null;
@@ -45,12 +46,13 @@ if (check_session()) {
 
                 $_SESSION['focused-slot'] = (int)$slot;
                 $_SESSION['character-id'] = (int)$char_id;
-                header('Location: /game');
+                header('Location: /game?page=sheet&sub=character');
                 exit();
             case 'new':
-                $char_name    = $_POST['create-character-name'];
-                $char_race    = validate_race($_POST['race-select']);
+                $char_name   = $_POST['create-character-name'];
+                $char_race   = validate_race($_POST['race-select']);
                 $char_avatar = validate_avatar('avatar-' . $_POST['avatar-select'] . '.webp');
+
                 $str     = $_POST['str-ap'];
                 $int     = $_POST['int-ap'];
                 $def     = $_POST['def-ap'];
@@ -128,7 +130,7 @@ if (check_session()) {
         <div class="container">
             <div class="d-flex justify-content-center">
                 <?php
-               
+
                 for ($i = 1; $i < 4; $i++) {
                     $char_slot = "get_charSlot$i";
                     $char_id   = $account->$char_slot();

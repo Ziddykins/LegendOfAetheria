@@ -2,7 +2,6 @@
     use Game\Account\Enums\Privileges;
     use Game\Character\Enums\FriendStatus;
 
-    
     $new_mail = check_mail('unread');
     $new_friend_reqs = get_friend_counts(FriendStatus::REQUEST_RECV);
 
@@ -14,7 +13,7 @@
             unfold_more
         </span>
 
-        <a href="/game?page=account">
+        <a href="/game?page=profile&sub=account">
             <span class="nav-icon material-symbols-sharp mt-3 border" style="cursor: pointer;"  data-bs-toggle="tooltip" data-bs-title="Account">
                 person
             </span></a>
@@ -26,7 +25,7 @@
                 </span></a>
         <?php endif; ?>
         
-        <a href="/game?page=profile">
+        <a href="/game?page=profile&sub=character">
             <span class="nav-icon material-symbols-sharp mt-3 border" style="cursor: pointer;" data-bs-toggle="tooltip" data-bs-title="Character Profile">
                 demography
             </span></a>

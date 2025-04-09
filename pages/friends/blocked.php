@@ -1,3 +1,8 @@
+<?php
+    if (check_session()) {
+        $blocked = [];
+    }
+?>
 <form id="settings-account" name="settings-account" action="/set_settings.php" method="POST">
                         <div class="row">
                             <div class="col">

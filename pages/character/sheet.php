@@ -1,6 +1,5 @@
 <?php
     include 'snippets/snip-charstats.php';
-
 ?>
         <div class="d-flex justify-content-center">
             <div class="card ps-3 mb-3 pt-3" style="max-width: 700px;">

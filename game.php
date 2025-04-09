@@ -14,14 +14,10 @@
     $system->load_sheet();
 
     $account = new Account($_SESSION['email']);
-    $account->load();
-
+    $character = new Character($account->get_id());
+    
     $color_mode = $account->get_settings()->get_colorMode();
     
-    $character = new Character($account->get_id());
-    $character->set_id($_SESSION['character-id']);
-    $character->load();
-
     $account->get_settings()->set_sideBar(SidebarType::LTE_DEFAULT);
     $sidebar_rel_link = $account->get_settings()->get_sideBar()->value;
 
@@ -38,11 +34,11 @@
         <?php include 'html/headers.html'; ?>
     </head>
         
-    <body class="main-font" data-bs-theme="<?php echo $color_mode; ?>"> 
+    <body class="main-font" data-bs-theme="<?php echo $color_mode; ?>" data-overlayscrollbars-initialize> 
         <div class="container-fluid overflow-hidden" style="height: 100vh;">
             <span id="terst" class="row g-0 h-100 app-wrapper layout-fixed sidebar-expand-lg ms-n3">
                 <?php include $sidebar_rel_link; ?>
-                <main id="main-section" class="col ps-1 border border-success overflow-hidden" style="height: 100vh; max-height: 100vh;">
+                <main id="main-section" class="col ps-1 border border-success overflow-hidden" style="height: 100vh; max-height: 100vh;" data-overlayscrollbars-initialize>
                     <div class="d-grid ms-3 mt-3">
                             <?php
                                 $privileges = $account->get_privileges()->value;
@@ -102,5 +98,6 @@
                 </div>
             </div>
         </div>
+        <script>OverlayScrollbars(document.querySelector('#main-section'), {  scrollbars: { theme: 'os-theme-light'}});</script>
     </body>
 </html>

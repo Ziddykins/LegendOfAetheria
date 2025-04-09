@@ -12,7 +12,7 @@
                     <h3><?php echo fix_name_header($character->get_name()); ?> Inbox</h3>
                 </div>
 
-                <div class="list-group overflow-hidden">
+                <div id="inbox-list" class="list-group overflow-hidden">
                     <?php echo $user_inbox->focusedFolder->getFolderHTML(); ?>
                 </div>
             </div>

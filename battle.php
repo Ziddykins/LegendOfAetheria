@@ -21,18 +21,13 @@
 
     if (check_session() === true) {
         if (isset($_POST['action'])) {
-            if (isset($_POST['csrf-token']) && $_POST['csrf-token'] !== $_SESSION['csrf-token']) {
-                http_response_code(401);
-                echo "CSRF Token Mismatch";
-                exit();
-            }
-            
             $action = $_POST['action'];
             $out_msg = null;
 
             if ($action === 'attack') {
                 if ($character->stats->get_ep() > 0) {
                     if ($character->stats->get_hp() > 0) {
+                        if ($character->get_monster()) {
                         $roll = roll(1, 100);
 
                         if ($roll > 50) {
@@ -74,7 +69,7 @@
 
         $attack  = roll(0, $attacker->stats->get_str());
         $defense = roll(0, $attackee->stats->get_def());
-        $damage  = $defense - $attack;
+        $damage  = $attack - $defense;
 
         $log->debug("Attack: $attack, Defense: $defense, Damage: $damage (" . $current->name . ")");
 
@@ -96,6 +91,10 @@
             attack_blocked($attacker, $attackee, $parry, $current);
         } else {
             attack_success($attacker, $attackee, $damage, $current);
+        }
+
+        if ($current == Turn::PLAYER) {
+            $character->set_monster($monster);
         }
     }
 
