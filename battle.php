@@ -28,20 +28,21 @@
                 if ($character->stats->get_ep() > 0) {
                     if ($character->stats->get_hp() > 0) {
                         if ($character->get_monster()) {
-                        $roll = roll(1, 100);
+                            $roll = roll(1, 100);
 
-                        if ($roll > 50) {
-                            $out_msg = '<div class="small text-warning"><-}====[ <span class="text-primary">Player</span> Turn ]====={-></div><br>';
-                            do_turn(Turn::PLAYER);
-                            echo $out_msg;
-                        } else {
-                            $out_msg = '<div class="small text-warning"><-}====[ <span class="text-danger">Enemy</span> Turn ]====={-></div><br>';
-                            do_turn(Turn::ENEMY);
-                            echo $out_msg;
-                        }
+                            if ($roll > 50) {
+                                $out_msg = '<div class="small text-warning"><-}====[ <span class="text-primary">Player</span> Turn ]====={-></div><br>';
+                                do_turn(Turn::PLAYER);
+                                echo $out_msg;
+                            } else {
+                                $out_msg = '<div class="small text-warning"><-}====[ <span class="text-danger">Enemy</span> Turn ]====={-></div><br>';
+                                do_turn(Turn::ENEMY);
+                                echo $out_msg;
+                            }
                             $character->stats->sub_ep(1);
-                        
-                        return true;
+                            
+                            return true;
+                        }
                     } else {
                         http_response_code(401);
                         echo "<span class=\"text-danger\">SYSTEM></span><span class=\"text-warning\">No HP Left</span><br>\r\n\r\n";

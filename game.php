@@ -38,7 +38,7 @@
         <div class="container-fluid overflow-hidden" style="height: 100vh;">
             <span id="terst" class="row g-0 h-100 app-wrapper layout-fixed sidebar-expand-lg ms-n3">
                 <?php include $sidebar_rel_link; ?>
-                <main id="main-section" class="col ps-1 border border-success overflow-hidden" style="height: 100vh; max-height: 100vh;" data-overlayscrollbars-initialize>
+                <main id="main-section" class="col ps-1 border border-success overflow-hidden" style="height: 100vh; max-height: 100vh; background: rgba(15,15,15,0.6);" data-overlayscrollbars-initialize>
                     <div class="d-grid ms-3 mt-3">
                             <?php
                                 $privileges = $account->get_privileges()->value;
@@ -47,8 +47,6 @@
                                     include 'html/verify.html';
                                     exit();
                                 }
-                                
-                                include 'navs/nav-summary.php';
 
                                 if (isset($_GET['page'])) {
                                     $requested_page = null;
@@ -68,23 +66,17 @@
                                     if (file_exists($page_string)) {
                                         include "$page_string";
                                     } else {
-                                        include "pages/character/sheet.php";
+                                        include 'pages/character/sheet.php';
                                     }
                                 }
                             ?>                        
                     </div>
-                    <div id="chatbox-bottom" name="chatbox-bottom" class="position-absolute bottom-0 text-center overflow-hidden border-top" style="transition: all 0.3s ease-in-out; height: 10px; background: rgba(5,5,5,0.6); width: calc(75% + 73px); margin-left: -4px">
-                        <div id="chat-handle" class="border-bottom bg-body-tertiary" style="height: 15px;">
-                            <span id="open-chat" class="material-symbols-outlined" style="margin-top: -6px;">expand_less</span>
-                            <span class="btn-close mt-n1" style="float: right; "></span>
-                        </div>
-                        <div id="chat-content" class="h-100 pt-2">
-                            <!-- Chat content goes here -->
-                        </div>
-                        <input type=text id="chat-input" class="invisible position-absolute bottom-50 start-0 w-100 text-white font-monospace" style="display:none; margin-bottom: -50px;" maxlength="250"></input>
-                    </div>
+
+                    
+
                 </main>
-            </>
+                <?php include 'html/chat.html'; ?>
+            </span>
         </div>
             
             
@@ -98,6 +90,6 @@
                 </div>
             </div>
         </div>
-        <script>OverlayScrollbars(document.querySelector('#main-section'), {  scrollbars: { theme: 'os-theme-light'}});</script>
+        <script>OverlayScrollbars(document.querySelector('#main-section'), {  overflow: { x: 'hidden' }, scrollbars: { theme: 'os-theme-light'}});</script>
     </body>
 </html>

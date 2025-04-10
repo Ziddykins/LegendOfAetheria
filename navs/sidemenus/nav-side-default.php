@@ -22,13 +22,10 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
 
 ?>
 
-<aside id="sidebar" class="app-sidebar shadow overflow-hidden" data-bs-theme="<?php echo $color_mode; ?>" style="width: 230px; min-width: 230px; height: 100vh;">
+<aside id="sidebar" class="app-sidebar shadow overflow-hidden" data-bs-theme="<?php echo $color_mode; ?>" style="width: 240px; min-width: 240px; height: 100vh;">
     <div class="sidebar-brand d-flex align-items-center mb-3">
         <a href="/game" class="brand-link ms-2">
             <img src="/img/logos/logo-banner-no-bg.webp" alt="Legend of Aetheria Logo" class="brand-image img-fluid">
-        </a>
-        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
-            <i class="bi bi-list"></i>
         </a>
     </div>
 
@@ -369,6 +366,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined">alternate_email</i>
                         <p class="ms-2">Mail</p>
+                        <i class="ms-auto bi bi-exclamation-square-fill text-warning"></i>
                         <i class="ms-auto bi bi-chevron-right"></i>
                     </a>
                     
@@ -447,9 +445,8 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     </ul>
                 </li>
             
-                <li id="account-anchor" class="nav-item">-
-                    
-                <a href="#" class="nav-link d-flex align-items-center ps-2">
+                <li id="account-anchor" class="nav-item">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
                         <i class="nav-icon material-symbols-outlined">person_pin</i>
                         <p class="ms-2">Account</p>
                         <i class="ms-auto bi bi-chevron-right"></i>
