@@ -44,8 +44,12 @@ if (check_session()) {
                 $sql_query = "SELECT `$char_slot` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
                 $char_id = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc()["$char_slot"];
 
+                $character = new Character($account->get_id(), $char_id);
+
+
                 $_SESSION['focused-slot'] = (int)$slot;
                 $_SESSION['character-id'] = (int)$char_id;
+                $_SESSION['name'] = $character->get_name();
                 header('Location: /game?page=sheet&sub=character');
                 exit();
             case 'new':

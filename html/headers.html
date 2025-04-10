@@ -50,11 +50,13 @@
                  u_aid: "<?php echo $_SESSION['account-id']; ?>",
                 u_csrf: "<?php echo $_SESSION['csrf-token']; ?>",
                  u_sid: "<?php echo session_id(); ?>",
+                 chat_history: [],
             };
         </script>
         <?php endif; ?>
         <?php if (isset($_SESSION['character-id'])): ?>
             <script>
                 loa.u_cid = "<?php echo $_SESSION['character-id']; ?>";
+                loa.u_name = "<?php echo $_SESSION['name']; ?>";
             </script>
         <?php endif; ?>

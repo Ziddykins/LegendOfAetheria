@@ -1,10 +1,37 @@
 <?php
     declare(strict_types = 1);
+    require_once "bootstrap.php";
     use Game\Account\Account;
-        require_once "bootstrap.php";
+    use Game\Character\Character;
 
-    $account = new Account($_SESSION['email']);
-    $account->load();
+    $account   = new Account($_SESSION['email']);
+    $character = new Character($account->get_id(), $_SESSION['character-id']);
+
+    $request = file_get_contents("php://input");
+    $req_obj = json_decode($request, true);
+
+    $response = [
+        'status' => null,
+        'message' => null,
+    ];
+
+    if (isset($req_obj['save_description']) && $req_obj['save_description'] == 1) {
+        $description = $req_obj['data'];
+
+        if (strlen($description) > 2048) {
+            $response['status'] = 'error';
+            $response['message'] = 'Description too long';
+            http_response_code(400);
+            echo json_encode($response);            
+            exit();
+        } else {
+            $character->set_description($description);
+            $response['status'] = 'success';
+            $response['message'] = 'Description saved successfully';
+            echo json_encode($response);
+            exit();
+        }
+    }
 
     if (isset($_POST['save']) && $_POST['save'] == 'ip_lock') {
         if (isset($_POST['status']) && $_POST['status'] == 'on') {
