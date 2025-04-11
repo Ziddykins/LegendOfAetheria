@@ -522,7 +522,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                         </li>
 
                         <li class="nav-item">
-                            <a href="/game?page=acct-settings" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=settings&sub=account" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">settings_account_box</i>
                                 <p class="ms-2">Settings</p>
                             </a>

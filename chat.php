@@ -18,9 +18,9 @@
             $nickname = $req_obj->nickname;
 
             if ($char_id !== $_SESSION['character-id']) {
-                check_abuse(AbuseType::CHATABUSE);
+                //check_abuse(AbuseType::CHATABUSE);
             } elseif ($room != '!main') {
-                check_abuse(AbuseType::CHATABUSE);
+                //check_abuse(AbuseType::CHATABUSE);
             }
 
             $message = htmlentities($message);
@@ -33,6 +33,9 @@
                 echo '{"status": "success"}';
             }
             break;
+        case 'online':
+            $sql_query = "SELECT COUNT(`id`) FROM tbl_accounts WHERE `session_id` IS NOT NULL";
+            return $db->execute_query($sql_query)->fetch_column();            
         default:
             echo '{"status": "error - invalid action"}';
     }
@@ -51,5 +54,5 @@
         $sql_query = "SELECT * FROM {$_ENV['SQL_CHAT_TBL']} WHERE `room` = ? ORDER BY `id` DESC LIMIT ?";
         $messages = $db->execute_query($sql_query, [$room, $count])->fetch_all(MYSQLI_ASSOC);
 
-                return $messages;
+        return $messages;
     }

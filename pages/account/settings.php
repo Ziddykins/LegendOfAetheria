@@ -12,6 +12,7 @@
             <div class="card shadow-sm">
                 <div class="card-header border-0">
                     <h3 class="card-title h5 mb-0">Account Settings</h3>
+                    <div class="hr"></div>
                 </div>
                 <div class="card-body">
                     <form id="ip-lock-form" class="needs-validation" novalidate>

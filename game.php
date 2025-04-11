@@ -14,7 +14,7 @@
     $system->load_sheet();
 
     $account = new Account($_SESSION['email']);
-    $character = new Character($account->get_id());
+    $character = new Character($account->get_id(), $_SESSION['character-id']);
     
     $color_mode = $account->get_settings()->get_colorMode();
     
@@ -33,6 +33,7 @@
     <head>
         <?php include 'html/headers.html'; ?>
     </head>
+    <script>loa.u_name = <?php echo $_SESSION['name']; ?>;</script>
         
     <body class="main-font" data-bs-theme="<?php echo $color_mode; ?>" data-overlayscrollbars-initialize> 
         <div class="container-fluid overflow-hidden" style="height: 100vh;">
@@ -82,7 +83,7 @@
             
             <div id="footer"> 
                 <?php include 'html/footers.html'; ?>
-            </>
+            </s>
 
             <div aria-live="polite" aria-atomic="true" class="position-relative">
                 <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
