@@ -2,6 +2,7 @@ document.getElementById("chat-handle").addEventListener("click", (e) => {
     const chatbox     = document.getElementById("chatbox-bottom");
     const chat_button = document.getElementById("open-chat");
     const chat_input  = document.getElementById("chat-input");
+    const chat_online = document.getElementById("chat-online");
 
     if (chatbox.style.height === "300px") {
         chatbox.style.height = "35px";
@@ -19,7 +20,7 @@ document.getElementById("chat-input").addEventListener("keyup", (e) => {
     if (e.keyCode == 13) {
         message = document.getElementById("chat-input").value.trim();
         document.getElementById("chat-input").value = "";
-        const chat_msg = {message: message, char_id: loa.u_cid, room: '!main', nickname: 'test', action: 'add'};
+        const chat_msg = {message: message, char_id: loa.u_cid, room: '!main', nickname: loa.u_name, action: 'add'};
         const chat_content = document.getElementById('chat-content');
         
         if (!message || message.length === 0 || /^\s*$/.test(message)) {
@@ -50,7 +51,7 @@ document.getElementById("chat-input").addEventListener("keyup", (e) => {
     } else if (e.keyCode == 38) { //up
 
     } else if (e.keyCode == 40) { //down
-        
+
     }
 });
 
@@ -83,27 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     messages = null;
 
-    fetch('chat', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({ action: 'get', room: '!main', count: 20})
-        }).then((response) => {
-            if (!response.ok) {
-                throw new Error("couldn't get messages");
-            } else {
-                return response.json();
-            }
-        }).then((json) => {
-            json.forEach((msg) => {
-                const chat_msg = gen_message(msg);
-                if (!document.getElementById(chat_msg.id)) {
-                    chat_content.appendChild(chat_msg);
-                }
-            });
-        })
+    ["get", "online"].forEach((actn) => {
+    
 });
 
 function gen_message(msg) {
@@ -119,3 +101,4 @@ function gen_message(msg) {
 
     return chat_msg;
 }
+
