@@ -69,7 +69,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                         
                             <ul id="inventory-list" class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/game?page=Equipment" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=equipment&sub=inventory" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">colorize</i>
                                         <p class="ms-2">Equipment</p>
                                     </a>
@@ -84,14 +84,14 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
 
                                     <ul id="items-list" class="nav nav-treeview">
                                         <li class="nav-item">
-                                            <a href="/game?page=Questitems" class="nav-link d-flex align-items-center ps-5">
+                                            <a href="/game?page=quest&sub=items" class="nav-link d-flex align-items-center ps-5">
                                                 <i class="nav-icon material-symbols-outlined">deployed_code_alert</i>
                                                 <p class="ms-2">Quest Items</p>
                                             </a>
                                         </li>
 
                                         <li class="nav-item">
-                                            <a href="/game?page=Consumables" class="nav-link d-flex align-items-center ps-5">
+                                            <a href="/game?page=consumables&sub=items" class="nav-link d-flex align-items-center ps-5">
                                                 <i class="nav-icon material-symbols-outlined">grocery</i>
                                                 <p class="ms-2">Consumables</p>
                                             </a>
@@ -101,21 +101,21 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                             </ul>
 
                             <li class="nav-item">
-                                <a href="/game?page=skills" class="nav-link d-flex align-items-center ps-3">
+                                <a href="/game?page=skills&sub=character" class="nav-link d-flex align-items-center ps-3">
                                     <i class="nav-icon material-symbols-outlined">hotel_class</i>
                                     <p class="ms-2">Skills</p>
                                 </a>
                             </li>
                         
                             <li class="nav-item">
-                                <a href="/game?page=spells" class="nav-link d-flex align-items-center ps-3">
+                                <a href="/game?page=spells&sub=character" class="nav-link d-flex align-items-center ps-3">
                                     <i class="nav-icon material-symbols-outlined">book</i>
                                     <p class="ms-2">Spells</p>
                                 </a>
                             </li>
                         
                             <li class="nav-item">
-                                <a href="/game?page=train" class="nav-link d-flex align-items-center ps-3">
+                                <a href="/game?page=train&sub=character" class="nav-link d-flex align-items-center ps-3">
                                     <i class="nav-icon material-symbols-outlined">fitness_center</i>
                                     <p class="ms-2">Train</p>
                                 </a>
@@ -133,21 +133,21 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
 
                     <ul id="familiar-list" class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/game?page=Manage" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=manage&sub=familiar" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">sound_detection_dog_barking</i>
                                 <p class="ms-2">Manage</p>
                             </a>
                         </li>
                     
                         <li class="nav-item">
-                            <a href="/game?page=Hatchery" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=hatchery&sub=familiar" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">egg</i>
                                 <p class="ms-2">Hatchery</p>
                             </a>
                         </li>
                     
                         <li class="nav-item">
-                            <a href="/game?page=Equipment" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=equipment&sub=familiar" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">pet_supplies</i>
                                 <p class="ms-2">Equipment</p>
                             </a>
@@ -164,35 +164,35 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                 
                     <ul id="location-list" class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/game?page=hunt&sub=system" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=hunt&sub=location" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">cruelty_free</i>
                                 <p class="ms-2">Hunt</p>
                             </a>
                         </li>
                         
                         <li class="nav-item">
-                            <a href="/game?page=map&sub=system" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=map&sub=location" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">map</i>
                                 <p class="ms-2">Map</p>
                             </a>
                         </li>
                     
                         <li class="nav-item">
-                            <a href="/game?page=explore&sub=system" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=explore&sub=location" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">forest</i>
                                 <p class="ms-2">Explore</p>
                             </a>
                         </li>
                     
                         <li class="nav-item">
-                            <a href="/game?page=zone&sub=system" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=zone&sub=location" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">rocket</i>
                                 <p class="ms-2">Zone</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/game?page=rest&sub=system" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=rest&sub=location" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">offline_bolt</i>
                                 <p class="ms-2">Rest</p>
                             </a>
@@ -209,14 +209,14 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                 
                     <ul id="economy-list" class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/game?page=Equipment" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=equipment&sub=economy" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">swords</i>
                                 <p class="ms-2">Equipment</p>
                             </a>
                         </li>
                         
                         <li class="nav-item">
-                            <a href="/game?page=Items" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=items&sub=economy" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">diamond</i>
                                 <p class="ms-2">Items</p>
                             </a>
@@ -231,21 +231,21 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                         
                             <ul id="blackmarket-list" class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/game?page=Buy" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=buy&sub=blackmarket" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">attach_money</i>
                                         <p class="ms-2">Buy</p>
                                     </a>
                                 </li>
                                 
                                 <li class="nav-item">
-                                    <a href="/game?page=Sell" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=sell&sub=blackmarket" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">paid</i>
                                         <p class="ms-2">Sell</p>
                                     </a>
                                 </li>
                                 
                                 <li class="nav-item">
-                                    <a href="/game?page=Market" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=market&sub=blackmarket" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">storefront</i>
                                         <p class="ms-2">Market</p>
                                     </a>
@@ -262,28 +262,28 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                             
                             <ul id="bank-list" class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/game?page=Loans" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=loans&sub=bank" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">clinical_notes</i>
                                         <p class="ms-2">Account</p>
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a href="/game?page=Depost" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=deposit&sub=bank" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">attach_money</i>
                                         <p class="ms-2">Depost</p>
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a href="/game?page=Withdrawal" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=withdrawal&sub=bank" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">paid</i>
                                         <p class="ms-2">Withdrawal</p>
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a href="/game?page=Loans" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=loans&sub=bank" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">payments</i>
                                         <p class="ms-2">Loans</p>
                                     </a>
@@ -302,21 +302,21 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     
                     <ul id="dungeon-list" class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/game?page=dungeon" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=dungeon&sub=dungeon" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">stat_minus_3</i>
                                 <p class="ms-2">Floor 1</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/game?page=Settings" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=settings&sub=dungeon" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">settings</i>
                                 <p class="ms-2">Settings</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="/game?page=Reset" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=reset&sub=dungeon" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined text-danger">restart_alt</i>
                                 <p class="ms-2">Reset</p>
                             </a>
@@ -333,28 +333,28 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                     
                     <ul id="quest-list" class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="/game?page=Active" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=active&sub=quests" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">lists</i>
                                 <p class="ms-2">Active</p>
                             </a>
                         </li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=Accepted" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=accepted&sub=quests" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">fact_check</i>
                                 <p class="ms-2">Accepted</p>
                             </a>
                         </li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=Completed" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=completed&sub=quests" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">done_all</i>
                                 <p class="ms-2">Completed</p>
                             </a>
                         </li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=Abandoned" class="nav-link d-flex align-items-center ps-3">
+                            <a href="/game?page=abandoned&sub=quests" class="nav-link d-flex align-items-center ps-3">
                                 <i class="nav-icon material-symbols-outlined">backspace</i>
                                 <p class="ms-2">Abandoned</p>
                             </a>
@@ -387,7 +387,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
 
                             <ul id="folder-list" class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/game?page=inbox&sub=mail" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=inbox&sub=folders" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">inbox</i>
                                         <p class="ms-2">Inbox</p>
                                     <?php if ($folders['INBOX']): ?>
@@ -399,7 +399,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=outbox&sub=mail" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=outbox&sub=folders" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">outbox</i>
                                         <p class="ms-2">Outbox</p>
                                     <?php if ($folders['OUTBOX']): ?>
@@ -411,7 +411,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=deleted&sub=mail" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=deleted&sub=folders" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">cancel_presentation</i>
                                         <p class="ms-2">Deleted</p>
                                     <?php if ($folders['DELETED']): ?>
@@ -423,7 +423,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
                                 </li>
                             
                                 <li class="nav-item">
-                                    <a href="/game?page=drafts&sub=mail" class="nav-link d-flex align-items-center ps-4">
+                                    <a href="/game?page=drafts&sub=folders" class="nav-link d-flex align-items-center ps-4">
                                         <i class="nav-icon material-symbols-outlined">mark_as_unread</i>
                                         <p class="ms-2">Drafts</p>
                                         <?php if ($folders['DRAFTS']): ?>
@@ -542,8 +542,7 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
         </nav>
     </div>
 </aside>
-<div id="sidebar-sliver" style="position: fixed; left: 0; top: 0; width: 10px; height: 100vh; z-index: 999; cursor: pointer; display: none;" 
-    onclick="document.body.classList.remove('sidebar-collapse'); document.body.classList.add('sidebar-open');"></div>
+<div id="sidebar-sliver" class="text-center" style="position: fixed; left: 0; top: 0; width: 10px; height: 100vh; z-index: 999; cursor: pointer; display: none;" onclick="document.body.classList.remove('sidebar-collapse'); document.body.classList.add('sidebar-open');">&gt;</div>
 
     <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -553,11 +552,14 @@ $char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'sku
        const observer = new MutationObserver(function(mutations) {
           mutations.forEach(function(mutation) {
              if (mutation.target.classList.contains("sidebar-collapse")) {
-                sliver.style.display = "block";
+                sliver.style.display = "flex";
+                sliver.style.alignItems = "center";
+                sliver.style.justifyContent = "center";
+                sliver.style.backgroundColor = "rgba(5, 57, 28, 0.21)";
+                sliver.innerHTML = "<i class=\"bi bi-chevron-right\"></i>";
                 console.log("SIDEBAR CLOSED");
              } else {
                 sliver.style.display = "none";
-                console.log("SIDEBAR OPEN");
              }
           });
        });

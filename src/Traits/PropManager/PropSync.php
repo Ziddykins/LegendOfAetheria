@@ -130,7 +130,7 @@ trait PropSync {
             $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";  
             
             if (is_object($params[0])) {
-                if (is_numeric($params[0]->value)) {
+                if (is_numeric($params[0]->value)) { // if an enum, essentially
                     $params[0] = $params[0]->value;
                 } else {
                     $params[0] = safe_serialize($params[0]);

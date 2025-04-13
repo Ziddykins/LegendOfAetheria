@@ -19,9 +19,11 @@ use Game\System\Enums\LOAError;
     function get_mysql_datetime($modifier = 'now') {
         global $log;
 
-        $operand  = substr($modifier, 0, 1);
-        $amount   = substr($modifier, 1);
-        $modifier = "$operand$amount";
+        if ($modifier !== 'now') {
+            $operand  = substr($modifier, 0, 1);
+            $amount   = substr($modifier, 1);
+            $modifier = "$operand$amount";
+        }
 
         return date("Y-m-d H:i:s", strtotime((string) $modifier));
     }
@@ -110,10 +112,10 @@ use Game\System\Enums\LOAError;
      * @param string $what The type of email to check. Currently, only 'unread' is supported.
      * @param int $account_id The ID of the account for which to check unread emails.
      *
-     * @return int|LOAError The number of unread emails for the specified account.
+     * @return int|LOAError|string The number of unread emails for the specified account.
      *                      If an unsupported value is provided for $what, the function returns LOAError::MAIL_UNKNOWN_DIRECTIVE.
      */
-    function check_mail($what) {
+    function check_mail($what): int|LOAError|string {
         global $db, $log;
 
         switch ($what) {
@@ -468,12 +470,12 @@ use Game\System\Enums\LOAError;
 
     function check_session(): bool {
         global $db, $log;
-            
+
         if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
             $log->warning("Sessions var 'logged-in' not set to 1", [ print_r($_SESSION, true), print_r(debug_backtrace(), true) ] );
             return false;
         }
-     
+
         $sql_query = "SELECT `session_id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
         $result = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc();
         
@@ -493,7 +495,10 @@ use Game\System\Enums\LOAError;
     }
 
     function gen_csrf_token(): string {
-        return bin2hex(random_bytes(32));
+        global $log;
+        $csrf = bin2hex(random_bytes(14)) . 'L04D' . bin2hex(random_bytes(14));
+        $log->warning("csrf: $csrf");
+        return $csrf;
     }
 
     function check_csrf($req_csrf): bool {

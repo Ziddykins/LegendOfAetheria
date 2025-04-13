@@ -1,7 +1,10 @@
-<div id="chatbox-bottom" name="chatbox-bottom" class="sticky-bottom text-center overflow-hidden border-top" style="transition: all 0.3s ease-in-out; height: 10px; background: rgba(5,5,5,0.6); width: 100%;">
-                        <div id="chat-handle" class="border-bottom bg-body-tertiary d-flex justify-content-between align-items-center" style="height: 15px; cursor: pointer;">
-                            <span id="open-chat" class="material-symbols-outlined" style="margin-top: -6px;">expand_less</span>
-                            <span id="close-chat-btn" class="btn-close p-3 mt-n1" style="float: right; display: none;"></span>
+<div id="chatbox-bottom" name="chatbox-bottom" class="sticky-bottom overflow-hidden border" style="transition: all 0.3s ease-in-out; height: 13px; background: rgba(5,5,5,0.8); width: calc(100% - 2px);">
+                        <div id="chat-handle" class="border border-primary bg-body-tertiary bg-gradient d-flex justify-content-between align-items-center" style="height: 30px; cursor: pointer;">
+                            <div class="d-inline-flex align-items-center justify-content-between">
+                                <span id="open-chat" class="d-flex material-symbols-outlined" style="margin-top: -3px">expand_less</span>
+                                <span id="online-count" class="d-flex small"></span>
+                                <span id="close-chat-btn" class="d-flex btn-close p-3 mt-n2"></span>
+                            </div>
                         </div>
                         <div id="chat-content" class="h-100 pt-2 ps-3 pb-3 border border-primary text-start" style="display: none; max-height: calc(100vh - 50px); overflow-y: auto;">
                             

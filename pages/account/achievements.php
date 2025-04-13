@@ -11,7 +11,7 @@
             foreach ($intervals as $interval) {
                 $monster = new Monster(MonsterScope::NONE);
 
-                $name_ns = preg_replace('/ /', '', $monster['name']);
+                $name_ns = preg_replace('/ /', '', $monster->get_name());
 
                 if ($count++ % 3 == 0) {
                     echo '<br>';

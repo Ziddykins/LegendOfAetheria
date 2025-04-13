@@ -1,4 +1,8 @@
 <?php
+
+use Game\Account\Account;
+use Game\Character\Character;
+
     if (isset($_POST['btn-accept']) && $_POST['btn-accept'] == "1") {
         accept_friend_req($focused_email);
         $log->info('Friend  accepted', ['email_1' => $account->get_email(), 'email_2' => $focused_email]);
