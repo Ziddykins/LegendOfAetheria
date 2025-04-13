@@ -6,4 +6,5 @@ enum AbuseType {
     case AUTOBOTTING; /* Using autoclickers to play for you */
     case MULTISIGNUP; /* Abusing the signup form/multi-characters */
     case TAMPERING;   /* Modifying POST requests */
+    case CHATABUSE;
 }

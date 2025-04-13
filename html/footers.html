@@ -13,7 +13,10 @@
         <script src="/admini/strator/js/popper.min.js"></script>
         <script src="/admini/strator/js/floating-ui-core.js"></script>
         <script src="/admini/strator/js/floating-ui-dom.js"></script>
+
+        <?php if ($_SERVER['SCRIPT_NAME'] == '/game.php'): ?>
         <script type="text/javascript" src="/js/chat.js"></script>
+        <?php endif; ?>
 
         <!-- Init any tooltips -->
         <script type="text/javascript">

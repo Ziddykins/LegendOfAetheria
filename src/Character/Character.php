@@ -25,6 +25,7 @@ class Character {
     private $description = 'None Provided';
 
     private $dateCreated;
+    private $lastAction;
 
     /* class Monster */
     public $monster;

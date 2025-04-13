@@ -5,6 +5,7 @@
     use Game\System\Enums\LOAError;
     use Game\System\Enums\Weather;
     use Game\Character\Character;
+    use Game\Account\Account;
 
     require_once "functions.php";
 
@@ -31,6 +32,7 @@
 
     function do_minute() {
         regenerate();
+        check_expired_sessions();
 //        check_eggs();
     }
     
@@ -124,5 +126,18 @@
                 $sql_query = "UPDATE {$_ENV['SQL_FMLR_TBL']} SET `hatched` = ? WHERE `character_id` = ?";
                 $db->execute_query($sql_query, [ 'True', $player['character_id'] ]);
             }
+        }
+    }
+
+    function check_expired_sessions() {
+        global $db, $log;
+
+        $sql_query = "SELECT `id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `last_action` < NOW() - INTERVAL 30 MINUTE";
+        $results = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
+
+        foreach ($results as $account) {
+            $temp_acct = new Account($account['email']);
+            $temp_acct->set_sessionID(null);
+            $log->info("Session Expire", ['Account' => $temp_acct->get_email(), 'Session ID' => $account['session_id']]);
         }
     }
