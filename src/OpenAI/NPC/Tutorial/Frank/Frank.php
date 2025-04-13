@@ -3,7 +3,15 @@
 namespace OpenAI\NPC\Tutorial\Frank;
 
 class Frank {
-    // ...existing code...
+    private $accountID;
+    private $characterID;
+    private $tutorialStep;
+
+    public function __construct($accountID, $characterID) {
+        $this->accountID = $accountID;
+        $this->characterID = $characterID;
+        $this->tutorialStep = 0;
+    }
 
     /**
      * Generates an interactive tutorial based on a list of links.
