@@ -8,6 +8,7 @@
     use Game\Components\Sidebar\Enums\SidebarType;
     use Game\System\System;
     use Game\Account\Settings;
+    use Game\OpenAI\NPC\Tutorial\Frank;
     //use Game\Familiar\Familiar;
 
     $system = new System(0);

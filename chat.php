@@ -44,14 +44,14 @@
         global $db;
         $sql_query = "INSERT INTO {$_ENV['SQL_CHAT_TBL']} (`character_id`, `room`, `message`, `nickname`) VALUES (?, ?, ?, ?)";
         
-        if (!$db->execute_query($sql_query, [$char_id, $room, $message, $nickname]) {
+        if (!$db->execute_query($sql_query, [$char_id, $room, $message, $nickname])) {
             http_response_code(400);
             return '{"status": "' . $db->error . '"}';
         }
         
         return '{"status": "success"}';
     }
-    function get_messages(string $room = '!main', int $count = 100): array {
+    function get_messages(string $room = '!main', int $count = 100): string {
         global $db;
         $messages = [];
         
@@ -63,5 +63,5 @@
             http_response_code(400);
             return '{"status": "' . $db->error . '"}';
         }
-        return json_encode($messages);
+        return $messages;
     }
