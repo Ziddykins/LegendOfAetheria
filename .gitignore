@@ -29,14 +29,4 @@ phpunit.xml
 **/Tests/**
 **/test**
 .blackboxrules
-admin/25654/widgets/recentorders.html
-admin/25654/widgets/recentlyadded.html
-admin/25654/widgets/recap.html
-admin/25654/widgets/info-box.php
-admin/25654/.htaccess
-admin/25654/widgets/small-box.php
-admin/25654/layout/
-admin/25654/system/*
-!admin/25654/system/functions.php
-admin/25654/css/setup.css
 pages/game-screen.php
