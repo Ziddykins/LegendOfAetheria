@@ -9,4 +9,4 @@
 
     $frank = new Frank($account->get_id(), $character->get_id());
 
-    $frank->generateTutorial();
+    $frank->generateTutorial(['hurr']);

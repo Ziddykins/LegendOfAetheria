@@ -1,19 +1,23 @@
 <?php
     use Game\Character\Enums\FriendStatus;
 
-    
-    $mutual_friends = get_friend_counts(FriendStatus::MUTUAL, 0, true);
-?>
-                    <div class="container border border-secondary p-5">
-                        <div class="row text-bg-dark bg-gradient mb-3 align-items-center">
-                            <div class="col">
-                                <div class="lead p-2">
-                                    Compose Message
-                                </div>
-                            </div>
+    $data = get_friend_counts(FriendStatus::MUTUAL, true)['ids'];
+    $arr = [];
 
+    foreach ($data as $id) {
+        array_push($arr, $id['character_id']);
+    }
+
+    $id_list = join(', ', $arr);
+        
+    $sql_query = "SELECT `name` FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` IN ($id_list)";
+    $results = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
+?>
+                    <div class="container border border-secondary ps-3 pe-3 w-50">
+                        <div class="row mb-3 mt-3 align-items-center">
                             <div class="col">
-                                <div id="mail-close" name="mail-close" class="btn btn-close float-end" onclick=close_click()>
+                                <div class="lead">
+                                    Compose Message
                                 </div>
                             </div>
                         </div>
@@ -27,9 +31,13 @@
                                 <input class="form-control" list="address-book-list" id="to-field" placeholder="Type to search contacts...">
                                 <datalist id="address-book-list">
                                     <?php
-                                        if ($mutual_friends) {
-                                            foreach ($mutual_friends as $mf) {
-                                                echo '<option value="' . $mf . '">';
+                                        
+                                        if ($results) {
+                                            $count = 0;
+                                            foreach ($results as $char) {
+                                                if ($count++ < 10) {
+                                                    echo "<option value=\"" . htmlentities($char['name']) . "\">";
+                                                }
                                             }
                                         } else {
                                             echo '<option value="Empty">';

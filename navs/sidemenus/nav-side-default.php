@@ -25,8 +25,8 @@ $currentPage = $_GET['page'] ?? '';
 $currentSub = $_GET['sub'] ?? '';
 ?>
 
-<aside id="sidebar" class="app-sidebar shadow overflow-hidden" data-bs-theme="<?php echo $color_mode; ?>" style="width: 240px; min-width: 240px; height: 100vh;">
-    <div class="sidebar-brand d-flex align-items-center mb-3">
+<aside id="sidebar" class="app-sidebar shadow overflow-hidden ps-3" data-bs-theme="<?php echo $color_mode; ?>" style="width: 240px; min-width: 240px; height: 100vh;">
+    <div class="sidebar-brand d-flex align-items-center">
         <a href="/game" class="brand-link ms-2">
             <img src="/img/logos/logo-banner-no-bg.webp" alt="Legend of Aetheria Logo" class="brand-image img-fluid">
         </a>
@@ -590,7 +590,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <style>
     .nav-link.active {
         font-weight: bold;
-        color: red;
+        color: rgba(200, 255, 200, .7) !important;
     }
     .menu-open > .nav-treeview {
         display: block !important;

@@ -200,47 +200,50 @@ use Game\System\Enums\LOAError;
      *
      * @return array|int The count of friend requests. If an unsupported value is provided for $which, the function returns 0.
      */
-    function get_friend_counts(FriendStatus $which, int $id = 0, bool $return_list = false): array|int {
+    function get_friend_counts(?FriendStatus $status, bool $return_list=false): array {
         global $db, $character;
         $count = 0;
-        $arr_users['ids'] = [];
+        $ids = [];
 
         $sql_query = <<<SQL
-            SELECT DISTINCT `id`
-            FROM {$_ENV['SQL_CHAR_TBL']}
-            WHERE `id` <> ?
+            SELECT 
+                `friend_status` AS `status`,
+                COUNT(`friend_status`) AS `count`
+            FROM {$_ENV['SQL_FRND_TBL']}
+            WHERE
+                sender_id = ? OR
+                recipient_id = ?
+            GROUP BY `friend_status`
         SQL;
-        
-        $ids = $db->execute_query($sql_query, [ $character->get_id() ])->fetch_all(MYSQLI_ASSOC);
 
-        if (!$ids) {
-            if ($return_list) {
-                $arr['count'] = 0;
-                return $arr;
+        $statuses = $db->execute_query($sql_query, [ $character->get_id(), $character->get_id() ])->fetch_all(MYSQLI_ASSOC);
+
+        $statuses['MUTUAL'] ?? 0;
+        $statuses['REQUEST_RECV'] ?? 0;
+        $statuses['REQUEST_SENT'] ?? 0;
+        $statuses['BLOCKED'] ?? 0;
+
+        if ($return_list) {
+            $status_clause = null;
+            if ($status !== null) {
+                $status_clause = " AND `friend_status` = '" . $status->name . "'";
             }
-            return 0;
+                
+
+            $sql_query = <<<SQL
+                SELECT DISTINCT
+                    IF(`recipient_id` = ?, `sender_id`, `recipient_id`) AS `character_id`
+                FROM {$_ENV['SQL_FRND_TBL']}
+                WHERE `recipient_id` = ? OR `sender_id` = ? $status_clause
+            SQL;
+            $ids = $db->execute_query($sql_query, [$character->get_id(), $character->get_id(), $character->get_id()])->fetch_all(MYSQLI_ASSOC);
+            $data = [];
+            $data['statuses'] = $statuses;
+            $data['ids'] = $ids;
+            return $data;
         }
         
-        foreach ($ids as $id) {
-            $target_status = $which;
-            $current_status = friend_status($id['id']);
-            if ($current_status === $target_status) {
-                $count++;
-
-                if ($return_list) {
-                    if (isset($email['email'])) {
-                        array_push($arr_users['ids'], $id['id']);
-                    }
-                }
-            }
-            
-            $arr_users['count'] = $count;
-
-            if ($return_list) {
-                return $arr_users;
-            }
-        }
-        return $count;
+        return $statuses;
     }
 
     /* TODO: test */

@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "overlayscrollbars": "^2.11.1"
+    "overlayscrollbars": "^2.11.1",
+    "rpg-awesome": "^0.2.0"
   }
 }

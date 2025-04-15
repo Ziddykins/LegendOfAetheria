@@ -64,7 +64,7 @@ function send_click() {
     }).catch((error) => {
         document.getElementById("status").textContent = `Status: ${error.mail_status}`;
     });
-      
+
     recipient_field.value = "";
     subject_field.value = "";
     message_field.value = "";

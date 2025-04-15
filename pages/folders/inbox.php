@@ -13,6 +13,6 @@
                 </div>
 
                 <div id="inbox-list" class="list-group overflow-hidden">
-                    <?php echo $user_inbox->focusedFolder->getFolderHTML(); ?>
+                    <?php echo $user_inbox->focusedFolder->getFolderHTML(true, 20); ?>
                 </div>
             </div>

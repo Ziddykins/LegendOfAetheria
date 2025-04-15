@@ -77,11 +77,30 @@ class Folder {
         }
     }
 
-    public function getFolderHTML() {
+    public function getFolderHTML(bool $pagination=false, int $per_page=10) {
         $html = null;
         $box_count = $this->getMessageCount();
+        $html = '<nav aria-label="Inbox">
+                    <ul class="pagination">
+                        <li class="page-item disabled">
+                            <a class="page-link">Previous</a>
+                        </li>';
+        
+        if ($box_count && $box_count / 10 >= 1) {
+        }
 
 
+
+                        /*<li class="page-item"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item active" aria-current="page">
+                            <a class="page-link" href="#">2</a>
+                        </li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>';*/
         for ($i=$box_count - 1; $i>=0; $i--) {
             $subject    = $this->envelopes[$i]->subject;
             $sender     = $this->envelopes[$i]->sender;

@@ -52,7 +52,9 @@
                                             <span class="d-none d-md-inline">Strength</span>
                                         </span>
                                         <span class="col"><?php echo $char_str; ?></span>
-                                        [ <span class="text-success material-symbols-sharp">add</span> ]
+                                        <?php if ($character->stats->get_ap()): ?>
+                                        <span class="col text-success material-symbols-sharp">add</span>
+                                        <?php endif; ?>
                                     </div>
 
                                     <div class="row mb-3">
@@ -61,6 +63,9 @@
                                             <span class="d-none d-md-inline">Defense</span>
                                         </span>
                                         <span class="col"><?php echo $char_def; ?></span>
+                                        <?php if ($character->stats->get_ap()): ?>
+                                        <span class="col text-success material-symbols-sharp">add</span>
+                                        <?php endif; ?>
                                     </div>
 
                                     <div class="row mb-3">
@@ -69,6 +74,9 @@
                                             <span class="d-none d-md-inline small">Intelligence</span>
                                         </span>
                                         <span class="col"><?php echo $char_int; ?></span>
+                                        <?php if ($character->stats->get_ap()): ?>
+                                        <span class="col text-success material-symbols-sharp">add</span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 
