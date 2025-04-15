@@ -17,7 +17,7 @@ use Game\Character\Enums\FriendStatus;
     
     /* Populate global $requests array with incoming requests */
     $recvreqs = $db->execute_query(
-        "SELECT * FROM {$_ENV['SQL_FRND_TBL']} WHERE `sender_id` = ? or `recipient_id` = ?",
+        "SELECT * FROM {$t['friends']} WHERE `sender_id` = ? or `recipient_id` = ?",
         [ $account->get_email(), $account->get_email() ]
     );
     
@@ -62,7 +62,7 @@ use Game\Character\Enums\FriendStatus;
         switch ($_POST['action']) {
             case 'cancel_request':
                 if (friend_status($email) === FriendStatus::REQUEST_SENT) {
-                    $sql_query = "DELETE FROM {$_ENV['SQL_FRND_TBL']} WHERE email_1 = ? AND email_2 = ?";
+                    $sql_query = "DELETE FROM {$t['friends']} WHERE email_1 = ? AND email_2 = ?";
                     $db->execute_query($sql_query, [ $account->get_email(), $email ]);
                     $log->info("Sent friend request deleted", ['To' => $email, 'From' => $account->get_email()]);
                 }

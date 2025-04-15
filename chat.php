@@ -1,9 +1,11 @@
 <?php
     require_once "bootstrap.php";
+
     $request = file_get_contents('php://input');
     $req_obj = json_decode($request);
-    $log->debug("POST: ", [json_decode($request)]);
+    
     header('Content-Type: application/json');
+
     switch ($req_obj->action) {
         case 'get_msgs':
             $count = $req_obj->count;
@@ -33,7 +35,7 @@
                 exit();
             }
         case 'get_online':
-            $sql_query = "SELECT COUNT(`id`) AS `online` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `session_id` IS NOT NULL";
+            $sql_query = "SELECT COUNT(`id`) AS `online` FROM {$t['accounts']} WHERE `session_id` IS NOT NULL";
             echo json_encode($db->execute_query($sql_query)->fetch_assoc());
             exit();
         default:
@@ -42,8 +44,8 @@
     }
 
     function add_message(int $char_id, string $room, string $message, string $nickname): void {
-        global $db;
-        $sql_query = "INSERT INTO {$_ENV['SQL_CHAT_TBL']} (`character_id`, `room`, `message`, `nickname`) VALUES (?, ?, ?, ?)";
+        global $db, $t;
+        $sql_query = "INSERT INTO {$t['chat']} (`character_id`, `room`, `message`, `nickname`) VALUES (?, ?, ?, ?)";
         
         if (!$db->execute_query($sql_query, [$char_id, $room, $message, $nickname])) {
             http_response_code(400);
@@ -55,11 +57,10 @@
         exit();
     }
     function get_messages(string $room = '!main', int $count = 100): void {
-        global $db;
+        global $db, $t;
         $messages = [];
         
-
-        $sql_query = "SELECT * FROM {$_ENV['SQL_CHAT_TBL']} WHERE `room` = ? ORDER BY `id` DESC LIMIT ?";
+        $sql_query = "SELECT * FROM {$t['chat']} WHERE `room` = ? ORDER BY `id` DESC LIMIT ?";
         $messages = $db->execute_query($sql_query, [$room, $count])->fetch_all(MYSQLI_ASSOC);
 
         if (!$messages) {
@@ -68,6 +69,5 @@
         }
         
         echo json_encode($messages);
-
-        
+        exit();
     }

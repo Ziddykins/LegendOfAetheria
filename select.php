@@ -41,7 +41,7 @@ if (check_session()) {
         switch ($action) {
             case 'load':
                 /* Get character ID in that slot */
-                $sql_query = "SELECT `$char_slot` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
+                $sql_query = "SELECT `$char_slot` FROM {$t['accounts']} WHERE `id` = ?";
                 $char_id = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc()["$char_slot"];
 
                 $character = new Character($account->get_id(), $char_id);
@@ -60,7 +60,7 @@ if (check_session()) {
                 $str     = $_POST['str-ap'];
                 $int     = $_POST['int-ap'];
                 $def     = $_POST['def-ap'];
-                $next_char_id = getNextTableID($_ENV['SQL_CHAR_TBL']);
+                $next_char_id = getNextTableID($t['characters']);
 
                 if ($str + $def + $int === MAX_ASSIGNABLE_AP) {
                     /* ya forgin' posts I know it */
@@ -74,7 +74,7 @@ if (check_session()) {
                     }
                 }
 
-                $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$char_slot` = ? WHERE `id` = ?";
+                $sql_query = "UPDATE {$t['accounts']} SET `$char_slot` = ? WHERE `id` = ?";
                 $db->execute_query($sql_query, [ $next_char_id, $account->get_id() ]);
 
                 $character = new Character($account->get_id());
@@ -92,15 +92,15 @@ if (check_session()) {
                 exit();
             case 'delete':
                 /* Get character ID in that slot */
-                $sql_query = "SELECT `$char_slot` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
+                $sql_query = "SELECT `$char_slot` FROM {$t['accounts']} WHERE `id` = ?";
                 $char_id = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc()["$char_slot"];
 
                 /* Clear that slot */
-                $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$char_slot` = NULL WHERE `id` = ?";
+                $sql_query = "UPDATE {$t['accounts']} SET `$char_slot` = NULL WHERE `id` = ?";
                 $db->execute_query($sql_query, [ $_SESSION['account-id'] ]);
 
                 /* Delete that character */
-                $sql_query = "DELETE FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
+                $sql_query = "DELETE FROM {$t['characters']} WHERE `id` = ?";
                 $db->execute_query($sql_query, [ $char_id ]);
 
                 $log->info(

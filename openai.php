@@ -39,8 +39,8 @@
                 ch.`race`,
                 ch.`account_id`,
                 ac.`credits`
-            FROM {$_ENV['SQL_CHAR_TBL']} AS `ch`
-                JOIN {$_ENV['SQL_ACCT_TBL']} AS `ac`
+            FROM {$t['characters']} AS `ch`
+                JOIN {$t['accounts']} AS `ac`
                     ON ch.`account_id` = ac.`id`
             WHERE ac.`id` = ?
         SQL;

@@ -2,7 +2,7 @@
     global $log;
 
     if ($_REQUEST['action'] === 'reset') {
-        $sql_query = 'UPDATE ' . $_ENV['SQL_CHAR_TBL'] . ' SET floor = 1 WHERE id = ' . $account->get_id();
+        $sql_query = 'UPDATE ' . $t['characters'] . ' SET floor = 1 WHERE id = ' . $account->get_id();
         $db->query($sql_query);
 
         echo 'Reset';

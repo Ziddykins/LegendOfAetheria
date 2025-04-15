@@ -65,9 +65,9 @@
     }
     
     function revive_all_players(): void {
-        global $db, $log;
+        global $db, $log, $t;
         
-        $sql_query  = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']} WHERE hp = 0";
+        $sql_query  = "SELECT * FROM {$t['characters']} WHERE hp = 0";
         $characters = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
 
         foreach ($characters as $t_character) {
@@ -83,8 +83,8 @@
     }
     
     function regenerate() {
-        global $db, $log;
-        $sql_query = "SELECT * FROM {$_ENV['SQL_CHAR_TBL']}";
+        global $db, $log, $t;
+        $sql_query = "SELECT * FROM {$t['characters']}";
         $characters = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
     
         foreach ($characters as $character) {
@@ -100,7 +100,7 @@
     }
 
     function check_eggs() {
-        global $db, $log;
+        global $db, $log, $t;
 
         $sql_query = <<<SQL
             SELECT 
@@ -109,7 +109,7 @@
                 `hatch_time`,
                 `hatched`,
                 `date_acquired`
-            FROM {$_ENV['SQL_FMLR_TBL']}
+            FROM {$t['familiars']}
             WHERE `hatched` = 'False'
         SQL;
 
@@ -123,16 +123,16 @@
             $time_remaining = sub_mysql_datetime($date_acquired, $hatch_time);
 
             if (!$time_remaining) {
-                $sql_query = "UPDATE {$_ENV['SQL_FMLR_TBL']} SET `hatched` = ? WHERE `character_id` = ?";
+                $sql_query = "UPDATE {$t['familiars']} SET `hatched` = ? WHERE `character_id` = ?";
                 $db->execute_query($sql_query, [ 'True', $player['character_id'] ]);
             }
         }
     }
 
     function check_expired_sessions() {
-        global $db, $log;
+        global $db, $log, $t;
 
-        $sql_query = "SELECT `id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `last_action` < NOW() - INTERVAL 30 MINUTE";
+        $sql_query = "SELECT `id` FROM {$t['accounts']} WHERE `last_action` < NOW() - INTERVAL 30 MINUTE";
         $results = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
 
         foreach ($results as $account) {

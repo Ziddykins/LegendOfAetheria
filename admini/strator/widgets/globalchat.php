@@ -6,7 +6,7 @@
     $messages = [];
 
     $sql_query = <<<SQL
-        SELECT * FROM {$_ENV['SQL_CHAT_TBL']}
+        SELECT * FROM {$t['chat']}
         WHERE `when` BETWEEN (NOW() - INTERVAL 7 DAY) AND NOW()
         ORDER BY `when` ASC
     SQL;

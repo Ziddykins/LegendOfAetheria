@@ -1,10 +1,10 @@
-    const chatbox        = document.getElementById('chatbox-bottom');
-    const chat_handle    = document.getElementById('chat-handle');
-    const chat_content   = document.getElementById('chat-content');
-    const chat_input     = document.getElementById('chat-input');
-    const open_chat_btn  = document.getElementById('open-chat');
-    const close_chat_btn = document.getElementById('close-chat-btn');
-    const online_count   = document.getElementById('online-count');
+var chatbox        = document.getElementById('chatbox-bottom');
+const chat_handle    = document.getElementById('chat-handle');
+const chat_content   = document.getElementById('chat-content');
+const chat_input     = document.getElementById('chat-input');
+const open_chat_btn  = document.getElementById('open-chat');
+const close_chat_btn = document.getElementById('close-chat-btn');
+const online_count   = document.getElementById('online-count');
 
 document.getElementById("chat-handle").addEventListener("click", (e) => {
     if (chatbox.style.height === "300px") {
