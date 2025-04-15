@@ -55,7 +55,7 @@
         } else {
             $ip = $_SERVER['REMOTE_ADDR'];
             $sql_query_get_count = <<<SQL
-                SELECT COUNT(*) AS `count` FROM {$_ENV['SQL_LOGS_TBL']} WHERE`ip` = ? AND
+                SELECT COUNT(*) AS `count` FROM {$t['logs']} WHERE`ip` = ? AND
                     `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW() AND
                     `type` = 'MULTISIGNUP'
                 SQL;

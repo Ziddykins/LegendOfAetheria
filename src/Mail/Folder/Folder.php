@@ -35,7 +35,7 @@ class Folder {
      * instantiates Envelope objects for each record, and populates the envelopes array.
      */
     public function getMessages() {
-        global $db;
+        global $db, $t;
         $clause = null;
 
         switch($this->folderType) {
@@ -52,7 +52,7 @@ class Folder {
         };
 
         $sql_query = <<<SQL
-            SELECT * FROM {$_ENV['SQL_MAIL_TBL']} 
+            SELECT * FROM {$t['mail']} 
             WHERE
                 $clause AND
                 `folder` = FIND_IN_SET(?, folder)

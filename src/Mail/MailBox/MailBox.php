@@ -44,8 +44,8 @@ class MailBox {
     }
 
     public static function getFolderCount(FolderType $folder, int $character_id): int {
-        global $db;
-        $sql_query = "SELECT COUNT(`id`) FROM {$_ENV['SQL_MAIL_TBL']} WHERE `r_cid` = ? AND `folder` = ?";
+        global $db, $t;
+        $sql_query = "SELECT COUNT(`id`) FROM {$t['mail']} WHERE `r_cid` = ? AND `folder` = ?";
         $result = $db->execute_query($sql_query, [ $character_id, $folder->name ])->fetch_column();
 
         return $result;

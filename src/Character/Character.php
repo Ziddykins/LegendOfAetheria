@@ -67,14 +67,14 @@ class Character {
     }
 
     private function getNextCharSlotID($accountID): int {
-        global $db;
-        $sqlQuery = "SELECT IF (`char_slot1` IS NULL, 1, IF (`char_slot2` IS NULL, 2, IF (`char_slot3` IS NULL, 3, -1))) AS `free_slot` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
+        global $db, $t;
+        $sqlQuery = "SELECT IF (`char_slot1` IS NULL, 1, IF (`char_slot2` IS NULL, 2, IF (`char_slot3` IS NULL, 3, -1))) AS `free_slot` FROM {$t['accounts']} WHERE `id` = ?";
         return intval($db->execute_query($sqlQuery, [ $accountID ])->fetch_assoc()['free_slot']);
     }
 
     public static function getAccountID($characterID): int {
-        global $db;
-        $sql_query = "SELECT `account_id` FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
+        global $db, $t;
+        $sql_query = "SELECT `account_id` FROM {$t['characters']} WHERE `id` = ?";
         $result = $db->execute_query($sql_query, [ $characterID ])->fetch_column();
 
         if (!$result) {

@@ -59,9 +59,9 @@ use Game\System\Enums\LOAError;
      * @return string|null The retrieved global value, or null if no matching record is found.
      */
     function get_globals($which) {
-        global $db;
+        global $db, $t;
         $ret_val = '';
-        $sql_query = "SELECT `value` FROM {$_ENV['SQL_GLBL_TBL']} WHERE `name` = '$which'";
+        $sql_query = "SELECT `value` FROM {$t['globals']} WHERE `name` = '$which'";
         $result = $db->query($sql_query);
         $row = $result->fetch_assoc();
 
@@ -80,9 +80,9 @@ use Game\System\Enums\LOAError;
      * @return void
      */
     function set_globals($name, $value) {
-        global $db;
+        global $db, $t;
 
-        $sql_query = "UPDATE {$_ENV['SQL_GLBL_TBL']} SET `value` = '$value' WHERE `name` = '$name'";
+        $sql_query = "UPDATE {$t['globals']} SET `value` = '$value' WHERE `name` = '$name'";
         $db->query($sql_query);
     }
 
@@ -116,11 +116,11 @@ use Game\System\Enums\LOAError;
      *                      If an unsupported value is provided for $what, the function returns LOAError::MAIL_UNKNOWN_DIRECTIVE.
      */
     function check_mail($what): int|LOAError|string {
-        global $db, $log;
+        global $db, $log, $t;
 
         switch ($what) {
             case 'unread':
-                $sql_query = "SELECT * FROM {$_ENV['SQL_MAIL_TBL']} WHERE NOT FIND_IN_SET('READ', `status`) AND `r_aid` = ?";
+                $sql_query = "SELECT * FROM {$t['mail']} WHERE NOT FIND_IN_SET('READ', `status`) AND `r_aid` = ?";
                 $result = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->num_rows;
                 return $result;
             default:
@@ -147,10 +147,10 @@ use Game\System\Enums\LOAError;
      *             - LOAError::FRNDS_FRIEND_STATUS_ERROR: An error occurred while determining the friendship status.
      */
     function friend_status(int $character_id): FriendStatus {
-        global $db, $log;
+        global $db, $log, $t;
 
         $status    = FriendStatus::NONE;
-        $sql_query = "SELECT * FROM {$_ENV['SQL_FRND_TBL']} WHERE `recipient_id` = ? OR `sender_id` = ?";
+        $sql_query = "SELECT * FROM {$t['friends']} WHERE `recipient_id` = ? OR `sender_id` = ?";
         $results   = $db->execute_query($sql_query, [ $character_id, $character_id ])->fetch_assoc();
 
         if ($results) {
@@ -177,10 +177,10 @@ use Game\System\Enums\LOAError;
      * @return void
      */
     function accept_friend_req($sender):bool {
-        global $db, $log;
+        global $db, $log, $t;
 
         if (friend_status($sender) === FriendStatus::REQUEST_RECV) {
-            $sql_query = "UPDATE {$_ENV['SQL_FRND_TBL']} SET `friend_status` = ? WHERE `recipient_id` = ?";
+            $sql_query = "UPDATE {$t['friends']} SET `friend_status` = ? WHERE `recipient_id` = ?";
             $db->execute_query($sql_query, [ FriendStatus::MUTUAL->value, $_SESSION['character-id'] ]);
             $log->info('Friend request accepted', [ 'sender' => $sender, 'recipient' => $_SESSION['character-id'] ]);
             return true;
@@ -201,7 +201,7 @@ use Game\System\Enums\LOAError;
      * @return array|int The count of friend requests. If an unsupported value is provided for $which, the function returns 0.
      */
     function get_friend_counts(?FriendStatus $status, bool $return_list=false): array {
-        global $db, $character;
+        global $db, $character, $t;
         $count = 0;
         $ids = [];
 
@@ -209,7 +209,7 @@ use Game\System\Enums\LOAError;
             SELECT 
                 `friend_status` AS `status`,
                 COUNT(`friend_status`) AS `count`
-            FROM {$_ENV['SQL_FRND_TBL']}
+            FROM {$t['friends']}
             WHERE
                 sender_id = ? OR
                 recipient_id = ?
@@ -233,7 +233,7 @@ use Game\System\Enums\LOAError;
             $sql_query = <<<SQL
                 SELECT DISTINCT
                     IF(`recipient_id` = ?, `sender_id`, `recipient_id`) AS `character_id`
-                FROM {$_ENV['SQL_FRND_TBL']}
+                FROM {$t['friends']}
                 WHERE `recipient_id` = ? OR `sender_id` = ? $status_clause
             SQL;
             $ids = $db->execute_query($sql_query, [$character->get_id(), $character->get_id(), $character->get_id()])->fetch_all(MYSQLI_ASSOC);
@@ -259,23 +259,12 @@ use Game\System\Enums\LOAError;
      * @return int|LOA::Error Returns LOAError::MAIL_ALREADY_BLOCKED if the user is already blocked,
      *                  otherwise, it prints the result and stops the script.
      */
-    function block_user($email_1, $email_2): mixed {
-        global $db;
-        $sqlQuery = 'SELECT email_2 FROM ' . $_ENV['SQL_FRND_TBL'] .
-                    "WHERE `email_1` = ? AND `email_2` = ?";
-
-        $result = $db->execute_query($sqlQuery, [$email_1, $email_2])->fetch_assoc();
-
-        if (str_starts_with($result['email_2'], '¿b¿')) {
-            return LOAError::MAIL_ALREADY_BLOCKED;
-        } else {
-            $sql_query = "UPDATE {$_ENV['SQL_FRND_TBL']} SET `email_2` = ? WHERE `email_1` = ? AND `email_2` = ?";
-            $db->execute_query(
-                $sql_query,
-                [ "¿b¿$email_2", $email_1, $email_2 ]
-            );
-            return 1;
-        }
+    function block_user($email_1, $email_2): int {
+        global $db, $t;
+        $sql_query = "INSERT INTO {$t['friends']} (`sender_id`, `recipient_id`, `friend_status`) VALUES (?, ?, ?) UPDATE ON DUPLICATE KEY `friend_status` = 'BLOCKED'";
+        $result = $db->execute_query($sql_query, [$email_1, $email_2, 'BLOCKED']);
+        
+        return 0;
     }
 
     /**
@@ -309,12 +298,12 @@ use Game\System\Enums\LOAError;
      * @return bool True if abuse is detected, false otherwise
      */
     function check_abuse(AbuseType $type, $account_id, $ip, $threshold = 1): bool {
-        global $db, $log;
+        global $db, $log, $t;
 
         switch ($type) {
             case AbuseType::MULTISIGNUP:
                 $sql_query = <<<SQL
-                                SELECT `id` FROM {$_ENV['SQL_LOGS_TBL']}
+                                SELECT `id` FROM {$t['logs']}
                                 WHERE `type` = ?
                                     AND `ip` = ?
                                     AND `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
@@ -328,7 +317,7 @@ use Game\System\Enums\LOAError;
                 return false;
             case AbuseType::TAMPERING:
                 $sql_query = <<<SQL
-                    SELECT `id` FROM {$_ENV['SQL_LOGS_TBL']}
+                    SELECT `id` FROM {$t['logs']}
                     WHERE `type` = ? AND `ip` = ?
                 SQL;
                 $count = $db->execute_query($sql_query, [ $type->name, $ip ])->num_rows;
@@ -386,7 +375,7 @@ use Game\System\Enums\LOAError;
     }
 
     function getNextTableID($table): int {
-        global $db;
+        global $db, $t;
         $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)+1) AS `next_id` FROM $table";
         $next_id = $db->execute_query($sql_query)->fetch_assoc()['next_id'];
         
@@ -394,20 +383,20 @@ use Game\System\Enums\LOAError;
     }
 
     function write_log(string $log_type, string $message, string $ip): void {
-        global $db;
+        global $db, $t;
         
-        $sql_query = "INSERT INTO {$_ENV['SQL_LOGS_TBL']} (`type`, `message`, `ip`) VALUES (?, ?, ?)";
+        $sql_query = "INSERT INTO {$t['logs']} (`type`, `message`, `ip`) VALUES (?, ?, ?)";
         $db->execute_query($sql_query, [ $log_type, $message, $ip ]);
     }
 
     function ban_user($account_id, $length_secs, $reason): void {
-        global $db;
+        global $db, $t;
         $expires = get_mysql_datetime("+$length_secs seconds");
-        $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `banned` = 'True' WHERE `id` = ?";
+        $sql_query = "UPDATE {$t['accounts']} SET `banned` = 'True' WHERE `id` = ?";
         $db->execute_query($sql_query, [ $account_id ]);
 
         $sql_query = <<<SQL
-            INSERT INTO {$_ENV['SQL_BANS_TBL']} 
+            INSERT INTO {$t['banned']} 
                 (`account_id`, `expires`, `reason`)
             VALUES (?, ?, ?)
         SQL;
@@ -472,14 +461,14 @@ use Game\System\Enums\LOAError;
     }
 
     function check_session(): bool {
-        global $db, $log;
+        global $db, $log, $t;
 
         if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
             $log->warning("Sessions var 'logged-in' not set to 1", [ print_r($_SESSION, true), print_r(debug_backtrace(), true) ] );
             return false;
         }
 
-        $sql_query = "SELECT `session_id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `id` = ?";
+        $sql_query = "SELECT `session_id` FROM {$t['accounts']} WHERE `id` = ?";
         $result = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc();
         
         if (!$result) {

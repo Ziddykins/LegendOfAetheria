@@ -29,7 +29,7 @@
                     if ($sender_csrf == $_SESSION['csrf-token']) {
                         if (friend_status($recipient) === FriendStatus::MUTUAL) {
                             $sql_query = <<<SQL
-                                INSERT INTO {$_ENV['SQL_MAIL_TBL']}
+                                INSERT INTO {$t['mail']}
                                     (
                                         `folder`,
                                         `to`,

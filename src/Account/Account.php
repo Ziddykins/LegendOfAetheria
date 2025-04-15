@@ -71,8 +71,8 @@ class Account {
     }
     
     public static function checkIfExists($email): int {
-        global $db, $log;
-        $sqlQuery = "SELECT `id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `email` = ?";
+        global $db, $log, $t;
+        $sqlQuery = "SELECT `id` FROM {$t['accounts']} WHERE `email` = ?";
         $result = $db->execute_query($sqlQuery, [$email])->fetch_assoc();
 
         if ($result && $result['id'] > 0) {

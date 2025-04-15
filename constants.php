@@ -6,6 +6,7 @@ const MAX_ASSIGNABLE_AP = 40;
 const REGEN_PER_TICK = 3;
 
 
+
 enum ModalButtonType {
     case YesNo;
     case Close;

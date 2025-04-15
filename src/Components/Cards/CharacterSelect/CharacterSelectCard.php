@@ -11,11 +11,11 @@ class CharacterSelectCard {
     }
 
     public function render(): string {
-        global $db, $log;
+        global $db, $log, $t;
         $cardHtml = null;
 
         if ($this->characterID) {
-            $sqlQuery = "SELECT `name`, `avatar`, `race`, `stats`, `level` FROM {$_ENV['SQL_CHAR_TBL']} WHERE `id` = ?";
+            $sqlQuery = "SELECT `name`, `avatar`, `race`, `stats`, `level` FROM {$t['characters']} WHERE `id` = ?";
             $character = $db->execute_query($sqlQuery, [ $this->characterID ])->fetch_assoc();
             $stats = safe_serialize($character['stats'], true);
 

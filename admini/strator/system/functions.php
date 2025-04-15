@@ -26,9 +26,9 @@ use Game\Character\Character;
      * @return int Returns the count of new member accounts.
      */
     function new_members_count($days = 30): int {
-        global $db;
+        global $db, $t;
 
-        $query = "SELECT COUNT(`id`) FROM {$_ENV['SQL_CHAR_TBL']} WHERE `date_created` BETWEEN (NOW() - INTERVAL $days DAY) AND NOW()";
+        $query = "SELECT COUNT(`id`) FROM {$t['characters']} WHERE `date_created` BETWEEN (NOW() - INTERVAL $days DAY) AND NOW()";
         return $db->execute_query($query)->fetch_column();        
     }
 

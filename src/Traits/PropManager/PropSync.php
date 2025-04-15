@@ -7,11 +7,44 @@ use Game\Character\Stats;
 use Game\Inventory\Inventory;
 use Game\System\Enums\LOAError;
 use Game\Traits\PropManager\Enums\PropType;
-use ReflectionClass;
-use ReflectionEnum;
 
 
-
+/**
+     * Trait PropSync
+     * 
+     * Provides functionality for synchronizing properties between the application and the database.
+     * This trait handles various actions such as getting, setting, creating, and loading properties
+     * for different types of entities (e.g., characters, accounts, monsters, etc.).
+     * 
+    * @method mixed propSync(string $method, array $params, PropType $type)
+     * 
+     * @param string $method The method name indicating the action to perform (e.g., "get", "set", "new", "load").
+     * @param array $params Parameters required for the action. The first parameter is typically the value to set or additional data.
+     * @param PropType $type The type of property being synchronized (e.g., PropType::CHARACTER, PropType::ACCOUNT).
+     * 
+     * @return mixed Returns the result of the action performed. For "get", it returns the property value.
+     *               For "set", "new", and "load", it may return an ID or null depending on the action.
+     * 
+     * @throws LOAError::FUNCT_PROPSYNC_TYPE If an unsupported PropType is provided.
+     * 
+     * Actions:
+     * - **get**: Retrieves the value of a property.
+     * - **set**: Updates the value of a property in the database and the object.
+     * - **new**: Creates a new entity in the database and initializes its properties.
+     * - **load**: Loads an entity's properties from the database into the object.
+     * 
+     * Supported PropTypes:
+     * - PropType::CSTATS, PropType::CHARACTER, PropType::INVENTORY: Uses the character table.
+     * - PropType::ACCOUNT, PropType::SETTINGS: Uses the account table.
+     * - PropType::FAMILIAR: Uses the familiar table.
+     * - PropType::MONSTER, PropType::MSTATS: Uses the monster table.
+     * 
+     * Notes:
+     * - The method dynamically determines the action and property based on the method name.
+     * - Serialization is used for complex properties like inventory, settings, and stats.
+     * - Global variables `$db` and `$log` are used for database operations and logging.
+     * - Environment variables (e.g., `$_ENV['SQL_CHAR_TBL']`) are used to determine table names.
+ */
 trait PropSync {
     private function propSync($method, $params, PropType $type): mixed {
         global $db, $log;

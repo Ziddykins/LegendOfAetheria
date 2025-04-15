@@ -24,12 +24,12 @@ class Familiar {
     }
 
     public function registerFamiliar() {
-        global $db;
-        $sqlQuery = "INSERT INTO {$_ENV['SQL_CHAR_TBL']} (`character_id`) VALUES (?)";
+        global $db, $t;
+        $sqlQuery = "INSERT INTO {$t['characters']} (`character_id`) VALUES (?)";
         
         $db->execute_query($sqlQuery, [ $this->characterID ]);
 
-        $sqlQuery = "SELECT `id` FROM {$_ENV['SQL_CHAR_TBL']} WHERE `character_id` = ?";
+        $sqlQuery = "SELECT `id` FROM {$t['characters']} WHERE `character_id` = ?";
         
         $result      = $db->execute_query($sqlQuery, [ $this->characterID ])->fetch_assoc();
         $familiar_id = $result['id'];
@@ -98,9 +98,9 @@ class Familiar {
     }
 
     public function loadFamiliar($characterID) {
-        global $db, $log;
+        global $db, $log, $t;
 
-        $sqlQuery = "SELECT * FROM {$_ENV['SQL_FMLR_TBL']} WHERE `character_id` = ?";
+        $sqlQuery = "SELECT * FROM {$t['familiars']} WHERE `character_id` = ?";
         $result = $db->execute_query($sqlQuery, [ $characterID ]);
 
         if ($result->num_rows === 0) {
@@ -190,7 +190,7 @@ class Familiar {
     }
 
     function __call($method, $params) {
-        global $log, $db;
+        global $log, $db, $t;
         $caller = debug_backtrace()[1]['function'];
 
         $var = lcfirst(substr($method, 4));
@@ -200,7 +200,7 @@ class Familiar {
         }
 
         if (strncasecmp($method, "set_", 4) === 0) {
-            $sqlQuery =  "UPDATE {$_ENV['SQL_FMLR_TBL']} ";
+            $sqlQuery =  "UPDATE {$t['familiars']} ";
             $table_col = $this->clsprop_to_tblcol($var);
 
             if (is_int($params[0])) {

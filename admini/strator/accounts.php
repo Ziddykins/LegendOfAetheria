@@ -31,9 +31,9 @@
 
             switch ($action) {
                 case 'ban':
-                    $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `banned` = 'True' WHERE `id` = ?";
+                    $sql_query = "UPDATE {$t['accounts']} SET `banned` = 'True' WHERE `id` = ?";
                     $db->execute_query($sql_query, [ $account_id ]);
-                    $sql_query = "INSERT INTO {$_ENV['SQL_BANS_TBL']} (`expires`, `reason, `account_id`) VALUES (?, ?, ?)";
+                    $sql_query = "INSERT INTO {$t['banned']} (`expires`, `reason, `account_id`) VALUES (?, ?, ?)";
                     $db->execute_query($sql_query, [ "NOW() + INTERVAL 1 DAY", "Admin Ban", $account_id ]);
                     break;
                 case 'delete':

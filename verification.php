@@ -20,7 +20,7 @@
     
     if (isset($_POST['code'])) {
         $verification_code = $_POST['code'];
-        $sql_query = "SELECT `id` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `verification_code` = ? AND `email` = ?";
+        $sql_query = "SELECT `id` FROM {$t['accounts']} WHERE `verification_code` = ? AND `email` = ?";
         $results = $db->execute_query($sql_query, [ $verification_code, $account->get_email() ]);
                 
         /* 
@@ -36,7 +36,7 @@
                 exit();
             }
 
-            $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `privileges` = '" . Privileges::USER->name . "', `verified` = 'True' WHERE `id` = {$account->get_id()}";
+            $sql_query = "UPDATE {$t['accounts']} SET `privileges` = '" . Privileges::USER->name . "', `verified` = 'True' WHERE `id` = {$account->get_id()}";
             $db->execute_query($sql_query);
 
             $log->info("User verification successful", [

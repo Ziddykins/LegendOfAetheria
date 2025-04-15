@@ -11,7 +11,7 @@
         if (password_verify($old_password, $account->get_password())) {
             if ($new_password === $confirm_password) {
                 $hashed_password = password_hash($new_password, PASSWORD_BCRYPT);
-                $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `password` = ? WHERE `email` = ?";
+                $sql_query = "UPDATE {$t['accounts']} SET `password` = ? WHERE `email` = ?";
                 $db->execute_query($sql_query);
         
                 session_regenerate_id();

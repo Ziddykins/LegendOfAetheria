@@ -22,7 +22,7 @@
     $account->get_settings()->set_sideBar(SidebarType::LTE_DEFAULT);
     $sidebar_rel_link = $account->get_settings()->get_sideBar()->value;
 
-    //$familiar = new Familiar($character->get_id(), $_ENV['SQL_FMLR_TBL']);
+    //$familiar = new Familiar($character->get_id(), $t['familiars']);
     //$familiar->loadFamiliar($character->get_id());
 
     $_SESSION['name'] = $character->get_name();
