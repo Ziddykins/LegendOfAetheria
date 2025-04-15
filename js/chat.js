@@ -1,9 +1,12 @@
-document.getElementById("chat-handle").addEventListener("click", (e) => {
-    const chatbox     = document.getElementById("chatbox-bottom");
-    const chat_button = document.getElementById("open-chat");
-    const chat_input  = document.getElementById("chat-input");
-    const chat_online = document.getElementById("chat-online");
+    const chatbox        = document.getElementById('chatbox-bottom');
+    const chat_handle    = document.getElementById('chat-handle');
+    const chat_content   = document.getElementById('chat-content');
+    const chat_input     = document.getElementById('chat-input');
+    const open_chat_btn  = document.getElementById('open-chat');
+    const close_chat_btn = document.getElementById('close-chat-btn');
+    const online_count   = document.getElementById('online-count');
 
+document.getElementById("chat-handle").addEventListener("click", (e) => {
     if (chatbox.style.height === "300px") {
         chatbox.style.height = "35px";
         chat_button.textContent = "expand_less";
@@ -20,14 +23,13 @@ document.getElementById("chat-input").addEventListener("keyup", (e) => {
     if (e.keyCode == 13) {
         message = document.getElementById("chat-input").value.trim();
         document.getElementById("chat-input").value = "";
-        const chat_msg = {message: message, char_id: loa.u_cid, room: '!main', nickname: loa.u_name, action: 'add'};
-        const chat_content = document.getElementById('chat-content');
+        const chat_msg = {message: message, char_id: loa.u_cid, room: '!main', nickname: loa.u_name, action: 'add_msg'};
         
         if (!message || message.length === 0 || /^\s*$/.test(message)) {
             return;
         }
 
-        do_post('chat', chat_msg);
+        do_post('chat', 'add_msg', chat_msg);
 
     } else if (e.keyCode == 38) { //up
         if (loa.chat_pos == loa.chat_history.length) {
@@ -48,30 +50,12 @@ document.getElementById("chat-input").addEventListener("keyup", (e) => {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const chatbox        = document.getElementById('chatbox-bottom');
-    const chat_handle    = document.getElementById('chat-handle');
-    const chat_content   = document.getElementById('chat-content');
-    const chat_input     = document.getElementById('chat-input');
-    const open_chat_btn  = document.getElementById('open-chat');
-    const close_chat_btn = document.getElementById('close-chat-btn');
-    const online_count   = document.getElementById('online-count');
     var messages = null;
     let is_open = false;
 
-    var obj_getmsgs = {
-        action: 'get_msgs',
-        room: '!main',
-        count: 20
-    };
-
-    var obj_ocount = {
-        action: 'online_count',
-    };
-
     chat_handle.addEventListener('click', () => {
-        online_count.innerText = do_post('chat', obj_ocount);
-        messages = do_post('chat', obj_getmsgs);
-
+        online_count.innerText = do_post('chat', 'get_online');
+        messages = do_post('chat', 'get_msgs');
         is_open = !is_open;
 
         if (is_open) {
@@ -93,11 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function gen_message(msg) {
+    if (!msg) {
+        return;
+    }
 	console.log("in gen_message(msg) ");
     console.log(msg);
     console.log(typeof(msg));
     let chat_msg = document.createElement('div');
-    let nick_len = msg['nickname'].length;
+    let nick_len = msg.nickname.length;
     let max_len = 10;
     let spaces = max_len - nick_len;
     let final_nick = "&nbsp;".repeat(spaces) + msg.nickname;
@@ -107,9 +94,29 @@ function gen_message(msg) {
     return chat_msg;
 }
 
-function do_post(uri, body_data) {
-	console.log("in do_post(uri, body_data) ");
-    
+function do_post(uri, directive, data=null) {
+    let body_data = null;
+
+    switch(directive) {
+        case 'get_online':
+            body_data = { action: 'get_online' };
+            break;
+        case 'get_msgs':
+            body_data = {
+                action: 'get_msgs',
+                room: '!main',
+                count: 20
+            };
+            break;
+        case 'add_msg':
+            body_data = {
+                action: 'add_msg',
+                data: data,
+                room: '!main',
+            };
+            break;
+    }
+
     fetch('chat', {
         method: 'POST',
         headers: {
@@ -124,16 +131,17 @@ function do_post(uri, body_data) {
                 return response.json();
             }
         }).then((json) => {
+            
             switch(body_data.action) {
-                case 'add':
-                    const html_msg = gen_message(chat_msg);
+                case 'get_msgs':
+                    const html_msg = gen_message(data);
 
                     if (chat_content.children.length > 20) {
                         chat_content.lastChild.remove();
                     }
 
                     chat_content.prepend(html_msg);
-                    loa.chat_history.push(message);
+                    loa.chat_history.push(data.message); // Push the message to chat history
                     break;
             }
         });

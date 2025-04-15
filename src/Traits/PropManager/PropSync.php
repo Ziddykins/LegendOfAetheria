@@ -13,7 +13,7 @@ use ReflectionEnum;
 
 
 trait PropSync {
-    private function propSync($method, $params, PropType $type) {
+    private function propSync($method, $params, PropType $type): mixed {
         global $db, $log;
         $table  = null;
         $prop   = null;
@@ -27,7 +27,7 @@ trait PropSync {
         }
 
         if ($method == 'propSync') {
-            return;
+            return null;
         }
 
         switch ($type) {
@@ -85,22 +85,22 @@ trait PropSync {
                     $srl_data = safe_serialize($this);
                     $sql_query = "UPDATE $tbl SET `stats` = ? WHERE `id` = ?";
                     $db->execute_query($sql_query, [ $srl_data, $this->id ]);
-                    return;
+                    return null;
                 case PropType::INVENTORY:
                     $id = $this->id;
                     $srl_data = safe_serialize($this);
                     $sql_query = "UPDATE {$_ENV['SQL_CHAR_TBL']} SET `inventory` = ? WHERE `id` = ?";
                     $db->execute_query($sql_query, [ $srl_data, $_SESSION['character-id'] ]);
-                    return;
+                    return null;
                 case PropType::SETTINGS:
                     $id = $this->id;
                     $srl_data = safe_serialize($this);
                     $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `settings` = ? WHERE `id` = ?";
                     $db->execute_query($sql_query, [ $srl_data, $this->id ]);
-                    return;
+                    return null;
                 case PropType::MONSTER:
                     if (isset($params[1]) && $params[1] === 'false') {
-                        return;
+                        return null;
                     }
 
                     $srl_data = safe_serialize($this);
@@ -244,5 +244,6 @@ trait PropSync {
                 $this->stats = $tmp_stats;
             }
         }
-    }
+        return 0;
+    }    
 }

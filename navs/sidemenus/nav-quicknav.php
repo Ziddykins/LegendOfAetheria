@@ -3,7 +3,8 @@
     use Game\Character\Enums\FriendStatus;
 
     $new_mail = check_mail('unread');
-    $new_friend_reqs = get_friend_counts(FriendStatus::REQUEST_RECV);
+    $data = get_friend_counts(null, false);
+    $new_friend_reqs = $data[1]['REQUEST_RECV'] ?? 0;
 
 ?>
 

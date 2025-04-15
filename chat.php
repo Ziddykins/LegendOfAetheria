@@ -2,13 +2,13 @@
     require_once "bootstrap.php";
     $request = file_get_contents('php://input');
     $req_obj = json_decode($request);
-
+    $log->debug("POST: ", [json_decode($request)]);
+    header('Content-Type: application/json');
     switch ($req_obj->action) {
         case 'get_msgs':
             $count = $req_obj->count;
             $room  = $req_obj->room;
-            $messages = get_messages($room, intval($count));
-            echo json_encode($messages);
+            get_messages($room, intval($count));
             break;
         case 'add_msg':
             $char_id  = $req_obj->char_id;
@@ -23,35 +23,38 @@
             }
 
             $message = htmlentities($message);
-            $result  = add_message($char_id, $room, $message, $nickname);
             
             if ($result == false) {
                 http_response_code(400);
-                echo '{"status": "error - couldnt add message"}';
+                echo '{"status":"error - couldnt add message"}';
+                exit();
             } else {
-                echo '{"status": "success"}';
+                echo '{"status":"success"}';
+                exit();
             }
-            break;
-        case 'online_count':
+        case 'get_online':
             $sql_query = "SELECT COUNT(`id`) AS `online` FROM {$_ENV['SQL_ACCT_TBL']} WHERE `session_id` IS NOT NULL";
             echo json_encode($db->execute_query($sql_query)->fetch_assoc());
-            break;
+            exit();
         default:
-            echo '{"status": "error - invalid action or data supplied"}';
+            echo '{"status":"error - invalid action or data supplied"}';
+            exit();
     }
 
-    function add_message(int $char_id, string $room, string $message, string $nickname): string {
+    function add_message(int $char_id, string $room, string $message, string $nickname): void {
         global $db;
         $sql_query = "INSERT INTO {$_ENV['SQL_CHAT_TBL']} (`character_id`, `room`, `message`, `nickname`) VALUES (?, ?, ?, ?)";
         
         if (!$db->execute_query($sql_query, [$char_id, $room, $message, $nickname])) {
             http_response_code(400);
-            return '{"status": "' . $db->error . '"}';
+            echo '{"status": "' . $db->error . '"}';
+            exit();
         }
         
-        return '{"status": "success"}';
+        echo '{"status":"success"}';
+        exit();
     }
-    function get_messages(string $room = '!main', int $count = 100): string {
+    function get_messages(string $room = '!main', int $count = 100): void {
         global $db;
         $messages = [];
         
@@ -61,7 +64,10 @@
 
         if (!$messages) {
             http_response_code(400);
-            return '{"status": "' . $db->error . '"}';
+            echo '{"status":"' . $db->error . '"}';
         }
-        return $messages;
+        
+        echo json_encode($messages);
+
+        
     }

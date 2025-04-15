@@ -75,8 +75,8 @@
                         }
                     ?>
                     </div>
-                    <?php include 'html/chat.html'; ?>
                 </main>
+                <?php include 'html/chat.html'; ?>
             </span>
         </div>
 
