@@ -87,11 +87,7 @@ class Folder {
                         </li>';
         
         if ($box_count && $box_count / 10 >= 1) {
-        }
-
-
-
-                        /*<li class="page-item"><a class="page-link" href="#">1</a></li>
+        $html .= '<li class="page-item"><a class="page-link" href="#">1</a></li>
                             <li class="page-item active" aria-current="page">
                             <a class="page-link" href="#">2</a>
                         </li>
@@ -100,7 +96,7 @@ class Folder {
                             <a class="page-link" href="#">Next</a>
                         </li>
                     </ul>
-                </nav>';*/
+                </nav>';
         for ($i=$box_count - 1; $i>=0; $i--) {
             $subject    = $this->envelopes[$i]->subject;
             $sender     = $this->envelopes[$i]->sender;

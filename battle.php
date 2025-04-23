@@ -83,7 +83,7 @@
         // miss
         if ($roll === 0) {
             $log->debug("Missed Attack! (" . $current->name . ")");
-            attack_missed($attacker, $attackee, 1, $current);
+            attack_missed($attacker, $attackee, roll(0,1), $current);
         }
 
         // block
@@ -103,48 +103,56 @@
         global $mn_name, $ch_name, $monster, $character, $verbs, $adverbs, $turn, $colors, $out_msg;
         $atk_verb = $verbs[array_rand($verbs)];
         $atk_adverb = $adverbs[array_rand($adverbs)];
-        
         $out_msg .= "<span class=\"{$colors[0]}\">{$attacker->get_name()} $atk_adverb $atk_verb {$attackee->get_name()} but misses!</span><br>";
 
         if ($offguard) {
             $attack = roll(0, intval($attackee->stats->get_str() / 2));
             $attacker->stats->sub_hp($attack);
-            
-            if (!check_alive($attacker)) {
-                $class = "bg-text-danger";
-                $out_msg .= "<span class=\"fw-bold text-center bg-text-danger\">{$attacker->get_name()} has been killed!</span><br>";
-                
-                if ($turn == Turn::ENEMY) {
-                   //award_player($attacker, $attackee);
-                }
-
-                return;
-            }
             $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$attackee->get_name()} sees an opportunity to strike the {$attacker->get_name()} and with a carefully timed blow, lands a hit for $attack damage! ({$attackee->stats->get_hp()} left)</span><br>";
-            $attackee->stats->sub_hp($attack);
-            check_alive($attackee);
+            check_alive($attackee, $turn);
         }
     }
 
     function attack_success($attacker, $attackee, $damage, $turn){
         global $colors, $verbs, $out_msg;
+
         $attackee->stats->sub_hp($damage);
         $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} for $damage damage! ({$attackee->stats->get_hp()} left)</span><br>";
+        check_alive($attackee, $turn);
     }
 
     function attack_blocked($attacker, $attackee, $parry, $turn) {
         global $colors, $verbs, $out_msg;
-        $out_msg .= "<span class=\"{$colors[0]}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} but {$attackee->get_name()} blocks it!</span><br>";
+
+        if ($parry) {
+            $parry_dmg = roll(1, $attackee->stats->get_str() / 4);
+            $attacker->stats->sub_hp($parry_dmg);
+            $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$attackee->get_name()} parries {$attacker->get_name()}'s attack and deals $parry_dmg damage!</span><br>";
+            check_alive($attackee, $turn);
+        } else {
+            $attackee->stats->sub_hp(1);
+            $out_msg .= "<span class=\"{$colors[$turn->value]}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} but {$attackee->get_name()} blocks it!</span><br>";
+            check_alive($attackee, $turn);
+        }
     }
 
-    function check_alive(&$target): bool {
-        global $out_msg;
-        if ($target->stats->get_hp() > 0) {
-            return true;
+    function check_alive(&$target, $turn): void {
+        global $out_msg, $colors;
+
+        if ($target->stats->get_hp() <= 0) {
+            $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$target->get_name()} has been killed!</span><br>";
+        
+            if ($turn == Turn::PLAYER) {    
+                $target->set_monster(null);
+                reward_player($target);
+            }
         }
-        http_response_code(401);
-        $out_msg .= '<div class="text-warning">' . $target->get_name() . ' is no longer alive"></div><br>';
-        return false;
+    }
+
+    function reward_player() {
+        global $character, $monster;
+        
+
     }
 
     function roll($min, $max): int {
