@@ -9,6 +9,7 @@ env_template=
 game_scripts_dir=
 game_template_dir=
 htaccess_template=
+constants_template=
 hosts_file=
 log_to_file=
 openai_apikey=
@@ -70,6 +71,7 @@ tbl_monsters=tbl_monsters
 tbl_logs=tbl_logs
 tbl_banned=tbl_banned
 tbl_globalchat=tbl_globalchat
+tbl_statistics=tbl_statistics
 
 [colors]
 red=[31m

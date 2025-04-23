@@ -6,11 +6,8 @@ use autodie;
 
 our $VERSION = "2.6.4.28";
 
-BEGIN {
-    eval { require Config::IniFiles; };
-    eval { require Term::ReadKey; };
-};
-
+use Config::IniFiles;
+use Term::ReadKey;
 use File::Path qw(make_path remove_tree);
 use Getopt::Long;
 use Data::Dumper;
@@ -27,7 +24,7 @@ GetOptions(
     'v|version' => sub { print "AutoInstaller.pl v$VERSION\n"; exit; },
 );
 
-if ($opt_step =~ /[a-z]/i) {
+if ($opt_step && $opt_step =~ /[a-z]/i) {
     my $t_step = name_to_const(uc $opt_step);
     if ($t_step) {
         $opt_step = $t_step;
@@ -37,6 +34,7 @@ if ($opt_step =~ /[a-z]/i) {
 }
 
 # ==================================[ cfg-start ]==================================== #
+# Autoflush data to screen
 $| = 1;
 
 use constant {
@@ -76,10 +74,9 @@ my %ini; # full configuration ini, all domains
 my %sql; # object containing constant sql table names
 my %clr; # color constants
 
-my $fqdn;     # fully qualified domain name to set up
-$fqdn = $opt_fqdn if $opt_fqdn;
-
 my $question; # current question to ask the user
+
+my $fqdn;     # fully qualified domain name to set up
 
 my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
 
@@ -109,13 +106,31 @@ if ($ENV{'USER'} ne 'root') {
         $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
 }
 
+$fqdn = $opt_fqdn if $opt_fqdn;
+
+if (!$fqdn) {
+    my $question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
+    print "$question\n";
+    print "fqdn> ";
+    chomp($fqdn = <STDIN>);
+}
+
+chomp(my $loc_check = `pwd`);
+$loc_check =~ s/\/install//;
+$cfg{web_root} = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
+
+populate_hashdata();
 get_sysinfo();
 
 if (!$opt_step) {
-    step_firstrun();
+    step_firstrun();    
 } else {
     %cfg = %{$ini{$opt_fqdn}};
     $cfg{step} = $opt_step;
+}
+
+if ($cfg{step} == PAD) {
+    $cfg{step}++;
 }
 
 if ($cfg{step} == SOFTWARE) {
@@ -163,9 +178,9 @@ if ($cfg{step} == TEMPLATES) {
     tell_user('INFO', "I'ma let you run some templates, but first I just needa know...");
     if (ask_user("Do you want to enable SSL?", 'y', 'yesno')) {
         step_vhost_ssl();
-        
+
     }
-    
+
     my @replacements = (
         "###REPL_PHP_BINARY###%%%$cfg{php_binary}",
 
@@ -191,8 +206,10 @@ if ($cfg{step} == TEMPLATES) {
         "###REPL_SQL_TBL_LOGS###%%%$sql{tbl_logs}",
         "###REPL_SQL_TBL_GLOBALS###%%%$sql{tbl_globals}",
         "###REPL_SQL_TBL_BANNED###%%%$sql{tbl_banned}",
-        "###REPL_SQL_TBL_GLOBALCHAT%%%$sql{tbl_globalchat}",
-        
+        "###REPL_SQL_TBL_GLOBALCHAT###%%%$sql{tbl_globalchat}",
+        "###REPL_SQL_TBL_STATISTICS###%%%$sql{tbl_statistics}",
+        "### REM ### %%% ",
+
 
         "###REPL_OPENAI_APIKEY###%%%$cfg{openai_apikey}",
 
@@ -262,11 +279,6 @@ print "$clr{green}All steps completed$clr{reset}\n";
 
 # ==================================[ steps-start ]================================= #
 sub step_firstrun {
-    my $question = "Enter the FQDN where the game will be accessed (e.g. loa.example.com)";
-
-    # If fqdn was supplied as an argument, skip the question
-    $fqdn //= ask_user($question, '', 'input');
-
     if ($ini{$fqdn}) {
         %cfg = %{$ini{$fqdn}};
 
@@ -280,8 +292,8 @@ sub step_firstrun {
 
                 while ($answer != 1 and $answer != 2) {
                     $question = "What would you like to do:\n"
-                                 . "1. Continue with previous config from step " . const_to_name($cfg{step}) . "\n"
-                                 . "2. Continue with previous config from the beginning\n";
+                                . "1. Continue with previous config from step " . const_to_name($cfg{step}) . "\n"
+                                . "2. Continue with previous config from the beginning\n";
                     $answer = int(ask_user($question, 'Choice', 'input'));
                 }
 
@@ -289,6 +301,10 @@ sub step_firstrun {
                     tell_user('INFO', 'Continuing script execution from previously ran install');
                     return;
                 } else {
+                    if ($cfg{step} > HOSTS) {
+                        tell_user("Script ran all the way through last time; continuing from the beginning...");
+                        $cfg{step} = SOFTWARE;
+                    }
                     $cfg{step} = SOFTWARE;
                     tell_user('INFO', 'Restarting install from beginning step with previous configuration');
                     return;
@@ -311,22 +327,6 @@ sub step_firstrun {
 
     $cfg{fqdn} = $fqdn;
 
-
-
-    if ($cfg{os} eq 'linux') {
-        %def = %{$ini{lin_examples}};
-    } else {
-        %def = %{$ini{win_examples}};
-    }
-
-    merge_hashes(\%cfg, \%def);
-    merge_hashes(\%cfg, \%glb);
-
-    chomp(my $loc_check = `pwd`);
-    $loc_check =~ s/\/install//;
-
-    $cfg{web_root} = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
-
     if ($loc_check ne $cfg{web_root}) {
         my $error = "Setup has determined the files are not in the correct place,\n" .
                     " or you're not in the correct folder. Please move the contents\n" .
@@ -337,20 +337,6 @@ sub step_firstrun {
         croak($error);
     }
 
-    $cfg{template_dir} = $cfg{web_root} . '/install/templates';
-    $cfg{scripts_dir}  = $cfg{web_root} . '/install/scripts';
-    $cfg{admin_email}  = "webmaster\@$cfg{fqdn}";
-    $cfg{setup_log}    = $cfg{web_root} . '/install/setup.log';
-
-    $cfg{virthost_ssl_template} = "$cfg{template_dir}/virtual_host_ssl.template";
-    $cfg{virthost_template}     = "$cfg{template_dir}/virtual_host.template";
-    $cfg{htaccess_template}     = "$cfg{template_dir}/htaccess.template";
-    $cfg{crontab_template}      = "$cfg{template_dir}/crontab.template";
-    $cfg{env_template}          = "$cfg{template_dir}/env.template";
-    $cfg{sql_template}          = "$cfg{template_dir}/sql.template";
-    $cfg{php_template}          = "$cfg{template_dir}/php.template";
-    $cfg{constants_template}    = "$cfg{template_dir}/constants.template";
-    $cfg{php_fpm}               = 0;
     next_step();
 
     return 0;
@@ -401,7 +387,7 @@ sub step_install_software {
                     $cfg{php_version} = "$t_phpv";
                 } else {
                     croak("Couldn't come to a conclusion for PHP version");
-                }                
+                }
             }
         }
     } else {
@@ -416,7 +402,7 @@ sub step_install_software {
     if ($cfg{distro} eq 'alpine') {
         ($alp_phpv = $cfg{php_version}) =~ s/\.//;
     }
-        
+
     my @packages = (
 		"deb:php$cfg{php_version}",
 		"deb:php$cfg{php_version}-cli",
@@ -452,14 +438,14 @@ sub step_install_software {
         push @packages,  $cfg{software} eq 'deb' ? "deb:php$cfg{php_version}-fpm" : "alp:php$cfg{php_version}-fpm"
     } else {
         $cfg{php_fpm} = 0;
-    }     
+    }
 
     tell_user('INFO', 'Installing ' . @packages . ' packages\n');
-    
+
     my $sw_cmd = "$cfg{pm_cmd} " . join (' ', grep { /$cfg{software}/ } @packages) . ' >/dev/null 2>&1';
     $sw_cmd =~ s/$cfg{software}://g;
     tell_user('INFO', "Installing software with command: $sw_cmd");
-    
+
     my $sw_output = `$sw_cmd`;
     if ($? == 0) {
         tell_user('SUCCESS', 'All necessary software has been installed');
@@ -489,7 +475,7 @@ sub step_webserver_configure {
 
     $cfg{apache_https_port} = ask_user('Enter apache port for HTTPS', '443', 'input');
     $cfg{apache_http_port}  = ask_user('Enter apache port for HTTP',   '80', 'input');
-    
+
     return 0;
 }
 
@@ -517,59 +503,80 @@ sub step_sql_configure {
 
     $question = "Please enter the SQL port to be used for the database";
     $cfg{sql_port} = ask_user($question, $cfg{sql_port}, 'input');
-    
+
     }
 
 sub step_vhost_ssl {
-    my $answer;
-    my $options = "1. Generate a self-signed certificate for $cfg{fqdn} and\n"
-                . "   enable HTTP -> HTTPS Redirection\n"
-                . "2. Keep current SSL and enable HTTP -> HTTPS redirection\n"
-                . "3. Don't enable HTTP -> HTTPS redirection\n"
-                . "4. Manually enter certificate and private key locations\n"
-                . "6. Skip\n\n"
-                . "0. Exit\n\n";
+    my $redir_status = "$clr{green}ON$clr{reset}";
+    $cfg{redir_http} = 1;
+    my $answer = -1;
+    my $linecheck;
 
-    if (ask_user("Do you want to enable SSL?", 'y', 'yesno')) {
-        $cfg{ssl_enabled} = 1;
-        `sed -i 's/# REM //' $cfg{virthost_conf_file_ssl}`;
+    # FIXME: Temp fix.
+    `touch $cfg{apache_directory}/ssl-$cfg{fqdn}.conf`;
 
-        print "Do you want to redirect traffic from http:80 to "
-            . "https:443? A valid certificate needs to be set in the "
-            . "script configuration!\n- Currently set -\n"
-            . "Certificate: $cfg{ssl_fullcer}\n"
-            . "Private Key: $cfg{ssl_privkey}\n\n";
+    print "    - Current SSL certificate set -\n"
+        . "Certificate: $cfg{ssl_fullcer}\n"
+        . "Private Key: $cfg{ssl_privkey}\n\n";
+    
+    while ($answer !~ /^[34560]$/) {
+        if ($answer eq 'S') {
+            if ($cfg{redir_status}) {
+                $cfg{redir_status} = 0;
+                $redir_status = "$clr{red}OFF$clr{reset}";
+            } else {
+                $cfg{redir_status} = 1;
+                $redir_status = "$clr{green}ON$clr{reset}";
+            }
+        }
 
-        print $options;
+        print "1. Generate a self-signed certificate for $cfg{fqdn} and use that\n"
+            . "2. Manually enter certificate and private key locations and use those\n"
+            . "3. Grab a Let's Encrypt SSL and use that\n"
+            . "4. Don't use SSL at all ($clr{red}not recommended$clr{reset} - even a self-signed is better than nothing)\n"
+            . "5. Skip this step\n\n"
+            . "6. Next step\n\n"
+            . "$clr{cyan}S$clr{reset}. Toggle HTTP -> HTTPS redirection (current: $redir_status)\n"
+            . "0. Exit\n\n";
+        $answer = int(ask_user('Choice', '', 'input'));
+    }
+        
 
-        $answer = int(ask_user('Choice', 1, 'input'));
+    if ($answer == 1) {
+        my $gen_output = `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/$cfg{fqdn}.key -out /etc/ssl/certs/$cfg{fqdn}.crt -subj '/CN=$cfg{fqdn}/O=$cfg{fqdn}/C=ZA' -batch`;
+        $cfg{ssl_fullcer} = "/etc/ssl/certs/$cfg{fqdn}.crt";
+        $cfg{ssl_privkey} = "/etc/ssl/private/$cfg{fqdn}.key";
 
-        if ($answer == 1) {
-            my $gen_output = `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/$cfg{fqdn}.key -out /etc/ssl/certs/$cfg{fqdn}.crt -subj '/CN=$cfg{fqdn}/O=$cfg{fqdn}/C=ZA' -batch`;
-            $cfg{ssl_fullcer} = "/etc/ssl/certs/$cfg{fqdn}.crt";
-            $cfg{ssl_privkey} = "/etc/ssl/private/$cfg{fqdn}.key";
-            `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
 
-            tell_user('SYSTEM', $gen_output);
+        tell_user('SYSTEM', $gen_output);
+
+        if (-e $cfg{ssl_fullcer} and -e $cfg{ssl_privkey}) {
             tell_user('SUCCESS', "Generated self-signed certificates and enabled HTTP to HTTPS redirection");
             tell_user('INFO', "Certificates and private key stored in /etc/ssl/certs and /etc/ssl/private, respectively");
-        } elsif ($answer == 2) {
-            tell_user('INFO', "Enabling rewrite directives in $cfg{virthost_conf_file}");
-            `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
-        } elsif ($answer == 4) {
-            my ($cert, $pkey);
-
-            while ((!-e $cert or !-e $pkey)) {
-                $cert = ask_user('Enter path to certificate', '', 'input');
-                $pkey = ask_user('Enter path to private key', '', 'input');
-            }
-            $cfg{ssl_fullcer} = $cert;
-            $cfg{ssl_privkey} = $pkey;
-            tell_user('SUCCESS', 'Valid certificate and key pair supplied, continuing');
+        } else {
+            tell_user('ERROR', 'Certificates were not created');
+            die "\n";
         }
+    } elsif ($answer == 2) {
+        my ($cert, $pkey);
+
+        while ((!-e $cert or !-e $pkey)) {
+            $cert = ask_user('Enter path to certificate', '', 'input');
+            $pkey = ask_user('Enter path to private key', '', 'input');
+        }
+        $cfg{ssl_fullcer} = $cert;
+        $cfg{ssl_privkey} = $pkey;
+        tell_user('SUCCESS', 'Valid certificate and key pair supplied, continuing');
+    } elsif ($answer == 3) {
+        print "Certbot.sh will run at the end of the script...";
+        $cfg{run_certbot} = 1;
+    
     } else {
-        $cfg{ssl_enabled} = 0;
-        `sed -i 's/# REM //' $cfg{virthost_conf_file}`;
+        print "invalid option\n";
+    }
+
+    if ($redir_status =~ /ON/) {
+        `sed -i 's/# SSLREM //' $cfg{virthost_conf_file}`;
     }
 }
 
@@ -620,7 +627,7 @@ sub step_apache_enables {
     my $success = 1000;
     my $mods = 'rewrite ssl ';
     my ($conf_output, $dismod_output, $mods_output, $sites_output, $sites_ssl_output);
-
+    $cfg{admin_email}  = "webmaster\@$cfg{fqdn}";
     tell_user('INFO', 'Enabling required Apache configurations, sites and modules');
 
     if (int($cfg{php_fpm}) == 1) {
@@ -634,11 +641,11 @@ sub step_apache_enables {
     } else {
         $mods .= "php$cfg{php_version}";
     }
-    
+
     $mods_output = `a2enmod $mods 2>&1`;
     $success += $?;
 
-    $sites_output = `a2ensite $ 2>&1`;
+    $sites_output = `a2ensite $cfg{fqdn} 2>&1`;
     $success += $?;
 
     if ($cfg{ssl_enabled}) {
@@ -654,7 +661,7 @@ sub step_apache_enables {
 
     tell_user('SYSTEM', "          mods result: $mods_output");
     tell_user('SYSTEM', "site (non-ssl) result: $sites_output");
-   
+
     if ($success == 1000) {
         tell_user('SUCCESS', "Apache configuration completed");
     } else {
@@ -663,7 +670,7 @@ sub step_apache_enables {
         if (!ask_user('Continue?', 'n', 'yesno')) {
             die "Quitting at user request\n";
         }
-    }    
+    }
 }
 
 sub step_php_configure {
@@ -739,7 +746,7 @@ sub step_php_configure {
 									 'syslog, ' .
 									 'system, ' .
 									 'xmlrpc_entity_decode',
-			
+
 	    'session.cookie_domain'   => $cfg{fqdn},
 	    'session.use_strict_mode' => 1,
 	    'session.use_cookies'     => 1,
@@ -811,12 +818,12 @@ sub step_composer_pull {
     if (ask_user("Composer is going to download/install these as $cfg{composer_runas} - continue?", 'y', 'yesno')) {
         my $cmd = "sudo -u $cfg{composer_runas} composer --working-dir \"$cfg{web_root}\" install 2>/dev/null;";
         $cmd .= "sudo -u $cfg{composer_runas} composer --working-dir \"$cfg{web_root}\" update 2>/dev/null";
-        
+
         my $cmd_output = `$cmd`;
         tell_user('SYSTEM', $cmd_output);
     }
 }
-                                           
+
 sub step_generate_templates {
     my @replacements = @{$_[0]};
     my $copy_output;
@@ -828,8 +835,8 @@ sub step_generate_templates {
     `sed -i 's/bind-address.*/bind-address = $cfg{sql_host}/' $cfg{sql_config_file}`;
 
     # Dirty-fix constants.php file TODO: Figure this out
-    # define('PATH_WEBROOTECTORY', '/var/www/html/dankaf.ca/loa/');
-    # `sed -i 's/.*PATH_WEBROOTECTORY.*//'`;
+    # define('WEBROOTECTORY', '/var/www/html/dankaf.ca/loa/');
+    # `sed -i 's/.*WEBROOTECTORY.*//'`;
 
     # key = in file, value = out file
     $templates{$cfg{env_template}}          = "$cfg{env_template}.ready";
@@ -869,7 +876,7 @@ sub step_process_templates {
     }
 
     tell_user('INFO', "Importing SQL schema, creating user and granting privileges");
-    
+
     ReadMode 'noecho';
     print "If the root account for the SQL server needs a password,\n";
     $tmp = ask_user("please enter it now or just hit enter", '', 'input');
@@ -905,7 +912,7 @@ sub step_process_templates {
     file_write("$cfg{web_root}/constants.php", "$cfg{constants_template}.ready", 'file');
 
     tell_user('INFO', "Installing our cronjobs under user $cfg{apache_runas}");
-    
+
     $crontab_output = `(sudo -u $cfg{apache_runas} crontab -l; cat $cfg{crontab_template}.ready; echo;) | sudo -u $cfg{apache_runas} crontab -`;
     tell_user('SYSTEM', $crontab_output);
 
@@ -922,7 +929,7 @@ sub step_start_services {
     foreach my $service (@services) {
         my $order = "start $service";
         tell_user('INFO', "Starting $service");
-        
+
 
         if ($cfg{svc_cmd} eq 'service') {
             $order = "$service start";
@@ -951,7 +958,7 @@ sub step_update_hosts {
     for (my $i=0; $i<@hosts; $i++) {
         tell_user($i . ". $hosts[$i]\n");
     }
-    
+
     my $choice = ask_user('Enter a choice from above or specify your own IP: ', '', 'input');
 
     if ($choice =~ /[0-9]+/) {
@@ -1050,9 +1057,9 @@ sub gen_random {
     my $password;
 
     for (1 .. $length) {
-        
+
         my $num = 0;
-        
+
         while (!$num or ($num >= 91 && $num <= 96)) {
             $num = int(rand(74)) + 48;
         }
@@ -1136,7 +1143,7 @@ sub ask_user {
             $no = "[$clr{red}n$clr{reset}]";
         }
 
-        print "[$yes / $no]>";        
+        print "[$yes / $no]>";
     } elsif ($type eq 'input') {
         if ($default) {
             print "[$clr{yellow}$default$clr{reset}]> ";
@@ -1153,7 +1160,7 @@ sub ask_user {
     } elsif ($answer =~ /[Nn]o?/ && $type eq 'yesno') {
         return 0;
     } elsif (($answer eq '' or !$answer) && $type eq 'yesno') {
-        if ($default eq 'y') {                             
+        if ($default eq 'y') {
             return 1;
         } else {
             return 0;
@@ -1216,8 +1223,7 @@ sub tell_user {
     }
 
     if ($cfg{setup_log}) {
-        open my $fh, '>>', $cfg{setup_log}
-          or die "Couldn't open log file for append '$cfg{setup_log}': $!";
+        open my $fh, '>>', $cfg{setup_log};
 
         print $fh $message;
 
@@ -1277,7 +1283,7 @@ sub const_to_name {
 
 sub name_to_const {
     my $name = shift;
-    
+
     my %names = (
         'PAD'       => 0,
         'FIRSTRUN'  => 1,
@@ -1293,7 +1299,7 @@ sub name_to_const {
         'CLEANUP'   => 11
     );
 
-    return $names{$name};    
+    return $names{$name};
 }
 
 sub next_step {
@@ -1342,7 +1348,7 @@ sub get_sysinfo {
                 open my $fh, '<', '/etc/os-release';
                 my @lines = <$fh>;
                 close $fh;
-                
+
                 my $found = 0;
                 foreach my $line (@lines) {
                     if ($line =~ /^ID=$distro/ || $line =~ /^LIKE=$distro/) {
@@ -1374,7 +1380,7 @@ sub get_sysinfo {
             }
         } else {
             tell_user('ERROR', 'Unable to determine distro');
-            
+
             if (ask_user('Is your distro debian-based, which uses apt-get?', 'n', 'yesno')) {
                 $cfg{distro} = 'debian';
                 $cfg{software} = 'deb';
@@ -1402,6 +1408,34 @@ sub get_sysinfo {
         $cfg{svc_cmd} = 'sc';
         $cfg{pm_cmd} = 'choco install';
     }
+}
+
+sub populate_hashdata {
+    my $step = $_[0];
+    
+    if ($^O eq 'linux') {
+        %def = %{$ini{lin_examples}};
+    } else {
+        %def = %{$ini{win_examples}};
+    }
+
+    merge_hashes(\%cfg, \%def);
+    merge_hashes(\%cfg, \%glb);
+    
+    $cfg{template_dir} = $cfg{web_root} . '/install/templates';
+    $cfg{scripts_dir}  = $cfg{web_root} . '/install/scripts';
+    $cfg{setup_log}    = $cfg{web_root} . '/install/setup.log';
+
+    $cfg{virthost_ssl_template} = "$cfg{template_dir}/virtual_host_ssl.template";
+    $cfg{virthost_template}     = "$cfg{template_dir}/virtual_host.template";
+    $cfg{htaccess_template}     = "$cfg{template_dir}/htaccess.template";
+    $cfg{crontab_template}      = "$cfg{template_dir}/crontab.template";
+    $cfg{env_template}          = "$cfg{template_dir}/env.template";
+    $cfg{sql_template}          = "$cfg{template_dir}/sql.template";
+    $cfg{php_template}          = "$cfg{template_dir}/php.template";
+    $cfg{constants_template}    = "$cfg{template_dir}/constants.template";
+    $cfg{php_fpm}               = 0;
+    $cfg{step}                  = $step;
 }
 
 sub help {

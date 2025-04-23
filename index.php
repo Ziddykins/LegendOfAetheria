@@ -7,11 +7,29 @@
     use Game\Character\Character;
     
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
-        $email    = $_POST['login-email'];
+        $email = $_POST['login-email'];
         $password = $_POST['login-password'];
-        $account  = null;
+        $ip = $_SERVER['REMOTE_ADDR'];
+
+        // Rate limiting check
+        $sql_query = <<<SQL
+            SELECT COUNT(*) as attempt_count 
+            FROM {$t['logs']} 
+            WHERE `ip` = ? 
+            AND `type` = 'LOGIN_ATTEMPT'
+            AND `date` > DATE_SUB(NOW(), INTERVAL 15 MINUTE)
+        SQL;
+        
+        $attempts = $db->execute_query($sql_query, [$ip])->fetch_assoc()['attempt_count'];
+        
+        if ($attempts >= 5) {
+            $log->warning('Rate limit exceeded for IP', ['ip' => $ip]);
+            header('Location: /?rate_limited');
+            exit();
+        }
 
         if (!check_valid_email($email)) {
+            write_log('LOGIN_ATTEMPT', 'Invalid email format', $ip);
             header('Location: /?invalid_email');
             exit();
         }
@@ -20,59 +38,58 @@
 
         if ($account_id > 0) {
             $account = new Account($email);
+            
+            if (password_verify($password, $account->get_password())) {
+                // Reset failed attempts on successful login
+                $account->set_failedLogins(0);
+
+                $_SESSION['logged-in'] = 1;
+                $_SESSION['email'] = $account->get_email();
+                $_SESSION['account-id'] = $account->get_id();
+                $_SESSION['selected-slot'] = -1;
+                $_SESSION['ip'] = $ip;
+                $_SESSION['last_activity'] = time();
+                
+                $account->set_sessionID(session_id());
+                $account->set_lastLogin(date('Y-m-d H:i:s'));
+
+                $ch = curl_init("http://127.0.0.1:3000/auth/basic");
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+                curl_setopt($ch, CURLOPT_HEADER, 0);
+                curl_setopt($ch, CURLOPT_USERPWD, "$email:$password");
+                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                $return = json_decode(curl_exec($ch));
+                curl_close($ch);
+
+                if ($return->token) {
+                    $_SESSION['bearer'] = $return->token;
+                    header('Location: /select');
+                    exit();
+                } else {
+                    echo "failed to get token";
+                    exit();
+                }
+            } else {
+                $failed_attempts = $account->get_failedLogins() + 1;
+                $account->set_failedLogins($failed_attempts);
+                
+                write_log('LOGIN_ATTEMPT', 'Failed login attempt', $ip);
+                
+                if ($failed_attempts >= 10) {
+                    $account->set_banned('True');
+                    $log->alert('Account locked due to excessive failed attempts', 
+                        ['email' => $email, 'ip' => $ip]);
+                }
+                
+                header('Location: /?failed_login');
+                exit();
+            }
         } else {
             $log->warning('Attempted login with a non-existing account', [ 'Email' => $email ]);
             header("Location: /?do_register&email=$email");
             exit();
-        }
-
-        /* Password for supplied email was correct */
-        if (password_verify($password, $account->get_password())) {
-            /* Check if account is IP locked and verify IP logging in matches stored IP lock address */
-            if ($account->get_ipLock() == 'True') {
-                if ($account->get_ipLockAddr() != $_SERVER['REMOTE_ADDR']) {
-                    $log->warning("User tried to login from non-matching IP address on IP locked account",
-                        [ "On File" => $account->get_ipLockAddr(), "Current" => $_SERVER['REMOTE_ADDR'] ]);
-                    header('Location: /?ip_locked');
-                    exit();
-                }
-            }
-
-            $log->info('Account login success', [
-                'Email'      => $account->get_email(),
-                'Privileges' => $account->get_privileges(),
-                'IpAddr'     => $account->get_ipAddress()
-            ]);
-
-            $_SESSION['logged-in']     = 1;
-            $_SESSION['email']         = $account->get_email();
-            $_SESSION['account-id']    = $account->get_id();
-            $_SESSION['selected-slot'] = -1;
-            $account->set_sessionID(session_id());
-
-            header('Location: /select');
-            exit();
-        } else {
-            $ip = $_SERVER['REMOTE_ADDR'];
-            $sql_query_get_count = <<<SQL
-                SELECT COUNT(*) AS `count` FROM {$t['logs']} WHERE`ip` = ? AND
-                    `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW() AND
-                    `type` = 'MULTISIGNUP'
-                SQL;
-
-            $failed_login_count = $db->execute_query($sql_query_get_count, [ $ip ])->fetch_assoc()['count'];
-
-            if ($failed_login_count >= 4) {
-                header('Location: /banned');
-                exit();
-            } else {
-                $message = "Failed login for IP Address $ip trying {$_POST['login-email']}";
-                //write_log('MULTISIGNUP', $message, $ip);
-            }
-
-            $email = preg_replace('/[^a-zA-Z0-9_@.-]+/', '', $_POST['login-email']);
-            setcookie("email", $email);
-            header("Location: /?failed_login");
         }
     } elseif (isset($_POST['register-submit']) && $_POST['register-submit'] == 1) {
         /* Account information */

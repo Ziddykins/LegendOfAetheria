@@ -53,3 +53,8 @@
 # Select Character (select.php)
 
   - [ ] Fix avatar display not showing preview image
+
+# Mail
+
+  - [ ] Need to redo how compose.php works; no emails, char only
+  

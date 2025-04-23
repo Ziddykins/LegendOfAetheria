@@ -4,11 +4,10 @@
         "monolog/monolog": "^3.8.1",
         "phpmailer/phpmailer": "^6.9.3",
         "composer/semver": "^3.4",
-        "composer": "*"
+        "phpunit/phpunit": "^12.1"
     },
     "require-dev": {
-        "phpmd/phpmd" : "@stable",
-        "phpunit/phpunit": "^11.5"
+        "phpmd/phpmd" : "@stable"
     },
     "autoload": {
         "psr-4": {

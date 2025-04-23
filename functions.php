@@ -1,5 +1,6 @@
 <?php
 
+use Game\Components\Modals\Enums\ModalButtonType;
 use Game\System\Enums\AbuseType;
 use Game\Character\Enums\FriendStatus;
 use Game\Character\Enums\Races;
@@ -8,13 +9,11 @@ use Game\System\Enums\LOAError;
 
      /**     * Retrieves a MySQL datetime string based on the provided modifier.
      *
-     * This function takes an optional modifier parameter, which defaults to 'now'.
-     * It extracts the operand (first character) and amount (remaining characters) from the modifier.
-     * Then, it uses PHP's strtotime function to calculate the datetime based on the modifier.
-     * Finally, it formats the datetime as a string in the 'Y-m-d H:i:s' format and returns it.
+     * This function calculates a datetime string in 'Y-m-d H:i:s' format based on the given modifier.
+     * If no modifier is provided, it defaults to the current datetime.
      *
-     * @param string $modifier The modifier for the datetime calculation. Defaults to 'now'.
-     * @return string The MySQL datetime string.
+     * @param string $modifier A string modifier for datetime calculation (e.g., '+1 day'). Defaults to 'now'.
+     * @return string The formatted MySQL datetime string.
      */
     function get_mysql_datetime($modifier = 'now') {
         global $log;
@@ -31,13 +30,10 @@ use Game\System\Enums\LOAError;
     /**
      * Calculates the difference in seconds between two MySQL datetime strings.
      *
-     * This function takes two MySQL datetime strings as input and calculates the difference in seconds between them.
-     * It uses PHP's strtotime function to convert the datetime strings into Unix timestamps, and then subtracts the
-     * timestamps to obtain the difference in seconds.
+     * Converts the provided datetime strings into Unix timestamps and computes the difference in seconds.
      *
-     * @param string $date_one The first MySQL datetime string.
-     * @param string $date_two The second MySQL datetime string.
-     *
+     * @param string $date_one The first datetime string in 'Y-m-d H:i:s' format.
+     * @param string $date_two The second datetime string in 'Y-m-d H:i:s' format.
      * @return int The difference in seconds between the two datetime strings.
      */
     function sub_mysql_datetime(string $date_one, string $date_two) {
@@ -49,14 +45,12 @@ use Game\System\Enums\LOAError;
     }
 
     /**
-     * Retrieves a global value from the database based on the provided name.
+     * Retrieves a global configuration value from the database.
      *
-     * Selects the 'value' column from the globals table and retrieves the
-     * value where the 'name' column matches the provided parameter.
+     * Queries the 'globals' table to fetch the value associated with the given name.
      *
-     * @param string $which The name of the global value to retrieve.
-     *
-     * @return string|null The retrieved global value, or null if no matching record is found.
+     * @param string $which The name of the global configuration to retrieve.
+     * @return string|null The value of the global configuration, or null if not found.
      */
     function get_globals($which) {
         global $db, $t;
@@ -69,14 +63,12 @@ use Game\System\Enums\LOAError;
     }
 
     /**
-     * Updates a global value in the database.
+     * Updates a global configuration value in the database.
      *
-     * This function connects to the database and updates the 'value' column in the 'tbl_globals' table
-     * where the 'name' column matches the provided parameter.
+     * Updates the 'globals' table with the provided name and value.
      *
-     * @param string $name  The name of the global value to update.
-     * @param string $value The new value for the global.
-     *
+     * @param string $name The name of the global configuration to update.
+     * @param string $value The new value for the global configuration.
      * @return void
      */
     function set_globals($name, $value) {
@@ -87,16 +79,13 @@ use Game\System\Enums\LOAError;
     }
 
     /**
-     * Generates a random floating-point number within a specified range.
+     * Generates a random floating-point number within a specified range and precision.
      *
-     * This function uses the PHP's lcg_value() function to generate a pseudo-random number between 0 and 1.
-     * It then multiplies this number by the absolute difference between the maximum and minimum values,
-     * and adds the minimum value to the result. This ensures that the generated number falls within the specified range.
+     * Uses a pseudo-random number generator to create a number between the given minimum and maximum values.
      *
-     * @param float $min The minimum value for the generated number.
-     * @param float $max The maximum value for the generated number.
-     * @param   int $precision Round to the supplied amount of decimal places.
-     *
+     * @param float $min The minimum value for the random number.
+     * @param float $max The maximum value for the random number.
+     * @param int $precision The number of decimal places to round the result to.
      * @return float A random floating-point number within the specified range.
      */
     function random_float($min, $max, $precision): float {
@@ -104,16 +93,12 @@ use Game\System\Enums\LOAError;
     }
 
     /**
-     * Checks the number of unread emails for a specific account.
+     * Checks the number of unread emails for the current account.
      *
-     * Selects the relevant emails from the specified envelope status
-     * and counts the number of unread emails for the given account ID.
+     * Queries the database to count emails with a status that does not include 'READ' for the current account.
      *
-     * @param string $what The type of email to check. Currently, only 'unread' is supported.
-     * @param int $account_id The ID of the account for which to check unread emails.
-     *
-     * @return int|LOAError|string The number of unread emails for the specified account.
-     *                      If an unsupported value is provided for $what, the function returns LOAError::MAIL_UNKNOWN_DIRECTIVE.
+     * @param string $what The type of email to check. Only 'unread' is supported.
+     * @return int|LOAError|string The count of unread emails or an error if the directive is unsupported.
      */
     function check_mail($what): int|LOAError|string {
         global $db, $log, $t;
@@ -129,22 +114,12 @@ use Game\System\Enums\LOAError;
     }
 
     /**
-     * Determines the friendship status between the current user and another user based on their email address.
+     * Determines the friendship status between the current user and another user.
      *
-     * This function checks the friendship status between the current user and another user by querying the database
-     * for records in the tbl_friends table. It sanitizes the email address to prevent SQL injection attacks.
+     * Checks the database for friendship records involving the specified character ID and returns the status.
      *
-     * @param string $email The email address of the user to check the friendship status with.
-     *
-     * @return Game\Character\Enums\FriendStatus The friendship status between the current user and the specified user.
-     *             The possible return values are:
-     *             - FriendStatus::MUTUAL: The current user and the specified user are mutual friends.
-     *             - FriendStatus::REQUESTED: The current user has sent a friend request to the specified user.
-     *             - FriendStatus::REQUEST: The current user has received a friend request from the specified user.
-     *             - FriendStatus::BLOCKED: The current user has blocked the specified user.
-     *             - FriendStatus::BLOCKED_BY: The specified user has blocked the current user.
-     *             - FriendStatus::NONE: There is no friendship relationship between the current user and the specified user.
-     *             - LOAError::FRNDS_FRIEND_STATUS_ERROR: An error occurred while determining the friendship status.
+     * @param int $character_id The ID of the character to check the friendship status with.
+     * @return Game\Character\Enums\FriendStatus The friendship status or an error if determination fails.
      */
     function friend_status(int $character_id): FriendStatus {
         global $db, $log, $t;
@@ -166,15 +141,12 @@ use Game\System\Enums\LOAError;
     }
 
     /**
-     * Accepts a friend request from the specified email address.
+     * Accepts a friend request from the specified sender.
      *
-     * This function checks if a friend request exists from the specified email address to the current user.
-     * If a request exists, it inserts a new record into the tbl_friends table with the current user's email
-     * and the specified email address. It also logs the acceptance of the friend request.
+     * Updates the friendship status to 'MUTUAL' if a friend request exists from the sender.
      *
-     * @param string $email The email address of the user who sent the friend request.
-     *
-     * @return void
+     * @param int $sender The ID of the sender who sent the friend request.
+     * @return bool True if the request was successfully accepted, false otherwise.
      */
     function accept_friend_req($sender):bool {
         global $db, $log, $t;
@@ -190,15 +162,13 @@ use Game\System\Enums\LOAError;
     }
 
     /**
-     * Retrieves the count of friend requests or other specified friend-related data.
+     * Retrieves friend-related data such as counts or lists based on the specified criteria.
      *
-     * This function connects to the database, retrieves a list of distinct email addresses from the account table,
-     * and then iterates through each email to determine the count of friend requests.
+     * Queries the database for friendship statuses and optionally returns a list of character IDs.
      *
-     * @param string $which The type of friend-related data to retrieve. Currently, only 'requests' is supported.
-     * @param int $id The ID of the account for which to retrieve friend-related data. If not provided, the current user's ID is used.
-     *
-     * @return array|int The count of friend requests. If an unsupported value is provided for $which, the function returns 0.
+     * @param FriendStatus|null $status The specific friendship status to filter by (optional).
+     * @param bool $return_list Whether to return a list of character IDs (default: false).
+     * @return array An array containing friendship statuses and optionally character IDs.
      */
     function get_friend_counts(?FriendStatus $status, bool $return_list=false): array {
         global $db, $character, $t;
@@ -248,36 +218,37 @@ use Game\System\Enums\LOAError;
 
     /* TODO: test */
     /**
-     * Blocks a user from the current user's friend list.
+     * Blocks a user by updating the friendship status to 'BLOCKED'.
      *
-     * This function checks if the specified user is already blocked by the current user.
-     * If the user is not already blocked, it updates the friend list to block the user.
+     * Inserts or updates the friendship record to reflect the blocked status.
      *
      * @param string $email_1 The email of the current user.
-     * @param string $email_2 The email of the user to be blocked.
-     *
-     * @return int|LOA::Error Returns LOAError::MAIL_ALREADY_BLOCKED if the user is already blocked,
-     *                  otherwise, it prints the result and stops the script.
+     * @param string $email_2 The email of the user to block.
+     * @return int Always returns 0.
      */
     function block_user($email_1, $email_2): int {
         global $db, $t;
-        $sql_query = "INSERT INTO {$t['friends']} (`sender_id`, `recipient_id`, `friend_status`) VALUES (?, ?, ?) UPDATE ON DUPLICATE KEY `friend_status` = 'BLOCKED'";
-        $result = $db->execute_query($sql_query, [$email_1, $email_2, 'BLOCKED']);
+        $sql_query = <<<SQL
+            INSERT INTO {$t['friends']}
+                (`sender_id`, `recipient_id`, `friend_status`)
+            VALUES
+                (?, ?, ?)
+            UPDATE ON DUPLICATE KEY
+                `friend_status` = 'BLOCKED'
+        SQL;
+
+        $db->execute_query($sql_query, [$email_1, $email_2, 'BLOCKED']);
         
         return 0;
     }
 
     /**
-     * Validates an email address using PHP's built-in filter functions.
+     * Validates an email address for proper format and sanitization.
      *
-     * This function takes an email address as input and performs two checks after sanitizing the
-     * provided email with PHP's FILTER_SANITIZE_EMAIL.
-     * 1. Checks if the sanitized email matches the email originally provided.
-     * 2. Checks to see if the sanitized email is a valid email, if the above step is successful.
+     * Ensures the email is sanitized and matches the original input, then checks if it is valid.
      *
      * @param string $email The email address to validate.
-     *
-     * @return bool True if the email address is valid, false otherwise.
+     * @return bool True if the email is valid, false otherwise.
      */
     function check_valid_email($email): bool {
         $sanitized_email = filter_var($email, FILTER_SANITIZE_EMAIL);
@@ -290,12 +261,15 @@ use Game\System\Enums\LOAError;
     }
 
     /**
-     * Checks for potential abuse based on the provided type and data.
-     *global $log;
-     * @param Game\System\Enums\AbuseType $type The type of abuse to check for (e.g. MULTISIGNUP)
-     * @param mixed $data Additional data to use in the abuse check (e.g. IP address)
+     * Checks for potential abuse based on the specified type and data.
      *
-     * @return bool True if abuse is detected, false otherwise
+     * Performs abuse detection by querying logs for suspicious activity.
+     *
+     * @param Game\System\Enums\AbuseType $type The type of abuse to check for.
+     * @param int $account_id The account ID to check abuse for.
+     * @param string $ip The IP address to check abuse for.
+     * @param int $threshold The threshold for abuse detection (default: 1).
+     * @return bool True if abuse is detected, false otherwise.
      */
     function check_abuse(AbuseType $type, $account_id, $ip, $threshold = 1): bool {
         global $db, $log, $t;
@@ -333,15 +307,26 @@ use Game\System\Enums\LOAError;
         return false;
     }
 
-
+    /**
+     * Generates an HTML modal with the specified parameters.
+     *
+     * Creates a Bootstrap modal with customizable content and button types.
+     *
+     * @param string $id The ID of the modal.
+     * @param string $bg_color The background color of the modal header.
+     * @param string $header The header text of the modal.
+     * @param string $body The body content of the modal.
+     * @param ModalButtonType $btn_type The type of buttons to include in the modal.
+     * @return string The generated HTML for the modal.
+     */
     function generate_modal($id, $bg_color, $header, $body, ModalButtonType $btn_type): string {
         $btn = null;
-        if ($btn_type === ModalButtonType::YesNo) {
+        if ($btn_type === ModalButtonType::YESNO) {
             $btn  = '<button type="button" class="btn btn-danger"  data-bs-dismiss="modal">No</button>';
             $btn .= '<button type="button" class="btn btn-success" data-bs-dismiss="modal">Yes</button>';
-        } elseif ($btn_type === ModalButtonType::Close) {
+        } elseif ($btn_type === ModalButtonType::CLOSE) {
             $btn  = '<button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>';
-        } elseif ($btn_type === ModalButtonType::OKCancel) {
+        } elseif ($btn_type === ModalButtonType::OKCANCEL) {
             $btn   = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>';
             $btn  .= '<button type="button" class="btn btn-primary"   data-bs-dismiss="modal">Okay</button>';
         } else {
@@ -369,11 +354,24 @@ use Game\System\Enums\LOAError;
         return $html;
     }
 
+    /**
+     * Retrieves the total count of monsters in the system.
+     *
+     * @return int The number of monsters.
+     */
     function get_monster_count(): int {
         global $system;
         return count($system->monsters);
     }
 
+    /**
+     * Retrieves the next available ID for a specified database table.
+     *
+     * Queries the table to find the maximum ID and increments it by 1.
+     *
+     * @param string $table The name of the table to retrieve the next ID for.
+     * @return int The next available ID.
+     */
     function getNextTableID($table): int {
         global $db, $t;
         $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)+1) AS `next_id` FROM $table";
@@ -382,6 +380,16 @@ use Game\System\Enums\LOAError;
         return $next_id;
     }
 
+    /**
+     * Logs a message to the database with the specified type and IP address.
+     *
+     * Inserts a log entry into the 'logs' table.
+     *
+     * @param string $log_type The type of log entry.
+     * @param string $message The log message.
+     * @param string $ip The IP address associated with the log entry.
+     * @return void
+     */
     function write_log(string $log_type, string $message, string $ip): void {
         global $db, $t;
         
@@ -389,6 +397,16 @@ use Game\System\Enums\LOAError;
         $db->execute_query($sql_query, [ $log_type, $message, $ip ]);
     }
 
+    /**
+     * Bans a user for a specified duration with a reason.
+     *
+     * Updates the user's account status to 'banned' and logs the ban details.
+     *
+     * @param int $account_id The ID of the account to ban.
+     * @param int $length_secs The duration of the ban in seconds.
+     * @param string $reason The reason for the ban.
+     * @return void
+     */
     function ban_user($account_id, $length_secs, $reason): void {
         global $db, $t;
         $expires = get_mysql_datetime("+$length_secs seconds");
@@ -404,8 +422,16 @@ use Game\System\Enums\LOAError;
         $db->execute_query($sql_query, [ $account_id, $expires, $reason ]);
     }
 
+    /**
+     * Validates a race against the predefined list of valid races.
+     *
+     * If the race is invalid, a random valid race is selected.
+     *
+     * @param string $race The race to validate.
+     * @return string The validated or randomly selected race.
+     */
     function validate_race($race): string {
-        global $log;
+        global $log, $account;
 
         $valid_race = 0;
 
@@ -417,15 +443,20 @@ use Game\System\Enums\LOAError;
 
         if (!$valid_race) {
             $race = Races::random()->name;
-            $log->critical(
-            "Race submitted wasn't an acceptable selection, choosing random enum: ",
-                [ 'Race' => $race ]
-            );
+            $log->critical("Possible POST modify in race selection", ['Race' => $race, 'AID' => $account->get_id()]);
         }
         
         return $race;
     }
 
+    /**
+     * Validates an avatar against the list of available avatars.
+     *
+     * If the avatar is invalid, a default avatar is assigned.
+     *
+     * @param string $avatar The avatar to validate.
+     * @return string The validated or default avatar.
+     */
     function validate_avatar($avatar): string {
         global $log;
 
@@ -447,10 +478,17 @@ use Game\System\Enums\LOAError;
         return $avatar;
     }
 
+    /**
+     * Safely serializes or unserializes data using base64 encoding.
+     *
+     * @param mixed $data The data to serialize or unserialize.
+     * @param bool|null $unserialize Whether to unserialize the data (default: false).
+     * @return mixed The serialized or unserialized data.
+     */
     function safe_serialize($data, ?bool $unserialize=null): mixed {
         global $log;
         $ret_data = null;
-        $log->warning("serialize in: ", [ 'Data' => $data, 'Unserialize' => $unserialize ]);
+
         if ($unserialize === true) {
             $ret_data = unserialize(base64_decode($data));
         } else {
@@ -460,11 +498,17 @@ use Game\System\Enums\LOAError;
         return $ret_data;
     }
 
+    /**
+     * Validates the current session for the logged-in user.
+     *
+     * Checks session variables and database records to ensure the session is valid.
+     *
+     * @return bool True if the session is valid, false otherwise.
+     */
     function check_session(): bool {
         global $db, $log, $t;
 
         if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
-            $log->warning("Sessions var 'logged-in' not set to 1", [ print_r($_SESSION, true), print_r(debug_backtrace(), true) ] );
             return false;
         }
 
@@ -486,6 +530,13 @@ use Game\System\Enums\LOAError;
         return true;
     }
 
+    /**
+     * Generates a CSRF token for the current session.
+     *
+     * Creates a random token and logs it for debugging purposes.
+     *
+     * @return string The generated CSRF token.
+     */
     function gen_csrf_token(): string {
         global $log;
         $csrf = bin2hex(random_bytes(14)) . 'L04D' . bin2hex(random_bytes(14));
@@ -493,6 +544,14 @@ use Game\System\Enums\LOAError;
         return $csrf;
     }
 
+    /**
+     * Validates a CSRF token against the session token.
+     *
+     * If the tokens do not match, the session is destroyed, and the user is redirected.
+     *
+     * @param string $req_csrf The CSRF token to validate.
+     * @return bool True if the token is valid, false otherwise.
+     */
     function check_csrf($req_csrf): bool {
         if ($req_csrf != $_SESSION['csrf-token']) {
             $_SESSION = [];
@@ -504,6 +563,15 @@ use Game\System\Enums\LOAError;
         return true;
     }
 
+    /**
+     * Dumps a variable to HTML for debugging purposes.
+     *
+     * Outputs the variable in a readable format and optionally exits the script.
+     *
+     * @param mixed $obj The variable to dump.
+     * @param bool|null $exit Whether to exit the script after dumping (default: true).
+     * @return int Always returns 0.
+     */
     function dump_to_html(mixed $obj, ?bool $exit=true): int {
         echo '<pre>';
         print_r($obj);
@@ -515,6 +583,14 @@ use Game\System\Enums\LOAError;
         return 0;
     }
 
+    /**
+     * Formats a name with a possessive suffix.
+     *
+     * Adds an apostrophe or "'s" to the end of the name based on its last character.
+     *
+     * @param string $name The name to format.
+     * @return string The formatted name.
+     */
     function fix_name_header(string $name): string {
         $ending_char = substr($name, -1, 1);
 

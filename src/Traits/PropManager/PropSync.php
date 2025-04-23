@@ -93,10 +93,8 @@ trait PropSync {
         } else {
             $log_str = $params[0];
         }
-        $log->debug("PropSync", ["Method" => $method, "Params" => print_r($params, true), "Action" => $action]);
 
         if (strcmp($action, "get") === 0) { /* GET */
-            $log->debug("PropSync ($action): " . $log_str);
             return $this->$prop;
         } elseif (strcmp($action, 'set') === 0) { /* SET */
 
@@ -233,7 +231,6 @@ trait PropSync {
 
                     $this->stats = $tmp_stats;
 
-                    $log->debug("Monster insert", [ 'NextID' => $next_id, 'Query' => $sql_query ]);
                     $db->execute_query($sql_query, [ $next_id, $_SESSION['account-id'], $_SESSION['character-id'], $this->scope->value, $this->seed, $srl_data ]);
                     return $next_id;
             }

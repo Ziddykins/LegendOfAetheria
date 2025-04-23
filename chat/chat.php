@@ -1,9 +1,13 @@
 <?php
+if ($_SERVER['SCRIPT_NAME'] == '/game.php') {
     require_once "bootstrap.php";
+} else {
+    require_once "../bootstrap.php";
+}
 
     $request = file_get_contents('php://input');
     $req_obj = json_decode($request);
-    
+
     header('Content-Type: application/json');
 
     switch ($req_obj->action) {
@@ -13,10 +17,10 @@
             get_messages($room, intval($count));
             break;
         case 'add_msg':
-            $char_id  = $req_obj->char_id;
-            $room     = $req_obj->room;
-            $message  = $req_obj->message;
-            $nickname = $req_obj->nickname;
+            $char_id  = $req_obj->data->char_id;
+            $room     = $req_obj->data->room;
+            $message  = $req_obj->data->message;
+            $nickname = $req_obj->data->nickname;
 
             if ($char_id !== $_SESSION['character-id']) {
                 //check_abuse(AbuseType::CHATABUSE);
@@ -25,6 +29,7 @@
             }
 
             $message = htmlentities($message);
+            $result = add_message($char_id, $room, $message, $nickname);
             
             if ($result == false) {
                 http_response_code(400);
@@ -43,24 +48,21 @@
             exit();
     }
 
-    function add_message(int $char_id, string $room, string $message, string $nickname): void {
+    function add_message(int $char_id, string $room, string $message, string $nickname): bool {
         global $db, $t;
         $sql_query = "INSERT INTO {$t['chat']} (`character_id`, `room`, `message`, `nickname`) VALUES (?, ?, ?, ?)";
         
         if (!$db->execute_query($sql_query, [$char_id, $room, $message, $nickname])) {
-            http_response_code(400);
-            echo '{"status": "' . $db->error . '"}';
-            exit();
+            return false;
         }
         
-        echo '{"status":"success"}';
-        exit();
+        return true;
     }
     function get_messages(string $room = '!main', int $count = 100): void {
         global $db, $t;
         $messages = [];
         
-        $sql_query = "SELECT * FROM {$t['chat']} WHERE `room` = ? ORDER BY `id` DESC LIMIT ?";
+        $sql_query = "SELECT DISTINCT * FROM {$t['chat']} WHERE `room` = ? ORDER BY `id` DESC LIMIT ?";
         $messages = $db->execute_query($sql_query, [$room, $count])->fetch_all(MYSQLI_ASSOC);
 
         if (!$messages) {
@@ -68,6 +70,6 @@
             echo '{"status":"' . $db->error . '"}';
         }
         
-        echo json_encode($messages);
+        echo json_encode(array_reverse($messages))      ;
         exit();
     }

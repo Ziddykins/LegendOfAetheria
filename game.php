@@ -14,7 +14,7 @@
     $system = new System(0);
     $system->load_sheet();
 
-    $account = new Account($_SESSION['email']);
+    $account   = new Account($_SESSION['email']);
     $character = new Character($account->get_id(), $_SESSION['character-id']);
     
     $color_mode = $account->get_settings()->get_colorMode();
@@ -76,7 +76,7 @@
                     ?>
                     </div>
                 </main>
-                <?php include 'html/chat.html'; ?>
+                <?php include 'chat/chat.html'; ?>
             </span>
         </div>
 

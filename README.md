@@ -202,8 +202,18 @@ Once those are setup:
 ```sh
 a2ensite loa.example.com
 a2ensite ssl-loa.example.com
-a2enmod php8.4 headers setenvif http2 ssl
+```
+
+If you're using PHP-FPM
+```sh
+a2dismod mpm_prefork php*
+a2enmod headers http2 ssl setenvif mpm_event proxy_fcgi
 a2enconf php8.4-fpm
+```
+
+Otherwise
+```sh
+a2enmod php8.4 headers http2 ssl
 ```
 
 > [!IMPORTANT]
@@ -256,8 +266,15 @@ Open a terminal and navigate to your webroot, then just issue
 sudo -u www-data composer --working-dir <GAME_WEB_ROOT> install
 ```
 
+replace install with update if you're updating the software.
+
 ### Templates
 
+    ## Generation
+
+        To generate the templates/schema required to make the game work, you'll need to use the autoinstaller.
+
+        `perl install/AutoInstaller.pl --step TEMPLATES --fqdn
 ### CRONJobs
 
 ### Credits

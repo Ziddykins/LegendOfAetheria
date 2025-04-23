@@ -1,14 +1,9 @@
 <?php
-declare(strict_types=1);
-
+require_once "bootstrap.php";
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\System\Enums\AbuseType;
 use Game\Components\Cards\CharacterSelect\CharacterSelectCard;
-
-require_once "bootstrap.php";
-
-
 
 if (check_session()) {
     $account = new Account($_SESSION['email']);
@@ -18,7 +13,6 @@ if (check_session()) {
         if (isset($_POST['slot']) && $_POST['slot'] > 0 && $_POST['slot'] <= 3) {
             $slot = $_POST['slot'];
             $_POST["select-new-$slot"] = 1;
-            
         }
     }
     
@@ -45,7 +39,6 @@ if (check_session()) {
                 $char_id = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc()["$char_slot"];
 
                 $character = new Character($account->get_id(), $char_id);
-
 
                 $_SESSION['focused-slot'] = (int)$slot;
                 $_SESSION['character-id'] = (int)$char_id;
@@ -171,8 +164,8 @@ if (check_session()) {
                 }
             });
         });
-        //const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-        //const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
     </script>
 
     <?php include "html/footers.html"; ?>    

@@ -10,7 +10,7 @@
 /.vscode/
 /.well-known/
 /esp32/
-/node_modules/
+**/**/node_modules/
 /sheets/
 /vendor/
 =

@@ -1,23 +1,21 @@
 <?php
     declare(strict_types = 1);
     session_start();
+    
     /* Core requirements */
     require_once 'vendor/autoload.php';
 
     use Game\System\System;
+    use PHPUnit\Framework\TestCase; // Ensure PHPUnit is available
     $system = new System(0);
-
-    define('PATH_WEBROOT',   '/var/www/html/kali.local/loa');
-    define('PATH_ADMINROOT', PATH_WEBROOT . '/admini/strator');
-    define('WEB_ADMINROOT', '/admini/strator');
-
+    require_once 'constants.php';
+    
     /* Funcs etc */
-    require_once PATH_WEBROOT . '/logger.php';
-    require_once PATH_WEBROOT . '/db.php';
-    require_once PATH_WEBROOT . '/functions.php';
-    require_once PATH_WEBROOT . '/mailer.php';
-    require_once PATH_WEBROOT . '/constants.php';
-
+    require_once WEBROOT . '/logger.php';
+    require_once WEBROOT . '/db.php';
+    require_once WEBROOT . '/functions.php';
+    require_once WEBROOT . '/mailer.php';
+    
     /* .env */
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
@@ -35,13 +33,28 @@
     $t['monsters']   = $_ENV['SQL_MNST_TBL'];
     $t['statistics'] = $_ENV['SQL_STAT_TBL'];
 
- 
 
     if ($_SERVER['SCRIPT_NAME'] !== '/index.php' && $_SERVER['SCRIPT_NAME'] !== '/cron.php') {
         if (check_session() === true) {
+            // Session timeout check - 30 minutes
+            if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+                session_unset();
+                session_destroy();
+                header('Location: /?session_expired');
+                exit();
+            }
+            
+            $_SESSION['last_activity'] = time();
+
+            // CSRF protection
             if (!isset($_SESSION['csrf-token'])) {
                 $_SESSION['csrf-token'] = gen_csrf_token();
             }
+
+            // Set security headers
+            header('X-Frame-Options: DENY');
+            header('X-XSS-Protection: 1; mode=block');
+            header('X-Content-Type-Options: nosniff');
         } else {
             header('Location: /?no_login');
             exit();
