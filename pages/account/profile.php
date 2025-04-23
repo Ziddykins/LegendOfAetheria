@@ -24,6 +24,9 @@
         }
     }
 ?>                 
+            <div class="container-lg">
+                <div class="row">
+                    <div class="col-6 p-4 rounded" style="background-color: rgba(5,5,5,.3);">
                         <div class="mb-3 row">
                             <label for="account-email" class="col-form-label fw-bold">Email:</label>
                             <div class="col">
@@ -53,23 +56,25 @@
                             </div>
                         </div>
 
+                        <div class="hr fs-3"></div>
+
                         <form id="profile-password-change" name="profile-password-change" action="/game?page=profile" method="POST">
                             <div class="mb-3 row">
-                                <label for="profile-old-password" class="col-sm-2 col-form-label fw-bold">Old Password:</label>
+                                <label for="profile-old-password" class="col-form-label fw-bold">Old Password:</label>
                                 <div class="col-sm-10">
                                     <input type="password" class="form-control" id="profile-old-password" name="profile-old-password">
                                 </div>
                             </div>
 
                             <div class="mb-3 row">
-                                <label for="profile-new-password" class="col-sm-2 col-form-label fw-bold">New Password:</label>
+                                <label for="profile-new-password" class="col-form-label fw-bold">New Password:</label>
                                 <div class="col-sm-10">
                                     <input type="password" class="form-control" id="profile-new-password" name="profile-new-password">
                                 </div>
                             </div>
 
                             <div class="mb-3 row">
-                                <label for="profile-confirm-password" class="col-sm-2 col-form-label fw-bold">Confirm Password:</label>
+                                <label for="profile-confirm-password" class="col-form-label fw-bold">Confirm Password:</label>
                                 <div class="col-sm-10">
                                     <input type="password" class="form-control" id="profile-confirm-password" name="profile-confirm-password">
                                 </div>
@@ -99,3 +104,5 @@
                             }
                         );
                     </script>
+                </div>
+            </div>

@@ -22,6 +22,7 @@
             $monster->load(MonsterScope::PERSONAL);
             $monster->random_monster();
             $character->set_monster($monster);
+            $mon_loaded = 1;
         }
     }
 
@@ -178,7 +179,7 @@
                 </div>
 
                 <div class="row mb-3">
-                    <form id="new-mon" name="new-mon" action="/game?page=hunt&action=hunt&scope=personal" method="post">
+                    <form id="new-mon" name="new-mon" action="/game?page=hunt&sub=location&action=hunt&scope=personal" method="post">
                         <div class="d-flex w-100">
                             <button id="hunt-new-monster" name="hunt-new-monster" class="btn btn-sm me-2 border-black btn-success flex-fill" type="submit" value="1" data-loa-monld="0">Hunt</button>
                             <button id="hunt-global-btn" name="hunt-global-btn" class="btn btn-sm border-black btn-secondary flex-fill" data-loa-monld="0">Global</button>

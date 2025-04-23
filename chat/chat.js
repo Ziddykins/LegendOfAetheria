@@ -111,6 +111,7 @@ function do_post(uri, directive, data = null) {
             case 'get_msgs':
                 var html_msg = null;
 
+                console.log(json);
                 json.forEach((msg) => {
                     html_msg = gen_message(msg);
                     var no_more = 0;

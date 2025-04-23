@@ -70,6 +70,6 @@ if ($_SERVER['SCRIPT_NAME'] == '/game.php') {
             echo '{"status":"' . $db->error . '"}';
         }
         
-        echo json_encode(array_reverse($messages))      ;
+        echo json_encode(array_reverse($messages));
         exit();
     }
