@@ -59,7 +59,7 @@
 
 ?>
 
-<?php include PATH_WEBROOT . '/html/opener.html'; ?>
+<?php include WEBROOT . '/html/opener.html'; ?>
     <head>
         <?php include PATH_ADMINROOT . '/html/headers.html'; ?>
         <script src="js/tabulator.min.js" type="text/javascript"></script>

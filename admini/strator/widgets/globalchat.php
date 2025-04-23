@@ -1,5 +1,5 @@
 <?php
-    require_once PATH_WEBROOT . '/bootstrap.php';
+    require_once WEBROOT . '/bootstrap.php';
 
     global $db;
 

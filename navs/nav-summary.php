@@ -1,4 +1,6 @@
 <?php
+
+use Game\Components\Modals\Enums\ModalButtonType;
     include "snippets/snip-charstats.php";
 
 ?>
@@ -29,7 +31,7 @@
                                 </a>
                                 <script>bootstrap.Modal.Default.backdrop = false; </script>
                                 <?php
-                                    echo generate_modal('ap-spend', 'success', 'Assign AP', $ap_modal_body, ModalButtonType::OKCancel);
+                                    echo generate_modal('ap-spend', 'success', 'Assign AP', $ap_modal_body, ModalButtonType::OKCANCEL);
                                 ?>
                             <?php else: ?>
                                 <i class="bi bi-capslock"></i>

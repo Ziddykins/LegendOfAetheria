@@ -77,7 +77,7 @@ class Familiar {
     public function getCard($which = 'current') {
         if ($which === 'empty') {
             $html = file_get_contents(
-                PATH_WEBROOT . 'html/card-egg-none.html'
+                WEBROOT . 'html/card-egg-none.html'
             );
 
             return $html;
@@ -88,7 +88,7 @@ class Familiar {
            // $html = "$build_timer\n";
             
             //$html .= file_get_contents(
-             //   PATH_WEBROOTECTORY . 'html/card-egg-current.html'
+             //   WEBROOTECTORY . 'html/card-egg-current.html'
            // );
             
             //$html .= "\n";

@@ -1,6 +1,7 @@
 <?php 
     use Game\Character\Enums\FriendStatus;
     use Game\Account\Enums\Privileges;
+    use Game\Components\Modals\Enums\ModalButtonType;
 ?>
 
 <div class="col-2 px-3 border border-grey">
@@ -168,7 +169,7 @@
                                                               $cur_floor . ' to floor 1 and return your ' .
                                                               'dungeon multiplier back to 1x<br /><br /><strong>' .
                                                               'Are you sure? This cannot be reversed!</strong>';
-                                                echo generate_modal('reset-dungeon', 'danger', 'Reset Dungeon Progress', $modal_body, ModalButtonType::YesNo);
+                                                echo generate_modal('reset-dungeon', 'danger', 'Reset Dungeon Progress', $modal_body, ModalButtonType::YESNO);
 
                                             ?>
                                         </li>

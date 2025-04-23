@@ -28,6 +28,7 @@ class Account {
     private $loggedIn;
     private $eggsOwned;
     private $eggsSeen;
+    private $jwtSecret;
 
     private $settings;
 
@@ -37,12 +38,19 @@ class Account {
 
     private $focusedSlot;
 
+    private $passwordOptions = [
+        'cost' => 12,
+        'memory_cost' => 1024,
+        'time_cost' => 2,
+        'threads' => 2
+    ];
+
     public function __construct($email = null) {
         if ($email) {
             $this->email = $email;
             $id = $this->checkIfExists($email);
             
-            if ($id) {
+            if ($id > 0) {
                 $this->id = $id;
                 $this->load($id);
             }

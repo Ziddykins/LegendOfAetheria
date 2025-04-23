@@ -38,12 +38,12 @@ document.querySelectorAll("button[id^='hunt']").forEach(async (btn) => {
             method: 'POST',
             body: `action=${which}&type=${atk_type}&csrf-token=${csrf_token}`
         }).then((response) => response.text()).then(async(data) => {
-                console.log(`got data: ${data}`);
-                battle_log.insertAdjacentHTML('afterbegin', data);
-                await update_hud();
-            }).catch((error) => {
-                battle_log.insertAdjacentHTML = battle_log.innerHTML + `${error.message}`;
-            });
+            console.log(`got data: ${data}`);
+            battle_log.insertAdjacentHTML('afterbegin', data);
+            await update_hud();
+        }).catch((error) => {
+            battle_log.insertAdjacentHTML = battle_log.innerHTML + `${error.message}`;
+        });
     });
 });
 

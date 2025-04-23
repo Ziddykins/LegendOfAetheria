@@ -47,8 +47,6 @@
         $mon_avatar = '/img/enemies/' . str_replace(' ', '', $monster->get_name()) . '.png';
     }
 ?>
-    <script src="node_modules/smooth-scrollbar/dist/smooth-scrollbar.js" type="text/javascript"></script>
-
     <div class="d-flex pt-3">
         <div class="container border border-1">
             <div class="row">

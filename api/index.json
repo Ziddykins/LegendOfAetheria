@@ -1,0 +1,2199 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Legend of Aetheria API",
+        "version": "1.0.0",
+        "description": "API for Legend of Aetheria game server",
+        "contact": {
+            "name": "Game Support",
+            "email": "webmaster@kali.local"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://api.kali.local:3000",
+            "description": "Development server"
+        }
+    ],
+    "security": [
+        {
+            "basicAuth": []
+        },
+        {
+            "bearerAuth": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Endpoints for user authentication and session management"
+        },
+        {
+            "name": "Characters",
+            "description": "Character creation and management endpoints"
+        },
+        {
+            "name": "Combat",
+            "description": "Battle system and combat-related endpoints"
+        },
+        {
+            "name": "Mail",
+            "description": "In-game mail system endpoints"
+        },
+        {
+            "name": "Inventory",
+            "description": "Character inventory management endpoints"
+        },
+        {
+            "name": "Market",
+            "description": "Trading and economy system endpoints"
+        },
+        {
+            "name": "Friends",
+            "description": "Social system and friend management endpoints"
+        },
+        {
+            "name": "Quests",
+            "description": "Quest system related endpoints"
+        },
+        {
+            "name": "Bank",
+            "description": "Banking and currency management endpoints"
+        },
+        {
+            "name": "Locations",
+            "description": "World map and location management endpoints"
+        }
+    ],
+    "externalDocs": {
+        "description": "Additional Documentation",
+        "url": "https://docs.kali.local"
+    },
+    "x-server-settings": {
+        "rate-limit": {
+            "requests-per-hour": 1000,
+            "burst": 50
+        },
+        "cors": {
+            "allowed-origins": ["https://game.kali.local", "https://loa.kali.local", "https://api.kali.local"],
+            "allowed-methods": ["GET", "POST", "PUT", "DELETE"],
+            "allowed-headers": ["Content-Type", "Authorization", "X-Api-Key"],
+            "max-age": 86400
+        },
+        "compression": {
+            "enabled": true,
+            "level": "medium",
+            "min-size": 1024
+        },
+        "jwt": {
+            "issuer": "api.kali.local",
+            "expiration": 3600,
+            "refreshExpiration": 86400,
+            "algorithm": "HS256"
+        }
+    },
+    "paths": {
+        "/auth/refresh": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Refresh JWT token",
+                "description": "Get a new JWT token using an existing valid token",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token refreshed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "expires": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/basic": {
+                        "post": {
+                "tags": ["Authentication"],
+                "summary": "Login with credentials",
+                "description": "Authenticate using username/password and receive a JWT token",
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful authentication",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "description": "JWT token for subsequent requests"
+                                        },
+                                        "expires": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "description": "Token expiration timestamp"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/Account"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                                    "expires": "2025-04-18T12:00:00Z",
+                                    "account": {
+                                        "id": 1,
+                                        "email": "user@example.com",
+                                        "privileges": "USER"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedError"
+                    }
+                }
+            }
+        },
+        "/v1/account/{accountID}": {
+            "get": {
+                "summary": "Get Account",
+                "description": "Retrieve an account by its ID.",
+                "security": [{"bearerAuth": []}],
+                "parameters": [
+                    {
+                        "name": "accountID",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the account to retrieve.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of the account.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Account"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Account not found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/characters": {
+            "get": {
+                "summary": "List Characters",
+                "description": "Get all characters for the authenticated account",
+                "security": [{"ApiKey": []}],
+                "responses": {
+                    "200": {
+                        "description": "List of characters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Character"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create Character",
+                "description": "Create a new character",
+                "security": [{"bearerAuth": []}],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["name", "race"],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Character name"
+                                    },
+                                    "race": {
+                                        "$ref": "#/components/schemas/Races"
+                                    },
+                                    "str": {
+                                        "type": "integer",
+                                        "minimum": 10,
+                                        "maximum": 20
+                                    },
+                                    "int": {
+                                        "type": "integer",
+                                        "minimum": 10,
+                                        "maximum": 20
+                                    },
+                                    "def": {
+                                        "type": "integer",
+                                        "minimum": 10,
+                                        "maximum": 20
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Character created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Character"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/characters/{characterId}": {
+            "get": {
+                "summary": "Get Character",
+                "description": "Get character details by ID",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "characterId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Character details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Character"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/characters/{characterId}/familiar": {
+            "get": {
+                "summary": "Get Character's Familiar",
+                "description": "Get the familiar associated with a character",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "characterId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Familiar details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Familiar"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/characters/{characterId}/inventory": {
+            "get": {
+                "summary": "Get Character's Inventory",
+                "description": "Get the inventory for a character",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "characterId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inventory contents",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Inventory"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/characters/{characterId}/battle": {
+            "post": {
+                "summary": "Start Battle",
+                "description": "Initiate a battle with a monster",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "characterId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["monsterId"],
+                                "properties": {
+                                    "monsterId": {
+                                        "type": "integer",
+                                        "description": "ID of the monster to battle"
+                                    },
+                                    "scope": {
+                                        "$ref": "#/components/schemas/MonsterScope"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Battle initiated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Battle"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/mail": {
+            "get": {
+                "summary": "Get Mail",
+                "description": "Get mail messages for the authenticated account",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "folder",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/FolderType"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of mail messages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Envelope"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Send Mail",
+                "description": "Send a new mail message",
+                "security": [{"ApiKey": []}],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["recipient", "subject", "message"],
+                                "properties": {
+                                    "recipient": {
+                                        "type": "string",
+                                        "description": "Recipient's email"
+                                    },
+                                    "subject": {
+                                        "type": "string",
+                                        "maxLength": 100
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "maxLength": 2000
+                                    },
+                                    "important": {
+                                        "type": "boolean",
+                                        "default": false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Mail sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Envelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/mail/{mailId}": {
+            "get": {
+                "summary": "Get Mail Message",
+                "description": "Get a specific mail message by ID",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "mailId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Mail message details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Envelope"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete Mail Message",
+                "description": "Move a mail message to the deleted folder",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "mailId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Mail message deleted"
+                    }
+                }
+            }
+        },
+        "/v1/characters/{characterId}/friends": {
+            "get": {
+                "summary": "Get Friends List",
+                "description": "Get list of friends for a character",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "characterId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/FriendStatus"
+                        },
+                        "description": "Filter by friend status"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of friends",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "friendId": {
+                                                "type": "integer"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "status": {
+                                                "$ref": "#/components/schemas/FriendStatus"
+                                            },
+                                            "online": {
+                                                "type": "boolean"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Send Friend Request",
+                "description": "Send a friend request to another character",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "characterId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["targetCharacterId"],
+                                "properties": {
+                                    "targetCharacterId": {
+                                        "type": "integer",
+                                        "description": "ID of the character to send friend request to"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Friend request sent"
+                    }
+                }
+            }
+        },
+        "/v1/characters/{characterId}/quests": {
+            "get": {
+                "summary": "Get Character Quests",
+                "description": "Get active and completed quests for a character",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "characterId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["active", "completed", "available"]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of quests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Quest"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/characters/{characterId}/bank": {
+            "get": {
+                "summary": "Get Bank Account",
+                "description": "Get character's bank account details",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "characterId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bank account details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BankAccount"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Perform Bank Transaction",
+                "description": "Deposit or withdraw gold from bank",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "characterId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["action", "amount"],
+                                "properties": {
+                                    "action": {
+                                        "type": "string",
+                                        "enum": ["deposit", "withdraw"],
+                                        "description": "Type of transaction"
+                                    },
+                                    "amount": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "Amount of gold"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Transaction successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/BankAccount"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/market/listings": {
+            "get": {
+                "summary": "Get Market Listings",
+                "description": "Get current market listings with optional filters",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["item", "familiar", "egg"]
+                        }
+                    },
+                    {
+                        "name": "rarity",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/ObjectRarity"
+                        }
+                    },
+                    {
+                        "name": "minLevel",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "maxPrice",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of market listings",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MarketListings"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create Market Listing",
+                "description": "Create a new market listing",
+                "security": [{"ApiKey": []}],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["itemId", "price"],
+                                "properties": {
+                                    "itemId": {
+                                        "type": "integer",
+                                        "description": "ID of item to sell"
+                                    },
+                                    "price": {
+                                        "type": "integer",
+                                        "description": "Asking price in gold"
+                                    },
+                                    "duration": {
+                                        "type": "integer",
+                                        "description": "Listing duration in hours",
+                                        "default": 24
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Market listing created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MarketListing"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/market/listings/{listingId}/purchase": {
+            "post": {
+                "summary": "Purchase Item",
+                "description": "Purchase an item from the market",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "listingId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Purchase successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PurchaseReceipt"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/locations": {
+            "get": {
+                "summary": "Get Locations",
+                "description": "Get list of available locations/maps",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "floor",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "description": "Filter by floor number"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of locations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Location"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/locations/{locationId}/travel": {
+            "post": {
+                "summary": "Travel to Location",
+                "description": "Move character to a new location",
+                "security": [{"ApiKey": []}],
+                "parameters": [
+                    {
+                        "name": "locationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["characterId"],
+                                "properties": {
+                                    "characterId": {
+                                        "type": "integer",
+                                        "description": "ID of character traveling"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Travel successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Location"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Account": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the account."
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "Email address of the account."
+                    },
+                    "password": {
+                        "type": "string",
+                        "description": "Password for the account."
+                    },
+                    "dateRegistered": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date when the account was registered."
+                    },
+                    "verified": {
+                        "type": "boolean",
+                        "description": "Whether the account is verified."
+                    },
+                    "verificationCode": {
+                        "type": "string",
+                        "description": "Verification code for the account."
+                    },
+                    "privileges": {
+                        "type": "string",
+                        "description": "Privileges assigned to the account."
+                    },
+                    "lastLogin": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Last login date and time."
+                    },
+                    "loggedOn": {
+                        "type": "boolean",
+                        "description": "Whether the account is currently logged on."
+                    },
+                    "failedLogins": {
+                        "type": "integer",
+                        "description": "Number of failed login attempts."
+                    },
+                    "ipAddress": {
+                        "type": "string",
+                        "description": "IP address of the account."
+                    },
+                    "credits": {
+                        "type": "integer",
+                        "description": "Credits available in the account."
+                    },
+                    "sessionID": {
+                        "type": "string",
+                        "description": "Session ID of the account."
+                    },
+                    "ipLock": {
+                        "type": "boolean",
+                        "description": "Whether the account is IP locked."
+                    },
+                    "ipLockAddr": {
+                        "type": "string",
+                        "description": "IP address for IP lock."
+                    },
+                    "banned": {
+                        "type": "boolean",
+                        "description": "Whether the account is banned."
+                    },
+                    "muted": {
+                        "type": "boolean",
+                        "description": "Whether the account is muted."
+                    },
+                    "loggedIn": {
+                        "type": "boolean",
+                        "description": "Whether the account is logged in."
+                    },
+                    "eggsOwned": {
+                        "type": "integer",
+                        "description": "Number of eggs owned by the account."
+                    },
+                    "eggsSeen": {
+                        "type": "integer",
+                        "description": "Number of eggs seen by the account."
+                    },
+                    "settings": {
+                        "type": "object",
+                        "description": "Settings of the account."
+                    },
+                    "charSlot1": {
+                        "type": "string",
+                        "description": "Character slot 1."
+                    },
+                    "charSlot2": {
+                        "type": "string",
+                        "description": "Character slot 2."
+                    },
+                    "charSlot3": {
+                        "type": "string",
+                        "description": "Character slot 3."
+                    },
+                    "focusedSlot": {
+                        "type": "string",
+                        "description": "Currently focused character slot."
+                    }
+                }
+            },
+            "Error": {
+                "type": "object",
+                "required": [
+                    "message"
+                ],
+                "properties": {
+                    "message": {
+                        "description": "A human readable error message",
+                        "type": "string"
+                    }
+                }
+            },
+            "PropManager": {
+                "type": "object",
+                "description": "Trait system for managing dynamic properties with database synchronization.",
+                "properties": {
+                    "propSync": {
+                        "type": "object",
+                        "description": "Handles synchronization of properties with the database"
+                    },
+                    "propMod": {
+                        "type": "object",
+                        "description": "Provides mathematical operations for modifying numeric properties",
+                        "properties": {
+                            "operations": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": ["add", "sub", "mul", "div", "exp", "mod"]
+                                },
+                                "description": "Available mathematical operations"
+                            },
+                            "constraints": {
+                                "type": "object",
+                                "properties": {
+                                    "minValue": {
+                                        "type": "integer",
+                                        "default": 0,
+                                        "description": "Minimum allowed value"
+                                    },
+                                    "maxValue": {
+                                        "type": "string",
+                                        "description": "Maximum allowed value, uses PHP_INT_MAX if not specified"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "PropType": {
+                "type": "string",
+                "enum": ["ACCOUNT", "CHARACTER", "ITEM"],
+                "description": "Enumeration of property types."
+            },
+            "Character": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the character"
+                    },
+                    "accountID": {
+                        "type": "integer",
+                        "description": "ID of the account this character belongs to"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Character name"
+                    },
+                    "race": {
+                        "type": "string",
+                        "description": "Character race"
+                    },
+                    "avatar": {
+                        "type": "string",
+                        "description": "Character avatar image"
+                    },
+                    "level": {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Character level"
+                    },
+                    "x": {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "X coordinate position"
+                    },
+                    "y": {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Y coordinate position"
+                    },
+                    "location": {
+                        "type": "string",
+                        "default": "The Shrine",
+                        "description": "Current location name"
+                    },
+                    "alignment": {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Character alignment value"
+                    },
+                    "gold": {
+                        "type": "integer",
+                        "default": 1000,
+                        "description": "Amount of gold"
+                    },
+                    "exp": {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Experience points"
+                    },
+                    "floor": {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Current floor level"
+                    },
+                    "description": {
+                        "type": "string",
+                        "default": "None Provided",
+                        "description": "Character description"
+                    },
+                    "dateCreated": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date when the character was created"
+                    },
+                    "lastAction": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date of last character action"
+                    },
+                    "monster": {
+                        "$ref": "#/components/schemas/Monster",
+                        "description": "Current monster interaction"
+                    },
+                    "stats": {
+                        "$ref": "#/components/schemas/Stats",
+                        "description": "Character statistics"
+                    },
+                    "inventory": {
+                        "$ref": "#/components/schemas/Inventory",
+                        "description": "Character inventory"
+                    }
+                }
+            },
+            "Stats": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Character ID these stats belong to"
+                    },
+                    "hp": {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Current hit points"
+                    },
+                    "maxHP": {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Maximum hit points"
+                    },
+                    "mp": {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Current magic points"
+                    },
+                    "maxMP": {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Maximum magic points"
+                    },
+                    "ep": {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Current energy points"
+                    },
+                    "maxEP": {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Maximum energy points"
+                    },
+                    "str": {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Strength stat"
+                    },
+                    "int": {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Intelligence stat"
+                    },
+                    "def": {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Defense stat"
+                    },
+                    "luk": {
+                        "type": "integer",
+                        "default": 3,
+                        "description": "Luck stat"
+                    },
+                    "exp": {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Current experience points"
+                    },
+                    "maxExp": {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "Experience points needed for next level"
+                    },
+                    "ap": {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Available attribute points"
+                    }
+                }
+            },
+            "Monster": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the monster"
+                    },
+                    "accountID": {
+                        "type": "integer",
+                        "description": "Associated account ID"
+                    },
+                    "characterID": {
+                        "type": "integer",
+                        "description": "Associated character ID"
+                    },
+                    "level": {
+                        "type": "integer",
+                        "description": "Monster level"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Monster name"
+                    },
+                    "scope": {
+                        "type": "string",
+                        "description": "Monster scope"
+                    },
+                    "seed": {
+                        "type": "string",
+                        "description": "Random seed for monster generation"
+                    },
+                    "summondBy": {
+                        "type": "integer",
+                        "description": "ID of the summoner for global/zone monsters"
+                    },
+                    "dropLevel": {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Level of items dropped"
+                    },
+                    "expAwarded": {
+                        "type": "integer",
+                        "description": "Experience points awarded on defeat"
+                    },
+                    "goldAwarded": {
+                        "type": "integer",
+                        "description": "Gold awarded on defeat"
+                    },
+                    "monsterClass": {
+                        "type": "string",
+                        "description": "Class/type of the monster"
+                    },
+                    "stats": {
+                        "$ref": "#/components/schemas/Stats",
+                        "description": "Monster statistics"
+                    }
+                }
+            },
+            "Inventory": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Character ID this inventory belongs to"
+                    },
+                    "slotCount": {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Total number of inventory slots"
+                    },
+                    "currentWeight": {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Current weight of items in inventory"
+                    },
+                    "maxWeight": {
+                        "type": "integer",
+                        "default": 1000,
+                        "description": "Maximum weight capacity"
+                    },
+                    "nextAvailableSlot": {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Next available slot number"
+                    },
+                    "slots": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Item"
+                        },
+                        "description": "Array of inventory slots containing items"
+                    }
+                }
+            },
+            "Item": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the item"
+                    },
+                    "weight": {
+                        "type": "integer",
+                        "description": "Weight of the item"
+                    },
+                    "socketCount": {
+                        "type": "integer",
+                        "description": "Number of sockets in the item"
+                    }
+                }
+            },
+            "Familiar": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the familiar"
+                    },
+                    "characterID": {
+                        "type": "integer",
+                        "description": "ID of the character this familiar belongs to"
+                    },
+                    "level": {
+                        "type": "integer",
+                        "description": "Familiar's level"
+                    },
+                    "experience": {
+                        "type": "integer",
+                        "description": "Current experience points"
+                    },
+                    "nextLevel": {
+                        "type": "integer",
+                        "description": "Experience needed for next level"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Familiar's name"
+                    },
+                    "avatar": {
+                        "type": "string",
+                        "description": "Path to familiar's avatar image"
+                    },
+                    "stats": {
+                        "$ref": "#/components/schemas/FamiliarStats",
+                        "description": "Familiar's statistics"
+                    }
+                }
+            },
+            "FamiliarStats": {
+                "type": "object",
+                "properties": {
+                    "level": {
+                        "type": "integer",
+                        "description": "Familiar's level"
+                    },
+                    "health": {
+                        "type": "integer",
+                        "description": "Current health points"
+                    },
+                    "maxHealth": {
+                        "type": "integer",
+                        "description": "Maximum health points"
+                    },
+                    "mana": {
+                        "type": "integer",
+                        "description": "Current mana points"
+                    },
+                    "maxMana": {
+                        "type": "integer",
+                        "description": "Maximum mana points"
+                    },
+                    "energy": {
+                        "type": "integer",
+                        "description": "Current energy points"
+                    },
+                    "maxEnergy": {
+                        "type": "integer",
+                        "description": "Maximum energy points"
+                    },
+                    "intelligence": {
+                        "type": "integer",
+                        "description": "Intelligence stat"
+                    },
+                    "strength": {
+                        "type": "integer",
+                        "description": "Strength stat"
+                    },
+                    "defense": {
+                        "type": "integer",
+                        "description": "Defense stat"
+                    },
+                    "experience": {
+                        "type": "integer",
+                        "description": "Current experience points"
+                    },
+                    "nextLevel": {
+                        "type": "integer",
+                        "description": "Experience needed for next level"
+                    },
+                    "eggsOwned": {
+                        "type": "integer",
+                        "description": "Number of eggs owned"
+                    },
+                    "eggsSeen": {
+                        "type": "integer",
+                        "description": "Number of eggs seen"
+                    }
+                }
+            },
+            "FamiliarEgg": {
+                "type": "object",
+                "properties": {
+                    "rarity": {
+                        "$ref": "#/components/schemas/ObjectRarity",
+                        "description": "Rarity level of the egg"
+                    },
+                    "rarityColor": {
+                        "type": "string",
+                        "description": "Color code representing the egg's rarity"
+                    },
+                    "hatched": {
+                        "type": "boolean",
+                        "description": "Whether the egg has hatched"
+                    },
+                    "hatchTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Time when the egg will hatch"
+                    },
+                    "lastRoll": {
+                        "type": "integer",
+                        "description": "Last rarity roll value for this egg"
+                    },
+                    "dateAcquired": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date when the egg was acquired"
+                    }
+                }
+            },
+            "ObjectRarity": {
+                "type": "string",
+                "enum": [
+                    "WORTHLESS",
+                    "TARNISHED",
+                    "COMMON",
+                    "ENCHANTED",
+                    "MAGICAL",
+                    "LEGENDARY",
+                    "EPIC",
+                    "MYSTIC",
+                    "HEROIC",
+                    "INFAMOUS",
+                    "GODLY"
+                ],
+                "description": "Rarity levels for objects in the game"
+            },
+            "Envelope": {
+                "type": "object",
+                "properties": {
+                    "mail_id": {
+                        "type": "integer",
+                        "description": "Unique identifier for the mail message"
+                    },
+                    "sender": {
+                        "type": "string",
+                        "description": "Username of the sender"
+                    },
+                    "recipient": {
+                        "type": "string",
+                        "description": "Username of the recipient"
+                    },
+                    "subject": {
+                        "type": "string",
+                        "description": "Subject of the mail message"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Content of the mail message"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Date and time when the message was sent"
+                    },
+                    "folder": {
+                        "$ref": "#/components/schemas/FolderType",
+                        "description": "The folder containing this message"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/EnvelopeStatus",
+                        "description": "Current status of the message"
+                    }
+                }
+            },
+            "EnvelopeStatus": {
+                "type": "string",
+                "enum": [
+                    "NONE",
+                    "READ",
+                    "REPLIED",
+                    "FAVORITE",
+                    "IMPORTANT"
+                ],
+                "description": "Possible statuses for a mail message"
+            },
+            "FolderType": {
+                "type": "string",
+                "enum": [
+                    "INBOX",
+                    "DRAFTS",
+                    "OUTBOX",
+                    "DELETED"
+                ],
+                "description": "Types of mail folders available in the system"
+            },
+            "OpenAI": {
+                "type": "object",
+                "properties": {
+                    "apiKey": {
+                        "type": "string",
+                        "description": "OpenAI API key for authentication"
+                    },
+                    "endPoint": {
+                        "type": "string",
+                        "description": "OpenAI API endpoint URL"
+                    },
+                    "imageModel": {
+                        "type": "string",
+                        "description": "The image generation model to use"
+                    },
+                    "imagePrompt": {
+                        "type": "string",
+                        "description": "Prompt for image generation"
+                    },
+                    "imageCount": {
+                        "type": "integer",
+                        "description": "Number of images to generate"
+                    },
+                    "imageSize": {
+                        "type": "string",
+                        "description": "Size of generated images"
+                    },
+                    "maxTokens": {
+                        "type": "integer",
+                        "description": "Maximum tokens for text generation"
+                    }
+                }
+            },
+            "HttpMethod": {
+                "type": "string",
+                "enum": ["GET", "POST"],
+                "description": "HTTP methods used for API requests"
+            },
+            "System": {
+                "type": "object",
+                "properties": {
+                    "monsters": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "List of monster definitions loaded from monsters.raw"
+                    },
+                    "weather": {
+                        "type": "string",
+                        "description": "Current weather in the zone"
+                    },
+                    "zone_id": {
+                        "type": "integer",
+                        "description": "Identifier for the current zone"
+                    }
+                }
+            },
+            "Battle": {
+                "type": "object",
+                "properties": {
+                    "turn": {
+                        "$ref": "#/components/schemas/Turn",
+                        "description": "Current turn in the battle"
+                    },
+                    "player": {
+                        "$ref": "#/components/schemas/Character",
+                        "description": "The player character in the battle"
+                    },
+                    "enemy": {
+                        "$ref": "#/components/schemas/Monster",
+                        "description": "The enemy monster in the battle"
+                    }
+                }
+            },
+            "Turn": {
+                "type": "integer",
+                "enum": [0, 1],
+                "x-enumNames": ["ENEMY", "PLAYER"],
+                "description": "Represents whose turn it is in battle"
+            },
+            "FriendStatus": {
+                "type": "string",
+                "enum": [
+                    "NONE",
+                    "REQUEST_SENT",
+                    "REQUEST_RECV",
+                    "MUTUAL",
+                    "BLOCKED",
+                    "BLOCKED_BY"
+                ],
+                "description": "Status of friendship between characters"
+            },
+            "CharacterStatus": {
+                "type": "integer",
+                "enum": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16,
+                    32,
+                    64,
+                    128,
+                    256,
+                    512,
+                    1024,
+                    2048,
+                    4096,
+                    8192
+                ],
+                "x-enumNames": [
+                    "HEALTHY",
+                    "POISONED",
+                    "BLINDED",
+                    "SCARED",
+                    "OVERENCUMBERED",
+                    "OVERHEATED",
+                    "STUNNED",
+                    "FROZEN",
+                    "BURNING",
+                    "CONFUSED",
+                    "CHARMED",
+                    "SLEEPING",
+                    "DEAD",
+                    "BLEEDING"
+                ],
+                "description": "Possible status conditions for a character"
+            },
+            "Races": {
+                "type": "string",
+                "enum": [
+                    "Angel",
+                    "Demon",
+                    "Dwarf",
+                    "Elf",
+                    "Gnome",
+                    "Halfling",
+                    "Human",
+                    "Orc",
+                    "Troll",
+                    "Undead",
+                    "Vampire",
+                    "Default"
+                ],
+                "description": "Available character races"
+            },
+            "MonsterScope": {
+                "type": "integer",
+                "enum": [0, 1, 2, 3],
+                "x-enumNames": ["GLOBAL", "ZONE", "PERSONAL", "NONE"],
+                "description": "Scope of monster visibility and interaction:\n- GLOBAL: Available for everyone to attack with shared rewards\n- ZONE: Restricted to specific map areas with local player contribution\n- PERSONAL: Only visible and attackable by individual player\n- NONE: No specific scope assigned"
+            },
+            "Specialty": {
+                "type": "string",
+                "enum": [
+                    "GIANT",
+                    "MINI",
+                    "HARDENED",
+                    "ENRAGED",
+                    "EXPERIENCED",
+                    "PACKRAT",
+                    "DEFECTING",
+                    "LEADER"
+                ],
+                "description": "Special monster attributes:\n- GIANT: 2-3x HP\n- MINI: 1/2 - 1/4 HP\n- HARDENED: 3-4x DEF\n- ENRAGED: 4x STR, -5% HP\n- EXPERIENCED: 3x EXP, +2% HP+DEF\n- PACKRAT: Increased item rarity and 3x gold\n- DEFECTING: Chance to spare life/join army\n- LEADER: 5-10x all stats"
+            },
+            "Quest": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Quest identifier"
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "Quest title"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Quest description"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": ["available", "active", "completed", "failed"],
+                        "description": "Current quest status"
+                    },
+                    "requirements": {
+                        "type": "object",
+                        "properties": {
+                            "level": {
+                                "type": "integer",
+                                "description": "Required character level"
+                            },
+                            "race": {
+                                "$ref": "#/components/schemas/Races",
+                                "description": "Required character race if any"
+                            }
+                        }
+                    },
+                    "rewards": {
+                        "type": "object",
+                        "properties": {
+                            "gold": {
+                                "type": "integer",
+                                "description": "Gold reward"
+                            },
+                            "experience": {
+                                "type": "integer",
+                                "description": "Experience points reward"
+                            },
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Item"
+                                },
+                                "description": "Item rewards"
+                            }
+                        }
+                    },
+                    "progress": {
+                        "type": "object",
+                        "properties": {
+                            "current": {
+                                "type": "integer",
+                                "description": "Current progress value"
+                            },
+                            "required": {
+                                "type": "integer",
+                                "description": "Required progress value"
+                            },
+                            "objectives": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "completed": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "BankAccount": {
+                "type": "object",
+                "properties": {
+                    "characterId": {
+                        "type": "integer",
+                        "description": "Character ID this bank account belongs to"
+                    },
+                    "balance": {
+                        "type": "integer",
+                        "description": "Current gold balance"
+                    },
+                    "transactions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "date": {
+                                    "type": "string",
+                                    "format": "date-time",
+                                    "description": "Transaction date"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "enum": ["deposit", "withdraw"],
+                                    "description": "Transaction type"
+                                },
+                                "amount": {
+                                    "type": "integer",
+                                    "description": "Transaction amount"
+                                },
+                                "balance": {
+                                    "type": "integer",
+                                    "description": "Balance after transaction"
+                                }
+                            }
+                        },
+                        "description": "Recent transactions"
+                    }
+                }
+            },
+            "MarketListings": {
+                "type": "object",
+                "properties": {
+                    "total": {
+                        "type": "integer",
+                        "description": "Total number of listings"
+                    },
+                    "listings": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MarketListing"
+                        }
+                    }
+                }
+            },
+            "MarketListing": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Listing ID"
+                    },
+                    "sellerId": {
+                        "type": "integer",
+                        "description": "Character ID of seller"
+                    },
+                    "item": {
+                        "$ref": "#/components/schemas/Item",
+                        "description": "Item being sold"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "description": "Asking price in gold"
+                    },
+                    "listed": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "When the item was listed"
+                    },
+                    "expires": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "When the listing expires"
+                    }
+                }
+            },
+            "PurchaseReceipt": {
+                "type": "object",
+                "properties": {
+                    "transactionId": {
+                        "type": "integer",
+                        "description": "Unique transaction ID"
+                    },
+                    "item": {
+                        "$ref": "#/components/schemas/Item",
+                        "description": "Purchased item"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "description": "Price paid"
+                    },
+                    "seller": {
+                        "type": "string",
+                        "description": "Name of seller"
+                    },
+                    "buyer": {
+                        "type": "string",
+                        "description": "Name of buyer"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Transaction timestamp"
+                    }
+                }
+            },
+            "Location": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Location ID"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Location name"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Location description"
+                    },
+                    "floor": {
+                        "type": "integer",
+                        "description": "Floor number"
+                    },
+                    "coordinates": {
+                        "type": "object",
+                        "properties": {
+                            "x": {
+                                "type": "integer",
+                                "description": "X coordinate"
+                            },
+                            "y": {
+                                "type": "integer",
+                                "description": "Y coordinate"
+                            }
+                        }
+                    },
+                    "requirements": {
+                        "type": "object",
+                        "properties": {
+                            "level": {
+                                "type": "integer",
+                                "description": "Required level to enter"
+                            },
+                            "items": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "description": "Required items to enter"
+                            }
+                        }
+                    },
+                    "weather": {
+                        "type": "string",
+                        "description": "Current weather conditions"
+                    },
+                    "monsters": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Monster"
+                        },
+                        "description": "Monsters in this location"
+                    },
+                    "npcs": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "NPCs in this location"
+                    },
+                    "connectedLocations": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "IDs of connected locations"
+                    }
+                }
+            },
+            "JWTToken": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "description": "JWT token"
+                    },
+                    "expires": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Token expiration timestamp"
+                    }
+                },
+                "required": ["token", "expires"]
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "JWT token authentication"
+            },
+            "basicAuth": {
+                "type": "http",
+                "scheme": "basic",
+                "description": "Basic authentication to obtain JWT token"
+            }
+        },
+        "responses": {
+            "UnauthorizedError": {
+                "description": "Authentication information is missing or invalid",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "example": 401
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "example": "Invalid or expired authentication token"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "ValidationError": {
+                "description": "Invalid input parameters",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "example": 400
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "example": "Invalid input parameters"
+                                },
+                                "details": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "field": {
+                                                "type": "string"
+                                            },
+                                            "message": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "RateLimitError": {
+                "description": "Too many requests",
+                "headers": {
+                    "X-RateLimit-Limit": {
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Request limit per hour"
+                    },
+                    "X-RateLimit-Remaining": {
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Remaining requests in the current time window"
+                    },
+                    "X-RateLimit-Reset": {
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "description": "Time when the rate limit resets"
+                    }
+                },
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "integer",
+                                    "example": 429
+                                },
+                                "message": {
+                                    "type": "string",
+                                    "example": "Rate limit exceeded"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

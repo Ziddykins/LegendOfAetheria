@@ -14,7 +14,7 @@
 	CustomLog ${APACHE_LOG_DIR}/###REPL_WEB_FQDN###-access.log combined
 
     # Will be uncommented if SSL enabled
-    # REM RewriteEngine on
-    # REM RewriteCond %{SERVER_NAME} =###REPL_WEB_FQDN###
-    # REM RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+    # SSLREM RewriteEngine on
+    # SSLREM RewriteCond %{SERVER_NAME} =###REPL_WEB_FQDN###
+    # SSLREM RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 </VirtualHost>
