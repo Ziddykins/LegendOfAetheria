@@ -442,7 +442,7 @@
             }
 
             if (!$valid_race) {
-                $race = Races::random()->name;
+                $race = Races::random_enum()->name;
                 $log->critical("Possible POST modify in race selection", ['Race' => $race, 'AID' => $account->get_id()]);
             }
             

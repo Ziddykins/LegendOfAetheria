@@ -9,13 +9,16 @@
     $monster = $character->get_monster();
     $mon_loaded = 0;
 
-    if ($monster->stats->get_hp() <= 0) {
-        $monster = null;
-    }
-
     if ($monster != null && $monster != "") {
         $mon_loaded = 1;
     }
+
+    if ($mon_loaded && $monster->stats->get_hp() <= 0) {
+        $monster = null;
+        $mon_loaded = 0;
+    }
+
+    
 
     if (isset($_POST['hunt-new-monster']) && $_POST['hunt-new-monster'] == 1) {
         check_csrf($_POST['csrf-token']);

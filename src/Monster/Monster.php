@@ -62,27 +62,32 @@ class Monster {
         global $log;
 
         $stats         = ["level", "hp", "mp", "str", "def", "int", "expAwarded", "goldAwarded"];
-        $bases         = [1.0, 10.0, 10.0, 2.0, 2.0, 2.0, 5.0, 5.0];
-        $multipliers   = [0.1,  0.5,  0.5, 0.3, 0.3, 0.3, 0.7, 0.7];
+        $bases         = [1.0, 10.0, 10.0, 2.0, 2.0, 2.0, 5.0, 5.0];  // These are additional values
+        $multipliers   = [0.1, 0.5, 0.5, 0.3, 0.3, 0.3, 0.7, 0.7];
         $std_deviation = random_float(-0.5, 0.5, 2);
 
         for ($i=0; $i<count($stats); $i++) {
-            $calculated_stat = $bases[$i] * (1 + ($player_level - 1) * $multipliers[$i]) + $std_deviation * ($player_level - 1);
-            $func = "set_{$stats[$i]}";
-
+            // Calculate the additional stat value based on player level
+            $additional_stat = $bases[$i] * (1 + ($player_level - 1) * $multipliers[$i]) + $std_deviation * ($player_level - 1);
+            
             if ($stats[$i] == "level") {
-                $monster->set_level($calculated_stat);
+                $monster->set_level($additional_stat);
                 continue;
             }
 
-            if ($calculated_stat < 0) {
-                $calculated_stat = 0;
+            if ($additional_stat < 0) {
+                $additional_stat = 0;
             }
 
-            $monster->stats->$func($calculated_stat);
- 
-
+            // Add the scaled value to existing stat instead of replacing it
+            $get_func = "get_{$stats[$i]}";
+            $set_func = "set_{$stats[$i]}";
+            $current_value = $monster->stats->$get_func();
+            $monster->stats->$set_func($current_value + $additional_stat);
         }
+
+        // Ensure maxHP is updated to match new HP if it changed
+        $monster->stats->set_maxHP($monster->stats->get_hp());
 
         return $monster;
     }

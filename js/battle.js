@@ -134,6 +134,10 @@ async function update_hud() {
         player_ep.textContent = player_stats.ep + ' / ' + player_stats.maxEP;
         monster_hp.textContent = monster_stats.hp + ' / ' + monster_stats.maxHP;
         monster_mp.textContent = monster_stats.mp + ' / ' + monster_stats.maxMP;
+
+        if (monster_hp.textContent.match(/^0/)) {
+            window.location.reload('/game?page=hunt&sub=location');
+        }
     }).catch((error) => {
         console.error(error);
     });

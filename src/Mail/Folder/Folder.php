@@ -69,7 +69,7 @@ class Folder {
             $envelope->recipient  = $row['to'];
             $envelope->subject    = $row['subject'];
             $envelope->message    = $row['message'];
-            $envelope->folder     = FolderType::name_to_value($row['folder']);
+            $envelope->folder     = FolderType::name_to_enum($row['folder']);
             $envelope->date       = $row['date'];
             $envelope->status     = $row['status'];
 
