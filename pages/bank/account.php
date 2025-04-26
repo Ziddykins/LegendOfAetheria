@@ -1,6 +1,7 @@
 <?php
     $character->bank->add_goldAmount(100);
     $character->bank->set_accountID(1);
+    
 ?>
 <div class="container">
     <div class="card shadow-sm">
@@ -45,19 +46,19 @@
                             <div class="list-group list-group-flush bg-transparent">
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
                                     <span>Interest Rate</span>
-                                    <span class="badge bg-info rounded-pill"><?php echo $character->bank->get_interestRate(); ?>%</span>
+                                    <span class="badge bg-primary rounded-pill"><?php echo $character->bank->get_interestRate(); ?>%</span>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
-                                    <span>Daily Earnings</span>
+                                    <span>Net Daily Earnings</span>
                                     <span class="badge bg-success rounded-pill"><?php echo $character->bank->get_interestRate() * $character->bank->get_goldAmount(); ?></span>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
-                                    <span>Daily Costs</span>
-                                    <span class="badge bg-warning rounded-pill"><?php echo $character->bank->get_dpr(); ?></span>
+                                    <span>Daily Percentage Rate</span>
+                                    <span class="badge bg-warning text-black rounded-pill"><?php echo $character->bank->get_dpr(); ?>.00%</span>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
                                     <span>Gross Rate</span>
-                                    <span class="badge bg-info rounded-pill"><?php echo $character->bank->get_interestRate(); ?>%</span>
+                                    <span class="badge bg-danger rounded-pill"><?php echo $character->bank->get_interestRate(); ?>%</span>
                                 </div>
                             </div>
                         </div>

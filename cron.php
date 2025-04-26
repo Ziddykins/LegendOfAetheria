@@ -53,10 +53,10 @@
         global $log;
 
         $cur_weather = get_globals('weather');
-        $new_weather = Weather::random();
+        $new_weather = Weather::random_enum();
 
         while ($new_weather === $cur_weather) {
-            $new_weather = Weather::random();
+            $new_weather = Weather::random_enum();
         }
         
         set_globals('weather', $new_weather->name);

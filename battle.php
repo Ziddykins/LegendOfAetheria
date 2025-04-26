@@ -14,6 +14,7 @@
     $monster = $character->get_monster();
     $ch_name = $character->get_name();
     $mn_name = $monster ? $monster->get_name() : '';
+    
 
     $colors = [ 'text-danger', 'text-primary' ];
     
@@ -41,6 +42,14 @@
         echo $out_msg;
     }
 
+    if ($action === 'heal') {
+        if (!validate_battle_state()) {
+            exit();
+        }
+    }
+
+        
+
     function validate_battle_state() {
         global $character, $out_msg;
 
@@ -61,6 +70,13 @@
         if (!$character->get_monster()) {
             http_response_code(401);
             $out_msg = "<span class=\"text-danger\">SYSTEM></span><span class=\"text-warning\">No Monster</span><br>\r\n\r\n";
+            echo $out_msg;
+            return false;
+        }
+
+        if ($character->get_monster()->stats->get_hp() <= 0) {
+            http_response_code(401);
+            $out_msg = "<span class=\"text-danger\">SYSTEM></span><span class=\"text-warning\">Monster is Dead</span><br>\r\n\r\n";
             echo $out_msg;
             return false;
         }
@@ -97,44 +113,97 @@
 
     function process_combat($attacker, $attackee, $roll, Turn $current) {
         global $log;
+        
+        $log->debug('Starting combat', [
+            'attacker' => $attacker->get_name(),
+            'attackee' => $attackee->get_name(),
+            'roll' => $roll,
+            'turn' => $current->name
+        ]);
 
         $attack = calculate_attack($attacker, $roll);
         $defense = calculate_defense($attackee);
         $damage = max(0, $attack - $defense);
 
+        $log->debug('Combat calculations', [
+            'base_attack' => $attack,
+            'defense' => $defense,
+            'final_damage' => $damage
+        ]);
+
         if ($roll === 100) {
+            $log->info('Critical hit!', ['damage_before_crit' => $damage]);
             handle_critical_hit($damage);
+            $log->info('After critical calculation', ['final_damage' => $damage]);
         } else if ($roll === 0) {
+            $log->info('Attack missed', ['roll' => $roll]);
             handle_miss($attacker, $attackee, $current);
         } else if ($damage <= 0) {
+            $log->info('Attack blocked', [
+                'attack' => $attack,
+                'defense' => $defense
+            ]);
             handle_block($attacker, $attackee, $current);
         } else {
+            $log->info('Regular hit', [
+                'damage' => $damage,
+                'target_remaining_hp' => $attackee->stats->get_hp()
+            ]);
             handle_hit($attacker, $attackee, $damage, $current);
         }
     }
 
     function calculate_attack($attacker, $roll) {
+        global $log;
         $base_attack = roll(1, intval($attacker->stats->get_str()));
+        $log->debug('Calculated attack', [
+            'attacker' => $attacker->get_name(),
+            'strength' => $attacker->stats->get_str(),
+            'roll_result' => $base_attack
+        ]);
         return $roll === 100 ? $base_attack * 2 : $base_attack;
     }
 
     function calculate_defense($defender) {
-        return roll(0, intval($defender->stats->get_def() * 0.8));
+        global $log;
+        $defense = roll(0, intval($defender->stats->get_def() * 0.8));
+        $log->debug('Calculated defense', [
+            'defender' => $defender->get_name(),
+            'base_defense' => $defender->stats->get_def(),
+            'modified_defense' => $defense
+        ]);
+        return $defense;
     }
 
     function handle_critical_hit(&$damage) {
+        global $log;
+        $original_damage = $damage;
         $damage *= intval(random_float(1.5, 2.0, 2));
+        $log->info('Critical hit calculation', [
+            'original_damage' => $original_damage,
+            'critical_multiplier' => ($damage / $original_damage),
+            'final_damage' => $damage
+        ]);
     }
 
     function handle_miss($attacker, $attackee, Turn $turn) {
-        global $verbs, $adverbs, $colors, $out_msg;
+        global $verbs, $adverbs, $colors, $out_msg, $log;
         
+        $log->info('Processing miss', [
+            'attacker' => $attacker->get_name(),
+            'defender' => $attackee->get_name()
+        ]);
+
         $atk_verb = $verbs[array_rand($verbs)];
         $atk_adverb = $adverbs[array_rand($adverbs)];
         $out_msg .= "<span class=\"{$colors[$turn->value]}\">{$attacker->get_name()} $atk_adverb $atk_verb {$attackee->get_name()} but misses!</span><br>";
 
-        if (roll(1, 100) > 70) { // 30% counter chance
+        if (roll(1, 100) > 70) {
             $counter_damage = roll(1, intval($attackee->stats->get_str() * 0.5));
+            $log->info('Counter attack triggered', [
+                'counter_damage' => $counter_damage,
+                'attacker' => $attackee->get_name()
+            ]);
             apply_damage($attacker, $counter_damage);
             $out_msg .= "<span class=\"{$colors[!$turn->value]}\">{$attackee->get_name()} sees an opening and counters for $counter_damage damage!</span><br>";
             check_alive($attacker, $turn);
@@ -166,7 +235,17 @@
     }
 
     function apply_damage($target, $damage) {
+        global $log;
+        $before_hp = $target->stats->get_hp();
         $target->stats->sub_hp($damage);
+        $after_hp = $target->stats->get_hp();
+        
+        $log->debug('Damage applied', [
+            'target' => $target->get_name(),
+            'damage' => $damage,
+            'hp_before' => $before_hp,
+            'hp_after' => $after_hp
+        ]);
     }
 
     function check_alive($target, Turn $turn): void {
