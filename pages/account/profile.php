@@ -24,7 +24,7 @@
         }
     }
 ?>                 
-            <div class="container-lg">
+            <div class="container">
                 <div class="row">
                     <div class="col-6 p-4 rounded" style="background-color: rgba(5,5,5,.3);">
                         <div class="mb-3 row">

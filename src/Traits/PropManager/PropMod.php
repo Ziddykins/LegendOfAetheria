@@ -22,11 +22,13 @@ trait PropMod {
             $max_value    = null;
             $str_max_prop = null;
 
-            if ($this->$prop) {
+            if (property_exists($this, $prop)) {
                 $cur_value = $this->$prop ?? 0;
+                
+                // Handle max values for HP, MP, EP
                 if (in_array($prop, ['hp', 'mp', 'ep'])) {
                     $str_max_prop = "max" . strtoupper($prop);
-                    $max_value = $this->$str_max_prop ?? PHP_INT_MAX; 
+                    $max_value = $this->$str_max_prop ?? PHP_INT_MAX;
                 }
             
                 if (is_numeric($cur_value)) {
@@ -49,7 +51,7 @@ trait PropMod {
                             $new_value /= $params[0];
                             break;
                         case 'exp':
-                            $new_value **= $params[0];
+                            $new_value = pow($new_value, $params[0]);
                             break;
                         case 'mod':
                             if ($params[0] == 0) {
@@ -61,18 +63,22 @@ trait PropMod {
                             throw new Exception('Unknown PropMod action');
                     }
 
-                    $new_value = min($new_value, $max_value);
+                    // Enforce bounds
+                    if ($max_value !== null) {
+                        $new_value = min($new_value, $max_value);
+                    }
                     $new_value = max($new_value, 0);
                         
+                    // Update the value and force sync
                     $prop_str = "set_$prop";
-                    $this->$prop_str($new_value);
+                    $this->$prop_str($new_value, true);
                 } else {
-                    print_r($this);
                     throw new Exception("Current value '$cur_value' is not numeric!");
                 }
             } else {
-                $this->$prop = $params[0];
-                return;
+                if (isset($params[0])) {
+                    $this->$prop = $params[0];
+                }
             }
         }
     }

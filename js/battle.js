@@ -12,6 +12,43 @@ document.querySelectorAll("ul[id$='drop-menu']").forEach((menu) => {
     });
 });
 
+function animateAttack(type) {
+    const monsterImg = document.querySelector('#monster-stats img');
+    const playerImg = document.querySelector('.col.pt-3.lh-1.text-center img');
+    
+    // Remove any existing animation classes
+    monsterImg.classList.remove('shake-anim', 'damage-anim', 'spellcast-anim', 'spell-burn', 'spell-frost', 'spell-heal');
+    playerImg.classList.remove('bounce-anim', 'spellcast-anim');
+    
+    if (type.toLowerCase().includes('attack')) {
+        playerImg.classList.add('bounce-anim');
+        setTimeout(() => monsterImg.classList.add('shake-anim'), 250);
+        setTimeout(() => monsterImg.classList.add('damage-anim'), 300);
+    } else if (type.toLowerCase() === 'burn') {
+        playerImg.classList.add('spellcast-anim');
+        setTimeout(() => {
+            monsterImg.classList.add('spell-burn', 'damage-anim');
+        }, 400);
+    } else if (type.toLowerCase() === 'frost') {
+        playerImg.classList.add('spellcast-anim');
+        setTimeout(() => {
+            monsterImg.classList.add('spell-frost', 'damage-anim');
+        }, 400);
+    } else if (type.toLowerCase() === 'heal') {
+        playerImg.classList.add('spellcast-anim', 'spell-heal');
+    }
+}
+
+function animateStatChange(element, isIncrease) {
+    element.classList.remove('flash-anim');
+    element.style.color = isIncrease ? '#28a745' : '#dc3545';
+    element.classList.add('flash-anim');
+    setTimeout(() => {
+        element.style.color = '';
+        element.classList.remove('flash-anim');
+    }, 1000);
+}
+
 document.querySelectorAll("button[id^='hunt']").forEach(async (btn) => {
     let which = btn.id.split("-")[1];
 
@@ -30,6 +67,9 @@ document.querySelectorAll("button[id^='hunt']").forEach(async (btn) => {
             battle_log.innerHTML = "";
         }
 
+        // Trigger attack animation
+        animateAttack(atk_type);
+
         fetch('/battle', {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -38,7 +78,6 @@ document.querySelectorAll("button[id^='hunt']").forEach(async (btn) => {
             method: 'POST',
             body: `action=${which}&type=${atk_type}&csrf-token=${csrf_token}`
         }).then((response) => response.text()).then(async(data) => {
-            console.log(`got data: ${data}`);
             battle_log.insertAdjacentHTML('afterbegin', data);
             await update_hud();
         }).catch((error) => {
@@ -81,6 +120,14 @@ async function update_hud() {
         let player_ep = document.getElementById("player-ep");
         let monster_hp = document.getElementById("monster-hp");
         let monster_mp = document.getElementById("monster-mp");
+
+        // Animate stat changes
+        if (player_stats.hp !== parseInt(player_hp.textContent)) {
+            animateStatChange(player_hp, player_stats.hp > parseInt(player_hp.textContent));
+        }
+        if (monster_stats.hp !== parseInt(monster_hp.textContent)) {
+            animateStatChange(monster_hp, monster_stats.hp > parseInt(monster_hp.textContent));
+        }
 
         player_hp.textContent = player_stats.hp + ' / ' + player_stats.maxHP;
         player_mp.textContent = player_stats.mp + ' / ' + player_stats.maxMP;

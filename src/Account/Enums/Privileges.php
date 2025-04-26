@@ -1,33 +1,8 @@
 <?php
 namespace Game\Account\Enums;
-
+use Game\Traits\EnumExtender\EnumExtender;
 enum Privileges: int {
-    public static function name_to_value(string $name): string {
-        foreach (self::cases() as $privilege) {
-            if ($name === $privilege->name){
-                return $privilege->value;
-            }
-        }
-        throw new \ValueError("$name is not a valid backing value for enum " . self::class);
-    }
-    
-    public static function name_to_enum(string $name) {
-        foreach (self::cases() as $privilege) {
-            if ($name === $privilege->name){
-                return $privilege;
-            }
-        }
-        throw new \ValueError("$name is not a valid backing value for enum " . self::class);
-    }
-
-    public static function value_to_enum(int $value): Privileges {
-        foreach (self::cases() as $privilege) {
-            if ($value == $privilege->value) {
-                return $privilege;
-            }
-        }
-        return Privileges::UNREGISTERED;
-    }
+    use EnumExtender;
 
     case BANNED = 1;
     case MUTED = 2;

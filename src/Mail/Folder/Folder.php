@@ -80,15 +80,23 @@ class Folder {
     public function getFolderHTML(bool $pagination=false, int $per_page=10) {
         $html = null;
         $box_count = $this->getMessageCount();
-        $html = '<nav aria-label="Inbox">
-                    <ul class="pagination">
-                        <li class="page-item disabled">
-                            <a class="page-link">Previous</a>
-                        </li>';
+        $disabled = 'disabled';
         
-        if ($box_count && $box_count / 10 >= 1) {
-        $html .= '<li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item active" aria-current="page">
+        $html = '<nav aria-label="Inbox">
+                    <ul class="pagination">';
+        
+        if ($box_count / $per_page >= 0) {
+            $disabled = '';
+        }
+        
+        $html .= '<li class="page-item ' . $disabled . '">
+                    <a class="page-link">Previous</a>
+                  </li>';
+        
+        $html .= '<li class="page-item">
+                      <a class="page-link active" href="#">1</a>
+                  </li>
+                            <li class="page-item" aria-current="page">
                             <a class="page-link" href="#">2</a>
                         </li>
                         <li class="page-item"><a class="page-link" href="#">3</a></li>
@@ -133,7 +141,6 @@ class Folder {
             $html .= '        <small id="env-frag-' . $i . '" class="col text-truncate">' . $msg_frag . '</small>';
             $html .= '   </a>';
             $html .= '</div>';
-            $html .= '';
         }
 
         return $html;

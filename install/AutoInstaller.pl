@@ -38,6 +38,7 @@ if ($opt_step && $opt_step =~ /[a-z]/i) {
 $| = 1;
 
 use constant {
+    PAD       => 0,
     FIRSTRUN  => 1,
     SOFTWARE  => 2,
     PHP       => 3,
@@ -123,7 +124,7 @@ populate_hashdata();
 get_sysinfo();
 
 if (!$opt_step) {
-    step_firstrun();    
+    step_firstrun();
 } else {
     %cfg = %{$ini{$opt_fqdn}};
     $cfg{step} = $opt_step;
@@ -518,7 +519,7 @@ sub step_vhost_ssl {
     print "    - Current SSL certificate set -\n"
         . "Certificate: $cfg{ssl_fullcer}\n"
         . "Private Key: $cfg{ssl_privkey}\n\n";
-    
+
     while ($answer !~ /^[34560]$/) {
         if ($answer eq 'S') {
             if ($cfg{redir_status}) {
@@ -540,7 +541,7 @@ sub step_vhost_ssl {
             . "0. Exit\n\n";
         $answer = int(ask_user('Choice', '', 'input'));
     }
-        
+
 
     if ($answer == 1) {
         my $gen_output = `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/$cfg{fqdn}.key -out /etc/ssl/certs/$cfg{fqdn}.crt -subj '/CN=$cfg{fqdn}/O=$cfg{fqdn}/C=ZA' -batch`;
@@ -570,7 +571,7 @@ sub step_vhost_ssl {
     } elsif ($answer == 3) {
         print "Certbot.sh will run at the end of the script...";
         $cfg{run_certbot} = 1;
-    
+
     } else {
         print "invalid option\n";
     }
@@ -1412,7 +1413,7 @@ sub get_sysinfo {
 
 sub populate_hashdata {
     my $step = $_[0];
-    
+
     if ($^O eq 'linux') {
         %def = %{$ini{lin_examples}};
     } else {
@@ -1421,7 +1422,7 @@ sub populate_hashdata {
 
     merge_hashes(\%cfg, \%def);
     merge_hashes(\%cfg, \%glb);
-    
+
     $cfg{template_dir} = $cfg{web_root} . '/install/templates';
     $cfg{scripts_dir}  = $cfg{web_root} . '/install/scripts';
     $cfg{setup_log}    = $cfg{web_root} . '/install/setup.log';

@@ -44,6 +44,8 @@
     function do_daily() {
         global $log;
         revive_all_players();
+        calculate_bank_interests();
+
         $log->info("Daily cron tick: " . time());
     }
     
@@ -140,5 +142,18 @@
             $temp_acct = new Account($account['email']);
             $temp_acct->set_sessionID(null);
             $log->info("Session Expire", ['Account' => $temp_acct->get_email(), 'Session ID' => $account['session_id']]);
+        }
+    }
+
+    function calculate_bank_interests(): void {
+        global $db, $log, $t;
+
+        $sql_query = "SELECT `interest_rate`, `gold_amount`, `loan`, `dpr` FROM {$t['bank']} WHERE (interest_rate > 0 AND gold_amount > 0) OR (loan > 0 AND dpr > 0)";
+        $results = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
+
+        foreach ($results as $result) {
+            $interest_added = $result['gold_amount'] * $result['interest_rate'];
+            $sql_query = "UPDATE {$t['bank']} SET gold_amount += $interest_added WHERE `character_id` = ?";
+            $db->execute_query($sql_query, [ $result['character_id'] ]);
         }
     }

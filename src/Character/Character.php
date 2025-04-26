@@ -1,7 +1,5 @@
 <?php
 namespace Game\Character;
-use Game\Inventory\Inventory;
-use Game\Monster\Monster;
 use Game\Traits\PropManager\Enums\PropType;
 use Game\Traits\PropManager\PropManager;
 
@@ -19,6 +17,7 @@ class Character {
     private $location = 'The Shrine';
     private $alignment = 0;
     private $gold = 1000;
+    private $spindels = 0;
     private $exp = 0;
 
     private $floor = 1;
@@ -35,6 +34,9 @@ class Character {
 
     /* class Inventory */
     public $inventory;
+
+    /* class Bank */
+    public $bank;
 
     public function __construct($accountID, $characterID = null) {
         $this->accountID = $accountID;

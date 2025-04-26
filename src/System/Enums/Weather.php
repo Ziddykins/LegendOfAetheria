@@ -1,21 +1,9 @@
 <?php
 namespace Game\System\Enums;
+use Game\Traits\EnumExtender\EnumExtender;
 
 enum Weather {
-    public static function random(): self {
-        $count = count(self::cases()) - 1;
-        return self::cases()[mt_rand(0, $count)];
-    }
-
-    public static function name_to_value(string $name): string {
-        foreach (self::cases() as $weather) {
-            if ($name === $weather->name){
-                return $weather->value;
-            }
-        }
-        throw new \ValueError("$name is not a valid backing value for enum " . self::class);
-    }
-
+    use EnumExtender;
     public function icon(): string {
         return match($this) {
             Weather::CLOUDY =>  '<span class="text-info-emphasis"><i class="bi bi-cloud-fill p-2"></i>',

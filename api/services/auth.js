@@ -11,7 +11,7 @@ module.exports = {
         try {
             // Generate secret first
             const secret = randomBytes(64).toString('hex');
-            
+
             // Create connection
             con = mysql.createConnection({
                 host: process.env.SQLHOST,
@@ -30,8 +30,8 @@ module.exports = {
 
             // Get user data
             const results = await new Promise((resolve, reject) => {
-                con.query("SELECT * FROM tbl_accounts WHERE `email` = ?", 
-                    [options.email], 
+                con.query("SELECT * FROM tbl_accounts WHERE `email` = ?",
+                    [options.email],
                     (err, results) => {
                         if (err) reject(err);
                         resolve(results);
@@ -46,7 +46,7 @@ module.exports = {
 
             // Fix bcrypt hash issue with 2y->2b
             const pw = results[0].password.replace('2y', '2b');
-            
+
             // Compare password
             const passwordMatch = await bcrypt.compare(options.password, pw);
             if (!passwordMatch) {
@@ -87,7 +87,7 @@ module.exports = {
         } finally {
             if (con) {
                 con.end();
-            }            console.log("Woooooooo pass");
+            } console.log("Woooooooo pass");
         }
     }
 };
