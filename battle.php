@@ -102,13 +102,6 @@
         $defense = calculate_defense($attackee);
         $damage = max(0, $attack - $defense);
 
-        $log->debug("Combat calcs", [
-            'attack' => $attack,
-            'defense' => $defense,
-            'damage' => $damage,
-            'turn' => $current->name
-        ]);
-
         if ($roll === 100) {
             handle_critical_hit($damage);
         } else if ($roll === 0) {
@@ -144,7 +137,7 @@
             $counter_damage = roll(1, intval($attackee->stats->get_str() * 0.5));
             apply_damage($attacker, $counter_damage);
             $out_msg .= "<span class=\"{$colors[!$turn->value]}\">{$attackee->get_name()} sees an opening and counters for $counter_damage damage!</span><br>";
-            check_alive($attacker, Turn::value_to_enum(!$turn->value));
+            check_alive($attacker, $turn);
         }
     }
 
@@ -153,7 +146,6 @@
 
         $parry_chance = roll(1, 100);
         if ($parry_chance > 70) { // 30% parry chance
-            $turn = Turn::value_to_enum(!$turn->value);
             $parry_dmg = roll(1, intval($attackee->stats->get_str() * 0.25));
             apply_damage($attacker, $parry_dmg);
             $out_msg .= "<span class=\"{$colors[$turn->value]}\">{$attackee->get_name()} parries {$attacker->get_name()}'s attack and deals $parry_dmg damage!</span><br>";
