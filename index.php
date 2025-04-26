@@ -1,6 +1,7 @@
 <?php
     require_once 'bootstrap.php';
 
+    use Game\Bank\BankManager;
     use Game\System\Enums\AbuseType;
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;

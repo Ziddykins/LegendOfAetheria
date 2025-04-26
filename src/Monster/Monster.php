@@ -16,8 +16,6 @@ class Monster {
     private string $seed;
     private int $summondBy; // Global or Zone monsters
     private int $dropLevel = 1;
-    private int $expAwarded;
-    private int $goldAwarded;
     private string $monsterClass;
     
     public $stats;
@@ -60,30 +58,38 @@ class Monster {
         $this->seed  = bin2hex(random_bytes(8));
     }
 
-    private function scale_monster(Monster $monster, int $player_lvl): Monster {
+    private function scale_monster(Monster $monster, int $player_level): Monster {
         global $log;
 
-        $stats   = ["level", "hp", "mp", "str", "def", "int", "expAwarded", "goldAwarded"];
-        $bases   = [1.0, 10.0, 10.0, 2.0, 2.0, 2.0, 5.0, 5.0];
-        $multi   = [0.1,  0.5,  0.5, 0.3, 0.3, 0.3, 0.7, 0.7];
-        $st_dv   = random_float(-0.5, 0.5, 2);
+        $stats         = ["level", "hp", "mp", "str", "def", "int", "expAwarded", "goldAwarded"];
+        $bases         = [1.0, 10.0, 10.0, 2.0, 2.0, 2.0, 5.0, 5.0];
+        $multipliers   = [0.1,  0.5,  0.5, 0.3, 0.3, 0.3, 0.7, 0.7];
+        $std_deviation = random_float(-0.5, 0.5, 2);
 
         for ($i=0; $i<count($stats); $i++) {
-            $calculated_stat = $bases[$i] * (1 + ($player_lvl - 1) * $multi[$i]) + $st_dv * ($player_lvl - 1);
+            $calculated_stat = $bases[$i] * (1 + ($player_level - 1) * $multipliers[$i]) + $std_deviation * ($player_level - 1);
             $func = "set_{$stats[$i]}";
+
+            if ($stats[$i] == "level") {
+                $monster->set_level($calculated_stat);
+                continue;
+            }
+
+            if ($calculated_stat < 0) {
+                $calculated_stat = 0;
+            }
+
             $monster->stats->$func($calculated_stat);
+ 
+
         }
-
-
-        $monster->stats->set_hp($monster->get_maxHP());
-        $monster->stats->set_mp($monster->get_maxMP());
 
         return $monster;
     }
 
 
 
-    public function random_monster(): void{
+    public function random_monster($player_level): void{
         global $system;
         $monster = $system->monsters[random_int(0, count($system->monsters) - 1)];
         $temp_stats_arr = explode(',', $monster);
@@ -106,5 +112,7 @@ class Monster {
         $this->monsterClass($temp_stats_arr[11]);
 
         $this->stats = $stats;
+
+        $this->scale_monster($this, $player_level);
     }
 }

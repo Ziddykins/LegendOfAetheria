@@ -32,6 +32,7 @@
     $t['banned']     = $_ENV['SQL_BANS_TBL'];
     $t['monsters']   = $_ENV['SQL_MNST_TBL'];
     $t['statistics'] = $_ENV['SQL_STAT_TBL'];
+    $t['bank']       = $_ENV['SQL_BANK_TBL'];
 
 
     if ($_SERVER['SCRIPT_NAME'] !== '/index.php' && $_SERVER['SCRIPT_NAME'] !== '/cron.php') {

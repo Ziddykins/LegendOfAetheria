@@ -6,7 +6,21 @@ module.exports = {
   */
   getAccountAccountID: async (options) => {
     let sql = "SELECT * FROM tbl_accounts WHERE `email` = ?";
-        
+        // Create connection
+    con = mysql.createConnection({
+        host: process.env.SQLHOST,
+        user: process.env.SQLUSER,
+        password: process.env.SQLPASS,
+        database: process.env.SQLDB
+    });
+
+    // Promisify connection
+    await new Promise((resolve, reject) => {
+        con.connect(err => {
+            if (err) reject(err);
+            resolve();
+        });
+    });
     con.query(sql, [email], (err, results, fields) => {
 
     });

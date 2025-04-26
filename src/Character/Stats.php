@@ -22,23 +22,18 @@ class Stats {
     private int $maxExp = 100;
     private int $ap     = 0;
 
-    /* Enum CharacterStatus, constants.php */
-    //private CharacterStatus $status;
-    
-    public function __construct ($characterID = 0) {
+    public function __construct($characterID = 0) {
         $this->id = $characterID;
+    }
 
-    }    public function __call($method, $params) {
-        global $db, $log;
+    public function __call($method, $params) {
+        global $db;
 
-        /* If it's a get, this is true */
         if (!count($params)) {
             $params = null;
         }
 
-        /* Avoid loops with propSync triggering itself */
         if ($method == 'propSync' || $method == 'propMod') {
-            $log->debug("$method loop");
             return;
         }
 

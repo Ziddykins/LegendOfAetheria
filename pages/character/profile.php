@@ -5,7 +5,7 @@
     }
 ?>
 
-                        <div class="container-lg">
+                        <div class="container">
                             <div class="row">
                                 <div class="col p-4 rounded" style="background-color: rgba(5,5,5,.3);">
                                     <div class="mb-3 row">
@@ -44,5 +44,5 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+
                     <script src="js/profile.js"></script>

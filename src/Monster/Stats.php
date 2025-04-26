@@ -18,21 +18,28 @@ class Stats {
     private int $int    = 10;
     private int $def    = 10;
     private int $luk    = 3;
+    private float $expAwarded = 0;
+    private float $goldAwarded = 0;
 
-    public function __construct ($monsterID = 0) {
+    public function __construct($monsterID = 0) {
         $this->id = $monsterID;
-
     }
+
     public function __call($method, $params) {
+        global $db;
+
+        if (!count($params)) {
+            $params = null;
+        }
+
         if ($method == 'propSync' || $method == 'propMod') {
             return;
         }
 
-        switch ($method) {
-            case 'propSync':
-                return $this->propSync($method, $params, PropType::MSTATS);
-            case 'propMod':
-                return $this->propMod($method, $params);
+        if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
+            return $this->propMod($method, $params);
+        } else {
+            return $this->propSync($method, $params, PropType::MSTATS);
         }
     }
 

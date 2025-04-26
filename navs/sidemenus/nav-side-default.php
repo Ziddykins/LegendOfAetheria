@@ -265,23 +265,9 @@ $currentSub = $_GET['sub'] ?? '';
                             
                             <ul id="bank-list" class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/game?page=loans&sub=bank" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'loans' && $currentSub === 'bank') ? 'active' : ''; ?>">
+                                    <a href="/game?page=account&sub=bank" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'account' && $currentSub === 'bank') ? 'active' : ''; ?>">
                                         <i class="nav-icon material-symbols-outlined">clinical_notes</i>
                                         <p class="ms-2">Account</p>
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a href="/game?page=deposit&sub=bank" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'deposit' && $currentSub === 'bank') ? 'active' : ''; ?>">
-                                        <i class="nav-icon material-symbols-outlined">attach_money</i>
-                                        <p class="ms-2">Depost</p>
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a href="/game?page=withdrawal&sub=bank" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'withdrawal' && $currentSub === 'bank') ? 'active' : ''; ?>">
-                                        <i class="nav-icon material-symbols-outlined">paid</i>
-                                        <p class="ms-2">Withdrawal</p>
                                     </a>
                                 </li>
 

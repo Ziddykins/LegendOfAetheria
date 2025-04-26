@@ -1,11 +1,8 @@
 <?php
 namespace Game\Character\Enums;
+use Game\Traits\EnumExtender\EnumExtender;
 enum Races {
-    public static function random(): self {
-        $count = count(self::cases()) - 1;
-        return self::cases()[rand(0, $count)];
-    }
-    
+    use EnumExtender;   
     case Angel;
     case Demon;
     case Dwarf;

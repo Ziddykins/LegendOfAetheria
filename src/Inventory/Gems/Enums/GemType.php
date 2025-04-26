@@ -1,8 +1,10 @@
 <?php
 
 namespace Game\Inventory\Gems\Enums;
+use Game\Traits\EnumExtender\EnumExtender;
 
 enum GemType {
+    use EnumExtender;
     // Red gems
     case RUBY;
     case GARNET;

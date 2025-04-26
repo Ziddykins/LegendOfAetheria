@@ -11,148 +11,197 @@
 
     $account = new Account($_SESSION['email']);
     $character = new Character($account->get_id(), $_SESSION['character-id']);
-    $character->stats->set_str(1000);
-    $character->stats->set_hp(10000);
     $monster = $character->get_monster();
     $ch_name = $character->get_name();
-    $mn_name = $monster->get_name();
+    $mn_name = $monster ? $monster->get_name() : '';
 
     $colors = [ 'text-danger', 'text-primary' ];
+    
+    if (!check_session()) {
+        http_response_code(401);
+        exit("Not logged in");
+    }
 
-    if (check_session() === true) {
-        if (isset($_POST['action'])) {
-            $action = $_POST['action'];
-            $out_msg = null;
+    if (!isset($_POST['action'])) {
+        http_response_code(400);
+        exit("No action specified");
+    }
 
-            if ($action === 'attack') {
-                if ($character->stats->get_ep() > 0) {
-                    if ($character->stats->get_hp() > 0) {
-                        if ($character->get_monster()) {
-                            $roll = roll(1, 100);
+    $action = $_POST['action'];
+    $out_msg = '';
 
-                            if ($roll > 50) {
-                                $out_msg = '<div class="small text-warning"><-}====[ <span class="text-primary">Player</span> Turn ]====={-></div><br>';
-                                do_turn(Turn::PLAYER);
-                                echo $out_msg;
-                            } else {
-                                $out_msg = '<div class="small text-warning"><-}====[ <span class="text-danger">Enemy</span> Turn ]====={-></div><br>';
-                                do_turn(Turn::ENEMY);
-                                echo $out_msg;
-                            }
-                            $character->stats->sub_ep(1);
-                            
-                            return true;
-                        }
-                    } else {
-                        http_response_code(401);
-                        echo "<span class=\"text-danger\">SYSTEM></span><span class=\"text-warning\">No HP Left</span><br>\r\n\r\n";
-                        return false;
-                    }
-                } else {
-                    http_response_code(401);
-                    echo "<span class=\"text-danger\">SYSTEM></span><span class=\"text-warning\">No EP Left</span><br>\r\n\r\n";
-                    return false;
-                }
-            }
+    if ($action === 'attack') {
+        if (!validate_battle_state()) {
+            exit();
         }
+
+        $turn = determine_turn();
+        $out_msg = format_turn_header($turn);
+        do_turn($turn);
+        echo $out_msg;
+    }
+
+    function validate_battle_state() {
+        global $character, $out_msg;
+
+        if ($character->stats->get_ep() <= 0) {
+            http_response_code(401);
+            $out_msg = "<span class=\"text-danger\">SYSTEM></span><span class=\"text-warning\">No EP Left</span><br>\r\n\r\n";
+            echo $out_msg;
+            return false;
+        }
+
+        if ($character->stats->get_hp() <= 0) {
+            http_response_code(401);
+            $out_msg = "<span class=\"text-danger\">SYSTEM></span><span class=\"text-warning\">No HP Left</span><br>\r\n\r\n";
+            echo $out_msg;
+            return false;
+        }
+
+        if (!$character->get_monster()) {
+            http_response_code(401);
+            $out_msg = "<span class=\"text-danger\">SYSTEM></span><span class=\"text-warning\">No Monster</span><br>\r\n\r\n";
+            echo $out_msg;
+            return false;
+        }
+
+        $character->stats->sub_ep(1);
+        return true;
+    }
+
+    function determine_turn() {
+        return roll(1, 100) > 50 ? Turn::PLAYER : Turn::ENEMY;
+    }
+
+    function format_turn_header(Turn $turn) {
+        $turn_name = $turn == Turn::PLAYER ? 'Player' : 'Enemy';
+        $turn_color = $turn == Turn::PLAYER ? 'text-primary' : 'text-danger';
+        return "<div class=\"small text-warning\"><-}====[ <span class=\"$turn_color\">$turn_name</span> Turn ]====={-></div><br>";
     }
 
     function do_turn(Turn $current): void {
         global $monster, $character, $log;
 
-        [ $attacker, $attackee ] = [ $character, $monster ];
+        [$attacker, $attackee] = $current == Turn::ENEMY ? 
+            [$monster, $character] : 
+            [$character, $monster];
+
         $roll = roll(1, 100);
-        [ $attack, $defense, $damage ] = [ null, null, null ];
+        process_combat($attacker, $attackee, $roll, $current);
 
-        if ($current == Turn::ENEMY) {
-            [ $attacker, $attackee ] = [ $monster, $character ];
-        }
-
-        $attack  = roll(0, $attacker->stats->get_str());
-        $defense = roll(0, $attackee->stats->get_def());
-        $damage  = $attack - $defense;
-
-        $log->debug("Attack: $attack, Defense: $defense, Damage: $damage (" . $current->name . ")");
-
-        // critr
-        if ($roll === 100) {
-            $damage *= intval(random_float(0.1, 1.5, 2));
-            $log->debug("Critical Hit! Damage: $damage (" . $current->name . ")");
-        }
-            
-        // miss
-        if ($roll === 0) {
-            $log->debug("Missed Attack! (" . $current->name . ")");
-            attack_missed($attacker, $attackee, roll(0,1), $current);
-        }
-
-        // block
-        if ($damage <= 0) {
-            $parry = roll(1,300) >= 150 ? 1 : 0;
-            attack_blocked($attacker, $attackee, $parry, $current);
-        } else {
-            attack_success($attacker, $attackee, $damage, $current);
-        }
-
+        // Always persist state after combat
         if ($current == Turn::PLAYER) {
             $character->set_monster($monster);
         }
     }
 
-    function attack_missed($attacker, $attackee, $offguard, $turn) {
-        global $mn_name, $ch_name, $monster, $character, $verbs, $adverbs, $turn, $colors, $out_msg;
+    function process_combat($attacker, $attackee, $roll, Turn $current) {
+        global $log;
+
+        $attack = calculate_attack($attacker, $roll);
+        $defense = calculate_defense($attackee);
+        $damage = max(0, $attack - $defense);
+
+        $log->debug("Combat calcs", [
+            'attack' => $attack,
+            'defense' => $defense,
+            'damage' => $damage,
+            'turn' => $current->name
+        ]);
+
+        if ($roll === 100) {
+            handle_critical_hit($damage);
+        } else if ($roll === 0) {
+            handle_miss($attacker, $attackee, $current);
+        } else if ($damage <= 0) {
+            handle_block($attacker, $attackee, $current);
+        } else {
+            handle_hit($attacker, $attackee, $damage, $current);
+        }
+    }
+
+    function calculate_attack($attacker, $roll) {
+        $base_attack = roll(1, intval($attacker->stats->get_str()));
+        return $roll === 100 ? $base_attack * 2 : $base_attack;
+    }
+
+    function calculate_defense($defender) {
+        return roll(0, intval($defender->stats->get_def() * 0.8));
+    }
+
+    function handle_critical_hit(&$damage) {
+        $damage *= intval(random_float(1.5, 2.0, 2));
+    }
+
+    function handle_miss($attacker, $attackee, Turn $turn) {
+        global $verbs, $adverbs, $colors, $out_msg;
+        
         $atk_verb = $verbs[array_rand($verbs)];
         $atk_adverb = $adverbs[array_rand($adverbs)];
-        $out_msg .= "<span class=\"{$colors[0]}\">{$attacker->get_name()} $atk_adverb $atk_verb {$attackee->get_name()} but misses!</span><br>";
+        $out_msg .= "<span class=\"{$colors[$turn->value]}\">{$attacker->get_name()} $atk_adverb $atk_verb {$attackee->get_name()} but misses!</span><br>";
 
-        if ($offguard) {
-            $attack = roll(0, intval($attackee->stats->get_str() / 2));
-            $attacker->stats->sub_hp($attack);
-            $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$attackee->get_name()} sees an opportunity to strike the {$attacker->get_name()} and with a carefully timed blow, lands a hit for $attack damage! ({$attackee->stats->get_hp()} left)</span><br>";
+        if (roll(1, 100) > 70) { // 30% counter chance
+            $counter_damage = roll(1, intval($attackee->stats->get_str() * 0.5));
+            apply_damage($attacker, $counter_damage);
+            $out_msg .= "<span class=\"{$colors[!$turn->value]}\">{$attackee->get_name()} sees an opening and counters for $counter_damage damage!</span><br>";
+            check_alive($attacker, Turn::value_to_enum(!$turn->value));
+        }
+    }
+
+    function handle_block($attacker, $attackee, Turn $turn) {
+        global $colors, $verbs, $out_msg;
+
+        $parry_chance = roll(1, 100);
+        if ($parry_chance > 70) { // 30% parry chance
+            $turn = Turn::value_to_enum(!$turn->value);
+            $parry_dmg = roll(1, intval($attackee->stats->get_str() * 0.25));
+            apply_damage($attacker, $parry_dmg);
+            $out_msg .= "<span class=\"{$colors[$turn->value]}\">{$attackee->get_name()} parries {$attacker->get_name()}'s attack and deals $parry_dmg damage!</span><br>";
+            check_alive($attacker, $turn);
+        } else {
+            apply_damage($attackee, 1);
+            $out_msg .= "<span class=\"{$colors[$turn->value]}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} but {$attackee->get_name()} blocks most of it!</span><br>";
             check_alive($attackee, $turn);
         }
     }
 
-    function attack_success($attacker, $attackee, $damage, $turn){
+    function handle_hit($attacker, $attackee, $damage, Turn $turn) {
         global $colors, $verbs, $out_msg;
-
-        $attackee->stats->sub_hp($damage);
-        $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} for $damage damage! ({$attackee->stats->get_hp()} left)</span><br>";
+        
+        apply_damage($attackee, $damage);
+        $out_msg .= "<span class=\"{$colors[$turn->value]}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} for $damage damage! ({$attackee->stats->get_hp()} HP left)</span><br>";
         check_alive($attackee, $turn);
     }
 
-    function attack_blocked($attacker, $attackee, $parry, $turn) {
-        global $colors, $verbs, $out_msg;
-
-        if ($parry) {
-            $parry_dmg = roll(1, $attackee->stats->get_str() / 4);
-            $attacker->stats->sub_hp($parry_dmg);
-            $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$attackee->get_name()} parries {$attacker->get_name()}'s attack and deals $parry_dmg damage!</span><br>";
-            check_alive($attackee, $turn);
-        } else {
-            $attackee->stats->sub_hp(1);
-            $out_msg .= "<span class=\"{$colors[$turn->value]}\">{$attacker->get_name()} {$verbs[array_rand($verbs)]} {$attackee->get_name()} but {$attackee->get_name()} blocks it!</span><br>";
-            check_alive($attackee, $turn);
-        }
+    function apply_damage($target, $damage) {
+        $target->stats->sub_hp($damage);
     }
 
-    function check_alive(&$target, $turn): void {
-        global $out_msg, $colors;
+    function check_alive($target, Turn $turn): void {
+        global $out_msg, $colors, $character;
 
         if ($target->stats->get_hp() <= 0) {
-            $out_msg .= "<span class=\"{$colors[$turn->value]}}\">{$target->get_name()} has been killed!</span><br>";
+            $out_msg .= "<span class=\"{$colors[$turn->value]}\">{$target->get_name()} has been defeated!</span><br>";
         
             if ($turn == Turn::PLAYER) {    
-                $target->set_monster(null);
-                reward_player($target);
+                reward_player();
             }
+
+            $character->set_monster(null);
         }
     }
 
     function reward_player() {
-        global $character, $monster;
-        
+        global $character, $monster, $out_msg;
 
+        $exp_gained = $monster->get_expAwarded();
+        $gold_gained = $monster->get_goldAwarded();
+
+        $character->add_experience($exp_gained);
+        $character->add_gold($gold_gained);
+        $character->set_monster(null);
+
+        $out_msg .= "<span class=\"text-success\">Victory! You gained $exp_gained experience and $gold_gained gold!</span><br>";
     }
 
     function roll($min, $max): int {

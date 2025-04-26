@@ -9,6 +9,10 @@
     $monster = $character->get_monster();
     $mon_loaded = 0;
 
+    if ($monster->stats->get_hp() <= 0) {
+        $monster = null;
+    }
+
     if ($monster != null && $monster != "") {
         $mon_loaded = 1;
     }
@@ -20,7 +24,7 @@
             
             $monster->new();
             $monster->load(MonsterScope::PERSONAL);
-            $monster->random_monster();
+            $monster->random_monster($character->get_level());
             $character->set_monster($monster);
             $mon_loaded = 1;
         }
@@ -48,6 +52,7 @@
         $mon_avatar = '/img/enemies/' . str_replace(' ', '', $monster->get_name()) . '.png';
     }
 ?>
+    <link rel="stylesheet" href="/css/battle-animations.css">
     <div class="d-flex pt-3">
         <div class="container border border-1">
             <div class="row">
@@ -56,7 +61,7 @@
                         <?php echo $monster->get_name(); ?>
                         <?php echo '<br><hr>'; ?>
                         <div class="d-flex justify-content-evenly">
-                            <img class="rounded-circle me-2" src="/img/enemies/<?php echo str_replace(' ', '', $monster->get_name()) . '.png';?>" width="150" height="150" />
+                            <img class="rounded-circle me-2" src="/img/enemies/<?php echo str_replace(' ', '', $monster->get_name()) . '.png';?>" width="150" height="150" data-entity="monster" />
 
                             <div class="d-grid align-items-start">
                                 <span class="d-grid align-items-center small mb-3">
@@ -130,9 +135,9 @@
                             </button>
                         
                             <ul id="attack-drop-menu" class="dropdown-menu">
-                                <li class="dropdown-item" data-loa-atk="1">Attack</li>
-                                <li class="dropdown-item" data-loa-atk="2">Heavy</li>
-                                <li class="dropdown-item" data-loa-atk="3">Special</li>
+                                <li class="dropdown-item" data-loa-atk="1" data-attack-type="physical">Attack</li>
+                                <li class="dropdown-item" data-loa-atk="2" data-attack-type="heavy">Heavy</li>
+                                <li class="dropdown-item" data-loa-atk="3" data-attack-type="special">Special</li>
                             </ul>
                         </div>
 
@@ -146,9 +151,9 @@
                             </button>
                         
                             <ul id="spells-drop-menu" class="dropdown-menu">
-                                <li class="dropdown-item" data-loa-spl="1">Burn</li>
-                                <li class="dropdown-item" data-loa-spl="2">Frost</li>
-                                <li class="dropdown-item" data-loa-spl="3">Heal</li>
+                                <li class="dropdown-item" data-loa-spl="1" data-spell-type="burn">Burn</li>
+                                <li class="dropdown-item" data-loa-spl="2" data-spell-type="frost">Frost</li>
+                                <li class="dropdown-item" data-loa-spl="3" data-spell-type="heal">Heal</li>
                             </ul>
                         </div>
                     </div>

@@ -14,5 +14,6 @@ enum PropType {
 
     /* Monster Stats */
     case MSTATS;
+    case BANKMANAGER;
 }
 
