@@ -7,6 +7,7 @@ const express = require('express'),
     upload = multer(),
     app = express(),
     mysql = require('mysql'),
+    csrf = require('csurf'),
     PORT = process.env.PORT || 3000,
     NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -25,13 +26,13 @@ app.use(express.text());
 
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(csrf({ cookie: true }));
 
 // parse multipart/form-data
 app.use(upload.array());
 app.use(express.static('public'));
 
-app.use(cookieParser());
+app.use(csrf({ cookie: true }));
 
 require('./routes')(app);
 
@@ -46,7 +47,7 @@ app.use((err, req, res, next) => {
     const status = err.status || 500;
     const msg = err.error || err.message;
     //log.error(`Error ${status} (${msg}) on ${req.method} ${req.url} with payload ${req.body}.`);
-    res.status(status).send({ status, error: msg });
+    res.status(status).json({ status, error: msg });
 });
 
 module.exports = app;

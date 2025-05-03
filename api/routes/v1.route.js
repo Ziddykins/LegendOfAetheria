@@ -15,7 +15,7 @@ router.get('/account/:accountID', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -31,7 +31,7 @@ router.post('/auth/refresh', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -47,7 +47,7 @@ router.get('/characters', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -64,7 +64,7 @@ router.post('/characters', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -81,7 +81,7 @@ router.get('/characters/:characterId', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -98,7 +98,7 @@ router.get('/characters/:characterId/bank', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -116,7 +116,7 @@ router.post('/characters/:characterId/bank', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -134,7 +134,7 @@ router.post('/characters/:characterId/battle', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -151,7 +151,7 @@ router.get('/characters/:characterId/familiar', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -169,7 +169,7 @@ router.get('/characters/:characterId/friends', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -187,7 +187,7 @@ router.post('/characters/:characterId/friends', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -204,7 +204,7 @@ router.get('/characters/:characterId/inventory', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -222,7 +222,7 @@ router.get('/characters/:characterId/quests', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -239,7 +239,7 @@ router.get('/locations', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -257,7 +257,7 @@ router.post('/locations/:locationId/travel', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -276,7 +276,7 @@ router.get('/mail', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -293,7 +293,7 @@ router.post('/mail', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -310,7 +310,7 @@ router.get('/mail/:mailId', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -327,7 +327,7 @@ router.delete('/mail/:mailId', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -347,7 +347,7 @@ router.get('/market/listings', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -364,7 +364,7 @@ router.post('/market/listings', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });
@@ -381,7 +381,7 @@ router.post('/market/listings/:listingId/purchase', async (req, res, next) => {
   }
   catch (err) {
     return res.status(500).send({
-      error: err || 'Something went wrong.'
+      error: 'Something went wrong'
     });
   }
 });

@@ -2,8 +2,8 @@
 namespace Game\Account;
 
 use Game\Traits\PropManager\PropManager;
-
 use Game\Traits\PropManager\Enums\PropType;
+
 
 class Account {
     use PropManager;
@@ -37,13 +37,6 @@ class Account {
     private $charSlot3;
 
     private $focusedSlot;
-
-    private $passwordOptions = [
-        'cost' => 12,
-        'memory_cost' => 1024,
-        'time_cost' => 2,
-        'threads' => 2
-    ];
 
     public function __construct($email = null) {
         if ($email) {
