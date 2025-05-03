@@ -1,63 +1,62 @@
 <?php
-    declare(strict_types = 1);
-    session_start();
-    
-    /* Core requirements */
-    require_once 'vendor/autoload.php';
+declare(strict_types=1);
+session_start();
 
-    use Game\System\System;
-    use PHPUnit\Framework\TestCase; // Ensure PHPUnit is available
-    $system = new System(0);
-    require_once 'constants.php';
-    
-    /* Funcs etc */
-    require_once WEBROOT . '/logger.php';
-    require_once WEBROOT . '/db.php';
-    require_once WEBROOT . '/functions.php';
-    require_once WEBROOT . '/mailer.php';
-    
-    /* .env */
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-    $dotenv->safeLoad();
-    
-    /* tables */
-    $t['accounts']   = $_ENV['SQL_ACCT_TBL'];
-    $t['characters'] = $_ENV['SQL_CHAR_TBL'];
-    $t['familiars']  = $_ENV['SQL_FMLR_TBL'];
-    $t['friends']    = $_ENV['SQL_FRND_TBL'];
-    $t['chat']       = $_ENV['SQL_CHAT_TBL'];
-    $t['globals']    = $_ENV['SQL_GLBL_TBL'];
-    $t['logs']       = $_ENV['SQL_LOGS_TBL'];
-    $t['mail']       = $_ENV['SQL_MAIL_TBL'];
-    $t['banned']     = $_ENV['SQL_BANS_TBL'];
-    $t['monsters']   = $_ENV['SQL_MNST_TBL'];
-    $t['statistics'] = $_ENV['SQL_STAT_TBL'];
-    $t['bank']       = $_ENV['SQL_BANK_TBL'];
+/* Core requirements */
+require_once 'vendor/autoload.php';
+
+use Game\System\System;
+use PHPUnit\Framework\TestCase; // Ensure PHPUnit is available
+
+$system = new System(0);
+require_once 'constants.php';
+
+/* Funcs etc */
+require_once WEBROOT . '/logger.php';
+require_once WEBROOT . '/db.php';
+require_once WEBROOT . '/functions.php';
+require_once WEBROOT . '/mailer.php';
+
+/* .env */
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->safeLoad();
+
+/* tables */
+$t['accounts']   = $_ENV['SQL_ACCT_TBL'];
+$t['characters'] = $_ENV['SQL_CHAR_TBL'];
+$t['familiars']  = $_ENV['SQL_FMLR_TBL'];
+$t['friends']    = $_ENV['SQL_FRND_TBL'];
+$t['chat']       = $_ENV['SQL_CHAT_TBL'];
+$t['globals']    = $_ENV['SQL_GLBL_TBL'];
+$t['logs']       = $_ENV['SQL_LOGS_TBL'];
+$t['mail']       = $_ENV['SQL_MAIL_TBL'];
+$t['banned']     = $_ENV['SQL_BANS_TBL'];
+$t['monsters']   = $_ENV['SQL_MNST_TBL'];
+$t['statistics'] = $_ENV['SQL_STAT_TBL'];
+$t['bank']       = $_ENV['SQL_BANK_TBL'];
 
 
-    if ($_SERVER['SCRIPT_NAME'] !== '/index.php' && $_SERVER['SCRIPT_NAME'] !== '/cron.php') {
-        if (check_session() === true) {
-            // Session timeout check - 30 minutes
-            if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
-                session_unset();
-                session_destroy();
-                header('Location: /?session_expired');
-                exit();
-            }
-            
-            $_SESSION['last_activity'] = time();
-
-            // CSRF protection
-            if (!isset($_SESSION['csrf-token'])) {
-                $_SESSION['csrf-token'] = gen_csrf_token();
-            }
-
-            // Set security headers
-            header('X-Frame-Options: DENY');
-            header('X-XSS-Protection: 1; mode=block');
-            header('X-Content-Type-Options: nosniff');
-        } else {
-            header('Location: /?no_login');
+if ($_SERVER['SCRIPT_NAME'] !== '/index.php' && $_SERVER['SCRIPT_NAME'] !== '/cron.php') {
+    if (check_session() === true) {
+        // Session timeout check - 30 minutes
+        if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+            session_unset();
+            session_destroy();
+            header('Location: /?session_expired');
             exit();
         }
+
+        $_SESSION['last_activity'] = time();
+
+        // CSRF protection
+        if (!isset($_SESSION['csrf-token'])) {
+            $_SESSION['csrf-token'] = gen_csrf_token();
+        }
+
+        header('X-Frame-Options: DENY');
+        header('X-Content-Type-Options: nosniff');
+    } else {
+        header('Location: /?no_login');
+        exit();
     }
+}

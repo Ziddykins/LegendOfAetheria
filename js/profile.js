@@ -17,7 +17,6 @@ function spinner_swap(element, original_icon, unswap) {
     return;
 }
 
-
 document.querySelectorAll('button').forEach(function(element) {
     element.addEventListener('click', function() {
         let original_icon =  element.children[0].classList[1];

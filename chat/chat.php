@@ -95,11 +95,7 @@ function get_messages(string $room = '!main', int $count = 100, int $since_id = 
     
     $messages = $result->fetch_all(MYSQLI_ASSOC);
     
-    // Reverse messages only for initial load to show newest at bottom
-    if ($since_id === 0) {
-        $messages = array_reverse($messages);
-    }
-    
+
     echo json_encode($messages);
     exit();
 }

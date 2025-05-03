@@ -11,11 +11,11 @@ router.post('/basic', async (req, res, next) => {
     try {
         const result = await auth.postBasic(options);
         console.log(JSON.stringify(result));
-        res.status(result.data.status || 200).send(result.data);
+        res.status(result.data.status || 200).json(result.data);
     } catch (err) {
         console.log(err.message);
         return res.status(500).send({
-            error: err || 'Something went wrong.'
+            error: 'Something went wrong'
         });
     }
 });

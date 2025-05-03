@@ -235,7 +235,7 @@ if (isset($_POST['gen-images']) && $_POST['gen-images'] == 1) {
 
         $json_obj = json_decode($response);
         $filename = explode("/", $json_obj->data[0]->url)[-1];
-        echo "<img src='" . $json_obj->data[0]->url . "'></img><br>";
+        echo "<img src='" . htmlentities($json_obj->data[0]->url, ENT_QUOTES, 'UTF-8') . "'></img><br>";
         $img_file = 'img/generated/';
         $ch = curl_init($json_obj->data[0]->url);
         $fp = fopen($img_file, 'wb');
