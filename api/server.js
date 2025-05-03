@@ -7,7 +7,7 @@ const express = require('express'),
     upload = multer(),
     app = express(),
     mysql = require('mysql'),
-    csrf = require('csurf'),
+    csrf = require('cs`rf'),
     PORT = process.env.PORT || 3000,
     NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -27,6 +27,7 @@ app.use(express.text());
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 app.use(csrf({ cookie: true }));
+
 
 // parse multipart/form-data
 app.use(upload.array());
