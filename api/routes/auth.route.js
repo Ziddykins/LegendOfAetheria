@@ -3,6 +3,7 @@ const auth = require('../services/auth');
 const router = new express.Router();
 
 router.post('/basic', async (req, res, next) => {
+    console.log(res);
     let options = {
         email: atob(req.headers.authorization.split(' ')[1]).split(":")[0],
         password: atob(req.headers.authorization.split(' ')[1]).split(":")[1]
