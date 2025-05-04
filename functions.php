@@ -1,11 +1,9 @@
-    <?php
-
+<?php
     use Game\Components\Modals\Enums\ModalButtonType;
     use Game\System\Enums\AbuseType;
     use Game\Character\Enums\FriendStatus;
     use Game\Character\Enums\Races;
     use Game\System\Enums\LOAError;
-
 
         /**     * Retrieves a MySQL datetime string based on the provided modifier.
          *
@@ -509,6 +507,7 @@
             global $db, $log, $t;
 
             if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
+
                 return false;
             }
 
