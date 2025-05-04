@@ -1,11 +1,10 @@
 <?php
     require_once 'bootstrap.php';
 
-    use Game\Bank\BankManager;
-    use Game\System\Enums\AbuseType;
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
+    use Game\System\Enums\AbuseType;
     
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
         $email = $_POST['login-email'];
@@ -65,7 +64,6 @@
                 print_r($return);
                 curl_close($ch);
 
-                if ($return->token) {
                     $_SESSION['bearer'] = $return->token;*/
                     header('Location: /select');
                     exit();

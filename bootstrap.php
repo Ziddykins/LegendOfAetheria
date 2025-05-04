@@ -1,12 +1,10 @@
 <?php
 declare(strict_types=1);
-session_start();
 
 /* Core requirements */
 require_once 'vendor/autoload.php';
 
 use Game\System\System;
-use PHPUnit\Framework\TestCase; // Ensure PHPUnit is available
 
 $system = new System(0);
 require_once 'constants.php';
@@ -39,6 +37,7 @@ $t['bank']       = $_ENV['SQL_BANK_TBL'];
 if ($_SERVER['SCRIPT_NAME'] !== '/index.php' && $_SERVER['SCRIPT_NAME'] !== '/cron.php') {
     if (check_session() === true) {
         // Session timeout check - 30 minutes
+
         if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
             session_unset();
             session_destroy();
