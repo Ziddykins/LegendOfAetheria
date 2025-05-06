@@ -9,9 +9,14 @@
     }
 
     $id_list = join(', ', $arr);
-        
-    $sql_query = "SELECT `name` FROM {$t['characters']} WHERE `id` IN ($id_list)";
-    $results = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
+    $results = null;
+
+    if (empty($id_list)) {
+        $results = 'No Results';    
+    } else {
+        $sql_query = "SELECT `name` FROM {$t['characters']} WHERE `id` IN ($id_list)";
+        $results = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
+    }
 ?>
                     <div class="container border border-secondary ps-3 pe-3 w-50">
                         <div class="row mb-3 mt-3 align-items-center">
