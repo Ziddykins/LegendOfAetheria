@@ -1,5 +1,5 @@
 <?php
-namespace Game\System\Enums;
+namespace Game\LoASys\Enums;
 
 # Categories:
 #   - FUNCT - Relating to the usage of a function

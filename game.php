@@ -1,17 +1,18 @@
 <?php
     declare(strict_types = 1);
-    require_once "bootstrap.php";
+    use Game\LoASys\LoASys;
 
+    require_once "bootstrap.php";
+    
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
     use Game\Components\Sidebar\Enums\SidebarType;
-    use Game\System\System;
     use Game\Account\Settings;
     use Game\OpenAI\NPC\Tutorial\Frank;
     //use Game\Familiar\Familiar;
 
-    $system = new System(0);
+    $system = new LoASys(0);
     $system->load_sheet();
 
     $account   = new Account($_SESSION['email']);
@@ -29,16 +30,33 @@
     $cur_floor        = $character->get_floor();
     $avatar           = $character->get_avatar();
     $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now")));
-    
+
+    // Tutorial logic: check if this is the user's first time in game.php after character selection
+    $show_tutorial = false;
+    if (!isset($_SESSION['tutorial_shown']) || $_SESSION['tutorial_shown'] !== true) {
+        $show_tutorial = true;
+        $_SESSION['tutorial_shown'] = true;
+        $frank = new Frank($account->get_id(), $character->get_id());
+        $tutorial_steps_json = $frank->renderInteractiveTutorial();
+    }
 ?>
 
 <?php include 'html/opener.html'; ?>
     <head>
         <?php include 'html/headers.html'; ?>
+        <?php if ($show_tutorial): ?>
+            <link rel="stylesheet" href="/css/frank-tutorial.css">
+        <?php endif; ?>
     </head>
     <script>loa.u_name = '<?php echo $_SESSION['name']; ?>';</script>
 
     <body class="main-font" data-bs-theme="<?php echo $color_mode; ?>" data-overlayscrollbars-initialize>
+        <?php if ($show_tutorial): ?>
+            <script>
+                window.FANK_TUTORIAL_STEPS = <?php echo $tutorial_steps_json; ?>;
+            </script>
+            <script src="/js/frank-tutorial.js"></script>
+        <?php endif; ?>
         <div class="d-flex-fill overflow-hidden" style="height: 100vh;">
             <span id="terst" class="row g-0 h-100 app-wrapper layout-fixed sidebar-expand-lg ms-n3">
             <?php include $sidebar_rel_link; ?>

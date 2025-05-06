@@ -1,10 +1,12 @@
-    <?php
+<?php
 
+    require_once 'bootstrap.php';
     use Game\Components\Modals\Enums\ModalButtonType;
-    use Game\System\Enums\AbuseType;
+    use Game\LoASys\Enums\AbuseType;
     use Game\Character\Enums\FriendStatus;
     use Game\Character\Enums\Races;
-    use Game\System\Enums\LOAError;
+    use Game\LoASys\Enums\LOAError;
+
 
 
         /**     * Retrieves a MySQL datetime string based on the provided modifier.
@@ -265,7 +267,7 @@
          *
          * Performs abuse detection by querying logs for suspicious activity.
          *
-         * @param Game\System\Enums\AbuseType $type The type of abuse to check for.
+         * @param Game\LoASys\Enums\AbuseType $type The type of abuse to check for.
          * @param int $account_id The account ID to check abuse for.
          * @param string $ip The IP address to check abuse for.
          * @param int $threshold The threshold for abuse detection (default: 1).
@@ -506,6 +508,11 @@
          * @return bool True if the session is valid, false otherwise.
          */
         function check_session(): bool {
+            // Skip session checks when running from CLI
+            if (php_sapi_name() === 'cli') {
+                return true;
+            }
+
             global $db, $log, $t;
 
             if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
@@ -545,7 +552,7 @@
         }
 
         /**
-         * Validates a CSRF token against the session token.
+         * Validates a CSRF tprintoken against the session token.
          *
          * If the tokens do not match, the session is destroyed, and the user is redirected.
          *

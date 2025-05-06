@@ -7,7 +7,7 @@ use Game\Bank\Enums\BankBracket;
 use Game\Character\Stats;
 use Game\Inventory\Inventory;
 use Game\Bank\BankManager;
-use Game\System\Enums\LOAError;
+use Game\LoASys\Enums\LOAError;
 use Game\Traits\PropManager\Enums\PropType;
 
 

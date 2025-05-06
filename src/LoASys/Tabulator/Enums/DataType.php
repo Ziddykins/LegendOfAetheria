@@ -1,5 +1,5 @@
 <?php
-namespace Game\System\Tabulator\Enums;
+namespace Game\LoASys\Tabulator\Enums;
 
 enum DataType {
     case HEADER_DATA;

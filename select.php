@@ -2,7 +2,7 @@
 require_once "bootstrap.php";
 use Game\Account\Account;
 use Game\Character\Character;
-use Game\System\Enums\AbuseType;
+use Game\LoASys\Enums\AbuseType;
 use Game\Components\Cards\CharacterSelect\CharacterSelectCard;
 
 if (check_session()) {
@@ -46,7 +46,7 @@ if (check_session()) {
                 header('Location: /game?page=sheet&sub=character');
                 exit();
             case 'new':
-                $char_name   = $_POST['create-character-name'];
+                $char_name   = preg_replace('/[^a-zA-Z0-9_-]+/', '', $_POST['create-character-name']);
                 $char_race   = validate_race($_POST['race-select']);
                 $char_avatar = validate_avatar('avatar-' . $_POST['avatar-select'] . '.webp');
 

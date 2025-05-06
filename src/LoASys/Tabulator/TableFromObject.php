@@ -1,8 +1,8 @@
 <?php
 
-namespace Game\System\Tabulator;
-use Game\System\Tabulator\Enums\DataType;
-use Game\System\Tabulator\Enums\LayoutType;
+namespace Game\LoASys\Tabulator;
+use Game\LoASys\Tabulator\Enums\DataType;
+use Game\LoASys\Tabulator\Enums\LayoutType;
 use ReflectionClass;
 
 class TableFromObject {

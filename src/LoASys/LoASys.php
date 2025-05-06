@@ -1,7 +1,7 @@
 <?php
-namespace Game\System;
+namespace Game\LoASys;
 
-class System {
+class LoASys {
     public $monsters = [];
     private $weather;
     private $zone_id;

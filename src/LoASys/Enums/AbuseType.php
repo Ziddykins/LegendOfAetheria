@@ -1,5 +1,5 @@
 <?php
-namespace Game\System\Enums;
+namespace Game\LoASys\Enums;
 
 enum AbuseType {
     case CHEATING;    /* General cheating/abuse of game mechanics etc. */

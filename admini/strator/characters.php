@@ -4,9 +4,9 @@
     use Game\Character\Character;
     use Game\Character\Stats;
     use Game\Inventory\Inventory;
-    use Game\System\Tabulator;
-    use Game\System\Tabulator\TableFromObject;
-    use Game\System\Tabulator\Enums\DataType;
+    use Game\LoASys\Tabulator;
+    use Game\LoASys\Tabulator\TableFromObject;
+    use Game\LoASys\Tabulator\Enums\DataType;
 
     require_once "../../bootstrap.php";
 

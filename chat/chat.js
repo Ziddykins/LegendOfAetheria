@@ -77,6 +77,7 @@ function setupEventListeners() {
     chat_input.removeEventListener('keydown', handleChatInput);
     chat_input.addEventListener('keydown', debounce(handleChatInput, 300));
 
+    
     // Cleanup on page unload
     window.addEventListener('unload', () => {
         stopPolling();

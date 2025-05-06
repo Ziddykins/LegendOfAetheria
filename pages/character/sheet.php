@@ -2,8 +2,8 @@
     include 'snippets/snip-charstats.php';
 ?>
         <div class="d-flex justify-content-center">
-            <div class="container"style="max-width: 700px;">
-                <div class="card ps-3 mb-3 pt-3"  ">
+            <div class="container"style="max-width: 750px;">
+                <div id="character-card" name="character-card" class="card ps-3 mb-3 pt-3"  ">
                     <div class="card-title lead">
                         <?php echo "$char_name the level $char_level $char_race"; ?>
                         
@@ -49,7 +49,7 @@
                                     <div class="row mb-3 mt-3">
                                         <span class="col">
                                             <i class="bi bi-hammer me-3"></i>
-                                            <span class="d-none d-md-inline">Strength</span>
+                                            <span class="d-none d-sm-inline">Strength</span>
                                         </span>
                                         <span class="col"><?php echo $char_str; ?></span>
                                         <?php if ($character->stats->get_ap()): ?>
@@ -60,7 +60,7 @@
                                     <div class="row mb-3">
                                         <span class="col">
                                             <i class="bi bi-shield-fill me-3"></i>
-                                            <span class="d-none d-md-inline">Defense</span>
+                                            <span class="d-none d-sm-inline">Defense</span>
                                         </span>
                                         <span class="col"><?php echo $char_def; ?></span>
                                         <?php if ($character->stats->get_ap()): ?>
@@ -71,7 +71,7 @@
                                     <div class="row mb-3">
                                         <span class="col">
                                             <i class="bi bi-journal-bookmark-fill me-3"></i>
-                                            <span class="d-none d-md-inline small">Intelligence</span>
+                                            <span class="d-none d-sm-inline small">Intelligence</span>
                                         </span>
                                         <span class="col"><?php echo $char_int; ?></span>
                                         <?php if ($character->stats->get_ap()): ?>

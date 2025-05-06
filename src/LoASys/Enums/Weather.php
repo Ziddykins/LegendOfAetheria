@@ -1,5 +1,5 @@
 <?php
-namespace Game\System\Enums;
+namespace Game\LoASys\Enums;
 use Game\Traits\EnumExtender\EnumExtender;
 
 enum Weather {

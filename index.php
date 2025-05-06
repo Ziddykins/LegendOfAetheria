@@ -2,7 +2,7 @@
     require_once 'bootstrap.php';
 
     use Game\Bank\BankManager;
-    use Game\System\Enums\AbuseType;
+    use Game\LoASys\Enums\AbuseType;
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
@@ -54,7 +54,7 @@
                 $account->set_sessionID(session_id());
                 $account->set_lastLogin(date('Y-m-d H:i:s'));
 
-                $ch = curl_init("http://127.0.0.1:3000/auth/basic");
+               /* $ch = curl_init("http://127.0.0.1:3000/auth/basic");
                 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
                 curl_setopt($ch, CURLOPT_HEADER, 0);
                 curl_setopt($ch, CURLOPT_USERPWD, "$email:$password");
@@ -65,13 +65,13 @@
                 curl_close($ch);
 
                 if ($return->token) {
-                    $_SESSION['bearer'] = $return->token;
+                    $_SESSION['bearer'] = $return->token;*/
                     header('Location: /select');
                     exit();
-                } else {
+                /*} else {
                     echo "failed to get token";
                     exit();
-                }
+                }*/
             } else {
                 $failed_attempts = $account->get_failedLogins() + 1;
                 $account->set_failedLogins($failed_attempts);

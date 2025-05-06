@@ -6,17 +6,18 @@
         <meta name="google-signin-client_id" content="905625455039-22nlqmke7jn849t3h7125i5tjtea89fb.apps.googleusercontent.com">
         <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
         <meta http-equiv="Content-Security-Policy"
-                 content="script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client https://apis.google.com/js/platform.js;
-                         style-src 'self' 'unsafe-inline' https://accounts.google.com https://cdn.jsdelivr.net/npm/*;
-                         object-src 'none';
-                         base-uri 'self';
-                         connect-src *;
-                         font-src 'self' https://fonts.gstatic.com https://fonts.gstatic.com/*;
-                         frame-src 'self' https://accounts.google.com;
-                         manifest-src 'self';
-                         media-src 'self';
-                         worker-src 'none';">
-                         
+                    content="script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client https://apis.google.com/js/platform.js;
+                            style-src 'self' 'unsafe-inline' https://accounts.google.com https://cdn.jsdelivr.net/npm/*;
+                            img-src 'self' data: https: http:;
+                            object-src 'none';
+                            base-uri 'self';
+                            connect-src *;
+                            font-src 'self' https://fonts.gstatic.com https://fonts.gstatic.com/*;
+                            frame-src 'self' https://accounts.google.com;
+                            manifest-src 'self';
+                            media-src 'self';
+                            worker-src 'none';">
+
         <!-- local 'self' https://accounts.google.com;-->
         <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
         <link rel="stylesheet" href="../css/bootstrap-icons.min.css">
@@ -26,7 +27,7 @@
         <link type="text/css" href="../css/overlayscrollbars.min.css" rel="stylesheet" />
         
         
-        
+        <script type="text/javascript" src="/js/functions.js"></script>
         <script src="/js/bootstrap.bundle.min.js" type="text/javascript"></script>
         <script src="/js/jquery-3.7.1.min.js" type="text/javascript"></script>
 
@@ -36,7 +37,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        <?php if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1): ?>
+        <?php if (php_sapi_name() !== 'cli' && isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1): ?>
         <?php
             if (!isset($_SESSION['csrf-token'])) {
                 $_SESSION['csrf-token'] = gen_csrf_token();
@@ -46,12 +47,12 @@
         <meta content="<?php echo $_SESSION['csrf-token']; ?>" name="csrf-token" />
         <script>                
             var loa = {
-               u_email: "<?php echo $_SESSION['email']; ?>",
-                 u_aid: "<?php echo $_SESSION['account-id']; ?>",
+                u_email: "<?php echo $_SESSION['email']; ?>",
+                u_aid: "<?php echo $_SESSION['account-id']; ?>",
                 u_csrf: "<?php echo $_SESSION['csrf-token']; ?>",
-                 u_sid: "<?php echo session_id(); ?>",
-                 chat_pos: 0,
-                 chat_history: [],
+                u_sid: "<?php echo session_id(); ?>",
+                chat_pos: 0,
+                chat_history: [],
             };
         </script>
         <?php endif; ?>

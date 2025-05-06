@@ -1,13 +1,17 @@
 <?php
     declare(strict_types = 1);
-    session_start();
+    use Game\LoASys\LoASys;
     
+    // Only return early for cron.php since it's CLI-only
+    if ($_SERVER['SCRIPT_NAME'] === '/cron.php') {
+        return;
+    }
+
     /* Core requirements */
     require_once 'vendor/autoload.php';
 
-    use Game\System\System;
     use PHPUnit\Framework\TestCase; // Ensure PHPUnit is available
-    $system = new System(0);
+    $system = new LoASys(0);
     require_once 'constants.php';
     
     /* Funcs etc */
@@ -34,30 +38,33 @@
     $t['statistics'] = $_ENV['SQL_STAT_TBL'];
     $t['bank']       = $_ENV['SQL_BANK_TBL'];
 
+    // Skip all header operations and session checks if running from CLI
+    if (php_sapi_name() !== 'cli') {
+        // Skip session checks for index.php since it handles login
+        if ($_SERVER['SCRIPT_NAME'] !== '/index.php') {
+            if (check_session() === true) {
+                // Session timeout check - 30 minutes
+                if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+                    session_unset();
+                    session_destroy();
+                    header('Location: /?session_expired');
+                    exit();
+                }
+                
+                $_SESSION['last_activity'] = time();
 
-    if ($_SERVER['SCRIPT_NAME'] !== '/index.php' && $_SERVER['SCRIPT_NAME'] !== '/cron.php') {
-        if (check_session() === true) {
-            // Session timeout check - 30 minutes
-            if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
-                session_unset();
-                session_destroy();
-                header('Location: /?session_expired');
+                // CSRF protection
+                if (!isset($_SESSION['csrf-token'])) {
+                    $_SESSION['csrf-token'] = gen_csrf_token();
+                }
+
+                // Set security headers
+                header('X-Frame-Options: DENY');
+                header('X-XSS-Protection: 1; mode=block');
+                header('X-Content-Type-Options: nosniff');
+            } else {
+                header('Location: /?no_login');
                 exit();
             }
-            
-            $_SESSION['last_activity'] = time();
-
-            // CSRF protection
-            if (!isset($_SESSION['csrf-token'])) {
-                $_SESSION['csrf-token'] = gen_csrf_token();
-            }
-
-            // Set security headers
-            header('X-Frame-Options: DENY');
-            header('X-XSS-Protection: 1; mode=block');
-            header('X-Content-Type-Options: nosniff');
-        } else {
-            header('Location: /?no_login');
-            exit();
         }
     }

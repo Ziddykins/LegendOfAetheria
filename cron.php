@@ -2,8 +2,8 @@
     declare(strict_types = 1);
     require_once "bootstrap.php";
 
-    use Game\System\Enums\LOAError;
-    use Game\System\Enums\Weather;
+    use Game\LoASys\Enums\LOAError;
+    use Game\LoASys\Enums\Weather;
     use Game\Character\Character;
     use Game\Account\Account;
 
@@ -24,6 +24,9 @@
             break;
         case 'daily':
             do_daily();
+            break;
+        case 'monthly':
+            do_monthly();
             break;
         default:
             $log->warning('No cron job specified!');
@@ -72,7 +75,7 @@
         $characters = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
 
         foreach ($characters as $t_character) {
-            $character = new Character($t_character['account-id'], $t_character['id']);
+            $character = new Character($t_character['account_id'], $t_character['id']);
             $character->load();
             $max_hp = $character->stats->get_maxHP();
 
@@ -135,25 +138,35 @@
     function check_expired_sessions() {
         global $db, $log, $t;
 
-        $sql_query = "SELECT `id` FROM {$t['accounts']} WHERE `last_action` < NOW() - INTERVAL 30 MINUTE";
+        $sql_query = <<<SQL
+            SELECT
+                a.`email`,
+                a.`session_id`,
+                c.`account_id`
+            FROM {$t['characters']} c
+            JOIN {$t['accounts']} a
+                ON a.`id` = c.`account_id`
+            WHERE
+                `last_action` < NOW() - INTERVAL 30 MINUTE;
+        SQL;
         $results = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
 
-        foreach ($results as $account) {
-            $temp_acct = new Account($account['email']);
+        foreach ($results as $user_data) {
+            $temp_acct = new Account($user_data['email']);
             $temp_acct->set_sessionID(null);
-            $log->info("Session Expire", ['Account' => $temp_acct->get_email(), 'Session ID' => $account['session_id']]);
+            $log->info("Session Expire", ['Account' => $temp_acct->get_email(), 'Session ID' => $user_data['session_id']]);
         }
     }
 
     function calculate_bank_interests(): void {
         global $db, $log, $t;
 
-        $sql_query = "SELECT `interest_rate`, `gold_amount`, `loan`, `dpr` FROM {$t['bank']} WHERE (interest_rate > 0 AND gold_amount > 0) OR (loan > 0 AND dpr > 0)";
+        $sql_query = "SELECT `interest_rate`, `gold_amount`, `loan`, `dpr`, `character_id` FROM {$t['bank']} WHERE (interest_rate > 0 AND gold_amount > 0) OR (loan > 0 AND dpr > 0)";
         $results = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
 
         foreach ($results as $result) {
             $interest_added = $result['gold_amount'] * $result['interest_rate'];
-            $sql_query = "UPDATE {$t['bank']} SET gold_amount += $interest_added WHERE `character_id` = ?";
+            $sql_query = "UPDATE {$t['bank']} SET `gold_amount` = `gold_amount` + $interest_added WHERE `character_id` = ?";
             $db->execute_query($sql_query, [ $result['character_id'] ]);
         }
     }

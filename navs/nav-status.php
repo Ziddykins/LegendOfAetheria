@@ -1,5 +1,5 @@
 <?php
-    use Game\System\Enums\Weather;
+    use Game\LoASys\Enums\Weather;
     
     $hp = $character->get_hp();
     $max_hp = $character->get_maxHP();

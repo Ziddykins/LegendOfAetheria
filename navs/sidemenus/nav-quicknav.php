@@ -8,7 +8,7 @@
 
 ?>
 
-<div class="d-flex pb-2 shadow-sm justify-content-evenly w-100">
+<div class="d-flex pb-2 shadow-sm justify-content-evenly w-100 align-items-center">
     <span data-bs-toggle="tooltip" data-bs-title="Expand All" class="nav-icon material-symbols-sharp mt-3 border" style="cursor: pointer;" onclick=expand_all()>
         unfold_more
     </span>
@@ -22,7 +22,14 @@
         <a href="/admini/strator/dashboard">
             <span class="material-symbols-sharp text-warning mt-3 border" data-bs-toggle="tooltip" data-bs-title="Administrator Panel">
                 shield_person
-            </span></a>
+            </span>
+        </a>
+
+        <a href="/game?page=administrator&sub=system">
+            <span class="material-symbols-sharp text-danger mt-3 border" data-bs-toggle="tooltip" data-bs-title="AI Panel">
+                text_fields_alt
+            </span>
+        </a>
     <?php endif; ?>
     
     <a href="/game?page=profile&sub=character">

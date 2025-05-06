@@ -1,0 +1,68 @@
+/* Frank Tutorial Overlay Styles */
+.frank-tutorial-blur {
+  filter: blur(4px) grayscale(60%) brightness(0.7);
+  pointer-events: none;
+  transition: filter 0.3s;
+}
+
+.frank-tutorial-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.2);
+  pointer-events: none;
+}
+
+.frank-tutorial-speech {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  z-index: 10000;
+  max-width: 420px;
+}
+
+.frank-tutorial-npc-img {
+  border-radius: 50%;
+  margin-right: 12px;
+  box-shadow: 0 2px 8px #0008;
+  background: transparent;
+  object-fit: cover;
+}
+
+.frank-tutorial-bubble {
+  background: #fffbe7;
+  color: #222;
+  border-radius: 18px;
+  padding: 18px 22px;
+  font-size: 1.0rem;
+  box-shadow: 0 2px 12px #0002;
+  border: 1px solid #e2c97a;
+  position: relative;
+}
+
+.frank-tutorial-bubble:after {
+  content: '';
+  position: absolute;
+  left: -18px;
+  bottom: 18px;
+  width: 0; height: 0;
+  border-top: 18px solid transparent;
+  border-bottom: 18px solid transparent;
+  border-right: 18px solid #fffbe7;
+}
+
+.frank-tutorial-next-btn {
+  margin-top: 10px;
+  background: #e2c97a;
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 18px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 1px 4px #0001;
+  transition: background 0.2s;
+}
+.frank-tutorial-next-btn:hover {
+  background: #ffe9a7;
+}
