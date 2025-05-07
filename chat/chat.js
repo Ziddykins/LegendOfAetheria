@@ -142,11 +142,13 @@ function fetchMessages(isInitial = false) {
             if (isInitial) {
                 chat_content.innerHTML = '';
             }
+
+            msgs.sort((a, b) => parseInt(a.id) - parseInt(b.id));
             
             msgs.forEach(msg => {
                 const messageEl = gen_message(msg);
                 if (messageEl) {
-                    chat_content.appendChild(messageEl);
+                    chat_content.insertBefore(messageEl, chat_content.firstChild);
                     lastMessageId = Math.max(lastMessageId, parseInt(msg.id));
                     
                     // Auto-scroll if near bottom
@@ -156,6 +158,8 @@ function fetchMessages(isInitial = false) {
                     }
                 }
             });
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
         }
     });
 }
@@ -174,9 +178,10 @@ function gen_message(msg) {
     let max_len = 10;
     let spaces = Math.max(0, max_len - nick_len);
     let final_nick = "&nbsp;".repeat(spaces) + msg.nickname;
+    let timestamp  = msg.when.split(' ')[1];;
 
     chat_msg.id = `chat-msg-${msg.id}`;
-    chat_msg.innerHTML = `<span class="text-warning text-end">${final_nick}:</span><span> ${msg.message}</span>`;
+    chat_msg.innerHTML = `<span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${msg.when.split(' ')[0]}">${timestamp}</span>&nbsp;<span class="text-warning text-end">${final_nick}:</span><span> ${msg.message}</span>`;
 
     return chat_msg;
 }

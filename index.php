@@ -6,6 +6,7 @@
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
+    use Game\System\Enums\AbuseType;
     
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
         $email = $_POST['login-email'];
@@ -62,6 +63,7 @@
                 curl_setopt($ch, CURLOPT_POST, 1);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
                 $return = json_decode(curl_exec($ch));
+                print_r($return);
                 curl_close($ch);
 
                 if ($return->token) {
@@ -69,8 +71,10 @@
                     header('Location: /select');
                     exit();
                 /*} else {
+                /*} else {
                     echo "failed to get token";
                     exit();
+                }*/
                 }*/
             } else {
                 $failed_attempts = $account->get_failedLogins() + 1;

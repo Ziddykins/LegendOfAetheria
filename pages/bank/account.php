@@ -1,7 +1,6 @@
 <?php
     $character->bank->add_goldAmount(100);
     $character->bank->set_accountID(1);
-    
 ?>
 <div class="container">
     <div class="card shadow-sm">

@@ -439,3 +439,110 @@
         </div>
     </div>
     <script type="text/javascript" src="../js/openai.js"></script>
+<?php
+
+$gpt_models = [
+    'gpt-4',
+    'gpt-3.5-turbo-1106',
+    'gpt-3.5-turbo',
+    'gpt-3.5-turbo-16k'
+];
+
+$dalle_models = [
+    'dall-e-3',
+    'dall-e-2'
+];
+
+$user_privs = Privileges::name_to_enum($account->get_privileges());
+
+if (isset($_POST['gen-images']) && $_POST['gen-images'] == 1) {
+    global $system;
+    $count  = 0;
+    $prompt = null;
+
+    if (isset($_POST['image-prompt'])) {
+        $prompt = htmlentities($_POST['image-prompt']);
+    } else {
+        $prompt = "Generate an image of a monster";
+    }
+    
+    $count++;
+    
+    $type   = $_POST['type'];
+    $model = $_POST['model'];
+    $count  = 1;
+
+    $endpoint = 'https://api.openai.com/v1/images/generations';
+    
+    if (in_array($model, $dalle_models)) {
+        if ($count < 1 || $count > 5) {
+            $count = 2;
+        }
+        
+        $openai_apikey = $_ENV['OPENAI_APIKEY'];    
+        $OpenAI = new OpenAI($openai_apikey, $endpoint);
+        
+        $headers = [
+            'Content-Type'  => 'application/json',
+            'Authorization' => "Bearer " . $OpenAI->get_apiKey()
+        ];
+
+        $OpenAI->set_imageModel($model);
+        $OpenAI->set_imagePrompt($prompt);
+        $OpenAI->set_imageCount($count);
+        $OpenAI->set_imageSize("256x256");
+        
+        $temp = print_r($OpenAI, true);
+        $temp = str_replace($_ENV['OPENAI_APIKEY'], '<font color="red"><APIKEY></font>', $temp);
+        echo $temp ;
+        $response = $OpenAI->doRequest(
+            HttpMethod::POST,
+            $OpenAI->get_payload()
+        );
+    } else {
+        echo "sry no";
+        exit();
+    }
+
+        $json_obj = json_decode($response);
+        $filename = explode("/", $json_obj->data[0]->url)[-1];
+        echo "<img src='" . htmlentities($json_obj->data[0]->url, ENT_QUOTES, 'UTF-8') . "'></img><br>";
+        $img_file = 'img/generated/';
+        $ch = curl_init($json_obj->data[0]->url);
+        $fp = fopen($img_file, 'wb');
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_exec($ch);
+        curl_close($ch);
+        fclose($fp);
+
+        echo "Saved $img_file\n<br>";
+        if ($count % 5 == 0) {
+            echo "sleepin'<br>";
+            sleep(360);
+        }
+        
+    }
+    exit();
+    
+    //echo '<div class="d-flex container">';
+  /*  foreach ($json_obj->data as $image) {
+        foreach ($image as $property) {   
+                    echo '<div class="row-cols-3">
+                        <div class="col">
+                            <h5>Image ' . $icount . '</h5>
+                        </div>
+                        <div class="col p-2 m-2 border">
+                            <img src="data:image/png;base64,' . $property . '" alt="user-generated-' . $i . '></img>
+                        </div>
+                        <div class="col">
+                            <small>' . $prompt . '</small>
+                        </div>
+                    </div>';
+        }
+        $icount++;
+    }
+    echo '</div>';
+    */
+
+?>

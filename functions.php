@@ -123,7 +123,7 @@
          * @param int $character_id The ID of the character to check the friendship status with.
          * @return Game\Character\Enums\FriendStatus The friendship status or an error if determination fails.
          */
-        function friend_status(int $character_id): FriendStatus {
+        function status(int $character_id): FriendStatus {
             global $db, $log, $t;
 
             $status    = FriendStatus::NONE;
@@ -131,7 +131,7 @@
             $results   = $db->execute_query($sql_query, [ $character_id, $character_id ])->fetch_assoc();
 
             if ($results) {
-                $status = FriendStatus::name_to_enum($results['friend_status']);
+                $status = FriendStatus::name_to_enum($results['status']);
             }
 
             if ($status == null) {
@@ -153,8 +153,8 @@
         function accept_friend_req($sender):bool {
             global $db, $log, $t;
 
-            if (friend_status($sender) === FriendStatus::REQUEST_RECV) {
-                $sql_query = "UPDATE {$t['friends']} SET `friend_status` = ? WHERE `recipient_id` = ?";
+            if (status($sender) === FriendStatus::REQUEST_RECV) {
+                $sql_query = "UPDATE {$t['friends']} SET `status` = ? WHERE `recipient_id` = ?";
                 $db->execute_query($sql_query, [ FriendStatus::MUTUAL->value, $_SESSION['character-id'] ]);
                 $log->info('Friend request accepted', [ 'sender' => $sender, 'recipient' => $_SESSION['character-id'] ]);
                 return true;
@@ -179,16 +179,18 @@
 
             $sql_query = <<<SQL
                 SELECT 
-                    `friend_status` AS `status`,
+                    `friend_status`,
                     COUNT(`friend_status`) AS `count`
                 FROM {$t['friends']}
                 WHERE
-                    sender_id = ? OR
-                    recipient_id = ?
+                    recipient_id = ? OR
+                    sender_id = ?
                 GROUP BY `friend_status`
             SQL;
 
-            $statuses = $db->execute_query($sql_query, [ $character->get_id(), $character->get_id() ])->fetch_all(MYSQLI_ASSOC);
+            $statuses = $db->execute_query($sql_query, 
+                [ $character->get_id(), $character->get_id()
+            ])->fetch_all(MYSQLI_ASSOC);
 
             $statuses['MUTUAL'] ?? 0;
             $statuses['REQUEST_RECV'] ?? 0;
@@ -200,7 +202,6 @@
                 if ($status !== null) {
                     $status_clause = " AND `friend_status` = '" . $status->name . "'";
                 }
-                    
 
                 $sql_query = <<<SQL
                     SELECT DISTINCT
@@ -232,11 +233,11 @@
             global $db, $t;
             $sql_query = <<<SQL
                 INSERT INTO {$t['friends']}
-                    (`sender_id`, `recipient_id`, `friend_status`)
+                    (`sender_id`, `recipient_id`, `status`)
                 VALUES
                     (?, ?, ?)
                 UPDATE ON DUPLICATE KEY
-                    `friend_status` = 'BLOCKED'
+                    `status` = 'BLOCKED'
             SQL;
 
             $db->execute_query($sql_query, [$email_1, $email_2, 'BLOCKED']);
@@ -516,6 +517,7 @@
             global $db, $log, $t;
 
             if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
+
                 return false;
             }
 
