@@ -24,7 +24,7 @@ function do_dumpin() {
           FLUSH PRIVILEGES;" >> /tmp/db.sql;
 
     echo -e "\e[0;32m - Making schema replacements for templates\e[0m";
-    for i in ACCOUNTS BANNED CHARACTERS FAMILIARS FRIENDS GLOBALS LOGS MAIL MONSTERS;
+    for i in ACCOUNTS BANNED CHARACTERS FAMILIARS FRIENDS GLOBALS LOGS MAIL MONSTERS BANK GLOBALCHAT STATISTICS;
     do
         LCTBL=`echo $i | perl -e 'while(<>){chomp;print lc$_;}'`;
         SEDREPLTBL="'s/tbl_$LCTBL/###REPL_SQL_TBL_$i###/g'";

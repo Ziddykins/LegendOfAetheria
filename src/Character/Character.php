@@ -25,6 +25,7 @@ class Character {
 
     private $dateCreated;
     private $lastAction;
+    private $tutorialCompleted = 'False';
 
     /* class Monster */
     public $monster;

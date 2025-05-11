@@ -38,7 +38,6 @@ if ($opt_step && $opt_step =~ /[a-z]/i) {
 $| = 1;
 
 use constant {
-    PAD       => 0,
     FIRSTRUN  => 1,
     SOFTWARE  => 2,
     PHP       => 3,
@@ -130,10 +129,6 @@ if (!$opt_step) {
     $cfg{step} = $opt_step;
 }
 
-if ($cfg{step} == PAD) {
-    $cfg{step}++;
-}
-
 if ($cfg{step} == SOFTWARE) {
     if (ask_user("Install required software?", 'y', 'yesno')) {
         step_install_software();
@@ -209,6 +204,7 @@ if ($cfg{step} == TEMPLATES) {
         "###REPL_SQL_TBL_BANNED###%%%$sql{tbl_banned}",
         "###REPL_SQL_TBL_GLOBALCHAT###%%%$sql{tbl_globalchat}",
         "###REPL_SQL_TBL_STATISTICS###%%%$sql{tbl_statistics}",
+        "###REPL_SQL_TBL_BANK###%%%$sql{tbl_bank}",
         "### REM ### %%% ",
 
 
@@ -520,7 +516,7 @@ sub step_vhost_ssl {
         . "Certificate: $cfg{ssl_fullcer}\n"
         . "Private Key: $cfg{ssl_privkey}\n\n";
 
-    while ($answer !~ /^[34560]$/) {
+    while ($answer !~ /^[234560]$/) {
         if ($answer eq 'S') {
             if ($cfg{redir_status}) {
                 $cfg{redir_status} = 0;
@@ -1278,7 +1274,7 @@ sub merge_hashes {
 }
 
 sub const_to_name {
-    my @names = qw/PAD FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER CLEANUP/;
+    my @names = qw/FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER CLEANUP/;
     return $names[shift];
 }
 
@@ -1286,7 +1282,6 @@ sub name_to_const {
     my $name = shift;
 
     my %names = (
-        'PAD'       => 0,
         'FIRSTRUN'  => 1,
         'SOFTWARE'  => 2,
         'PHP'       => 3,

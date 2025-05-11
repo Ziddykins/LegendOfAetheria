@@ -26,7 +26,7 @@
             do_daily();
             break;
         case 'monthly':
-            do_monthly();
+            //do_monthly();
             break;
         default:
             $log->warning('No cron job specified!');
@@ -161,12 +161,15 @@
     function calculate_bank_interests(): void {
         global $db, $log, $t;
 
-        $sql_query = "SELECT `interest_rate`, `gold_amount`, `loan`, `dpr`, `character_id` FROM {$t['bank']} WHERE (interest_rate > 0 AND gold_amount > 0) OR (loan > 0 AND dpr > 0)";
+        $sql_query = "SELECT `interest_rate`, `gold`, `loan`, `dpr`, `character_id` FROM {$t['bank']} WHERE (interest_rate > 0 AND gold > 0) OR (loan > 0 AND dpr > 0)";
         $results = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
 
         foreach ($results as $result) {
-            $interest_added = $result['gold_amount'] * $result['interest_rate'];
-            $sql_query = "UPDATE {$t['bank']} SET `gold_amount` = `gold_amount` + $interest_added WHERE `character_id` = ?";
+            $interest_added = $result['gold'] > 0 ? $result['gold'] * $result['interest_rate'] : 0;
+            $loan_interest  = $result['loan'] > 0 ? $result['dpr'] * $result['loan'] : 0;
+
+            $sql_query = "UPDATE {$t['bank']} SET `gold` = `gold` + $interest_added WHERE `character_id` = ?";
             $db->execute_query($sql_query, [ $result['character_id'] ]);
-        }
+            $log->warning('Loans and gold interest accumulated', [ 'CharacterID' => $result['character_id'], 'Interest' => $interest_added, 'Loans' => $loan_interest ]);
+        }        
     }

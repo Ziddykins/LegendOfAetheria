@@ -17,9 +17,9 @@
     $character->load();
 
   
-    if (isset($_REQUEST['generate_description']) 
-            && $_REQUEST['generate_description'] == 1
-            && isset($_REQUEST['characterID'])) {
+    if (isset($_POST['generate_description']) 
+            && $_POST['generate_description'] == 1
+            && isset($_POST['characterID'])) {
 
         
         $credits = $account->get_credits();
@@ -50,8 +50,7 @@
         $api_endpoint = 'https://api.openai.com/v1/chat/completions';
         
         $chatbot = new OpenAI(
-            $_ENV['OPENAI_APIKEY'],
-            $api_endpoint
+            $_ENV['OPENAI_APIKEY']
         );
 
         $chatbot->set_model('gpt-3.5-turbo-1106');
@@ -96,5 +95,35 @@
         echo $description;
     } else {
         echo "Invalid Query";
+    }
+
+    // Read raw POST data
+    $input = file_get_contents('php://input');
+    $postData = json_decode($input, true) ?? [];
+
+    if (isset($postData['gen-images'])) {
+        $chatbot = new OpenAI($_ENV['OPENAI_APIKEY']);
+        $chatbot->set_model($postData['model']);
+        $chatbot->set_prompt($postData['image-prompt']);
+        $chatbot->set_count((int)$postData['count']);
+        $chatbot->set_resolution($postData['resolutions']);
+        
+        try {
+            $response = json_decode($chatbot->generate_image());
+            if (isset($response->error)) {
+                echo "<div class='alert alert-danger'>{$response->error->message}</div>";
+            } else {
+                // Handle successful response
+                $images = $response->data;
+                echo "<div class='d-flex container flex-wrap'>";
+                foreach ($images as $image) {
+                    echo "<div class='m-2'><img src='{$image->url}' class='img-fluid' /></div>";
+                }
+                echo "</div>";
+            }
+        } catch (Exception $e) {
+            echo "<div class='alert alert-danger'>Error: {$e->getMessage()}</div>";
+        }
+        exit;
     }
 ?>

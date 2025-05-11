@@ -12,11 +12,14 @@
     use Game\OpenAI\NPC\Tutorial\Frank;
     //use Game\Familiar\Familiar;
 
+    $contents = file_get_contents(("php://input"));
+
     $system = new LoASys(0);
     $system->load_sheet();
 
     $account   = new Account($_SESSION['email']);
     $character = new Character($account->get_id(), $_SESSION['character-id']);
+
     
     $color_mode = $account->get_settings()->get_colorMode();
     
@@ -48,7 +51,7 @@
             <link rel="stylesheet" href="/css/frank-tutorial.css">
         <?php endif; ?>
     </head>
-    <script>loa.u_name = '<?php echo $_SESSION['name']; ?>';</script>
+    
 
     <body class="main-font" data-bs-theme="<?php echo $color_mode; ?>" data-overlayscrollbars-initialize>
         <?php if ($show_tutorial): ?>
@@ -62,6 +65,7 @@
             <?php include $sidebar_rel_link; ?>
                 <main id="main-section" class="col ps-1 border border-success overflow-hidden" style="height: 100vh; max-height: 100vh; background: rgba(15,15,15,0.6);" data-overlayscrollbars-initialize>
                     <div class="d-grid ms-3 mt-3">
+                    
                     <?php
                         $privileges = $account->get_privileges()->value;
 
@@ -86,7 +90,8 @@
                             }
 
                             if (file_exists($page_string)) {
-                                include "$page_string";
+                                include (string) $page_string;
+
                             } else {
                                 include 'pages/character/sheet.php';
                             }

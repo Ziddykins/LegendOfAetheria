@@ -15,7 +15,7 @@ const ToastManager = {
         verification_success: { id: 'success-verification',     duration: 3000, type: 'success', icon: 'bi-check',            header: 'Verification Successful', message: 'Account verification successful!' },
         verification_failed:  { id: 'failed-verification',      duration: 3000, type: 'danger',  icon: 'bi-envelope-slash',   header: 'Verification Failed',     message: 'Account verification failed - check email/code combination' },
         abuse_signup:         { id: 'abuse-signup',             duration: 3000, type: 'danger',  icon: 'bi-slash-circle',     header: 'Sign-Up Abuse',           message: 'Throttled; too many account creations!' },
-        iplocked:             { id: 'ip-locked-fail',           duration: 3000, type: 'danger',  icon: 'bi-dash-circle',      header: 'IP Locked',               message: 'IP Locked Account - Non-matching IP address' },
+        iplock_failed:        { id: 'ip-locked-fail',           duration: 3000, type: 'danger',  icon: 'bi-dash-circle',      header: 'IP Locked',               message: 'IP Locked Account - Non-matching IP address' },
         friend_add_self:      { id: 'self-add',                 duration: 3000, type: 'danger',  icon: 'bi-slash-circle',     header: 'Adding Self',             message: 'Cannot add yourself to friends list!' },
         friend_invalid_email: { id: 'invalid-email',            duration: 3000, type: 'danger',  icon: 'bi-slash-circle',     header: 'Invalid Email',           message: 'Email supplied does not exist or you have been blocked' },
         friend_already_added: { id: 'already-friend',           duration: 3000, type: 'danger',  icon: 'bi-slash-circle',     header: 'Already Friended',        message: 'User already added as a friend!' },
@@ -54,36 +54,33 @@ const ToastManager = {
         this.createToast({ ...defaults, ...options });
     },
 
-    createToast(toastObj) {
-        console.log(toastObj);
+    createToast({ id, type, icon, header, message, duration, callback }) {
         const toast_div = document.createElement('div');
-        const badge_text = (toastObj.type[0].toUpperCase() + toastObj.type.slice(1)).replace('Danger', 'Error');
+        const badge_text = type[0].toUpperCase() + type.slice(1).replace('Danger', 'Error');
 
-        toast_div.id = toastObj.id;
+        toast_div.id = id;
         toast_div.classList.add('toast');
         toast_div.setAttribute('role', 'alert');
         toast_div.setAttribute('aria-live', 'assertive');
         toast_div.setAttribute('aria-atomic', 'true');
 
-        toast_div.innerHTML = `<div class="toast-header">
-                                    <span class="badge text-bg-${toastObj.type} bg-gradient me-auto">
-                                        <i class="bi ${toastObj.icon} rounded me-2"></i> ${badge_text}
-                                    </span> ${toastObj.header}
-                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                                </div>
-                                
-                                <div class="toast-body">
-                                    ${toastObj.message}
-                                </div>`;
+        toast_div.innerHTML = `
+            <div class="toast-header">
+                <span class="badge text-bg-${type} bg-gradient me-auto">
+                    <i class="bi ${icon} rounded me-2"></i> ${badge_text}
+                </span> ${header}
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">${message}</div>
+        `;
 
         document.getElementById('toast-container').append(toast_div);
-
         const toast = bootstrap.Toast.getOrCreateInstance(toast_div, {
-            delay: toastObj.duration
+            delay: duration
         });
 
         toast.show();
-        if (toastObj.callback) toastObj.callback();
+        if (callback) callback();
     }
 };
 
@@ -100,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (query.has('logged_out')) {
         ToastManager.show('logged_out');
     } else if (query.has('gooft')) {
-        ToastManager.show('dun_gooft');
+        ToastManager.show('dun_gooft');        
     } else if (query.has('account_exists')) {
         ToastManager.show('account_exists');
     } else if (query.has('no_login')) {
@@ -111,29 +108,30 @@ document.addEventListener('DOMContentLoaded', () => {
         ToastManager.show('password_not_changed');
     } else if (query.has('action', 'pw_reset') && query.has('result', 'pass')) {
         ToastManager.show('password_changed');
+    } else if (query.has('page', 'friends') && query.has('action', 'send_request')) {
+        ToastManager.show('friend_req_sent');
+    } else if (query.has('invalid_email')) {
+        ToastManager.show('friend_invalid_email');
+    } else if (query.has('already_verified')) {
+        ToastManager.show('friend_already_added');        
     } else if (query.has('resent_verification')) {
-        ToastManager.show('resent_verification');
+        
     } else if (query.has('verification_successful')) {
-        ToastManager.show('verification_success');
+
     } else if (query.has('verification_failed')) {
-        ToastManager.show('verification_failed');
+
     } else if (query.has('abuse_signup')) {
-        ToastManager.show('abuse_signup');
+
     } else if (query.has('ip_locked')) {
-        ToastManager.show('ip_locked');
 
     } else if (query.has('page') && query.has('error')) {
         if (query.get('page') == 'friends') {
             if (query.get('error') == 'self_add') {
-                ToastManager.show('friend_self_add');
-            } else if (query.get('error') == 'invalid_email') {
-                ToastManager.show('friend_invalid_email');
-            } else if (query.get('error') == 'already_friend') {
-                ToastManager.show('friend_already_added');   
-            }
 
-            if (query.has('action', 'send_request')) {
-                ToastManager.show('friend_req_sent');
+            } else if (query.get('error') == 'invalid_email') {
+
+            } else if (query.get('error') == 'already_friend') {
+
             }
         }
     } else if (query.has('csrf-failed')) {

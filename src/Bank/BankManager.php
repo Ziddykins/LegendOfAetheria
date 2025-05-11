@@ -9,7 +9,7 @@
         private int $id;
         private int $accountID;
         private int $characterID;
-        private float $goldAmount;
+        private float $gold;
         private float $interestRate; // Daily interest rate, gained based on amount of gold
         private float $dpr; // Daily Percentage Rate for the current loan
         private int $spindels;
@@ -24,9 +24,10 @@
             if ($this->characterID) {
                 $this->id = $characterID;
                 $this->load($this->id);
+                return;
             }
 
-            $this->goldAmount = 0;
+            $this->gold = 0;
             $this->interestRate = 0.25;
             $this->dpr = 25.0;
             $this->spindels = 0;

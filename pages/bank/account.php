@@ -1,6 +1,7 @@
 <?php
-    $character->bank->add_goldAmount(100);
-    $character->bank->set_accountID(1);
+    $lol = 1;
+
+
 ?>
 <div class="container">
     <div class="card shadow-sm">
@@ -20,12 +21,24 @@
                             <div class="list-group list-group-flush bg-transparent">
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
                                     <span>Banked Gold</span>
-                                    <span class="badge bg-primary rounded-pill"><?php echo $character->bank->get_goldAmount(); ?></span>
+                                    <span id="banked-gold" name="banked-gold" class="badge bg-primary rounded-pill"><?php echo $character->bank->get_gold(); ?></span>
                                 </div>
+
+                                <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
+                                    <span>Banked Spindels</span>
+                                    <span id="banked-spindels" name="banked-spindels" class="badge bg-secondary rounded-pill"><?php echo $character->bank->get_spindels(); ?></span>
+                                </div>
+
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
                                     <span>Gold On-Hand</span>
-                                    <span class="badge bg-secondary rounded-pill"><?php echo $character->get_gold(); ?></span>
+                                    <span id="gold-on-hand" name="gold-on-hand" class="badge bg-secondary rounded-pill"><?php echo $character->get_gold(); ?></span>
                                 </div>
+
+                                <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
+                                    <span>Spindels On-Hand</span>
+                                    <span id="spindels-on-hand" name="spindels-on-hand" class="badge bg-secondary rounded-pill"><?php echo $character->get_spindels(); ?></span>
+                                </div>
+
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
                                     <span>Active Loans</span>
                                     <span class="badge bg-danger rounded-pill"><?php echo $character->bank->get_loan(); ?></span>
@@ -49,7 +62,7 @@
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
                                     <span>Net Daily Earnings</span>
-                                    <span class="badge bg-success rounded-pill"><?php echo $character->bank->get_interestRate() * $character->bank->get_goldAmount(); ?></span>
+                                    <span class="badge bg-success rounded-pill"><?php echo $character->bank->get_interestRate() * $character->bank->get_gold(); ?></span>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
                                     <span>Daily Percentage Rate</span>
@@ -83,10 +96,10 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-outline-primary flex-grow-1">
+                                <button id="gold-withdraw" name="gold-withdraw" class="btn btn-outline-primary flex-grow-1">
                                     <i class="bi bi-arrow-90deg-right me-1"></i>Withdraw
                                 </button>
-                                <button class="btn btn-primary flex-grow-1">
+                                <button id="gold-deposit" name="gold-deposit" class="btn btn-primary flex-grow-1">
                                     <i class="bi bi-arrow-90deg-left me-1"></i>Deposit
                                 </button>
                             </div>
@@ -109,10 +122,10 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
-                                <button class="btn btn-outline-primary flex-grow-1">
+                                <button id="spindels-withdraw" name="spindels-withdraw" class="btn btn-outline-primary flex-grow-1">
                                     <i class="bi bi-arrow-90deg-right me-1"></i>Withdraw
                                 </button>
-                                <button class="btn btn-primary flex-grow-1">
+                                <button id="spindels-deposit" name="spindels-deposit" class="btn btn-primary flex-grow-1">
                                     <i class="bi bi-arrow-90deg-left me-1"></i>Deposit
                                 </button>
                             </div>
@@ -123,4 +136,7 @@
         </div>
     </div>
 </div>
+
+
+<script src="/pages/bank/bank.js" type="text/javascript"></script>
 
