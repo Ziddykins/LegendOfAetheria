@@ -35,7 +35,7 @@
             exit();
         }
 
-        $account_id = Account::checkIfExists($email);
+        $account_id = Account::checkIfExists('email', $email, $_ENV['SQL_ACCT_TBL']);
 
         if ($account_id > 0) {
             $account = new Account($email);
@@ -102,7 +102,7 @@
         }
 
         /* Email doesn't exist */
-        if (Account::checkIfExists($email) == -1) {
+        if ($account_id > 0) {
             /* AP assigned properly */
             if ($str + $def + $int === MAX_ASSIGNABLE_AP) {
                 /* Passwords match */

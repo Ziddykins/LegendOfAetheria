@@ -11,5 +11,17 @@ trait PropManager {
     use PropMod;
     use PropSync;
     use PropDump;
+
+    public static function checkIfExists($search_column, $data, $table): int {
+        global $db, $log, $t;
+        $sqlQuery = "SELECT `id` FROM $table WHERE `$search_column` = ?";
+        $result = $db->execute_query($sqlQuery, [$data])->fetch_assoc();
+
+        if ($result && $result['id'] > 0) {
+            return $result['id'];
+        }
+
+        return -1;
+    }
 }
 ?>

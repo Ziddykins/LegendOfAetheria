@@ -41,7 +41,7 @@ class Account {
     public function __construct($email = null) {
         if ($email) {
             $this->email = $email;
-            $id = $this->checkIfExists($email);
+            $id = $this->checkIfExists('email', $email, $_ENV['SQL_ACCT_TBL']);
             
             if ($id > 0) {
                 $this->id = $id;
@@ -69,17 +69,5 @@ class Account {
         } else {
             return $this->propSync($method, $params, PropType::ACCOUNT);
         }
-    }
-    
-    public static function checkIfExists($email): int {
-        global $db, $log, $t;
-        $sqlQuery = "SELECT `id` FROM {$t['accounts']} WHERE `email` = ?";
-        $result = $db->execute_query($sqlQuery, [$email])->fetch_assoc();
-
-        if ($result && $result['id'] > 0) {
-            return $result['id'];
-        }
-
-        return -1;
     }
 }

@@ -18,23 +18,15 @@
         private float $transferLimit;
 
         public function __construct(int $accountID, int $characterID) {
-            $this->accountID = $accountID;
-            $this->characterID = $characterID;
+            if ($characterID) {
+                $this->characterID = $characterID;
+                $id = $this->checkIfExists('character_id', $characterID, $_ENV['SQL_BANK_TBL']);
 
-            if ($this->characterID) {
-                $this->id = $characterID;
-                $this->load($this->id);
-                return;
+                if ($id > 0) {
+                    $this->id = $id;
+                    $this->load($id);
+                }
             }
-
-            $this->gold = 0;
-            $this->interestRate = 0.25;
-            $this->dpr = 25.0;
-            $this->spindels = 0;
-            $this->loan = 0;
-            $this->bracket = BankBracket::STANDARD;
-            $this->transferLimit = 5000;
-            $this->load();
         }
 
         public function __call($method, $params) {

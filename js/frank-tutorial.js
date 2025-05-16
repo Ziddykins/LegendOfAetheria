@@ -1,11 +1,12 @@
 // Frank Tutorial Overlay Logic
 (function() {
-    if (!window.FANK_TUTORIAL_STEPS || !window.FANK_TUTORIAL_STEPS.steps) return;
-    const steps = window.FANK_TUTORIAL_STEPS.steps;
+    if (!window.FRANK_TUTORIAL_STEPS || !window.FRANK_TUTORIAL_STEPS.steps) return;
+    const steps = window.FRANK_TUTORIAL_STEPS.steps;
     let current = 0;
     let overlay, speech, lastFocus;
     expand_all();
 
+    console.log(steps);
     function blurExcept(selector) {
         document.querySelectorAll('body > *:not(.frank-tutorial-overlay):not(.frank-tutorial-speech)').forEach(el => {
             if (!el.matches(selector) && !el.classList.contains('frank-tutorial-speech')) {
@@ -46,6 +47,9 @@
                 <br><button class="frank-tutorial-next-btn">${idx < steps.length-1 ? 'Next' : 'Finish'}</button>
             </div>
         `;
+
+        speech.left = step.left;
+        speech.top  = step.top;
         setTimeout(() => positionSpeechBubble(focusEl), 100);
         document.getElementsByClassName('frank-tutorial-bubble')[0].scrollTo();
         // Next button
@@ -71,6 +75,7 @@
     speech = document.createElement('div');
     speech.className = 'frank-tutorial-speech';
     document.body.appendChild(speech);
+
 
     // Start tutorial
     showStep(current);

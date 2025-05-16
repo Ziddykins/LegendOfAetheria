@@ -29,15 +29,10 @@ class OpenAI {
 
     public function doRequest($method, $data) {
         $ch = curl_init();
-        
+
         curl_setopt_array($ch, [
             CURLOPT_URL => $this->endPoint,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => $data,
             CURLOPT_HTTPHEADER => [
@@ -45,12 +40,10 @@ class OpenAI {
                 "Authorization: Bearer {$this->apiKey}",
             ],
         ]);
-
         $response = curl_exec($ch);
         $err = curl_error($ch);
         
-        error_log("OpenAI Request: " . json_encode($data));
-        error_log("OpenAI Response: " . $response);
+
         
         curl_close($ch);
         
@@ -62,25 +55,28 @@ class OpenAI {
     }
 
     public function get_payload() {
-        $model = Models::name_to_enum($this->model);
-        if ($model === Models::DALLE2 || $model === Models::DALLE3) {
+        if ($this->model === 'dall-e-2' || $this->model === 'dall-e-3') {
             $payload = [
-                "model" => $this->model->value,
-                "prompt" => $this->prompt,
-                "n" => (int)$this->count,
-                "size" => $this->resolution,
-                "response_format" => "url"
+                "model" => 'dall-e-2',
+                "prompt" => 'testing this'
+                //"model" => $this->model,
+                //"prompt" => $this->prompt,
+                //"n" => (int)$this->count, // Ensure number of images is included
+                //"size" => $this->resolution, // Ensure resolution is included
             ];
+
             return json_encode($payload);
         }
+
         return $this->payload;
     }
 
     public function showPayload() {
         if (isset($this->payload)) {
-            $temp_payload = $this->payload;
-            $temp_payload = preg_replace($_ENV['OPENAI_APIKEY'], '<APIKEY>', $temp_payload);
-            print_r($temp_payload);
+            $key = $this->apiKey;
+            $this->set_apiKey('<APIKEY>');
+            print_r($this);
+            $this->set_apiKey($key);
         } else {
             echo "Payload Not Set";
         }
@@ -99,14 +95,13 @@ class OpenAI {
     }
     
     public function throw_error($error) {
-        echo "<div class=\"alert alert-danger\">$error</div>";
+        return "<div class=\"alert alert-danger\">$error</div>";
     }
 
     public function generate_image() {
         global $log;
         $this->endPoint = 'https://api.openai.com/v1/images/generations';
-        $payload = $this->get_payload();
-
-        return $this->doRequest(HttpMethod::POST, $payload);
+        $this->payload = $this->get_payload();
+        return $this->doRequest(HttpMethod::POST, $this->payload);
     }
 }

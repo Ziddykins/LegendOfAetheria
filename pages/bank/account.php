@@ -1,5 +1,5 @@
 <?php
-    $lol = 1;
+$lol = 1;
 
 
 ?>
@@ -9,7 +9,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="card-title h4 mb-0"><?php echo fix_name_header($character->get_name()); ?>'s Bank Account</h2>
             </div>
-            
+
             <div class="row g-4 mb-4">
                 <!-- Account Summary -->
                 <div class="col-md-6">
@@ -65,12 +65,12 @@
                                     <span class="badge bg-success rounded-pill"><?php echo $character->bank->get_interestRate() * $character->bank->get_gold(); ?></span>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
-                                    <span>Daily Percentage Rate</span>
+                                    <span>Loan DPR</span>
                                     <span class="badge bg-warning text-black rounded-pill"><?php echo $character->bank->get_dpr(); ?>.00%</span>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-secondary">
-                                    <span>Gross Rate</span>
-                                    <span class="badge bg-danger rounded-pill"><?php echo $character->bank->get_interestRate(); ?>%</span>
+                                    <span>Daily Charge</span>
+                                    <span class="badge bg-danger rounded-pill"><?php echo $character->bank->get_dpr() * $character->bank->get_loan(); ?> gold</span>
                                 </div>
                             </div>
                         </div>
@@ -91,7 +91,7 @@
                             <div class="mb-3">
                                 <label for="gold-amount" class="form-label">Amount to Transfer</label>
                                 <div class="input-group">
-                                    <input id="gold-amount" class="form-control" type="number" min="1" max="<?php echo $character->get_gold(); ?>" placeholder="Enter amount">
+                                    <input id="gold-amount" class="form-control" type="number" min="1" max="<?php echo max($character->get_gold(), $character->bank->get_gold()); ?>" placeholder="Enter amount">
                                     <span class="input-group-text">Gold</span>
                                 </div>
                             </div>
@@ -117,7 +117,7 @@
                             <div class="mb-3">
                                 <label for="spindels-amount" class="form-label">Amount to Transfer</label>
                                 <div class="input-group">
-                                    <input id="spindels-amount" class="form-control" type="number" placeholder="Enter amount">
+                                    <input id="spindels-amount" class="form-control" type="number" max="<?php echo max($character->get_spindels(), $character->bank->get_spindels()); ?>" placeholder="Enter amount">
                                     <span class="input-group-text">Spindels</span>
                                 </div>
                             </div>
@@ -139,4 +139,3 @@
 
 
 <script src="/pages/bank/bank.js" type="text/javascript"></script>
-

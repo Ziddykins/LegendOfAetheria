@@ -39,6 +39,9 @@ class Character {
     /* class Bank */
     public $bank;
 
+    /* class Spellbook */
+    public $spellbook;
+
     public function __construct($accountID, $characterID = null) {
         $this->accountID = $accountID;
         

@@ -181,7 +181,7 @@ function gen_message(msg) {
     let timestamp  = msg.when.split(' ')[1];;
 
     chat_msg.id = `chat-msg-${msg.id}`;
-    chat_msg.innerHTML = `<span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${msg.when.split(' ')[0]}">${timestamp}</span>&nbsp;<span class="text-warning text-end">${final_nick}:</span><span> ${msg.message}</span>`;
+    chat_msg.innerText = `<span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="${msg.when.split(' ')[0]}">${timestamp}</span>&nbsp;<span class="text-warning text-end">${final_nick}:</span><span> ${msg.message}</span>`;
 
     return chat_msg;
 }

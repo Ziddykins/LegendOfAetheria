@@ -27,7 +27,6 @@ function create_dropdowns(parent_select, items) {
         
         parent_select.appendChild(option);
     }
-    console.log(parent_select);
     return parent_select;
 }
 
@@ -43,19 +42,19 @@ var ai = {
 
     'image': {
         'models': [
-            'DALLE2',
-            'DALLE3'
+            'dall-e-2',
+            'dall-e-3'
         ],
-        'DALLE2': {
-            'name': 'DALL-E 2',
+        'dall-e-2': {
+            'name': 'dall-e-2',
             'max_prompt_size': 1000,
             'max_count': 5,
             'edits': true,
 
             'resolutions': [
-                '256x256',
-                '512x512',
-                '1024x1024'
+                '1024x1024',
+                '1024x1536',
+                '1536x1024'
             ],
 
             'quality': [
@@ -64,8 +63,8 @@ var ai = {
             ]
         },
 
-        'DALLE3': {
-            'name': 'DALL-E 3',
+        'dall-e-3': {
+            'name': 'dall-e-3',
             'max_count': 1,
             'max_prompt_size': 4000,
             'edits': false,
@@ -101,14 +100,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const aiType = document.getElementById('ai-type');
     const aiModel = document.getElementById('ai-model');
     const gptDiv = document.getElementById('gpt');
-    const dalleDiv = document.getElementById('dall-e');
+    const dalleDiv = document.getElementById('dall-e-container');
     const emptyOption = document.createElement('option');
+    const previousImages = document.getElementById('previous-images');
+
     emptyOption.value = '= Select =';
     emptyOption.textContent = '= Select =';
     emptyOption.disabled = true;
     emptyOption.selected = true;
     
     let selectedType = null;
+
+    gptDiv.style.display = 'none';
+    dalleDiv.style.display = 'none';
+    previousImages.style.display = 'none';
 
     function updateModelField() {
         const modelInput = document.querySelector('input[name="model"]');
@@ -124,17 +129,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (this.value === 'text') {
             models = ai.text.models;
-            gptDiv.classList.remove('invisible');
-            dalleDiv.classList.add('invisible');
             selectedType = 'text';
         } else if (this.value === 'image') {
             models = ai.image.models;
-            dalleDiv.classList.remove('invisible');
-            gptDiv.classList.add('invisible');
             selectedType = 'image';
         }
-
-        // Add options to model select
 
         models.forEach(model => {
             const option = document.createElement('option');
@@ -151,22 +150,31 @@ document.addEventListener('DOMContentLoaded', function() {
         updateModelField();
 
 
-        
+        if (aiType.value === 'text') {
+            dalleDiv.style.display = 'none';
+            gptDiv.style.display = 'block';
+            previousImages.style.display = 'none';
+        } else if (aiType.value === 'image') {
+            dalleDiv.style.display = 'block';
+            gptDiv.style.display = 'none';
+            previousImages.style.display = 'block';
+        }
+
         // Update count input based on selected model
         const countInput = document.getElementById('count');
         var resolutionSelect = document.getElementById('resolutions');
         resolutionSelect.innerHTML = '';
         var resolutions = [];
 
-        if (this.value === 'DALLE3') {
+        if (this.value === 'dall-e-3') {
             countInput.value = '1';
             countInput.disabled = true;
-            countInput.title = 'DALL-E 3 only supports generating 1 image at a time';
-            resolutions = ai.image['DALLE3'].resolutions;
+            countInput.title = 'dall-e-3 only supports generating 1 image at a time';
+            resolutions = ai.image['dall-e-3'].resolutions;
         } else {
             countInput.disabled = false;
             countInput.title = '';
-            resolutions = ai.image['DALLE2'].resolutions;
+            resolutions = ai.image['dall-e-2'].resolutions;
         }
 
         resolutionSelect = create_dropdowns(resolutionSelect, resolutions);
@@ -177,7 +185,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function(e) {
             var modelInput = form.querySelector('input[name="model"]');
-            modelInput = modelInput.replace('DALLE', 'dall-e');
             
             if (!modelInput || !modelInput.value) {
                 e.preventDefault();
@@ -195,21 +202,21 @@ document.addEventListener('DOMContentLoaded', function() {
     if (dalleForm) {
         dalleForm.addEventListener('submit', function(e) {
             const modelInput = this.querySelector('input[name="model"]');
-            modelInput = modelInput.replace('DALLE', 'dall-e');
             if (!modelInput || !modelInput.value) {
                 e.preventDefault();
                 alert('Please select an AI model first');
                 return;
             }
+            document.getElementById('use-previous-slot').value = parseInt(document.querySelector('input[type = radio]:checked').id.split('-')[2]);
             updateModelField();
         });
     }
 
     // Trigger initial state
-    if (aiModel.value === 'DALLE3') {
+    if (aiModel.value === 'dall-e-3') {
         const countInput = document.getElementById('count');
         countInput.value = '1';
         countInput.disabled = true;
-        countInput.title = 'DALL-E 3 only supports generating 1 image at a time';
+        countInput.title = 'dall-e-3 only supports generating 1 image at a time';
     }
 });

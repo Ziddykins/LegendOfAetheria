@@ -111,18 +111,19 @@
         try {
             $response = json_decode($chatbot->generate_image());
             if (isset($response->error)) {
-                echo "<div class='alert alert-danger'>{$response->error->message}</div>";
+                echo "<div class='alert alert-danger'>{" . htmlentities($response->error->message) . "</div>";
             } else {
                 // Handle successful response
                 $images = $response->data;
                 echo "<div class='d-flex container flex-wrap'>";
                 foreach ($images as $image) {
-                    echo "<div class='m-2'><img src='{$image->url}' class='img-fluid' /></div>";
+                    echo "<div class='m-2'><img src='" . htmlentities($image->url) . "' class='img-fluid' /></div>";
                 }
                 echo "</div>";
             }
         } catch (Exception $e) {
-            echo "<div class='alert alert-danger'>Error: {$e->getMessage()}</div>";
+            global $log;
+            $log->error($e->getMessage());
         }
         exit;
     }

@@ -10,9 +10,9 @@ function spinner_swap(element, original_icon, unswap) {
         icon_holder = original_icon; // will be like, 'bi-whatever'
         console.log("add spinner");
         console.log("original icon:" + original_icon);
-        element.children[0].remove(original_icon);
-        element.children[0].add('spinner-border');
-        element.children[0].add('spinner-border-sm');
+      //  element.children[0].remove(original_icon);
+       // element.children[0].add('spinner-border');
+        //element.children[0].add('spinner-border-sm');
     }
     return;
 }
@@ -49,7 +49,7 @@ document.querySelectorAll('button').forEach(function(element) {
             }
 
             if (do_fetch) {
-                spinner_swap(element, original_icon, false);
+               // spinner_swap(element, original_icon, false);
                 fetch(url, {
                     method: "POST",
                     headers: {
@@ -60,10 +60,10 @@ document.querySelectorAll('button').forEach(function(element) {
                     body: JSON.stringify(data)
                 }).then((response) => {
                     if (!response.ok) {
-                        spinner_swap(element, original_icon, true);
+                        //spinner_swap(element, original_icon, true);
                         throw new Error(response.text());                        
                     } else {
-                        spinner_swap(element, original_icon, true);
+                       // spinner_swap(element, original_icon, true);
                         return response.json();
                     }
                 }).then((data) => {

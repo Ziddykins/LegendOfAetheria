@@ -27,6 +27,8 @@ class Frank {
                 'focusSelector' => '#main-content',
                 'message' => "Hey there, I'm Frank! Welcome to the world of LOA. Don't worry, I only bite when debugging. Let's get started! (Step 1/5)",
                 'clickFirst' => false,
+                'left' => '20%',
+                'top' => '80%'
             ],
             [
                 'npcImage' => '/img/tutorial/frank-pointing.png',
