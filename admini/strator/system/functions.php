@@ -11,7 +11,9 @@ use Game\Character\Character;
      */
     function get_new_members($days) {
         global $db;
-
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $days)) {
+            throw new ValueError('Invalid input');
+        }
         $sql_query = "SELECT * FROM `tbl_characters` WHERE `date_created` BETWEEN (NOW() - INTERVAL $days DAY) AND NOW() ORDER BY `date_created` ASC LIMIT 8";
         $characters = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
 
@@ -27,7 +29,9 @@ use Game\Character\Character;
      */
     function new_members_count($days = 30): int {
         global $db, $t;
-
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $days)) {
+            throw new ValueError('Invalid input');
+        }
         $query = "SELECT COUNT(`id`) FROM {$t['characters']} WHERE `date_created` BETWEEN (NOW() - INTERVAL $days DAY) AND NOW()";
         return $db->execute_query($query)->fetch_column();        
     }
