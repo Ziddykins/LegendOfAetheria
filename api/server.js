@@ -6,6 +6,7 @@ const express = require('express'),
     multer = require('multer'),
     upload = multer(),
     app = express(),
+    helmet = require('helmet'),
     mysql = require('mysql'),
     csrf = require('cs`rf'),
     PORT = process.env.PORT || 3000,
@@ -17,6 +18,7 @@ app.set('env', NODE_ENV);
 
 app.use(cors());
 app.use(log('tiny'));
+app.use(helmet());
 
 // parse application/json
 app.use(express.json());
