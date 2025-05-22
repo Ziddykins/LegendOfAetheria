@@ -183,7 +183,10 @@ trait PropSync {
                 break;
         }
 
-        $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";  
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table) || !preg_match('/^[a-zA-Z0-9_]+$/', $table_col)) {
+            throw new ValueError('Invalid input');
+        }
+        $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";
         
         if (is_object($params[0])) {
             if (is_numeric($params[0]->value)) { // if an enum, essentially
@@ -208,6 +211,9 @@ trait PropSync {
                 $this->set_settings($tmp_settings);
                 $srl_data = safe_serialize($tmp_settings);
 
+                if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
+                    throw new ValueError('Invalid input');
+                }
                 $sql_query  = "INSERT INTO $table (`id`, `email`, `settings`) VALUES (?, ?, ?)";
                 $this->id = $accountID;
                 $db->execute_query($sql_query, [ $accountID, $this->email, $srl_data ] );
@@ -246,6 +252,9 @@ trait PropSync {
 
                 $chr_query = "INSERT INTO $table (`id`, `account_id`, `inventory`, `stats`, `bank`) VALUES (?, ?, ?, ?, ?)";
                 $bnk_query = "INSERT INTO {$_ENV['SQL_BANK_TBL']} (`id`, `account_id`, `character_id`) VALUES (?, ?, ?)";
+                if (!preg_match('/^[a-zA-Z0-9_]+$/', $char_col)) {
+                    throw new ValueError('Invalid input');
+                }
                 $act_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$char_col` = ? WHERE `id` = ?";
 
                 $db->execute_query($chr_query, [ $char_id, $this->accountID, $srl_inventory, $srl_stats, $srl_bank ]);
