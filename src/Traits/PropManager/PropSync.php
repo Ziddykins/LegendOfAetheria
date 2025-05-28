@@ -282,10 +282,17 @@ trait PropSync {
     }
 
     private function handle_load($type, $params, $table) {
-        global $db;
-        $tmp_obj = null;
+		global $db;
+
+		$tmp_obj = null;
         $sql_query = "SELECT * FROM $table WHERE `id` = ?";
-        $tmp_obj = $db->execute_query($sql_query, [ $this->id ])->fetch_assoc();
+
+		try {
+	        $tmp_obj = $db->execute_query($sql_query, [ $this->id ])->fetch_assoc();
+		} catch (Exception $e) {
+			echo "ahmagad: table: '$table', type: $type, params: " . print_r($params, true), " - plz gooby " . $e->getMessage() . "\n";
+			exit();
+		}
         
         foreach ($tmp_obj as $key => $value) {
             $key = $this->tblcol_to_clsprop($key);

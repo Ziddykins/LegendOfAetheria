@@ -4,7 +4,6 @@ namespace Game\Account;
 use Game\Traits\PropManager\PropManager;
 use Game\Traits\PropManager\Enums\PropType;
 
-
 class Account {
     use PropManager;
     
@@ -59,13 +58,16 @@ class Account {
         }
 
         /* Avoid loops with propSync triggering itself */
-        if ($method == 'propSync' || $method == 'propMod') {
+        if ($method == 'propSync' || $method == 'propMod' || $method == 'propDump') {
             $log->debug("$method loop");
             return;
         }
 
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
             return $this->propMod($method, $params);
+
+        } elseif (preg_match('/^(dump|restore)$/', $method, $MATCHES)) {
+            return $this->$MATCHES[1]();
         } else {
             return $this->propSync($method, $params, PropType::ACCOUNT);
         }
