@@ -38,7 +38,6 @@ if ($opt_step && $opt_step =~ /[a-z]/i) {
 $| = 1;
 
 use constant {
-    PAD       => 0,
     FIRSTRUN  => 1,
     SOFTWARE  => 2,
     PHP       => 3,
@@ -76,7 +75,6 @@ my %sql; # object containing constant sql table names
 my %clr; # color constants
 
 my $question; # current question to ask the user
-
 my $fqdn;     # fully qualified domain name to set up
 
 my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
@@ -120,6 +118,27 @@ chomp(my $loc_check = `pwd`);
 $loc_check =~ s/\/install//;
 $cfg{web_root} = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
 
+if (-d $cfg{web_root}) {
+    $cfg{web_root} =~ s/\/$//; # remove trailing slash
+} else {
+    tell_user('ERROR', "Web root directory '$cfg{web_root}' does not exist");
+
+    if (ask_user("The installation files will have to be moved to the webroot we just created.\n"
+               . "Would you like to do that now?", 'y', 'yesno')) {
+
+        my $mkdir_cmd = "mkdir -p $cfg{web_root}";
+        tell_user('SYSTEM', `$mkdir_cmd`);
+
+        move("$loc_check/", $cfg{web_root}) or croak "Failed to move files: $!";
+        $loc_check = $cfg{web_root};
+        
+        tell_user('SUCCESS', "Moved installation files to web root directory '$cfg{web_root}'");
+    } else {
+        tell_user('ERROR', "You will have to move the installation files to the web root directory manually (mv $loc_check $cfg{web_root})\n"
+                         . "Exiting script now...");
+    }
+}
+
 populate_hashdata();
 get_sysinfo();
 
@@ -128,10 +147,6 @@ if (!$opt_step) {
 } else {
     %cfg = %{$ini{$opt_fqdn}};
     $cfg{step} = $opt_step;
-}
-
-if ($cfg{step} == PAD) {
-    $cfg{step}++;
 }
 
 if ($cfg{step} == SOFTWARE) {
@@ -179,7 +194,6 @@ if ($cfg{step} == TEMPLATES) {
     tell_user('INFO', "I'ma let you run some templates, but first I just needa know...");
     if (ask_user("Do you want to enable SSL?", 'y', 'yesno')) {
         step_vhost_ssl();
-
     }
 
     my @replacements = (
@@ -221,9 +235,12 @@ if ($cfg{step} == TEMPLATES) {
     );
 
     if ($cfg{ssl_enabled}) {
-        push @replacements, "###REPL_PROTOCOL###%%%https";
+        if ($cfg{redir_status}) {
+            push @replacements, "# SSLREM %%% ";
+        }
+        push @replacements, "###REPL_PROTOCOL###%%\%https";
     } else {
-        push @replacements, "###REPL_PROTOCOL###%%%http";
+        push @replacements, "###REPL_PROTOCOL###%%\%http";
     }
 
     if (ask_user("Generate templates?", 'y', 'yesno')) {
@@ -441,7 +458,7 @@ sub step_install_software {
         $cfg{php_fpm} = 0;
     }
 
-    tell_user('INFO', 'Installing ' . @packages . ' packages\n');
+    tell_user('INFO', 'Installing ' . @packages . ' packages');
 
     my $sw_cmd = "$cfg{pm_cmd} " . join (' ', grep { /$cfg{software}/ } @packages) . ' >/dev/null 2>&1';
     $sw_cmd =~ s/$cfg{software}://g;
@@ -462,10 +479,6 @@ sub step_webserver_configure {
     my $question = "Enter the location of your webserver's config directory (e.g. /etc/apache2)";
     $cfg{apache_directory} = ask_user($question, '/etc/apache2', 'input');
 
-    $question = "Please enter the path to where the game will reside (e.g. /var/www/html/example.com/loa)";
-    $cfg{web_root} = ask_user($question, $cfg{web_root} ? $cfg{web_root} : '/var/www/html/kali.local/loa', 'input');
-    $cfg{web_root} =~ s/\/$//;
-
     $cfg{virthost_conf_file}     = "$cfg{apache_directory}/sites-available/$cfg{fqdn}.conf";
     $cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{fqdn}.conf";
 
@@ -476,6 +489,8 @@ sub step_webserver_configure {
 
     $cfg{apache_https_port} = ask_user('Enter apache port for HTTPS', '443', 'input');
     $cfg{apache_http_port}  = ask_user('Enter apache port for HTTP',   '80', 'input');
+
+    $cfg{admin_email} = ask_user('Enter the email address for the webserver admin', 'webmaster@' . $cfg{fqdn}, 'input');
 
     return 0;
 }
@@ -509,7 +524,7 @@ sub step_sql_configure {
 
 sub step_vhost_ssl {
     my $redir_status = "$clr{green}ON$clr{reset}";
-    $cfg{redir_http} = 1;
+    $cfg{redir_status} = 1;
     my $answer = -1;
     my $linecheck;
 
@@ -520,8 +535,8 @@ sub step_vhost_ssl {
         . "Certificate: $cfg{ssl_fullcer}\n"
         . "Private Key: $cfg{ssl_privkey}\n\n";
 
-    while ($answer !~ /^[34560]$/) {
-        if ($answer eq 'S') {
+    while ($answer !~ /^[0-6]$/) {
+        if ($answer == 7) {
             if ($cfg{redir_status}) {
                 $cfg{redir_status} = 0;
                 $redir_status = "$clr{red}OFF$clr{reset}";
@@ -537,26 +552,25 @@ sub step_vhost_ssl {
             . "4. Don't use SSL at all ($clr{red}not recommended$clr{reset} - even a self-signed is better than nothing)\n"
             . "5. Skip this step\n\n"
             . "6. Next step\n\n"
-            . "$clr{cyan}S$clr{reset}. Toggle HTTP -> HTTPS redirection (current: $redir_status)\n"
+            . "$clr{cyan}7$clr{reset}. Toggle HTTP -> HTTPS redirection (current: $redir_status)\n"
             . "0. Exit\n\n";
         $answer = int(ask_user('Choice', '', 'input'));
     }
-
 
     if ($answer == 1) {
         my $gen_output = `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/$cfg{fqdn}.key -out /etc/ssl/certs/$cfg{fqdn}.crt -subj '/CN=$cfg{fqdn}/O=$cfg{fqdn}/C=ZA' -batch`;
         $cfg{ssl_fullcer} = "/etc/ssl/certs/$cfg{fqdn}.crt";
         $cfg{ssl_privkey} = "/etc/ssl/private/$cfg{fqdn}.key";
 
-
         tell_user('SYSTEM', $gen_output);
 
         if (-e $cfg{ssl_fullcer} and -e $cfg{ssl_privkey}) {
-            tell_user('SUCCESS', "Generated self-signed certificates and enabled HTTP to HTTPS redirection");
+            my $msg = "Generated self-signed certificates ";
+            $msg   .= "and enabled HTTP to HTTPS redirection" if $cfg{redir_status};
+            tell_user('SUCCESS', $msg);
             tell_user('INFO', "Certificates and private key stored in /etc/ssl/certs and /etc/ssl/private, respectively");
         } else {
-            tell_user('ERROR', 'Certificates were not created');
-            die "\n";
+            croak("Certificates were not created, script cannot continue\n");
         }
     } elsif ($answer == 2) {
         my ($cert, $pkey);
@@ -565,19 +579,15 @@ sub step_vhost_ssl {
             $cert = ask_user('Enter path to certificate', '', 'input');
             $pkey = ask_user('Enter path to private key', '', 'input');
         }
+
         $cfg{ssl_fullcer} = $cert;
         $cfg{ssl_privkey} = $pkey;
         tell_user('SUCCESS', 'Valid certificate and key pair supplied, continuing');
     } elsif ($answer == 3) {
         print "Certbot.sh will run at the end of the script...";
         $cfg{run_certbot} = 1;
-
     } else {
         print "invalid option\n";
-    }
-
-    if ($redir_status =~ /ON/) {
-        `sed -i 's/# SSLREM //' $cfg{virthost_conf_file}`;
     }
 }
 
@@ -1278,7 +1288,7 @@ sub merge_hashes {
 }
 
 sub const_to_name {
-    my @names = qw/PAD FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER CLEANUP/;
+    my @names = qw/FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER CLEANUP/;
     return $names[shift];
 }
 
@@ -1286,7 +1296,6 @@ sub name_to_const {
     my $name = shift;
 
     my %names = (
-        'PAD'       => 0,
         'FIRSTRUN'  => 1,
         'SOFTWARE'  => 2,
         'PHP'       => 3,

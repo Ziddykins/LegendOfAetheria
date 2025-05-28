@@ -56,13 +56,18 @@ class Character {
         }
 
         /* Avoid loops with propSync triggering itself */
-        if ($method == 'propSync' || $method == 'propMod') {
+        if ($method == 'propSync' || $method == 'propMod' || $method == 'propConvert' || $method == 'propDump' || $method == 'propRestore') {
             $log->debug("$method loop");
             return;
         }
 
+        $MATCHES = [];
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
             return $this->propMod($method, $params);
+        } elseif (preg_match('/^(dump|restore)$/', $method, $MATCHES)) {
+            $func = $MATCHES[1];
+            echo $func;
+            return $this->$func($params[0] ?? null);
         } else {
             return $this->propSync($method, $params, PropType::CHARACTER);
         }
