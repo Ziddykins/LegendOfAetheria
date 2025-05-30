@@ -1,10 +1,10 @@
 <?php
 namespace Game\Monster;
-use Game\Traits\PropManager\Enums\PropType;
-use Game\Traits\PropManager\PropManager;
+use Game\Traits\PropSuite\Enums\PropType;
+use Game\Traits\PropSuite\PropSuite;
 
 class Stats {
-    use PropManager;
+    use PropSuite;
 
     private int $id;
     private int $hp     = 100;
@@ -37,7 +37,10 @@ class Stats {
         }
 
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
-            return $this->propMod($method, $params);
+                        return $this->propMod($method, $params);
+        } elseif (preg_match('/^(dump|restore)$/', $method, $matches)) {
+            $func = $matches[1];
+            return $this->$func($params[0] ?? null);
         } else {
             return $this->propSync($method, $params, PropType::MSTATS);
         }

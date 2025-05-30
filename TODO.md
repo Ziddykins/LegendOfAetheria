@@ -58,3 +58,5 @@
 
   - [ ] Need to redo how compose.php works; no emails, char only
   
+# meh
+  - [ ] fix avatar selection, shouldn't see or be able to specify unknown (add to check)

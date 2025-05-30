@@ -1,4 +1,6 @@
 <?php
+
+
     declare(strict_types = 1);
     require_once "bootstrap.php";
 
@@ -30,12 +32,14 @@
     $avatar           = $character->get_avatar();
     $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now")));
     
-    $yooo = $character->dump();
 
-    $new_char = $character->restore($yooo);
+    //$yooo = $character->dump();
+
+    //$new_char = $character->restore($yooo);
 
     echo "<pre>";
-    print_r($new_char);
+    echo $character->dump();
+    //print_r($new_char);
         echo "</pre>";
     exit();
     

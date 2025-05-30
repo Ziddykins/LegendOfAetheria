@@ -17,6 +17,7 @@ enum LOAError: int {
     case SQLDB_NOCONNECTION        = -2000;
     case SQLDB_PREPPED_EXECUTE     = -2001; // deprecated for execute_query in php8.2
     case SQLDB_UNKNOWN_SAVE_TYPE   = -2002;
+    case SQLDB_UNKNOWN_TABLE       = -2003;
 
     case FRNDS_FRIEND_STATUS_ERROR = -3000;
 

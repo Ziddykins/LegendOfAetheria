@@ -1,5 +1,5 @@
 <?php
-namespace Game\Traits\PropManager;
+namespace Game\Traits\PropSuite;
 use Exception;
 
 trait PropMod {

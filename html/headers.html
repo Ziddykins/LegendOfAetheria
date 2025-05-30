@@ -18,12 +18,12 @@
                          worker-src 'none';">
                          
         <!-- local 'self' https://accounts.google.com;-->
-        <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css">
-        <link rel="stylesheet" href="../css/bootstrap-icons.min.css">
-        <link rel="stylesheet" type="text/css" href="../css/gfonts.css" />
-        <link rel="stylesheet" type="text/css" href="../css/loa.css" />
-        <link rel="stylesheet" href="../css/adminlte.min.css">
-        <link type="text/css" href="../css/overlayscrollbars.min.css" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/bootstrap-icons.min.css">
+        <link rel="stylesheet" type="text/css" href="/css/gfonts.css" />
+        <link rel="stylesheet" type="text/css" href="/css/loa.css" />
+        <link rel="stylesheet" href="/css/adminlte.min.css">
+        <link type="text/css" href="/css/overlayscrollbars.min.css" rel="stylesheet" />
         
         
         
@@ -31,19 +31,18 @@
         <script src="/js/jquery-3.7.1.min.js" type="text/javascript"></script>
 
         <!-- Progress bar library from https://loading.io -->
-        <link rel="stylesheet" type="text/css" href="../css/loading-bar.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/loading-bar.css"/>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
         <?php if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1): ?>
-        <?php
-            if (!isset($_SESSION['csrf-token'])) {
-                $_SESSION['csrf-token'] = gen_csrf_token();
-            }
-        ?>
+        <?php if (!isset($_SESSION['csrf-token'])): ?>
+            $_SESSION['csrf-token'] = gen_csrf_token();
+        <?php endif; ?>
 
         <meta content="<?php echo $_SESSION['csrf-token']; ?>" name="csrf-token" />
+
         <script>                
             var loa = {
                u_email: "<?php echo $_SESSION['email']; ?>",
@@ -55,6 +54,7 @@
             };
         </script>
         <?php endif; ?>
+
         <?php if (isset($_SESSION['character-id'])): ?>
             <script>
                 loa.u_cid = "<?php echo $_SESSION['character-id']; ?>";

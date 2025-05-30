@@ -1,12 +1,12 @@
 <?php
 namespace Game\Monster;
 use Game\Monster\Enums\MonsterScope;
-use Game\Traits\PropManager\PropManager;
-use Game\Traits\PropManager\Enums\PropType;
+use Game\Traits\PropSuite\PropSuite;
+use Game\Traits\PropSuite\Enums\PropType;
 use Game\Monster\Stats;
 
 class Monster {
-    use PropManager;
+    use PropSuite;
     private ?int $id;
     private int $accountID;
     private int $characterID;
@@ -19,6 +19,11 @@ class Monster {
     private string $monsterClass;
     
     public $stats;
+
+    public function __construct(MonsterScope $scope) {
+        $this->scope = $scope;
+        $this->seed  = bin2hex(random_bytes(8));
+    }
 
     /**
     * Magic method to handle dynamic getters and setters for the Monster class properties.
@@ -47,16 +52,16 @@ class Monster {
         }
 
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
-            return $this->propMod($method, $params);
+                        return $this->propMod($method, $params);
+        } elseif (preg_match('/^(dump|restore)$/', $method, $matches)) {
+            $func = $matches[1];
+            return $this->$func($params[0] ?? null);
         } else {
             return $this->propSync($method, $params, PropType::MONSTER);
         }
     }
 
-    public function __construct(MonsterScope $scope) {
-        $this->scope = $scope;
-        $this->seed  = bin2hex(random_bytes(8));
-    }
+
 
     private function scale_monster(Monster $monster, int $player_level): Monster {
         global $log;

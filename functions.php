@@ -13,9 +13,7 @@
          * @param string $modifier A string modifier for datetime calculation (e.g., '+1 day'). Defaults to 'now'.
          * @return string The formatted MySQL datetime string.
          */
-        function get_mysql_datetime($modifier = 'now') {
-            global $log;
-
+        function get_mysql_datetime($modifier = 'now'): string {
             if ($modifier !== 'now') {
                 $operand  = substr($modifier, 0, 1);
                 $amount   = substr($modifier, 1);
@@ -50,13 +48,13 @@
          * @param string $which The name of the global configuration to retrieve.
          * @return string|null The value of the global configuration, or null if not found.
          */
-        function get_globals($which) {
+        function get_globals(string $which): ?string {
             global $db, $t;
-            $ret_val = '';
-            $sql_query = "SELECT `value` FROM {$t['globals']} WHERE `name` = '$which'";
-            $result = $db->query($sql_query);
-            $row = $result->fetch_assoc();
-
+            $sql_query = "SELECT `value` FROM {$t['globals']} WHERE `name` = ?";
+            $result = $db->execute_query($sql_query, [$which]);
+            if (!$result || !($row = $result->fetch_assoc())) {
+                return null;
+            }
             return $row['value'];
         }
 
@@ -72,8 +70,8 @@
         function set_globals($name, $value) {
             global $db, $t;
 
-            $sql_query = "UPDATE {$t['globals']} SET `value` = '$value' WHERE `name` = '$name'";
-            $db->query($sql_query);
+            $sql_query = "UPDATE {$t['globals']} SET `value` = ? WHERE `name` = ?";
+            $db->execute_query($sql_query, [ $value, $name ]);
         }
 
         /**
@@ -98,17 +96,19 @@
          * @param string $what The type of email to check. Only 'unread' is supported.
          * @return int|LOAError|string The count of unread emails or an error if the directive is unsupported.
          */
-        function check_mail($what): int|LOAError|string {
-            global $db, $log, $t;
-
-            switch ($what) {
-                case 'unread':
-                    $sql_query = "SELECT * FROM {$t['mail']} WHERE NOT FIND_IN_SET('READ', `status`) AND `r_aid` = ?";
-                    $result = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->num_rows;
-                    return $result;
-                default:
-                    return LOAError::MAIL_UNKNOWN_DIRECTIVE;
+        function check_mail(string $what): int {
+            global $db, $t;
+    
+            if ($what === 'unread') {
+                $sql_query = "SELECT COUNT(*) as count FROM {$t['mail']} WHERE NOT FIND_IN_SET('READ', `status`) AND `r_aid` = ?";
+                $result = $db->execute_query($sql_query, [$_SESSION['account-id']]);
+                if (!$result) {
+                    return 0;
+                }
+                $row = $result->fetch_assoc();
+                return (int)($row['count'] ?? 0);
             }
+            return 0;
         }
 
         /**
@@ -168,48 +168,46 @@
          * @param bool $return_list Whether to return a list of character IDs (default: false).
          * @return array An array containing friendship statuses and optionally character IDs.
          */
-        function get_friend_counts(?FriendStatus $status, bool $return_list=false): array {
+        function get_friend_counts(?FriendStatus $status, bool $return_list = false): array {
             global $db, $character, $t;
-            $count = 0;
-            $ids = [];
+            $statuses = [];
 
-            $sql_query = <<<SQL
-                SELECT 
-                    `friend_status`,
-                    COUNT(`friend_status`) AS `count`
-                FROM {$t['friends']}
-                WHERE
-                    recipient_id = ? OR
-                    sender_id = ?
-                GROUP BY `friend_status`
-            SQL;
+            $sql_query = "SELECT `friend_status`, COUNT(*) AS `count` FROM {$t['friends']} 
+                          WHERE recipient_id = ? OR sender_id = ? 
+                          GROUP BY `friend_status`";
+            
+            $result = $db->execute_query($sql_query, [$character->get_id(), $character->get_id()]);
+            if ($result) {
+                while ($row = $result->fetch_assoc()) {
+                    $statuses[$row['friend_status']] = (int)$row['count'];
+                }
+            }
 
-            $statuses = $db->execute_query($sql_query, 
-                [ $character->get_id(), $character->get_id()
-            ])->fetch_all(MYSQLI_ASSOC);
-
-            $statuses['MUTUAL'] ?? 0;
-            $statuses['REQUEST_RECV'] ?? 0;
-            $statuses['REQUEST_SENT'] ?? 0;
-            $statuses['BLOCKED'] ?? 0;
+            // Set default values for missing statuses
+            $statuses['MUTUAL'] = $statuses['MUTUAL'] ?? 0;
+            $statuses['REQUEST_RECV'] = $statuses['REQUEST_RECV'] ?? 0;
+            $statuses['REQUEST_SENT'] = $statuses['REQUEST_SENT'] ?? 0;
+            $statuses['BLOCKED'] = $statuses['BLOCKED'] ?? 0;
 
             if ($return_list) {
-                $status_clause = null;
-                if ($status !== null) {
-                    $status_clause = " AND `friend_status` = '" . $status->name . "'";
+                $ids = [];
+                $status_clause = $status !== null ? " AND `friend_status` = '" . $status->name . "'" : '';
+                
+                $sql_query = "SELECT DISTINCT IF(`recipient_id` = ?, `sender_id`, `recipient_id`) AS `character_id` 
+                              FROM {$t['friends']} 
+                              WHERE `recipient_id` = ? OR `sender_id` = ? $status_clause";
+                
+                $result = $db->execute_query($sql_query, [$character->get_id(), $character->get_id(), $character->get_id()]);
+                if ($result) {
+                    while ($row = $result->fetch_assoc()) {
+                        $ids[] = $row;
+                    }
                 }
-
-                $sql_query = <<<SQL
-                    SELECT DISTINCT
-                        IF(`recipient_id` = ?, `sender_id`, `recipient_id`) AS `character_id`
-                    FROM {$t['friends']}
-                    WHERE `recipient_id` = ? OR `sender_id` = ? $status_clause
-                SQL;
-                $ids = $db->execute_query($sql_query, [$character->get_id(), $character->get_id(), $character->get_id()])->fetch_all(MYSQLI_ASSOC);
-                $data = [];
-                $data['statuses'] = $statuses;
-                $data['ids'] = $ids;
-                return $data;
+                
+                return [
+                    'statuses' => $statuses,
+                    'ids' => $ids
+                ];
             }
             
             return $statuses;
@@ -270,37 +268,29 @@
          * @param int $threshold The threshold for abuse detection (default: 1).
          * @return bool True if abuse is detected, false otherwise.
          */
-        function check_abuse(AbuseType $type, $account_id, $ip, $threshold = 1): bool {
-            global $db, $log, $t;
+        function check_abuse(AbuseType $type, int $account_id, string $ip, int $threshold = 1): bool {
+            global $db, $t;
 
             switch ($type) {
                 case AbuseType::MULTISIGNUP:
-                    $sql_query = <<<SQL
-                                    SELECT `id` FROM {$t['logs']}
-                                    WHERE `type` = ?
-                                        AND `ip` = ?
-                                        AND `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
-                                SQL;
-                    $count = $db->execute_query($sql_query, [ $type->name, $ip ])->num_rows;
-
-                    if ($count > $threshold) {
-                        return true;
+                    $sql_query = "SELECT COUNT(*) as count FROM {$t['logs']} 
+                                 WHERE `type` = ? AND `ip` = ? 
+                                 AND `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()";
+                    $result = $db->execute_query($sql_query, [$type->name, $ip]);
+                    if (!$result) {
+                        return false;
                     }
+                    $row = $result->fetch_assoc();
+                    return ((int)$row['count']) > $threshold;
 
-                    return false;
                 case AbuseType::TAMPERING:
-                    $sql_query = <<<SQL
-                        SELECT `id` FROM {$t['logs']}
-                        WHERE `type` = ? AND `ip` = ?
-                    SQL;
-                    $count = $db->execute_query($sql_query, [ $type->name, $ip ])->num_rows;
-
-                    if ($count > $threshold) {
-                        return true;
+                    $sql_query = "SELECT COUNT(*) as count FROM {$t['logs']} WHERE `type` = ? AND `ip` = ?";
+                    $result = $db->execute_query($sql_query, [$type->name, $ip]);
+                    if (!$result) {
+                        return false;
                     }
-                    return false;
-                default:
-                    $log->error("No type specified for abuse lookup");
+                    $row = $result->fetch_assoc();
+                    return ((int)$row['count']) > $threshold;
             }
 
             return false;
@@ -371,10 +361,18 @@
          * @param string $table The name of the table to retrieve the next ID for.
          * @return int The next available ID.
          */
-        function getNextTableID($table): int {
-            global $db, $t;
+        function getNextTableID($table): int|LOAError {
+            global $db, $t, $log;
+
+            if (!is_valid_table($table)) {
+                $log->error("Unknown table '$table' passed to " . __FUNCTION__);
+                return LOAError::SQLDB_UNKNOWN_TABLE;
+            }
+            
             $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)+1) AS `next_id` FROM $table";
             $next_id = $db->execute_query($sql_query)->fetch_assoc()['next_id'];
+
+            $log->debug("Checking next table ID: '$next_id' for table '$table'", [ 'Query' => $sql_query ]);
             
             return $next_id;
         }
@@ -599,4 +597,10 @@
             }
 
             return "$name's";
+        }
+
+        function is_valid_table($table): bool {
+            global $t;
+
+            return in_array($table, $t);
         }

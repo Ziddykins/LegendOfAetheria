@@ -1,11 +1,11 @@
 <?php
     namespace Game\Bank;
     use Game\Bank\Enums\BankBracket;
-    use Game\Traits\PropManager\PropManager;
-    use Game\Traits\PropManager\Enums\PropType;
+    use Game\Traits\PropSuite\PropSuite;
+    use Game\Traits\PropSuite\Enums\PropType;
 
     class BankManager {
-        use PropManager;
+        use PropSuite;
         private int $id;
         private int $accountID;
         private int $characterID;
@@ -39,19 +39,15 @@
         public function __call($method, $params) {
             global $db, $log;
     
-            /* If it's a get, this is true */
             if (!count($params)) {
                 $params = null;
             }
-    
-            /* Avoid loops with propSync triggering itself */
-            if ($method == 'propSync' || $method == 'propMod') {
-                $log->debug("$method loop");
-                return;
-            }
-    
+
             if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
                 return $this->propMod($method, $params);
+            } elseif (preg_match('/^(dump|restore)$/', $method, $matches)) {
+                $func = $matches[1];
+                return $this->$func($params[0] ?? null);
             } else {
                 return $this->propSync($method, $params, PropType::BANKMANAGER);
             }
