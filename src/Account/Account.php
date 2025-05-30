@@ -1,41 +1,42 @@
 <?php
 namespace Game\Account;
 
-use Game\Traits\PropManager\PropManager;
-use Game\Traits\PropManager\Enums\PropType;
+use Game\Traits\PropSuite\PropSuite;
+use Game\Traits\PropSuite\Enums\PropType;
+use Game\Account\Enums\Privileges;
 
 class Account {
-    use PropManager;
+    use PropSuite;
     
-    private $id;
-    private $email;
-    private $password;
-    private $dateRegistered;
-    private $verified;
-    private $verificationCode;
-    private $privileges;
-    private $lastLogin;
-    private $loggedOn;
-    private $failedLogins;
-    private $ipAddress;
-    private $credits;
-    private $sessionID;
-    private $ipLock;
-    private $ipLockAddr;
-    private $banned;
-    private $muted;
-    private $loggedIn;
-    private $eggsOwned;
-    private $eggsSeen;
-    private $jwtSecret;
+    private int $id;
+    private string $email;
+    private string $password;
+    private string $dateRegistered;
+    private bool $verified;
+    private string $verificationCode;
+    private Privileges $privileges;
+    private string $lastLogin;
+    private string $loggedOn;
+    private int $failedLogins;
+    private string $ipAddress;
+    private int $credits;
+    private string $sessionID;
+    private string $ipLock;
+    private string $ipLockAddr;
+    private bool $banned;
+    private bool $muted;
+    private bool $loggedIn;
+    private int $eggsOwned;
+    private int $eggsSeen;
+    private string $jwtSecret;
 
-    private $settings;
+    private Settings $settings;
 
-    private $charSlot1;
-    private $charSlot2;
-    private $charSlot3;
+    private int $charSlot1;
+    private int $charSlot2;
+    private int $charSlot3;
 
-    private $focusedSlot;
+    private int $focusedSlot;
 
     public function __construct($email = null) {
         if ($email) {
@@ -57,17 +58,11 @@ class Account {
             $params = null;
         }
 
-        /* Avoid loops with propSync triggering itself */
-        if ($method == 'propSync' || $method == 'propMod' || $method == 'propDump') {
-            $log->debug("$method loop");
-            return;
-        }
-
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
             return $this->propMod($method, $params);
-
-        } elseif (preg_match('/^(dump|restore)$/', $method, $MATCHES)) {
-            return $this->$MATCHES[1]();
+        } elseif (preg_match('/^(dump|restore)$/', $method, $matches)) {
+            $func = $matches[1];
+            return $this->$func($params[0] ?? null);
         } else {
             return $this->propSync($method, $params, PropType::ACCOUNT);
         }

@@ -1,18 +1,17 @@
 <?php
-namespace Game\Traits\PropManager;
+namespace Game\Traits\PropSuite;
 
 use ReflectionClass;
 use ReflectionProperty;
-use Game\Traits\PropManager\PropType;
 
-trait PropDump {
+trait PropDump { 
     /**
      * Dumps an object and all its nested objects into a JSON structure
      * that preserves type information and null values.
      * 
      * @return string JSON representation of the object
      */
-    private function dump(): string {
+    private function propDump(): string {
         return json_encode($this->dumpObject($this));
     }
 
@@ -22,7 +21,11 @@ trait PropDump {
      * @param string $json The JSON dump to restore from
      * @return object The restored object
      */
-    private function restore(string $json): object {
+    private function propRestore($json): object|null {
+        if (!$json) {
+            return null;
+        }
+
         $data = json_decode($json, true);
         return $this->restoreObject($data);
     }
@@ -91,7 +94,10 @@ trait PropDump {
     /**
      * Internal method to recursively restore an object from dumped data
      */
-    private function restoreObject(array $data): object {
+    private function restoreObject(array $data): object|null {
+        if (!$data) {
+            return null;
+        }
         $className = $data['__class'];
         if (!class_exists($className)) {
             throw new \RuntimeException("Cannot restore class $className - class not found");

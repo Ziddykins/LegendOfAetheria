@@ -1,5 +1,5 @@
 <?php
-namespace Game\Traits\PropManager;
+namespace Game\Traits\PropSuite;
 
 trait PropConvert {
     private function clsprop_to_tblcol($property) {

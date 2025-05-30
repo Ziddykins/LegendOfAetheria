@@ -1,5 +1,5 @@
 <?php
-namespace Game\Traits\PropManager\Enums;
+namespace Game\Traits\PropSuite\Enums;
 
 enum PropType {
     case ACCOUNT;

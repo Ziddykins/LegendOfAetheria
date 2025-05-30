@@ -168,20 +168,22 @@
 }
 
 
-.josefinslab {
+/*.josefinslab {
+
   font-family: "Josefin Slab", serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
 }
 
-.main-font {
+/*.main-font {
   font-family: "Syne Mono", monospace;
-  font-weight: 100;
+  font-weight: 200;
   font-style: normal;
-}
+}*/
 
-.afacad-flux-loa {
+/*.afacad-flux-loa {*/
+.main-font {
   font-family: "Afacad Flux", serif;
   font-optical-sizing: auto;
   font-weight: 200;

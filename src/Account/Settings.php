@@ -2,12 +2,12 @@
 namespace Game\Account;
 
 use Exception;
-use Game\Traits\PropManager\PropManager;
-use Game\Traits\PropManager\Enums\PropType;
+use Game\Traits\PropSuite\PropSuite;
+use Game\Traits\PropSuite\Enums\PropType;
 use Game\Components\Sidebar\Enums\SidebarType;
 
 class Settings {
-    use PropManager;
+    use PropSuite;
 
     private int $id;
     private string $colorMode;
@@ -27,16 +27,14 @@ class Settings {
             $params = null;
         }
 
-        /* Avoid loops with propSync triggering itself */
-        if ($method == 'propSync' || $method == 'propMod') {
-            $log->debug("$method loop");
-            return;
-        }
-
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
             return $this->propMod($method, $params);
+        } elseif (preg_match('/^(dump|restore)$/', $method, $matches)) {
+            $func = $matches[1];
+            return $this->$func($params[0] ?? null);
         } else {
             return $this->propSync($method, $params, PropType::SETTINGS);
         }
     }
 }
+

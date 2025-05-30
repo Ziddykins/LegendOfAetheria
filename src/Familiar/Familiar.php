@@ -2,12 +2,12 @@
 namespace Game\Familiar;
 
 use Game\Inventory\Enums\ObjectRarity;
-use Game\Traits\PropManager\PropManager;
+use Game\Traits\PropSuite\PropSuite;
 
 require_once "bootstrap.php";
 
 class Familiar {
-    use PropManager;
+    use PropSuite;
 
     private int $id;
     private int $characterID;

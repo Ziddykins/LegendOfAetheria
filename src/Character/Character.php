@@ -1,42 +1,49 @@
 <?php
 namespace Game\Character;
-use Game\Traits\PropManager\Enums\PropType;
-use Game\Traits\PropManager\PropManager;
+use Game\Traits\PropSuite\Enums\PropType;
+use Game\Traits\PropSuite\PropSuite;
+use Game\Monster\Monster;
+use Game\Character\Stats;
+use Game\Inventory\Inventory;
+use Game\Bank\BankManager;
+use Game\Character\Enums\Races;
 
 class Character {
-    use PropManager;
+    use PropSuite;
     
-    private $id;
-    private $accountID;
-    private $name;
-    private $race;
-    private $avatar;
-    private $level = 1;
-    private $x = 0;
-    private $y = 0;
-    private $location = 'The Shrine';
-    private $alignment = 0;
-    private $gold = 1000;
-    private $spindels = 0;
-    private $exp = 0;
+    private int $id;
+    private int $accountID;
+    private int $level = 1;
+    private int $x = 0;
+    private int $y = 0;
+    private int $alignment = 0;
+    private int $spindels = 0;
+    private int $exp = 0;
+    private int $dateCreated;
+    private int $floor = 1;
 
-    private $floor = 1;
-    private $description = 'None Provided';
+    private float $gold = 1000.0;
 
-    private $dateCreated;
-    private $lastAction;
+    private string $description = 'None Provided';
+    private string $location = 'The Shrine';
+    private string $name;
+    private string $avatar;
+    private string $lastAction;
+
+    /* enum Races */
+    private Races $race;
 
     /* class Monster */
-    public $monster;
+    public Monster $monster;
 
     /* class Stats */
-    public $stats;
+    public Stats $stats;
 
     /* class Inventory */
-    public $inventory;
+    public Inventory $inventory;
 
     /* class Bank */
-    public $bank;
+    public BankManager $bank;
 
     public function __construct($accountID, $characterID = null) {
         $this->accountID = $accountID;
@@ -66,7 +73,6 @@ class Character {
             return $this->propMod($method, $params);
         } elseif (preg_match('/^(dump|restore)$/', $method, $MATCHES)) {
             $func = $MATCHES[1];
-            echo $func;
             return $this->$func($params[0] ?? null);
         } else {
             return $this->propSync($method, $params, PropType::CHARACTER);

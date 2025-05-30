@@ -2,12 +2,12 @@
 namespace Game\Inventory;
 
 use Game\Inventory\Items\Item;
-use Game\Traits\PropManager\Enums\PropType;
-use Game\Traits\PropManager\PropManager;
+use Game\Traits\PropSuite\Enums\PropType;
+use Game\Traits\PropSuite\PropSuite;
 
 
 class Inventory {
-    use PropManager;
+    use PropSuite;
     private int $id;
     private int $slotCount;
     private int $currentWeight;
