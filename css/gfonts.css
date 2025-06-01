@@ -183,7 +183,7 @@
 }*/
 
 /*.afacad-flux-loa {*/
-.main-font {
+/*.main-font {*/
   font-family: "Afacad Flux", serif;
   font-optical-sizing: auto;
   font-weight: 200;
@@ -192,16 +192,17 @@
     "slnt" 0;
 }
 
-.press-start {
+.main-font {
   font-family: "Press Start 2P", serif;
-  font-weight: 100;
+  font-weight: 600;
   font-size: 12px;
   font-style: normal;
 }
 
-.jacquarda {
+/*.main-font {
   font-family: "Jacquarda Bastarda 9", serif;
   font-weight: 100;
-  font-size: 24px;
+  font-size: 32px;
   font-style: normal;
 }
+*/

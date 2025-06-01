@@ -1,11 +1,11 @@
 <?php
 namespace Game\Inventory\Items;
 class Item {
-    private string $name;
-    private int $weight;
+    private string $name = "None";
+    private int $weight = 0;
     /* Array of Class ItemSockets */
-    private array $sockets;
-    private array $modifiers;
+    private array $sockets = [];
+    private array $modifiers = [];
 
     public function __construct($name = "None", $weight = 0, $socketCount = 1) {
         $this->name   = $name;

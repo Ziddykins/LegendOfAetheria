@@ -9,9 +9,9 @@ use Game\Components\Sidebar\Enums\SidebarType;
 class Settings {
     use PropSuite;
 
-    private int $id;
-    private string $colorMode;
-    private SidebarType $sideBar;
+    private ?int $id = null;
+    private string $colorMode = 'dark';
+    private ?SidebarType $sideBar = null;
 
     public function __construct($accountID) {
         $this->id = $accountID;
@@ -29,7 +29,7 @@ class Settings {
 
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
             return $this->propMod($method, $params);
-        } elseif (preg_match('/^(dump|restore)$/', $method, $matches)) {
+        } elseif (preg_match('/^(propDump|propRestore)$/', $method, $matches)) {
             $func = $matches[1];
             return $this->$func($params[0] ?? null);
         } else {
@@ -37,4 +37,3 @@ class Settings {
         }
     }
 }
-

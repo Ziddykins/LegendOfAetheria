@@ -4,6 +4,10 @@ use Game\Account\Account;
 use Game\Character\Character;
 use Game\Mail\Folder\Enums\FolderType;
 use Game\Mail\MailBox\MailBox;
+use Game\Character\Enums\FriendStatus;
+use Game\Account\Enums\Privileges;
+
+require_once "constants.php";
 
 $account   = new Account($_SESSION['email']); 
 $character = new Character($account->get_id(), $_SESSION['character-id']); 
@@ -517,7 +521,7 @@ $currentSub = $_GET['sub'] ?? '';
                             </a>
                         </li>                        
                     </ul>
-                    <div class="pb-5 mb-5 mt-5 d-flex w-100 align-content-center justify-content-center">
+                    <!-- div class="pb-5 mb-5 mt-5 d-flex w-100 align-content-center justify-content-center">
                         <a href="/logout" class="btn bg-dark-subtle shadow">
                             <span class="d-flex align-content-around">
                                 <span class="material-symbols-outlined float-start">move_item</span>
@@ -525,7 +529,79 @@ $currentSub = $_GET['sub'] ?? '';
                             </span>
 
                         </a>
-                    </div>
+                    </div> -->
+                    <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 fixed-bottom">
+                            <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
+                                <span><img src="img/avatars/<?php echo $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
+                            </a>
+                            
+                            <a href="#" class="text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="d-none d-md-inline mx-1 ms-3 fs-6">Account</span>
+                            </a>
+                        
+                            <ul class="dropdown-menu dropdown-menu text-small shadow">
+                                <li>
+                                    <a class="dropdown-item" href="?page=profile">Profile</a>
+                                    <ul class="dropdown-menu dropdown-menu text-small shadow">
+                                        <li>
+                                            <a class="dropdown-item" href="?page=profile">Profile</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=friends">Friends
+                                    <?php
+                                        $posts = 0;
+                                        $posts = get_friend_counts(FriendStatus::REQUEST_RECV);
+                                        $pill_bg  = 'bg-danger';
+
+                                        if (!$posts) {
+                                            $pill_bg = 'bg-primary';
+                                        }
+                                    ?>
+    <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo "woo"; ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=mail">Mail
+                                        <?php
+                                            $unread_mail = check_mail('unread');
+                                            $pill_bg = 'bg-danger';
+        
+                                            if ($unread_mail == 0) {
+                                                    $pill_bg = 'bg-primary';
+                                            }
+                                        ?>
+<span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $unread_mail; ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=settings">Settings</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <?php
+                                    $privileges = $account->get_privileges()->name;
+                                            
+                                    if ($privileges > Privileges::ADMINISTRATOR->value) {
+                                        $href = ADMIN_WEBROOT;
+                                        echo "<li>\n\t\t\t\t\t\t\t\t\t";
+                                    
+                                        echo "<a class=\"dropdown-item\" href=\"$href\">Administrator</a>";
+                                        echo "\n\t\t\t\t\t\t\t\t</li>\n";
+                                    }
+                                ?>
+                                
+                                <li>
+                                    <a class="dropdown-item" href="/select">Characters</a>
+                                </li>
+                                        
+                                <li>
+                                    <a class="dropdown-item" href="/logout">Sign out</a>
+                                </li>
+                            </ul>
+                        </div>
                 </li>
             </ul>
         </nav>

@@ -1,5 +1,6 @@
 <?php
 namespace Game\Components\Cards\CharacterSelect;
+use Game\Character\Stats;
 
 class CharacterSelectCard {
     private $characterID;
@@ -17,7 +18,8 @@ class CharacterSelectCard {
         if ($this->characterID) {
             $sqlQuery = "SELECT `name`, `avatar`, `race`, `stats`, `level` FROM {$t['characters']} WHERE `id` = ?";
             $character = $db->execute_query($sqlQuery, [ $this->characterID ])->fetch_assoc();
-            $stats = safe_serialize($character['stats'], true);
+            $stats = new Stats($this->characterID);
+            $stats->propRestore($character['stats']);
 
             $cardHtml = '<div class="card text-center me-3 ms-1" data-loa-slot="' . $this->slot . '">
                     <span class="small text-bg-dark bg-gradient float-right">Slot ' . $this->slot . '</span>

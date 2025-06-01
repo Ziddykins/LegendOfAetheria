@@ -9,15 +9,15 @@ require_once "bootstrap.php";
 class Familiar {
     use PropSuite;
 
-    private int $id;
-    private int $characterID;
-    private int $level;
-    private int $experience;
-    private int $nextLevel;
-    private string $name;
-    private $avatar;
+    private ?int $id = null;
+    private ?int $characterID = null;
+    private int $level = 1;
+    private int $experience = 0;
+    private int $nextLevel = 100;
+    private ?string $name = null;
+    private $avatar = null;
    
-    private $stats;
+    private ?Stats $stats = null;
 
     public function __construct($characterID, $table) {
         $this->characterID = $characterID;

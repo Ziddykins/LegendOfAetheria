@@ -1,14 +1,17 @@
 <?php
 namespace Game\Traits\PropSuite;
 
-use Game\Account\Settings;
-use Game\Account\Enums\Privileges;
-use Game\Bank\Enums\BankBracket;
+use ValueError;
 use Game\Character\Stats;
-use Game\Inventory\Inventory;
+use Game\Account\Settings;
 use Game\Bank\BankManager;
+use Game\Inventory\Inventory;
 use Game\System\Enums\LOAError;
+use Game\Bank\Enums\BankBracket;
+use Game\Account\Enums\Privileges;
 use Game\Traits\PropSuite\Enums\PropType;
+use Exception;
+use ReflectionType;
 
 /**
      * Trait PropSync
@@ -133,8 +136,6 @@ trait PropSync {
             $id = $this->id;
         }
         
-        $this->$prop = $params[0];
-
         switch ($type) {
             case PropType::CSTATS:
             case PropType::MSTATS:
@@ -199,16 +200,9 @@ trait PropSync {
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $table) || !preg_match('/^[a-zA-Z0-9_]+$/', $table_col)) {
             throw new ValueError('Invalid input');
         }
+
         $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";
         
-        if (is_object($params[0])) {
-            if (is_numeric($params[0]->value)) { // if an enum, essentially
-                $params[0] = $params[0]->value;
-            } else {
-                $params[0] = safe_serialize($params[0]);
-            }
-        }
-
         $db->execute_query($sql_query, [ $params[0], $id ]);
     }
 
@@ -229,6 +223,7 @@ trait PropSync {
                 $db->execute_query($sql_query, [ $accountID, $this->email, $srl_data ] );
 
                 return $accountID;
+            
             case PropType::CHARACTER:
                 if (isset($params[0])) {
                     $next_slot = $params[0];
@@ -246,7 +241,9 @@ trait PropSync {
                 
                 $tmp_inventory = new Inventory($this->id);
                 $tmp_stats     = new Stats($this->id);
-                $tmp_bank      = new BankManager($this->id, $this->accountID);
+                
+                $tmp_bank      = new BankManager($this->accountID, $this->id);
+                $tmp_bank->id(getNextTableID($_ENV['SQL_BANK_TBL']));
                 
                 $srl_inventory = $tmp_inventory->propDump();
                 $srl_stats     = $tmp_stats->propDump();
@@ -260,6 +257,7 @@ trait PropSync {
                 if (!preg_match('/^[a-zA-Z0-9_]+$/', $char_col)) {
                     throw new ValueError('Invalid input');
                 }
+
                 $act_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$char_col` = ? WHERE `id` = ?";
 
                 $db->execute_query($chr_query, [ $this->id, $this->accountID, $srl_inventory, $srl_stats, $srl_bank ]);
@@ -330,7 +328,7 @@ trait PropSync {
                 $settings_data = $tmp_obj['settings'];
                 $this->settings = $tmp_settings->propRestore($settings_data);
             }
-            $this->settings   = $this->propRestore($tmp_obj['settings']);                                                                                                                                                                                                                                                                          
+
             $this->privileges = Privileges::name_to_enum($tmp_obj['privileges']);
         } elseif ($type == PropType::MONSTER) {
             $this->stats = $this->propRestore($tmp_obj['stats']);
@@ -347,8 +345,7 @@ trait PropSync {
 
             $key = $this->tblcol_to_clsprop($key);
 
-            if ($value !== null && $value !== 'NULL' && $value) {
-                $this->$key = $value;
+            if ($value !== null && $value !== 'NULL' && $value) {                $this->$key = $value;
             }
         }
     } 

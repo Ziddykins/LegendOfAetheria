@@ -91,10 +91,11 @@
         $characters = $db->execute_query($sql_query)->fetch_all(MYSQLI_ASSOC);
     
         foreach ($characters as $character) {
-            $obj_char = new Character($character['account_id'], $character['id']);
-            $obj_char->stats = safe_serialize($character['stats'], true);
-            
             $stats = [ "mp", "hp", "ep" ];
+
+            $obj_char = new Character($character['account_id'], $character['id']);
+            $obj_char->stats = $obj_char->stats->propRestore($character['stats']);
+
             foreach ($stats as $stat) {
                 $set_str = "add_$stat";
                 $obj_char->stats->$set_str(REGEN_PER_TICK);

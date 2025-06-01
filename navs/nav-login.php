@@ -71,7 +71,12 @@
             <div class="mb-2">
                 <div class="d-flex text-bg-tertiary bg-gradient border shadow">
                     <div class="p-2 flex-grow-1">
-                        <h6><i class="bi bi-person-fill-gear"></i> Account</h6>
+                        <h6>
+                            <i class="bi bi-person-fill-gear"></i> Account
+                            <i id="random" class="bi bi-shuffle float-end me-4"></i>
+                            <i id="debug" class="bi bi-diamond-half float-end me-4"></i>
+                        </h6>
+
                     </div>
                 </div>
 
@@ -339,4 +344,38 @@
 
         target_div.innerHTML = html_string;
     });
+
+    function genString(length) {
+        return Math.random().toString(26).substring(2, length + 2);
+    }
+
+    document.getElementById("random").addEventListener("click", function() {
+    
+    });
+
+    document.getElementById("debug").addEventListener("click", function() {
+        const email = document.getElementById("register-email");
+        const pw = document.getElementById("register-password");
+        const pw2 = document.getElementById("register-password-confirm");
+        const charname = document.getElementById("register-character-name");
+        const race = document.getElementById("race-select");
+        const avatar = document.getElementById("avatar-select");
+
+        email.value = "test" + genString(5) + "@example.com";
+        pw.value = genString(10);
+        pw2.value = pw.value;
+        charname.value = "TestChar" + genString(5);
+        race.selectedIndex = parseInt(Math.random()*race.options.length)
+        avatar.selectedIndex = parseInt(Math.random()*avatar.options.length)
+
+        var stats = ["str", "def", "int"];
+        for (let i=0; i<10; i++) {
+            var which = stats[Math.floor(Math.random() * 3)];
+            stat_adjust(which + '-plus').click();
+
+        }
+        
+    });
+
+
 </script>
