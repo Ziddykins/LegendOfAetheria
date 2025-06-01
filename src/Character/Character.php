@@ -7,6 +7,7 @@ use Game\Character\Stats;
 use Game\Inventory\Inventory;
 use Game\Bank\BankManager;
 use Game\Character\Enums\Races;
+use ReflectionEnumPureCase;
 
 class Character {
     use PropSuite;
@@ -19,38 +20,45 @@ class Character {
     private int $alignment = 0;
     private int $spindels = 0;
     private int $exp = 0;
-    private int $dateCreated;
+    private string $dateCreated = '1970-01-01 00:00:00';
     private int $floor = 1;
 
     private float $gold = 1000.0;
 
     private string $description = 'None Provided';
     private string $location = 'The Shrine';
-    private string $name;
-    private string $avatar;
-    private string $lastAction;
+    private string $name = 'NoName';
+    private string $avatar = '';
+    private string $lastAction = '';
 
     /* enum Races */
-    private Races $race;
+    private ?Races $race = null;
 
     /* class Monster */
-    public Monster $monster;
+    public ?Monster $monster = null;
 
     /* class Stats */
-    public Stats $stats;
+    public ?Stats $stats = null;
 
     /* class Inventory */
-    public Inventory $inventory;
+    public ?Inventory $inventory = null;
 
     /* class Bank */
-    public BankManager $bank;
+    public ?BankManager $bank = null;
 
     public function __construct($accountID, $characterID = null) {
         $this->accountID = $accountID;
-        
+        $this->stats = new Stats($characterID ?? 0);
+
         if ($characterID) {
+            
             $this->id = $characterID;
+            $this->inventory = new Inventory($this->id);
+            $this->race = Races::random_enum();
             $this->load($this->id);
+            $this->stats->set_id($this->id);
+            
+
         }
     }
 
@@ -62,17 +70,12 @@ class Character {
             $params = null;
         }
 
-        /* Avoid loops with propSync triggering itself */
-        if ($method == 'propSync' || $method == 'propMod' || $method == 'propConvert' || $method == 'propDump' || $method == 'propRestore') {
-            $log->debug("$method loop");
-            return;
-        }
 
-        $MATCHES = [];
+        $matches = [];
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
             return $this->propMod($method, $params);
-        } elseif (preg_match('/^(dump|restore)$/', $method, $MATCHES)) {
-            $func = $MATCHES[1];
+        } elseif (preg_match('/^(propDump|propRestore)$/', $method, $matches)) {
+            $func = $matches[1];
             return $this->$func($params[0] ?? null);
         } else {
             return $this->propSync($method, $params, PropType::CHARACTER);

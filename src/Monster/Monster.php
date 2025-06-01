@@ -7,18 +7,18 @@ use Game\Monster\Stats;
 
 class Monster {
     use PropSuite;
-    private ?int $id;
-    private int $accountID;
-    private int $characterID;
-    private int $level;
-    private string $name;
-    private $scope;
-    private string $seed;
-    private int $summondBy; // Global or Zone monsters
+    private ?int $id = null;
+    private ?int $accountID = null;
+    private ?int $characterID = null;
+    private int $level = 1;
+    private ?string $name = null;
+    private ?MonsterScope $scope = null;
+    private string $seed = '';
+    private ?int $summondBy = null; // Global or Zone monsters
     private int $dropLevel = 1;
-    private string $monsterClass;
+    private ?string $monsterClass = null;
     
-    public $stats;
+    public ?Stats $stats = null;
 
     public function __construct(MonsterScope $scope) {
         $this->scope = $scope;
@@ -53,7 +53,7 @@ class Monster {
 
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
                         return $this->propMod($method, $params);
-        } elseif (preg_match('/^(dump|restore)$/', $method, $matches)) {
+        } elseif (preg_match('/^(propDump|propRestore)$/', $method, $matches)) {
             $func = $matches[1];
             return $this->$func($params[0] ?? null);
         } else {

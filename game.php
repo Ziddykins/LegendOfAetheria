@@ -30,20 +30,7 @@
     $_SESSION['name'] = $character->get_name();
     $cur_floor        = $character->get_floor();
     $avatar           = $character->get_avatar();
-    $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now")));
-    
-
-    //$yooo = $character->dump();
-
-    //$new_char = $character->restore($yooo);
-
-    echo "<pre>";
-    echo $character->dump();
-    //print_r($new_char);
-        echo "</pre>";
-    exit();
-    
-    
+    $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now")));    
 ?>
 
 <?php include 'html/opener.html'; ?>

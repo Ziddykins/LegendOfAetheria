@@ -18,7 +18,7 @@
                                     <div class="mb-3 row">
                                         <label for="character-race" class="col-form-label fw-bold">Character Race:</label>
                                         <div class="col">
-                                            <input type="text" class="form-control" id="character-race" name="character-race" value="<?php echo $character->get_race(); ?>" disabled>
+                                            <input type="text" class="form-control" id="character-race" name="character-race" value="<?php echo ctype_lower($character->get_race()->name); ?>" disabled>
                                         </div>
                                     </div>
                                     

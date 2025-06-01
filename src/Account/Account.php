@@ -8,35 +8,35 @@ use Game\Account\Enums\Privileges;
 class Account {
     use PropSuite;
     
-    private int $id;
-    private string $email;
-    private string $password;
-    private string $dateRegistered;
-    private bool $verified;
-    private string $verificationCode;
-    private Privileges $privileges;
-    private string $lastLogin;
-    private string $loggedOn;
-    private int $failedLogins;
-    private string $ipAddress;
-    private int $credits;
-    private string $sessionID;
-    private string $ipLock;
-    private string $ipLockAddr;
-    private bool $banned;
-    private bool $muted;
-    private bool $loggedIn;
-    private int $eggsOwned;
-    private int $eggsSeen;
-    private string $jwtSecret;
+    private ?int $id = null;
+    private string $email = '';
+    private string $password = '';
+    private string $dateRegistered = '';
+    private bool $verified = false;
+    private string $verificationCode = '';
+    private ?Privileges $privileges = null;
+    private string $lastLogin = '';
+    private string $loggedOn = '';
+    private int $failedLogins = 0;
+    private string $ipAddress = '';
+    private int $credits = 0;
+    private string $sessionID = '';
+    private string $ipLock = '';
+    private string $ipLockAddr = '';
+    private bool $banned = false;
+    private bool $muted = false;
+    private bool $loggedIn = false;
+    private int $eggsOwned = 0;
+    private int $eggsSeen = 0;
+    private string $jwtSecret = '';
 
-    private Settings $settings;
+    private ?Settings $settings = null;
 
-    private int $charSlot1;
-    private int $charSlot2;
-    private int $charSlot3;
+    private ?int $charSlot1 = null;
+    private ?int $charSlot2 = null;
+    private ?int $charSlot3 = null;
 
-    private int $focusedSlot;
+    private ?int $focusedSlot = null;
 
     public function __construct($email = null) {
         if ($email) {
@@ -60,7 +60,7 @@ class Account {
 
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
             return $this->propMod($method, $params);
-        } elseif (preg_match('/^(dump|restore)$/', $method, $matches)) {
+        } elseif (preg_match('/^(propDump|propRestore)$/', $method, $matches)) {
             $func = $matches[1];
             return $this->$func($params[0] ?? null);
         } else {

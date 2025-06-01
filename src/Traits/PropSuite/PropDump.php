@@ -116,10 +116,13 @@ trait PropDump {
                 if (is_array($value) && isset($value['__class'])) {
                     // Restore nested object
                     $value = $this->restoreObject($value);
-                } elseif (is_array($value) && isset($value['name']) && $propertyData['type'] === 'UnitEnum') {
-                    // Restore enum
-                    $enumClass = $propertyData['type'];
-                    $value = constant("$enumClass::{$value['name']}");
+                } elseif (is_array($value) && isset($value['name'])) {
+                    $propertyType = $property->getType();
+                    if ($propertyType && enum_exists($propertyType->getName())) {
+                        // Restore enum using the actual enum class from property type
+                        $enumClass = $propertyType->getName();
+                        $value = constant("$enumClass::{$value['name']}");
+                    }
                 }
 
                 $property->setValue($instance, $value);

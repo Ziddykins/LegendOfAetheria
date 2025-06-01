@@ -48,8 +48,7 @@ CREATE TABLE `###REPL_SQL_TBL_ACCOUNTS###` (
   `char_slot1` int(9) unsigned DEFAULT NULL,
   `char_slot2` int(9) unsigned DEFAULT NULL,
   `char_slot3` int(9) unsigned DEFAULT NULL,
-  `settings` blob DEFAULT NULL,
-  `jwt_secret` blob DEFAULT NULL,
+  `settings` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `slots` (`char_slot1`,`char_slot2`,`char_slot3`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -115,10 +114,10 @@ CREATE TABLE `###REPL_SQL_TBL_CHARACTERS###` (
   `gold` bigint(20) unsigned DEFAULT 1000,
   `floor` int(9) unsigned DEFAULT 1,
   `description` text DEFAULT 'None Provided',
-  `stats` blob DEFAULT NULL,
-  `inventory` blob DEFAULT NULL,
-  `monster` blob DEFAULT NULL,
-  `bank` blob DEFAULT NULL,
+  `stats` varchar(255) DEFAULT NULL,
+  `inventory` varchar(255) DEFAULT NULL,
+  `monster` varchar(255) DEFAULT NULL,
+  `bank` varchar(255) DEFAULT NULL,
   `date_created` datetime DEFAULT current_timestamp(),
   `last_action` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`) USING BTREE
@@ -261,7 +260,7 @@ CREATE TABLE `###REPL_SQL_TBL_MONSTERS###` (
   `exp_awarded` bigint(20) DEFAULT NULL,
   `gold_awarded` bigint(20) DEFAULT NULL,
   `monster_class` varchar(255) DEFAULT NULL,
-  `stats` blob DEFAULT NULL,
+  `stats` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

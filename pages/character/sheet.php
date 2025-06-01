@@ -5,7 +5,7 @@
             <div class="container"style="max-width: 700px;">
                 <div class="card ps-3 mb-3 pt-3"  ">
                     <div class="card-title lead">
-                        <?php echo "$char_name the level $char_level $char_race"; ?>
+                        <?php echo "$char_name the level $char_level {$char_race->name}"; ?>
                         
                         <span class="small text-body-secondary float-end pe-3" style="font-size: 10px;">
                             Character created <?php echo $character->get_dateCreated(); ?>
