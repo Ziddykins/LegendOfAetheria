@@ -30,8 +30,6 @@ class Stats {
     private int $evsn = 0;
     private int $rgen = 0;
     private int $absb = 0;
-
-
     public function __construct($characterID = 0) {
         $this->id = $characterID;
     }
@@ -43,12 +41,8 @@ class Stats {
             $params = null;
         }
 
-        if ($method == 'propSync' || $method == 'propMod') {
-            return;
-        }
-
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
-                        return $this->propMod($method, $params);
+            return $this->propMod($method, $params);
         } elseif (preg_match('/^(propDump|propRestore)$/', $method, $matches)) {
             $func = $matches[1];
             return $this->$func($params[0] ?? null);

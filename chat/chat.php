@@ -41,8 +41,6 @@ switch ($req_obj->action) {
         $room = $req_obj->data->room;
         $message = $req_obj->data->message;
         $nickname = $req_obj->data->nickname;
-
-
         $message = htmlentities($message);
         $result = add_message($char_id, $room, $message, $nickname);
         

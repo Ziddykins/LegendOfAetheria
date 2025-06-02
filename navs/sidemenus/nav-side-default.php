@@ -624,8 +624,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         activeLink.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-
-
     
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {

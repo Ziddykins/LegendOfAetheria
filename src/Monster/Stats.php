@@ -32,12 +32,8 @@ class Stats {
             $params = null;
         }
 
-        if ($method == 'propSync' || $method == 'propMod') {
-            return;
-        }
-
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
-                        return $this->propMod($method, $params);
+            return $this->propMod($method, $params);
         } elseif (preg_match('/^(propDump|propRestore)$/', $method, $matches)) {
             $func = $matches[1];
             return $this->$func($params[0] ?? null);

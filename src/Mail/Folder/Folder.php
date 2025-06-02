@@ -114,8 +114,6 @@ class Folder {
             
             $status_int = EnvelopeStatus::value_from_flagstring($flagstring);
             $read       = $status_int & EnvelopeStatus::READ->value;
-
-
             $status_line = EnvelopeStatus::get_status_line($flagstring);
 
             $html .= '<div class="list-group w-50">';

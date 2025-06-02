@@ -2,8 +2,6 @@
 namespace Game\OpenAI;
 
 use Game\OpenAI\Enums\HttpMethod;
-
-
 class OpenAI {
     protected $apiKey;
     protected $endPoint;

@@ -57,19 +57,16 @@ class Character {
             $this->race = Races::random_enum();
             $this->load($this->id);
             $this->stats->set_id($this->id);
-            
-
         }
     }
 
     public function __call($method, $params) {
         global $db, $log;
 
-        /* If it's a get, this is true */
+        
         if (!count($params)) {
             $params = null;
         }
-
 
         $matches = [];
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {

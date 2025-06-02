@@ -48,6 +48,4 @@
             $burn->set_statuses([ Status::BURNING, Status::OVERHEATED ]);
         }
     }
-
-
 ?>

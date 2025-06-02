@@ -6,7 +6,6 @@
         $sql_pass = $_ENV['SQL_PASS'];
         
         $db = new mysqli($sql_host, $sql_user, $sql_pass, $sql_db, $sql_port);
-
         if ($db->connect_errno) {
             //$log->critical('Unable to make a connection to the SQL database: ' . $db->connect_error);
             die('Couldn\'t connect to the backend server');

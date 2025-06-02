@@ -10,8 +10,6 @@ use Game\Traits\PropConvert;
 
 require_once "../../bootstrap.php";
 require_once "system/functions.php";
-
-
 if (check_session()) {
     $account = new Account($_SESSION['email']);
     $character = new Character($account->get_id(), $_SESSION['character-id']);
@@ -56,8 +54,6 @@ function clsprop_to_tblcol($property): string|null {
             $out .= strtolower($property[$i]);
              continue;
         }
-
-
         if (isset($property[$i+1])) {
             $check_double = $property[$i] . $property[$i + 1];
         } else {
@@ -85,7 +81,7 @@ function clsprop_to_tblcol($property): string|null {
 
 <?php include WEBROOT . '/html/opener.html'; ?>
 <head>
-    <?php include PATH_ADMINROOT . '/html/headers.html'; ?>
+    <?php include ADMIN_WEBROOT . '/html/headers.html'; ?>
     <script src="js/tabulator.min.js" type="text/javascript"></script>
     <link rel="stylesheet" href="css/tabulator.min.css">
     
@@ -96,7 +92,7 @@ function clsprop_to_tblcol($property): string|null {
         <nav class="app-header navbar navbar-expand bg-body">
             <div class="container-fluid">
 
-                <?php include PATH_ADMINROOT . '/components/nav-links.html'; ?>
+                <?php include ADMIN_WEBROOT . '/components/nav-links.html'; ?>
 
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
@@ -105,9 +101,9 @@ function clsprop_to_tblcol($property): string|null {
                         </a>
                     </li>
 
-                    <?php include PATH_ADMINROOT . '/components/messages.html'; ?>
+                    <?php include ADMIN_WEBROOT . '/components/messages.html'; ?>
 
-                    <?php include PATH_ADMINROOT . '/components/notifications.html'; ?>
+                    <?php include ADMIN_WEBROOT . '/components/notifications.html'; ?>
 
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-lte-toggle="fullscreen">
@@ -128,12 +124,12 @@ function clsprop_to_tblcol($property): string|null {
                         </a>
                     </li>
 
-                    <?php include PATH_ADMINROOT . '/components/usermenu.html'; ?>
+                    <?php include ADMIN_WEBROOT . '/components/usermenu.html'; ?>
                 </ul>
             </div>
         </nav>
 
-        <?php include PATH_ADMINROOT . '/components/sidebar.html'; ?>
+        <?php include ADMIN_WEBROOT . '/components/sidebar.html'; ?>
 
         <main class="app-main">
             <div class="app-content-header">
@@ -145,7 +141,7 @@ function clsprop_to_tblcol($property): string|null {
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-end">
                             <li class="breadcrumb-item"><a href="/">Home</a></li>
-                                <li class="breadcrumb-item"><a href="<?php echo WEB_ADMINROOT . '/dashboard'; ?>">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="<?php echo ADMIN_WEBROOT . '/dashboard'; ?>">Dashboard</a></li>
                                 <li class="breadcrumb-item active" aria-current="page">Accounts</li>
                             </ol>
                         </div>
