@@ -218,8 +218,6 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
     </table>
     <![endif]-->
     
-
-
   
   
 <div class="u-row-container v-row-padding--vertical v-row-background-image--outer" style="padding: 0px;background-color: transparent">
@@ -261,8 +259,6 @@ table, td { color: #000000; } #u_body a { color: #0000ee; text-decoration: under
   </div>
   </div>
   
-
-
     <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
     </td>
   </tr>

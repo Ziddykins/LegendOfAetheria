@@ -54,14 +54,12 @@
     }
 
     
-    require_once PATH_ADMINROOT . '/system/functions.php';
-
-
+    require_once ADMIN_WEBROOT . '/system/functions.php';
 ?>
 
 <?php include WEBROOT . '/html/opener.html'; ?>
     <head>
-        <?php include PATH_ADMINROOT . '/html/headers.html'; ?>
+        <?php include ADMIN_WEBROOT . '/html/headers.html'; ?>
         <script src="js/tabulator.min.js" type="text/javascript"></script>
         <link rel="stylesheet" href="css/tabulator.min.css">
         
@@ -72,7 +70,7 @@
             <nav class="app-header navbar navbar-expand bg-body">
                 <div class="container-fluid">
 
-                    <?php include PATH_ADMINROOT . '/components/nav-links.html'; ?>
+                    <?php include ADMIN_WEBROOT . '/components/nav-links.html'; ?>
 
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
@@ -81,9 +79,9 @@
                             </a>
                         </li>
 
-                        <?php include PATH_ADMINROOT . '/components/messages.html'; ?>
+                        <?php include ADMIN_WEBROOT . '/components/messages.html'; ?>
 
-                        <?php include PATH_ADMINROOT . '/components/notifications.html'; ?>
+                        <?php include ADMIN_WEBROOT . '/components/notifications.html'; ?>
 
                         <li class="nav-item">
                             <a class="nav-link" href="#" data-lte-toggle="fullscreen">
@@ -104,12 +102,12 @@
                             </a>
                         </li>
 
-                        <?php include PATH_ADMINROOT . '/components/usermenu.html'; ?>
+                        <?php include ADMIN_WEBROOT . '/components/usermenu.html'; ?>
                     </ul>
                 </div>
             </nav>
 
-            <?php include PATH_ADMINROOT . '/components/sidebar.html'; ?>
+            <?php include ADMIN_WEBROOT . '/components/sidebar.html'; ?>
 
             <main class="app-main">
                 <div class="app-content-header">
@@ -121,7 +119,7 @@
                             <div class="col-sm-6">
                                 <ol class="breadcrumb float-sm-end">
                                     <li class="breadcrumb-item"><a href="/">Home</a></li>
-                                    <li class="breadcrumb-item"><a href="<?php echo WEB_ADMINROOT . '/dashboard'; ?>">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="<?php echo ADMIN_WEBROOT . '/dashboard'; ?>">Dashboard</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">Characters</li>
                                 </ol>
                             </div>
@@ -158,7 +156,7 @@
                                 echo $tb->objectToJson($char, DataType::HEADER_DATA);
                                 $character['manage'] ='<div class="text-center"><a href="./accounts/?action=ban&account_id=' . $character['id'] . '"><i class="bi bi-ban-fill text-danger fw-bold fs-6 me-2 opacity-50"></i></a><a href="./accounts/?action=message"><i class="bi bi-chat-text-fill text-primary fw-bold fs-6 me-2 opacity-50"></i></a><a href="./accounts/?action=save"><i class="bi bi-floppy-fill text-success fw-bold fs-6 me-2 opacity-50"></i></a></span>'; 
                                 $stats     = new Stats($character['id']);
-                                $stats     = safe_serialize($character['stats'], true);
+                                $stats     = $stats->propRestore($character['stats']);
                                 $refl = new ReflectionClass($stats);
 
                                 $props = $refl->getProperties();

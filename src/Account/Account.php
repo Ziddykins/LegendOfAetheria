@@ -53,7 +53,6 @@ class Account {
     public function __call($method, $params) {
         global $db, $log;
 
-        /* If it's a get, this is true */
         if (!count($params)) {
             $params = null;
         }

@@ -21,7 +21,7 @@
 
 <?php include WEBROOT . '/html/opener.html'; ?>
     <head>
-        <?php include PATH_ADMINROOT . '/html/headers.html'; ?>
+        <?php include ADMIN_WEBROOT . '/html/headers.html'; ?>
         
     </head>
 
@@ -30,7 +30,7 @@
             <nav class="app-header navbar navbar-expand bg-body">
                 <div class="container-fluid">
 
-                    <?php include PATH_ADMINROOT . '/components/nav-links.html'; ?>
+                    <?php include ADMIN_WEBROOT . '/components/nav-links.html'; ?>
 
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
@@ -39,9 +39,9 @@
                             </a>
                         </li>
 
-                        <?php include PATH_ADMINROOT . '/components/messages.html'; ?>
+                        <?php include ADMIN_WEBROOT . '/components/messages.html'; ?>
 
-                        <?php include PATH_ADMINROOT . '/components/notifications.html'; ?>
+                        <?php include ADMIN_WEBROOT . '/components/notifications.html'; ?>
 
                         <li class="nav-item">
                             <a class="nav-link" href="#" data-lte-toggle="fullscreen">
@@ -62,12 +62,12 @@
                             </a>
                         </li>
 
-                        <?php include PATH_ADMINROOT . '/components/usermenu.html'; ?>
+                        <?php include ADMIN_WEBROOT . '/components/usermenu.html'; ?>
                     </ul>
                 </div>
             </nav>
 
-            <?php include PATH_ADMINROOT . '/components/sidebar.html'; ?>
+            <?php include ADMIN_WEBROOT . '/components/sidebar.html'; ?>
 
             <main class="app-main">
                 <div class="app-content-header">
@@ -157,15 +157,15 @@
 
                         <div class="d-flex flex-wrap align-items-evenly">
                             <div id="direct-chat-container" class="mb-3 ms-3">
-                                <?php include PATH_ADMINROOT . '/widgets/globalchat.php' ?>
+                                <?php include ADMIN_WEBROOT . '/widgets/globalchat.php' ?>
                             </div>
 
                             <div class="mb-3 ms-3">
-                                <?php include PATH_ADMINROOT . '/widgets/browserstats.html'; ?>
+                                <?php include ADMIN_WEBROOT . '/widgets/browserstats.html'; ?>
                             </div>
 
                             <div class="mb-3 ms-3 w-50">
-                                <?php include PATH_ADMINROOT . '/widgets/newmembers.html'; ?>
+                                <?php include ADMIN_WEBROOT . '/widgets/newmembers.html'; ?>
                             </div>
                         </div>
                     </div>
@@ -175,7 +175,7 @@
                     </div>
                 </div>
             </main>
-            <?php include PATH_ADMINROOT . '/html/footers.html'; ?>
+            <?php include ADMIN_WEBROOT . '/html/footers.html'; ?>
         </div>
     </body>
 </html>

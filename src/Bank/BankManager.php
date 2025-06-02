@@ -15,7 +15,7 @@
         private int $spindels = 0;
         private float $loan = 0.00;
         private ?BankBracket $bracket = null;
-        private float $transferLimit = 5000.0;
+        private float $transferLimit = 5000.0                        ;
 
         public function __construct(int $accountID, ?int $characterID) {
             $this->accountID = $accountID;

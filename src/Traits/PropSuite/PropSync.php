@@ -10,6 +10,7 @@ use Game\System\Enums\LOAError;
 use Game\Bank\Enums\BankBracket;
 use Game\Account\Enums\Privileges;
 use Game\Traits\PropSuite\Enums\PropType;
+use Game\Monster\Enums\MonsterScope;
 use Exception;
 use ReflectionType;
 
@@ -202,7 +203,6 @@ trait PropSync {
         }
 
         $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";
-        
         $db->execute_query($sql_query, [ $params[0], $id ]);
     }
 
@@ -241,15 +241,11 @@ trait PropSync {
                 
                 $tmp_inventory = new Inventory($this->id);
                 $tmp_stats     = new Stats($this->id);
-                
                 $tmp_bank      = new BankManager($this->accountID, $this->id);
-                $tmp_bank->id(getNextTableID($_ENV['SQL_BANK_TBL']));
-                
+
                 $srl_inventory = $tmp_inventory->propDump();
                 $srl_stats     = $tmp_stats->propDump();
                 $srl_bank      = $tmp_bank->propDump();
-
-                $bank_id = getNextTableID($_ENV['SQL_BANK_TBL']);                
 
                 $chr_query = "INSERT INTO $table (`id`, `account_id`, `inventory`, `stats`, `bank`) VALUES (?, ?, ?, ?, ?)";
                 $bnk_query = "INSERT INTO {$_ENV['SQL_BANK_TBL']} (`id`, `account_id`, `character_id`) VALUES (?, ?, ?)";
@@ -261,7 +257,7 @@ trait PropSync {
                 $act_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$char_col` = ? WHERE `id` = ?";
 
                 $db->execute_query($chr_query, [ $this->id, $this->accountID, $srl_inventory, $srl_stats, $srl_bank ]);
-                $db->execute_query($bnk_query, [ $bank_id, $this->accountID, $this->id ]);
+                $db->execute_query($bnk_query, [ $tmp_bank->id, $this->accountID, $this->id ]);
                 $db->execute_query($act_query, [ $this->id, $this->accountID ]);
 
                 return $this->id;
@@ -308,18 +304,21 @@ trait PropSync {
                 $tmp_inventory = new Inventory($this->id);
                 $inv_data = $tmp_obj['inventory'];
                 $this->inventory = $tmp_inventory->propRestore($inv_data);
+                return;
             }
             
             if (isset($tmp_obj['stats'])) {
                 $tmp_stats = new Stats($this->id);
                 $stats_data = $tmp_obj['stats'];
                 $this->stats = $tmp_stats->propRestore($stats_data);
+                return;
             }
 
             if (isset($tmp_obj['bank'])) {
                 $tmp_bank = new BankManager($_SESSION['account-id'], $this->id);
                 $bank_data = $tmp_obj['bank'];
                 $this->bank = $tmp_bank->propRestore($bank_data);
+                return;
             }
 
         } elseif ($type == PropType::ACCOUNT) {
@@ -327,15 +326,20 @@ trait PropSync {
                 $tmp_settings = new Settings($this->id);
                 $settings_data = $tmp_obj['settings'];
                 $this->settings = $tmp_settings->propRestore($settings_data);
+                return;
             }
 
             $this->privileges = Privileges::name_to_enum($tmp_obj['privileges']);
         } elseif ($type == PropType::MONSTER) {
             $this->stats = $this->propRestore($tmp_obj['stats']);
+            $this->scope = MonsterScope::name_to_enum($tmp_obj['scope']);
+            return;
         } elseif ($type == PropType::FAMILIAR) {
             /* TODO: Familiar loading */
+            return;
         } elseif ($type == PropType::BANKMANAGER) {
             $this->bracket = BankBracket::name_to_enum($tmp_obj['bracket']);
+            return;
         }
 
         foreach ($tmp_obj as $key => $value) {
@@ -349,8 +353,6 @@ trait PropSync {
             }
         }
     } 
-
-
     private function convertToType(mixed $value, string|ReflectionType $type): mixed {
         if ($value === null) {
             return null;

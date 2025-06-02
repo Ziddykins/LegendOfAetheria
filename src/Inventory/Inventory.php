@@ -4,8 +4,6 @@ namespace Game\Inventory;
 use Game\Inventory\Items\Item;
 use Game\Traits\PropSuite\Enums\PropType;
 use Game\Traits\PropSuite\PropSuite;
-
-
 class Inventory {
     use PropSuite;
     private int $id;
@@ -30,15 +28,21 @@ class Inventory {
     }
 
     public function __call($method, $params) {
-        if ($method == 'propSync' || $method == 'propMod') {
-            return;
+        global $db, $log;
+
+        
+        if (!count($params)) {
+            $params = null;
         }
 
-        switch ($method) {
-            case 'propSync':
-                return $this->propSync($method, $params, PropType::INVENTORY);
-            case 'propMod':
-                return $this->propMod($method, $params);
+        $matches = [];
+        if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
+            return $this->propMod($method, $params);
+        } elseif (preg_match('/^(propDump|propRestore)$/', $method, $matches)) {
+            $func = $matches[1];
+            return $this->$func($params[0] ?? null);
+        } else {
+            return $this->propSync($method, $params, PropType::INVENTORY);
         }
     }
 
