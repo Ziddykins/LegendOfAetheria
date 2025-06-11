@@ -16,13 +16,16 @@ use File::Copy;
 use Carp;
 
 GetOptions(
-    'f|fqdn=s' => \my $opt_fqdn,
-    's|step=s' => \my $opt_step,
-    'o|only'   => \my $opt_only,
-    'l|list-steps' => sub { for (1 .. 11) { print "[$_: ", const_to_name($_), "] "; } exit; },
-    'h|help'   => \&help,
-    'v|version' => sub { print "AutoInstaller.pl v$VERSION\n"; exit; },
+    'f|fqdn=s'     => \my $opt_fqdn,
+    's|step=s'     => \my $opt_step,
+    'o|only'       => \my $opt_only,
+    'c|config=s'   => \my $opt_config,
+    'l|list-steps' => sub { for (1 .. 12) { print "[$_: ", const_to_name($_ - 1), "] "; } exit; },
+    'h|help'       => \&help,
+    'v|version'    => sub { print "AutoInstaller.pl v$VERSION\n"; exit; },
 );
+
+$opt_fqdn = lc $opt_fqdn;
 
 if ($opt_step && $opt_step =~ /[a-z]/i) {
     my $t_step = name_to_const(uc $opt_step);
@@ -77,7 +80,15 @@ my %clr; # color constants
 my $question; # current question to ask the user
 my $fqdn;     # fully qualified domain name to set up
 
+# hosts list (/etc/hosts)
+my %hosts;
+my @list;
+
 my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
+
+if ($opt_config) {
+    $cfg_file = $opt_config;
+}
 
 if (!-e $cfg_file) {
     croak('No config specified, no default config found');
@@ -112,6 +123,7 @@ if (!$fqdn) {
     print "$question\n";
     print "fqdn> ";
     chomp($fqdn = <STDIN>);
+    $fqdn = lc $fqdn;
 }
 
 chomp(my $loc_check = `pwd`);
@@ -145,7 +157,7 @@ get_sysinfo();
 if (!$opt_step) {
     step_firstrun();
 } else {
-    %cfg = %{$ini{$opt_fqdn}};
+    %cfg = %{$ini{$fqdn}};
     $cfg{step} = $opt_step;
 }
 
@@ -191,52 +203,17 @@ if ($cfg{step} == OPENAI) {
 }
 
 if ($cfg{step} == TEMPLATES) {
+    my @replacements;
+    parse_replacements(\@replacements);
+    
     tell_user('INFO', "I'ma let you run some templates, but first I just needa know...");
-    if (ask_user("Do you want to enable SSL?", 'y', 'yesno')) {
+    if (ask_user("Will you want to enable SSL?", 'y', 'yesno')) {
         step_vhost_ssl();
-    }
-
-    my @replacements = (
-        "###REPL_PHP_BINARY###%%%$cfg{php_binary}",
-
-        "###REPL_WEB_DOCROOT###%%%$cfg{web_root}",
-        "###REPL_WEB_ADMIN_EMAIL###%%%$cfg{admin_email}",
-        "###REPL_WEB_FQDN###%%%$cfg{fqdn}",
-        "###REPL_WEB_SSL_FULLCER###%%%$cfg{ssl_fullcer}",
-        "###REPL_WEB_SSL_PRIVKEY###%%%$cfg{ssl_privkey}",
-
-        "###REPL_SQL_DB###%%%$cfg{sql_database}",
-        "###REPL_SQL_USER###%%%$cfg{sql_username}",
-        "###REPL_SQL_PASS###%%%$cfg{sql_password}",
-        "###REPL_SQL_HOST###%%%$cfg{sql_host}",
-        "###REPL_SQL_PORT###%%%$cfg{sql_port}",
-
-        "###REPL_SQL_TBL_ACCOUNTS###%%%$sql{tbl_accounts}",
-        "###REPL_SQL_TBL_CHARACTERS###%%%$sql{tbl_characters}",
-        "###REPL_SQL_TBL_FAMILIARS###%%%$sql{tbl_familiars}",
-        "###REPL_SQL_TBL_FRIENDS###%%%$sql{tbl_friends}",
-        "###REPL_SQL_TBL_MAIL###%%%$sql{tbl_mail}",
-        "###REPL_SQL_TBL_MONSTERS###%%%$sql{tbl_monsters}",
-        "###REPL_SQL_USER###%%%$cfg{sql_username}",
-        "###REPL_SQL_TBL_LOGS###%%%$sql{tbl_logs}",
-        "###REPL_SQL_TBL_GLOBALS###%%%$sql{tbl_globals}",
-        "###REPL_SQL_TBL_BANNED###%%%$sql{tbl_banned}",
-        "###REPL_SQL_TBL_GLOBALCHAT###%%%$sql{tbl_globalchat}",
-        "###REPL_SQL_TBL_STATISTICS###%%%$sql{tbl_statistics}",
-        "### REM ### %%% ",
-
-
-        "###REPL_OPENAI_APIKEY###%%%$cfg{openai_apikey}",
-
-        "###REPL_PHP_COOKIEDOMAIN###%%%$cfg{fqdn}",
-
-        "###REPL_APACHE_HTTP_PORT###%%%$cfg{apache_http_port}",
-        "###REPL_APACHE_HTTPS_PORT###%%%$cfg{apache_https_port}",
-    );
+    }    
 
     if ($cfg{ssl_enabled}) {
         if ($cfg{redir_status}) {
-            push @replacements, "# SSLREM %%% ";
+            push @replacements, "# SSLREM %%%\t";
         }
         push @replacements, "###REPL_PROTOCOL###%%\%https";
     } else {
@@ -322,6 +299,7 @@ sub step_firstrun {
                     if ($cfg{step} > HOSTS) {
                         tell_user("Script ran all the way through last time; continuing from the beginning...");
                         $cfg{step} = SOFTWARE;
+                        handle_cfg(\%cfg, CFG_W_DOMAIN, $fqdn);
                     }
                     $cfg{step} = SOFTWARE;
                     tell_user('INFO', 'Restarting install from beginning step with previous configuration');
@@ -332,6 +310,8 @@ sub step_firstrun {
             if (ask_user("Are you sure? This will wipe the current config for this FQDN", 'y', 'yesno')) {
                 delete $ini{$fqdn};
                 $ini{$fqdn} = {};
+                $ini{$fqdn}{step} = SOFTWARE;
+                handle_cfg({}, CFG_W_MAIN, $fqdn);
             } else {
                 tell_user('WARN', "Continuing with loaded configuration");
                 %cfg = %{$ini{$fqdn}};
@@ -340,6 +320,7 @@ sub step_firstrun {
     } else {
         tell_user('WARN', 'No configuration for this FQDN, creating new entry');
         $ini{$fqdn} = {};
+        $ini{$fqdn}{step} = 2;
         handle_cfg({}, CFG_W_MAIN, $fqdn);
     }
 
@@ -569,6 +550,7 @@ sub step_vhost_ssl {
             $msg   .= "and enabled HTTP to HTTPS redirection" if $cfg{redir_status};
             tell_user('SUCCESS', $msg);
             tell_user('INFO', "Certificates and private key stored in /etc/ssl/certs and /etc/ssl/private, respectively");
+            $cfg{ssl_enabled} = 1;
         } else {
             croak("Certificates were not created, script cannot continue\n");
         }
@@ -582,12 +564,14 @@ sub step_vhost_ssl {
 
         $cfg{ssl_fullcer} = $cert;
         $cfg{ssl_privkey} = $pkey;
+        $cfg{ssl_enabled} = 1;
         tell_user('SUCCESS', 'Valid certificate and key pair supplied, continuing');
     } elsif ($answer == 3) {
         print "Certbot.sh will run at the end of the script...";
         $cfg{run_certbot} = 1;
+        $cfg{ssl_enabled} = 1;
     } else {
-        print "invalid option\n";
+        print "Invalid option\n";
     }
 }
 
@@ -695,6 +679,7 @@ sub step_php_configure {
 	    'allow_url_fopen'         => 'Off',
 	    'allow_url_include'       => 'Off',
 	    'session.gc_maxlifetime'  => 600,
+	    'session.auto_start'      => 1,
 	    'disable_functions'       => 'apache_child_terminate, ' .
 									 'apache_setenv, ' .
 									 'chdir, ' .
@@ -845,10 +830,6 @@ sub step_generate_templates {
     # Dirty-fix SQL bind address
     `sed -i 's/bind-address.*/bind-address = $cfg{sql_host}/' $cfg{sql_config_file}`;
 
-    # Dirty-fix constants.php file TODO: Figure this out
-    # define('WEBROOTECTORY', '/var/www/html/dankaf.ca/loa/');
-    # `sed -i 's/.*WEBROOTECTORY.*//'`;
-
     # key = in file, value = out file
     $templates{$cfg{env_template}}          = "$cfg{env_template}.ready";
     $templates{$cfg{htaccess_template}}     = "$cfg{htaccess_template}.ready";
@@ -951,36 +932,12 @@ sub step_start_services {
 }
 
 sub step_update_hosts {
-    my @hosts;
-    open my $fh, '<', '/etc/hosts';
-    my @lines = <$fh>;
-    close $fh;
+    my %hosts;
+    my @list;
 
-    foreach my $line (@lines) {
-        chomp $line;
-        $line =~ s/#.*//;
-        next if $line =~ /^$/;
-        $line =~ s/(.*?)[ \t].*/$1/;
-        push @hosts, $line;
-    }
-
-    tell_user('Found these available IPs, please select or enter an IP for the server to resolve $cfg{fqdn} to');
-
-    for (my $i=0; $i<@hosts; $i++) {
-        tell_user($i . ". $hosts[$i]\n");
-    }
-
-    my $choice = ask_user('Enter a choice from above or specify your own IP: ', '', 'input');
-
-    if ($choice =~ /[0-9]+/) {
-        $choice = $hosts[$choice];
-    }
-
-    if (ask_user("Writing: '$choice\t$cfg{fqdn}' to $cfg{hosts_file}, okay?")) {
-        open my $fh, '>>', $cfg{hosts_file};
-        print $fh "$choice\t$cfg{fqdn}\n";
-        close $fh;
-    }
+    read_hosts();
+    choose_host();
+    write_hosts();
 }
 
 # ====================================[ steps-end ]====================================== #
@@ -1234,12 +1191,24 @@ sub tell_user {
     }
 
     if ($cfg{setup_log}) {
-        open my $fh, '>>', $cfg{setup_log};
-
-        print $fh $message;
-
-        close $fh or die "Couldn't close file: $!\n";
+        write_log("$prefix -> $message", 1);
     }
+}
+
+sub write_log {
+    my ($message, $has_prefix) = @_;
+    my $date    = get_date();
+    my $prefix  = "[$date] -> ";
+
+    $has_prefix //= 0;
+
+    open my $fh, '>>', 'setup.log' or die "Can't open file for read: $!\n";
+    if ($has_prefix) {
+        print $fh "$message\n";
+    } else {
+        print $fh "$prefix $message\n";
+    }
+    close $fh or die "Can't close file: $!\n";
 }
 
 sub check_platform {
@@ -1258,16 +1227,13 @@ sub handle_cfg {
     my %t_hash = %{$href_section};
 
     if ($op eq CFG_W_DOMAIN) {
-        if (exists($ini{$fqdn})) {
-            %{$ini{$fqdn}} = %t_hash;
-            tied(%ini)->WriteConfig($cfg_file);
-            tell_user('SUCCESS', "Updated domain '$fqdn' config");
-        } else {
+        if (!exists($ini{$fqdn})) {
             $ini{$fqdn} = {};
-            %{$ini{$fqdn}} = %t_hash;
-            tied(%ini)->WriteConfig($cfg_file);
             tell_user('SUCCESS', "Added new webroot '$cfg_file'\n");
         }
+        %{$ini{$fqdn}} = %t_hash;
+        tied(%ini)->WriteConfig($cfg_file);
+        tell_user('SUCCESS', "Updated ${fqdn}'s config: '$cfg_file'\n");
     } elsif ($op eq CFG_W_MAIN) {
         tied(%ini)->WriteConfig($cfg_file);
     }
@@ -1288,7 +1254,7 @@ sub merge_hashes {
 }
 
 sub const_to_name {
-    my @names = qw/FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER CLEANUP/;
+    my @names = qw/FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER CLEANUP HOSTS/;
     return $names[shift];
 }
 
@@ -1296,17 +1262,18 @@ sub name_to_const {
     my $name = shift;
 
     my %names = (
-        'FIRSTRUN'  => 1,
-        'SOFTWARE'  => 2,
-        'PHP'       => 3,
-        'SERVICES'  => 4,
-        'SQL'       => 5,
-        'OPENAI'    => 6,
-        'TEMPLATES' => 7,
-        'APACHE'    => 8,
-        'PERMS'     => 9,
-        'COMPOSER'  => 10,
-        'CLEANUP'   => 11
+    'FIRSTRUN'  => 1,
+    'SOFTWARE'  => 2,
+    'PHP'       => 3,
+    'SERVICES'  => 4,
+    'SQL'       => 5,
+    'OPENAI'    => 6,
+    'TEMPLATES' => 7,
+    'APACHE'    => 8,
+    'PERMS'     => 9,
+    'COMPOSER'  => 10,
+    'CLEANUP'   => 11,
+    'HOSTS'     => 12,
     );
 
     return $names{$name};
@@ -1448,6 +1415,58 @@ sub populate_hashdata {
     $cfg{step}                  = $step;
 }
 
+sub read_hosts {
+	open my $fh, '<', '/etc/hosts';
+	my @lines = <$fh>;
+	close $fh;
+
+	my $cur = 1;
+
+	foreach my $line (@lines) {
+		chomp $line;
+		next if $line =~ /[#]/;
+
+		my @objs = split /[\t ]+/, $line;
+		my $ip = $objs[0];
+
+		for (my $i=1; $i<scalar @objs; $i++) {
+			$hosts{$ip}{hosts}{$objs[$i]} = 1;
+		}
+	}
+}
+
+sub choose_host {
+	my @list = keys %hosts;
+	my $cur = 1;
+
+	foreach my $key (@list) {
+		tell_user('INFO',  $cur++ . ". $key\n");
+	}
+
+	my $choice = 99;
+
+	while (!$list[$choice]) {
+		$choice = ask_user("Which IP would you like the fqdn added under?\n\tChoice: ", '127.0.1.1', 'input');
+		my ($sub, $apex, $tld) = split /\./, $cfg{fqdn};
+		$choice--;
+		$hosts{$list[$choice]}{hosts}{"$apex.$tld"} = 1;
+		$hosts{$list[$choice]}{hosts}{"$sub"} = 1;
+		$hosts{$list[$choice]}{hosts}{"$sub.$apex.$tld"} = 1;
+	}
+}
+
+sub write_hosts {
+	open my $fh, '>', '/etc/hosts';
+	foreach my $key (keys %hosts) {
+		print $fh "$key\t\t";
+		foreach my $val (keys %{$hosts{$key}{hosts}}) {
+			print $fh "$val "				
+		}
+		print $fh "\n";
+	}
+	close $fh;
+}
+
 sub help {
     print "Usage: $0 [options]\n\n";
     print "Options:\n";
@@ -1458,4 +1477,22 @@ sub help {
     print "  -s, --step\t\tSpecify a step to start at\n";
     print "  -l, --list-steps\tList the available steps to supply to -s/--step\n";
     exit 0;
+}
+
+sub parse_replacements {
+    my $replacements = $_[0];
+    my @local = @{$replacements};
+
+    open my $fh, '<', 'templates/replacementns.repl';
+
+    while (my $line = <$fh>) {
+        chomp $line;
+        $line =~ s/cfg\((.*?)\)/$cfg{$1}/;
+        $line =~ s/sql\((.*?)\)/$sql{$1}/;
+
+        my ($target, $replace) = split '%%%', $line;
+
+        push @local, "$target%%%$replace" if $target and $replace;
+    }
+    $replacements = @local;
 }

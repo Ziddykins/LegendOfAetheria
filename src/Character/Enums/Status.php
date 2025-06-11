@@ -1,7 +1,10 @@
 <?php
 namespace Game\Character\Enums;
+use Game\Traits\EnumExtender\EnumExtender;
 
 enum Status: int {
+    use EnumExtender;
+    
     case HEALTHY        = 1;
     case POISONED       = 2;
     case BLINDED        = 4;

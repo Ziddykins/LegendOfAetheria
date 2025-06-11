@@ -1,11 +1,14 @@
 <?php
-    require_once 'bootstrap.php';
+    require_once 'constants.php';
+    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
 
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
+    use Game\Character\Enums\Status;
     use Game\System\Enums\AbuseType;
-    
+use Random\Randomizer;
+
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
         $email = $_POST['login-email'];
         $password = $_POST['login-password'];
@@ -38,6 +41,7 @@
 
         if ($account_id > 0) {
             $account = new Account($email);
+            $account->load($account_id);
             
             if (password_verify($password, $account->get_password())) {
                 // Reset failed attempts on successful login
@@ -53,24 +57,8 @@
                 $account->set_sessionID(session_id());
                 $account->set_lastLogin(date('Y-m-d H:i:s'));
 
-                /*$ch = curl_init("http://127.0.0.1:3000/auth/basic");
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-                curl_setopt($ch, CURLOPT_HEADER, 0);
-                curl_setopt($ch, CURLOPT_USERPWD, "$email:$password");
-                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                $return = json_decode(curl_exec($ch));
-                print_r($return);
-                curl_close($ch);
-
-                    $_SESSION['bearer'] = $return->token;*/
-                    header('Location: /select');
-                    exit();
-                /*} else {
-                    echo "failed to get token";
-                    exit();
-                }*/
+                header('Location: /select');
+                exit();
             } else {
                 $failed_attempts = $account->get_failedLogins() + 1;
                 $account->set_failedLogins($failed_attempts);
@@ -99,7 +87,10 @@
         $time_sqlformat     = get_mysql_datetime();
         $ip_address         = $_SERVER['REMOTE_ADDR'];
         $verification_code  = strrev(hash('sha256', session_id()));
-        $verification_code .= substr(hash('sha256', strval(mt_rand(0,100))), 0, 15);
+        $verification_code .= substr(hash('sha256', strval(mt_rand(0,100))), 0, VERIFICATION_CODE_LENGTH);
+        $tmp_arr = str_split($verification_code);
+        shuffle_array($tmp_arr, 1000);
+        $verification_code = join('', $tmp_arr);
 
         /* Character information */
         $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $_POST['register-character-name']);
@@ -119,7 +110,7 @@
         /* Email doesn't exist */
         if (Account::checkIfExists($email) == -1) {
             /* AP assigned properly */
-            if ($str + $def + $int === MAX_ASSIGNABLE_AP) {
+            if ($str + $def + $int === STARTING_ASSIGNABLE_AP) {
                 /* Passwords match */
                 if ($password === $password_confirm) {
                     $password = password_hash($password, PASSWORD_BCRYPT);
@@ -168,7 +159,7 @@
                     $character->stats->set_mp(100);
                     $character->stats->set_maxMP(100);
 
-                    //$character->stats->set_status(CharacterStatus::HEALTHY);
+                    $character->stats->set_status(Status::HEALTHY);
 
                     //send_mail($email, $account);
                     header('Location: /?register_success');
@@ -207,17 +198,6 @@
             </div>
         </div>
 
-        <?php if (isset($_COOKIES['email'])): ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                let up = new URLSearchParams(window.location.search);
-
-                if (up.has('failed_login')) {
-                    document.getElementById('login-email').value = decodeURIComponent(document.cookie).split(';')[0].split('=')[1];
-                }
-            });
-        </script>
-        <?php endif; ?>
         <?php include 'html/footers.html'; ?>
     </body>
 </html>

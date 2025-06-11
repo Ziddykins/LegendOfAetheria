@@ -3,8 +3,8 @@
     use Game\Account\Account;
     use Game\Character\Character;
  
-     
-    require_once '../../bootstrap.php';
+    require_once "../../constants.php";
+    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
     require_once 'system/functions.php';
 
     $account = null;

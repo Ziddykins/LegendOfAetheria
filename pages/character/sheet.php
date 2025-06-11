@@ -46,16 +46,39 @@
                                 </div>
 
                                 <div class="container border shadow-sm">
+
+                                    <?php 
+                                        $class = get_class($character->stats);
+                                        $reflect = new ReflectionClass($class);
+                                        $props   = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
+                                    ?>
+
+                                    <?php foreach ($props as $prop): ?>
+                                            <?php if (count_chars($prop->getName()) == 4): ?>
+                                                <?php
+                                                    $prop_name = $prop->getName();
+                                                    $func_get  = "get_" . $prop->getName();
+                                                ?>
+                                            <?php else: ?>
+                                                <?php
+                                                    global $log;
+                                                    $log->debug("Skipping " . $prop->getName());
+                                                ?>
+                                                <?php continue; ?>
+                                            <?php endif; ?>
+                                                
                                     <div class="row mb-3 mt-3">
                                         <span class="col">
                                             <i class="bi bi-hammer me-3"></i>
-                                            <span class="d-none d-md-inline">Strength</span>
+                                            <span class="d-none d-md-inline"><?php echo substr($prop->getName(), 0, 4); ?></span>
                                         </span>
-                                        <span class="col"><?php echo $char_str; ?></span>
-                                        <?php if ($character->stats->get_ap()): ?>
-                                        <span class="col text-success material-symbols-sharp">add</span>
+                                        
+                                        <span class="col"><?php echo $character->stats->$func_get(); ?></span>
+                                        <?php if ($character->get_ap()): ?>
+                                            <span class="col text-success material-symbols-sharp">add</span>
                                         <?php endif; ?>
                                     </div>
+                                    <?php endforeach; ?>
 
                                     <div class="row mb-3">
                                         <span class="col">
@@ -63,7 +86,7 @@
                                             <span class="d-none d-md-inline">Defense</span>
                                         </span>
                                         <span class="col"><?php echo $char_def; ?></span>
-                                        <?php if ($character->stats->get_ap()): ?>
+                                        <?php if ($character->get_ap()): ?>
                                         <span class="col text-success material-symbols-sharp">add</span>
                                         <?php endif; ?>
                                     </div>
@@ -74,7 +97,7 @@
                                             <span class="d-none d-md-inline small">Intelligence</span>
                                         </span>
                                         <span class="col"><?php echo $char_int; ?></span>
-                                        <?php if ($character->stats->get_ap()): ?>
+                                        <?php if ($character->get_ap()): ?>
                                         <span class="col text-success material-symbols-sharp">add</span>
                                         <?php endif; ?>
                                     </div>
