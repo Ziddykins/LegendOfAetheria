@@ -1,12 +1,15 @@
 <?php
-require_once "bootstrap.php";
+require_once "constants.php";
+require_once SYSTEM_DIRECTORY . '/bootstrap.php';
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\System\Enums\AbuseType;
 use Game\Components\Cards\CharacterSelect\CharacterSelectCard;
+$log->debug("WE MADE IT TO SELECT");
+
 
 if (check_session()) {
-    $account = new Account($_SESSION['email']);
+    $account   = new Account($_SESSION['email']);
     $character = new Character($account->get_id());
 
     if (isset($_POST['create-submit']) && $_POST['create-submit'] == 1) {
@@ -55,7 +58,7 @@ if (check_session()) {
                 $def     = $_POST['def-ap'];
                 $next_char_id = getNextTableID($t['characters']);
 
-                if ($str + $def + $int === MAX_ASSIGNABLE_AP) {
+                if ($str + $def + $int === STARTING_ASSIGNABLE_AP) {
                     /* ya forgin' posts I know it */
                     if (($str < 10 || $def < 10 || $int < 10)) {
                         $ip = $_SERVER['REMOTE_ADDR'];
@@ -110,6 +113,7 @@ if (check_session()) {
         }
     }
 } else {
+    $log->debug("WE DIIIED cuz session. in select.");
     header('Location: /?no_login');
     exit();
 }

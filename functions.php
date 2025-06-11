@@ -605,3 +605,13 @@
 
             return in_array($table, $t);
         }
+
+        function shuffle_array(array &$array, int $iterations): void {
+            for ($i=0; $i < $iterations; $i++) {
+                $r1 = mt_rand(0, count($array) - 1);
+                $r2 = mt_rand(0, count($array) - 1);
+                $tmp = $array[$r1];
+                $array[$r1] = $array[$r2];
+                $array[$r2] = $tmp;
+            }
+        }

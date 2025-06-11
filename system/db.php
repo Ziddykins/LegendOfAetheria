@@ -1,9 +1,20 @@
 <?php
 
-use Game\System\Enums\LOAError;
-    require 'vendor/autoload.php';
-    include('logger.php');
-    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    use Game\System\Enums\LOAError;
+    
+    try {
+        @include_once "../constants.php";
+    } catch (Exception $e) {
+        @include_once "./constants.php";
+    } finally {
+        @include_once "../../constants.php";
+    }
+
+    require WEBROOT . '/vendor/autoload.php';
+    require_once SYSTEM_DIRECTORY . '/logger.php';
+
+    
+    $dotenv = Dotenv\Dotenv::createImmutable(WEBROOT);
     $dotenv->safeLoad();
     
 

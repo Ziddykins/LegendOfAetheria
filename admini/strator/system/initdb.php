@@ -4,9 +4,10 @@ require_once '../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable('../');
 $dotenv->safeLoad();
 require_once 'constants.php';
-require_once 'db.php';
+require_once SYSTEM_DIRECTORY . '/db.php';
+require_once SYSTEM_DIRECTORY . '/logger.php';
 require_once 'functions.php';
-require_once 'logger.php';
+
 if (!isset($argv)) {
     $log->warning('Access to cron.php directly is not allowed!', ['POST' => print_r($_POST, true)]);
     echo 'Access to initdb.php directly is not allowed!';

@@ -13,23 +13,23 @@
                                             .dWi   `
                                      4888~  J8%                                                  
                                        ^"===*"`                    
-                                                  ,
-                                                 oec:  
-                                         u.     @88888  
-                                   ...ue888b    8"*88%  
-                                   888R Y888r   8b.     
-                                   888R I888>  u888888> 
-                                   888R I888>   8888R   
-                                   888R I888>   8888P   
-     ▖▖▄ ▄ ▄ ▄▖▄▖                  u8888cJ888   *888>   
-     ▙▌▌▌▌▌▙▘▄▌▙▖                   "*888*P"     4888    
-      ▌▙▘▙▘▙▘▙▖▄▌                     'Y"        '888    
-                                                  88R   
-                                                  88E
-                                                  88>     
-                                                  48     
-                                                  '8
-                                                  `
+                                                      ,
+                                                     oec:  
+                                             u.     @88888  
+                                       ...ue888b    8"*88%  
+                                       888R Y888r   8b.     
+                                       888R I888>  u888888> 
+                                       888R I888>   8888R   
+                                       888R I888>   8888P   
+     ▖▖ ▄ ▄ ▄  ▖ ▄▖▄▖                  u8888cJ888   *888>   
+     ▙▌ ▌▌▌▌▙▘   ▄▌▙▖                   "*888*P"     4888    
+      ▌ ▙▘▙▘▙▘   ▙▖▄▌                     'Y"        '888    
+                                                      88R   
+                                                      88E
+                                                      88>     
+                                                      48     
+                                                      '8
+                                                      `
 
      ,..,,._                                  s                                           .                
   .zf"``"db96689b                            :8     .uef^"                               @88>              
@@ -52,14 +52,18 @@ Debian/Ubuntu/Alpine
 cd install
 
 ** if ubuntu **
-sudo bash scripts/sury_setup_ubnt.sh
+sudo bash install/scripts/sury_setup_ubnt.sh
+
+* note: Plucky doesn't seem to be supported yet by Sury PPA. Use this if you run into trusted issues.
+sed -i 's/Components: main/Components: main\nTrusted: yes/' /etc/apt/sources.list.d/ondrej-ubuntu-php-plucky.sources
 
 ** if debian **
-sudo bash scripts/sury_setup_debian.sh
+sudo bash install/scripts/sury_setup_debian.sh
 
 
-sudo bash scripts/perldeps.sh
-mv config.ini.example config.ini
+sudo bash install/scripts/perldeps.sh
+mv config.ini.default config.ini
+cd install
 chmod +x AutoInstaller.pl
 sudo ./AutoInstaller.pl
 

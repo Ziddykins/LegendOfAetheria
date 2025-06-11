@@ -6,7 +6,7 @@ use Game\Account\Enums\Privileges;
 use Game\Character\Character;
 use Game\Monster\Pool;
 
-require_once "bootstrap.php";
+require_once SYSTEM_DIRECTORY . '/bootstrap.php';
 
 if (check_session() === true) {
     if ($account->get_privileges() >= Privileges::ADMINISTRATOR) {

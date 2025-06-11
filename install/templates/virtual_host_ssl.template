@@ -14,7 +14,7 @@
       	ErrorLog ${APACHE_LOG_DIR}/###REPL_WEB_FQDN###-error.log
        	CustomLog ${APACHE_LOG_DIR}/###REPL_WEB_FQDN###-access.log combined
 
-	SSLEngine on
+	    SSLEngine on
         SSLCertificateFile ###REPL_WEB_SSL_FULLCER###
         SSLCertificateKeyFile ###REPL_WEB_SSL_PRIVKEY###
     </VirtualHost>

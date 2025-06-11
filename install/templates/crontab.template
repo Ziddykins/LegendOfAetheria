@@ -1,4 +1,4 @@
-* * * * * ###REPL_PHP_BINARY### ###REPL_WEB_DOCROOT###/cron.php minute
-0 * * * * ###REPL_PHP_BINARY### ###REPL_WEB_DOCROOT###/cron.php hourly
-0 0 * * * ###REPL_PHP_BINARY### ###REPL_WEB_DOCROOT###/cron.php daily
-0 0 1 * * ###REPL_PHP_BINARY### ###REPL_WEB_DOCROOT###/cron.php monthly
+* * * * * ###REPL_PHP_BINARY### ###REPL_WEB_DOCROOT###/system/cron.php minute
+0 * * * * ###REPL_PHP_BINARY### ###REPL_WEB_DOCROOT###/system/cron.php hourly
+0 0 * * * ###REPL_PHP_BINARY### ###REPL_WEB_DOCROOT###/system/cron.php daily
+0 0 1 * * ###REPL_PHP_BINARY### ###REPL_WEB_DOCROOT###/system/cron.php monthly

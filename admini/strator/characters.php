@@ -8,7 +8,8 @@
     use Game\System\Tabulator\TableFromObject;
     use Game\System\Tabulator\Enums\DataType;
 
-    require_once "../../bootstrap.php";
+    require_once "../../constants.php";
+    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
 
     if (check_session()) {
         $account = new Account($_SESSION['email']);

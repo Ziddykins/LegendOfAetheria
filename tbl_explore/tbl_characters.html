@@ -1,22 +1,24 @@
 <pre>
-+--------------+---------------------+------+-----+---------------------+----------------+
-| Field        | Type                | Null | Key | Default             | Extra          |
-+--------------+---------------------+------+-----+---------------------+----------------+
-| id           | int(9) unsigned     | NO   | PRI | NULL                | auto_increment |
-| account_id   | int(9) unsigned     | NO   |     | NULL                |                |
-| level        | int(9) unsigned     | YES  |     | 1                   |                |
-| name         | varchar(50)         | YES  |     | NULL                |                |
-| race         | varchar(50)         | YES  |     | NULL                |                |
-| avatar       | varchar(50)         | YES  |     | avatar-unknown.jpg  |                |
-| x            | int(9)              | YES  |     | 0                   |                |
-| y            | int(9)              | YES  |     | 0                   |                |
-| location     | varchar(127)        | YES  |     | The Shrine          |                |
-| alignment    | int(9)              | YES  |     | 5                   |                |
-| gold         | bigint(20) unsigned | YES  |     | 1000                |                |
-| floor        | int(9) unsigned     | YES  |     | 1                   |                |
-| description  | text                | YES  |     | 'None Provided'     |                |
-| stats        | blob                | YES  |     | NULL                |                |
-| inventory    | blob                | YES  |     | NULL                |                |
-| monster      | blob                | YES  |     | NULL                |                |
-| date_created | datetime            | YES  |     | current_timestamp() |                |
-+--------------+---------------------+------+-----+---------------------+----------------+
++--------------+---------------------+------+-----+---------------------+-------------------------------+
+| Field        | Type                | Null | Key | Default             | Extra                         |
++--------------+---------------------+------+-----+---------------------+-------------------------------+
+| id           | int(9) unsigned     | NO   | PRI | NULL                | auto_increment                |
+| account_id   | int(9) unsigned     | NO   |     | NULL                |                               |
+| level        | int(9) unsigned     | YES  |     | 1                   |                               |
+| name         | varchar(50)         | YES  |     | NULL                |                               |
+| race         | varchar(50)         | YES  |     | NULL                |                               |
+| avatar       | varchar(50)         | YES  |     | avatar-unknown.jpg  |                               |
+| x            | int(9)              | YES  |     | 0                   |                               |
+| y            | int(9)              | YES  |     | 0                   |                               |
+| location     | varchar(127)        | YES  |     | The Shrine          |                               |
+| alignment    | int(9)              | YES  |     | 5                   |                               |
+| gold         | bigint(20) unsigned | YES  |     | 1000                |                               |
+| floor        | int(9) unsigned     | YES  |     | 1                   |                               |
+| description  | text                | YES  |     | 'None Provided'     |                               |
+| stats        | varchar(255)        | YES  |     | NULL                |                               |
+| inventory    | varchar(255)        | YES  |     | NULL                |                               |
+| monster      | varchar(255)        | YES  |     | NULL                |                               |
+| bank         | varchar(255)        | YES  |     | NULL                |                               |
+| date_created | datetime            | YES  |     | current_timestamp() |                               |
+| last_action  | timestamp           | YES  |     | current_timestamp() | on update current_timestamp() |
++--------------+---------------------+------+-----+---------------------+-------------------------------+
