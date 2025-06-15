@@ -5,6 +5,9 @@ use Game\Traits\PropSuite\PropSuite;
 use Game\Traits\PropSuite\Enums\PropType;
 use Game\Account\Enums\Privileges;
 
+/**
+ * @method load(int $account_id)
+ */
 class Account {
     use PropSuite;
     
@@ -41,7 +44,7 @@ class Account {
     public function __construct($email = null) {
         if ($email) {
             $this->email = $email;
-            $id = $this->checkIfExists($email);
+            $id = self::checkIfExists($email);
             
             if ($id > 0) {
                 $this->id = $id;
@@ -59,12 +62,14 @@ class Account {
 
         if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
             return $this->propMod($method, $params);
-        } elseif (preg_match('/^(propDump|propRestore)$/', $method, $matches)) {
+        }
+
+        if (preg_match('/^(propDump|propRestore)$/', $method, $matches)) {
             $func = $matches[1];
             return $this->$func($params[0] ?? null);
-        } else {
-            return $this->propSync($method, $params, PropType::ACCOUNT);
         }
+
+        return $this->propSync($method, $params, PropType::ACCOUNT);
     }
     
     public static function checkIfExists($email): int {

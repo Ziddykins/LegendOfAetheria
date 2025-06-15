@@ -25,7 +25,7 @@ class Character {
     private int $floor = 1;
 
     private float $gold = 1000.0;
-
+    
     private string $description = 'None Provided';
     private string $location = 'The Shrine';
     private string $name = 'NoName';

@@ -58,7 +58,7 @@ sudo bash install/scripts/sury_setup_ubnt.sh
 sed -i 's/Components: main/Components: main\nTrusted: yes/' /etc/apt/sources.list.d/ondrej-ubuntu-php-plucky.sources
 
 ** if debian **
-sudo bash install/scripts/sury_setup_debian.sh
+sudo bash install/scripts/sury_setup_deb.sh
 
 
 sudo bash install/scripts/perldeps.sh

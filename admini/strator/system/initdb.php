@@ -3,7 +3,7 @@ declare(strict_types = 1);
 require_once '../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable('../');
 $dotenv->safeLoad();
-require_once 'constants.php';
+;
 require_once SYSTEM_DIRECTORY . '/db.php';
 require_once SYSTEM_DIRECTORY . '/logger.php';
 require_once 'functions.php';

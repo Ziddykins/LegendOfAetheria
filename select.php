@@ -1,6 +1,8 @@
 <?php
-require_once "constants.php";
-require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+
+require_once "system/constants.php";
+require_once "system/bootstrap.php";
+
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\System\Enums\AbuseType;

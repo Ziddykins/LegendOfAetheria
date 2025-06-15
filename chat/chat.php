@@ -1,7 +1,6 @@
 <?php
-
-require_once '../constants.php';
-require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+require_once 'vendor/autoload.php';
+global $t, $db;
 
 /* Check if user is logged in */
 if (!isset($_SESSION['account-id'])) {

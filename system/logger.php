@@ -4,6 +4,6 @@
     use Monolog\Handler\StreamHandler;
 
     $log = new Logger('LegendOfAetheria');
-    $log->pushHandler(new StreamHandler(__DIR__ . '/gamelog.txt', Level::Debug));
+    $log->pushHandler(new StreamHandler(LOG_DIRECTORY . '/gamelog.txt', Level::Debug));
 
 ?>

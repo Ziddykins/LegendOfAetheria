@@ -8,9 +8,9 @@ use Game\Inventory\Gem;
 use Game\Monster\Pool;
 use Game\Traits\PropConvert;
 
-require_once "../../constants.php";
-require_once SYSTEM_DIRECTORY . '/bootstrap.php';
-require_once "system/functions.php";
+require_once "../../system/constants.php";
+;
+require_once "../../system/functions.php";
 
 if (check_session()) {
     $account = new Account($_SESSION['email']);

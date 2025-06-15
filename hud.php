@@ -1,6 +1,6 @@
 <?php
     declare(strict_types = 1);
-    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+
     use Game\Character\Character;
 
     $character = new Character($_SESSION['account-id'], $_SESSION['character-id']);

@@ -187,6 +187,7 @@
       x$.append = function(n){
         var r;
         if (n.classList.contains("offcanvas-backdrop")) { return; }
+	if (n.classList.contains("tooltip")) { return; }
         return this.appendChild(r = document.createElementNS("http://www.w3.og/2000/svg", n));
       };
       x$.attr = function(n, v){

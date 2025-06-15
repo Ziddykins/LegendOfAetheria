@@ -15,6 +15,19 @@
     $char_str = $character->stats->get_str();
     $char_def = $character->stats->get_def();
     $char_int = $character->stats->get_int();
+    $char_luck = $character->stats->get_luck();
+    $char_chsm = $character->stats->get_chsm();
+    $char_dext = $character->stats->get_dext();
+    $char_sped = $character->stats->get_sped();
+    $char_mdef = $character->stats->get_mdef();
+    $char_crit = $character->stats->get_crit();
+    $char_dodg = $character->stats->get_dodg();
+    $char_blck = $character->stats->get_blck();
+    $char_accu = $character->stats->get_accu();
+    $char_rsst = $character->stats->get_rsst();
+    $char_evsn = $character->stats->get_evsn();
+    $char_rgen = $character->stats->get_rgen();
+    $char_absb = $character->stats->get_absb();
 
     $max_hp = $character->stats->get_maxHP();
     $max_mp = $character->stats->get_maxMP();
@@ -44,3 +57,80 @@
     $align = $character->get_alignment();
 
     $race = $character->get_race();
+
+    $class   = get_class($character->stats);
+    $reflect = new ReflectionClass($class);
+    $props   = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
+
+    $stats_map = [
+        'str' => [
+            'name' => 'Strength',
+            'icon' => 'swords',
+            'value' => $char_str
+        ],
+        'def' => [
+            'name' => 'Defense',
+            'icon' => 'security',
+            'value' => $char_def
+        ],
+        'int' => [
+            'name' => 'Intelligence',
+            'icon' => 'neurology',
+            'value' => $char_int            
+        ],
+        'luck' => [
+            'name' => 'Luck',
+            'icon' => 'poker_chip',
+            'value' => $char_luck
+        ],
+        'char' => [
+            'name' => 'Charisma',
+            'icon' => 'favorite',
+            'value' => $char_chsm
+        ],
+        'dext' => [
+            'name' => 'Dexterity',
+            'icon' => 'import_contacts',
+            'value' => $char_dext
+        ],
+        'sped' => [
+            'name' => 'Speed',
+            'icon' => 'sprint',
+            'value' => $char_sped
+        ],
+        'mdef' => [
+            'name' => 'Magic Defense',
+            'icon' => 'shield_moon',
+            'value' => $char_mdef
+        ],
+        'crit' => [
+            'name' => 'Critical',
+            'icon' => 'brightness_alert',
+            'value' => $char_crit
+        ],
+        'dodg' => [
+            'name' => 'Dodge',
+            'icon' => 'switch_left',
+            'value' => $char_dodg
+        ],
+        'blck' => [
+            'name' => 'Block',
+            'icon' => 'encrypted_minus_circle',
+            'value' => $char_blck
+        ],
+        'accu' => [
+            'name' => 'Accuracy',
+            'icon' => 'target',
+            'value' => $char_accu
+        ],
+        'rsst' => [
+            'name' => 'Resist',
+            'icon' => 'special_character',
+            'value' => $char_rsst
+        ],
+        'rgen' => [
+            'name' => 'Regeneration',
+            'icon' => 'compost',
+            'value' => $char_rgen
+        ]
+    ];

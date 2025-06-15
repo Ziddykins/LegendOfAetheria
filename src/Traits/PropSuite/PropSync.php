@@ -60,8 +60,6 @@ trait PropSync {
             return null;
         }
 
-        global $db, $log;
-        $table  = null;
         $prop   = null;
         $offset = strpos($method, "_");
         $action = substr($method, 0, $offset);
@@ -72,10 +70,6 @@ trait PropSync {
             $prop = lcfirst(substr($method, $offset + 1));
         }
 
-        if ($method == 'propSync') {
-            return null;
-        }
-        
         switch ($type) {
             case PropType::CSTATS:
             case PropType::CHARACTER:
@@ -104,20 +98,9 @@ trait PropSync {
             $params[0] = null;
         }
 
-        if (isset($params[0]->name)) {
-            $log_str = $params[0]->name;
-        } else {
-            $log_str = $params[0];
-        }
-        
-
         switch($action) {
             case "get":
-                if (isset($this->$prop)) {
-                    return $this->$prop;
-                } else {
-                    return null;
-                }
+                return $this->$prop ?? null;
             case "set":
                 $this->handle_set($prop, $params, $type, $table);
                 break;
@@ -131,11 +114,10 @@ trait PropSync {
         return LOAError::FUNCT_PROPSYNC_TYPE;
     }
 
-    private function handle_set($prop, $params, $type, $table) {
+    private function handle_set($prop, $params, $type, $table): void {
         global $db, $log;
         $table_col = $this->clsprop_to_tblcol($prop);
-        $sql_query = null;
-    
+
         if (isset($this->id)) {
             $id = $this->id;
         }
@@ -169,7 +151,7 @@ trait PropSync {
                 return;
             case PropType::MONSTER:
                 if (isset($params[1]) && $params[1] === 'false') {
-                    return null;
+                    return;
                 }
 
                 $srl_data = $this->propDump();
@@ -210,7 +192,6 @@ trait PropSync {
         }
 
         $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";
-        $log->debug("PropSync Update: Table: $table - Column: $table_col, ID: $id, Passed Param: " . $params[0]);
         $db->execute_query($sql_query, [ $params[0], $id ]);
     }
 
@@ -232,11 +213,7 @@ trait PropSync {
 
                 return $accountID;            
             case PropType::CHARACTER:
-                if (isset($params[0])) {
-                    $next_slot = $params[0];
-                } else {
-                    $next_slot = $this->getNextCharSlotID($this->accountID);
-                }
+                $next_slot = $params[0] ?? $this->getNextCharSlotID($this->accountID);
 
                 $this->id = getNextTableId($_ENV['SQL_CHAR_TBL']);
                 $char_col   = "char_slot$next_slot";
@@ -285,6 +262,8 @@ trait PropSync {
                 $db->execute_query($sql_query, [ $next_id, $_SESSION['account-id'], $_SESSION['character-id'], $this->scope->value, $this->seed, $srl_data ]);
                 return $next_id;
         }
+
+        return -1;
     }
 
     private function handle_load($type, $params, $table) {
