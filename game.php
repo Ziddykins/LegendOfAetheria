@@ -1,6 +1,7 @@
 <?php
     declare(strict_types = 1);
-    require_once "bootstrap.php";
+    require_once "constants.php";
+    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
 
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
@@ -22,13 +23,15 @@
     $account->get_settings()->set_sideBar(SidebarType::LTE_DEFAULT);
     $sidebar_rel_link = $account->get_settings()->get_sideBar()->value;
 
+
     //$familiar = new Familiar($character->get_id(), $t['familiars']);
     //$familiar->loadFamiliar($character->get_id());
 
     $_SESSION['name'] = $character->get_name();
     $cur_floor        = $character->get_floor();
     $avatar           = $character->get_avatar();
-    $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now")));    
+    $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now"))); 
+    $log->debug("WE MADE IT TO GAME");   
 ?>
 
 <?php include 'html/opener.html'; ?>

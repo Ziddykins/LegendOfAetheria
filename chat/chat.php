@@ -1,11 +1,9 @@
 <?php
-if ($_SERVER['SCRIPT_NAME'] == '/game.php') {
-    require_once "bootstrap.php";
-} else {
-    require_once "../bootstrap.php";
-}
 
-// Check if user is logged in
+require_once '../constants.php';
+require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+
+/* Check if user is logged in */
 if (!isset($_SESSION['account-id'])) {
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'Please log in to access chat']);

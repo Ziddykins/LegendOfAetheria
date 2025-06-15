@@ -1,5 +1,5 @@
 <?php
-require_once "bootstrap.php";
+require_once SYSTEM_DIRECTORY . '/bootstrap.php';
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\Mail\Folder\Enums\FolderType;
@@ -40,7 +40,7 @@ $currentSub = $_GET['sub'] ?? '';
         <?php include 'navs/sidemenus/nav-quicknav.php'; ?>
     </div>
 
-    <div class="sidebar-wrapper" style="height: calc(100vh - 100px); overflow-y: auto;">
+    <div class="sidebar-wrapper" style="height: calc(100vh - 180px); overflow-y: auto; padding-bottom: 80px;">
         <nav class="nav-menu h-100 d-flex flex-column">
             <ul class="nav sidebar-menu flex-column flex-grow-1" data-lte-toggle="treeview" role="menu">
                 <!-- Character Section -->
@@ -514,7 +514,7 @@ $currentSub = $_GET['sub'] ?? '';
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        <li class="nav-item mb-3">
                             <a href="/game?page=settings&sub=account" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'settings' && $currentSub === 'account') ? 'active' : ''; ?>">
                                 <i class="nav-icon material-symbols-outlined">settings_account_box</i>
                                 <p class="ms-2">Settings</p>
@@ -530,7 +530,7 @@ $currentSub = $_GET['sub'] ?? '';
 
                         </a>
                     </div> -->
-                    <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 fixed-bottom">
+                    <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 position-absolute bottom-0 ms-3 ps-3 start-0 w-100 bg-dark" style="z-index: 1030; min-height: 70px;">
                             <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
                                 <span><img src="img/avatars/<?php echo $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
                             </a>

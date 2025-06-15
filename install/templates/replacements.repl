@@ -1,0 +1,46 @@
+= Template replacements
+= ---------------------
+= Anything with a .template extension will have these replacements performed on them
+= The format is:
+= - target%%%replacement
+= To reference a config.ini variable, use the following format:
+= - target%%%cfg(variable)
+= To reference a SQL variable, use the following format:
+= - target%%%sql(variable)
+
+
+###REPL_PHP_BINARY###%%%cfg(php_binary)
+
+###REPL_WEB_DOCROOT###%%%cfg(web_root)
+###REPL_WEB_ADMIN_EMAIL###%%%cfg(admin_email)
+###REPL_WEB_FQDN###%%%cfg(fqdn)
+###REPL_WEB_SSL_FULLCER###%%%cfg(ssl_fullcer)
+###REPL_WEB_SSL_PRIVKEY###%%%cfg(ssl_privkey)
+
+###REPL_SQL_DB###%%%cfg(sql_database)
+###REPL_SQL_USER###%%%cfg(sql_username)
+###REPL_SQL_PASS###%%%cfg(sql_password)
+###REPL_SQL_HOST###%%%cfg(sql_host)
+###REPL_SQL_PORT###%%%cfg(sql_port)
+
+###REPL_SQL_TBL_ACCOUNTS###%%%sql(tbl_accounts)
+###REPL_SQL_TBL_CHARACTERS###%%%sql(tbl_characters)
+###REPL_SQL_TBL_FAMILIARS###%%%sql(tbl_familiars)
+###REPL_SQL_TBL_FRIENDS###%%%sql(tbl_friends)
+###REPL_SQL_TBL_MAIL###%%%sql(tbl_mail)
+###REPL_SQL_TBL_MONSTERS###%%%sql(tbl_monsters)
+###REPL_SQL_TBL_LOGS###%%%sql(tbl_logs)
+###REPL_SQL_TBL_GLOBALS###%%%sql(tbl_globals)
+###REPL_SQL_TBL_BANNED###%%%sql(tbl_banned)
+###REPL_SQL_TBL_GLOBALCHAT###%%%sql(tbl_globalchat)
+###REPL_SQL_TBL_STATISTICS###%%%sql(tbl_statistics)
+###REPL_SQL_TBL_BANK###%%%sql(tbl_bank)
+
+# REM%%%\t
+
+###REPL_OPENAI_APIKEY###%%%cfg(openai_apikey)
+
+###REPL_PHP_COOKIEDOMAIN###%%%cfg(fqdn)
+
+###REPL_APACHE_HTTP_PORT###%%%cfg(apache_http_port)
+###REPL_APACHE_HTTPS_PORT###%%%cfg(apache_https_port)

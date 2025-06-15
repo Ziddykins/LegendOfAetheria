@@ -59,4 +59,16 @@
   - [ ] Need to redo how compose.php works; no emails, char only
   
 # meh
-  - [ ] fix avatar selection, shouldn't see or be able to specify unknown (add to check)
+  - [x] fix avatar selection, shouldn't see or be able to specify unknown (add to check)
+
+### Installer fixes:
+
+- [x] Change INSTALL paths, include "install" i.e. install/scripts
+- [x]  ubuntu php, need sed on apt sources.d ->
+       sed -i 's/Components: main/Components: main\nTrusted: yes/' /etc/apt/sources.list.d/ondrej-ubuntu-php-plucky.sources
+- [ ]  script needs to be re-ran in new dir after moving, running in memory after move isn't great
+- [ ]  re-copy config file default to new location as script will have populated the fqdn lol
+- [ ]  ssl apache vhost still not created >:|
+- [x]  #REM and #SSLREM not removed in template processing
+
+

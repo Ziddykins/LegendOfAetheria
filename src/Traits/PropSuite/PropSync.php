@@ -3,6 +3,8 @@ namespace Game\Traits\PropSuite;
 
 use ValueError;
 use Game\Character\Stats;
+use Game\Character\Enums\Status;
+use Game\Character\Enums\Races;
 use Game\Account\Settings;
 use Game\Bank\BankManager;
 use Game\Inventory\Inventory;
@@ -10,6 +12,7 @@ use Game\System\Enums\LOAError;
 use Game\Bank\Enums\BankBracket;
 use Game\Account\Enums\Privileges;
 use Game\Traits\PropSuite\Enums\PropType;
+use Game\Monster\Monster;
 use Game\Monster\Enums\MonsterScope;
 use Exception;
 use ReflectionType;
@@ -129,7 +132,7 @@ trait PropSync {
     }
 
     private function handle_set($prop, $params, $type, $table) {
-        global $db;
+        global $db, $log;
         $table_col = $this->clsprop_to_tblcol($prop);
         $sql_query = null;
     
@@ -146,21 +149,24 @@ trait PropSync {
 
                 $id = $this->id;
                 $srl_data = $this->propDump();
+                $log->debug($srl_data);
                 $sql_query = "UPDATE $tbl SET `stats` = ? WHERE `id` = ?";
                 $db->execute_query($sql_query, [ $srl_data, $this->id ]);
-                return null;
+                return;
             case PropType::INVENTORY:
                 $id = $this->id;
                 $srl_data = $this->propDump();
+                $log->debug($srl_data);
                 $sql_query = "UPDATE {$_ENV['SQL_CHAR_TBL']} SET `inventory` = ? WHERE `id` = ?";
-                $db->execute_query($sql_query, [ $srl_data, $_SESSION['character-id'] ]);
-                return null;
+                $db->execute_query($sql_query, [ $srl_data, $$this->id ]);
+                return;
             case PropType::SETTINGS:
                 $id = $this->id;
                 $srl_data = $this->propDump();
+                $log->debug($srl_data);
                 $sql_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `settings` = ? WHERE `id` = ?";
                 $db->execute_query($sql_query, [ $srl_data, $this->id ]);
-                return null;
+                return;
             case PropType::MONSTER:
                 if (isset($params[1]) && $params[1] === 'false') {
                     return null;
@@ -173,6 +179,7 @@ trait PropSync {
                 if ($prop === 'scope') {
                     $params[0] = $params[0]->value;
                 }
+
                 break;
             case PropType::CHARACTER:
                 $id = $this->id;
@@ -203,6 +210,7 @@ trait PropSync {
         }
 
         $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";
+        $log->debug("PropSync Update: Table: $table - Column: $table_col, ID: $id, Passed Param: " . $params[0]);
         $db->execute_query($sql_query, [ $params[0], $id ]);
     }
 
@@ -222,8 +230,7 @@ trait PropSync {
                 
                 $db->execute_query($sql_query, [ $accountID, $this->email, $srl_data ] );
 
-                return $accountID;
-            
+                return $accountID;            
             case PropType::CHARACTER:
                 if (isset($params[0])) {
                     $next_slot = $params[0];
@@ -247,7 +254,7 @@ trait PropSync {
                 $srl_stats     = $tmp_stats->propDump();
                 $srl_bank      = $tmp_bank->propDump();
 
-                $chr_query = "INSERT INTO $table (`id`, `account_id`, `inventory`, `stats`, `bank`) VALUES (?, ?, ?, ?, ?)";
+                $chr_query = "INSERT INTO $table (`id`, `account_id`, `inventory`, `stats`, `bank`, `status`) VALUES (?, ?, ?, ?, ?, ?)";
                 $bnk_query = "INSERT INTO {$_ENV['SQL_BANK_TBL']} (`id`, `account_id`, `character_id`) VALUES (?, ?, ?)";
 
                 if (!preg_match('/^[a-zA-Z0-9_]+$/', $char_col)) {
@@ -256,8 +263,8 @@ trait PropSync {
 
                 $act_query = "UPDATE {$_ENV['SQL_ACCT_TBL']} SET `$char_col` = ? WHERE `id` = ?";
 
-                $db->execute_query($chr_query, [ $this->id, $this->accountID, $srl_inventory, $srl_stats, $srl_bank ]);
-                $db->execute_query($bnk_query, [ $tmp_bank->id, $this->accountID, $this->id ]);
+                $db->execute_query($chr_query, [ $this->id, $this->accountID, $srl_inventory, $srl_stats, $srl_bank, $this->status->value ]);
+                $db->execute_query($bnk_query, [ $tmp_bank->get_id(), $this->accountID, $this->id ]);
                 $db->execute_query($act_query, [ $this->id, $this->accountID ]);
 
                 return $this->id;
@@ -283,7 +290,7 @@ trait PropSync {
     private function handle_load($type, $params, $table) {
 		global $db;
 
-        $objects = [ 'privileges', 'bracket', 'scope', 'settings', 'privileges', 'bank', 'stats', 'inventory', 'race' ];
+        $objects = [ 'privileges', 'bracket', 'scope', 'settings', 'privileges', 'bank', 'stats', 'inventory', 'race', 'monster', 'status' ];
 
         $tmp_obj = null;
         $sql_query = "SELECT * FROM $table WHERE `id` = ?";
@@ -296,50 +303,47 @@ trait PropSync {
 		}
         
         if ($type == PropType::CHARACTER) {
-            $tmp_inventory = null;
-            $tmp_stats = null;
-            $tmp_bank = null;
-
             if (isset($tmp_obj['inventory'])) {
                 $tmp_inventory = new Inventory($this->id);
                 $inv_data = $tmp_obj['inventory'];
                 $this->inventory = $tmp_inventory->propRestore($inv_data);
-                return;
             }
             
             if (isset($tmp_obj['stats'])) {
                 $tmp_stats = new Stats($this->id);
                 $stats_data = $tmp_obj['stats'];
                 $this->stats = $tmp_stats->propRestore($stats_data);
-                return;
             }
 
             if (isset($tmp_obj['bank'])) {
                 $tmp_bank = new BankManager($_SESSION['account-id'], $this->id);
                 $bank_data = $tmp_obj['bank'];
                 $this->bank = $tmp_bank->propRestore($bank_data);
-                return;
             }
 
+            if (isset($tmp_obj['monster'])) {
+                $tmp_monster = new Monster(MonsterScope::PERSONAL, $this->id);
+                $monster_data = $tmp_obj['monster'];
+                $this->monster = $tmp_monster->propRestore($monster_data);
+            }
+
+            $this->status = Status::name_to_enum($tmp_obj['status']);
+            $this->race   = Races::name_to_enum($tmp_obj['race']);
         } elseif ($type == PropType::ACCOUNT) {
             if (isset($tmp_obj['settings'])) {
                 $tmp_settings = new Settings($this->id);
                 $settings_data = $tmp_obj['settings'];
                 $this->settings = $tmp_settings->propRestore($settings_data);
-                return;
             }
 
             $this->privileges = Privileges::name_to_enum($tmp_obj['privileges']);
         } elseif ($type == PropType::MONSTER) {
             $this->stats = $this->propRestore($tmp_obj['stats']);
             $this->scope = MonsterScope::name_to_enum($tmp_obj['scope']);
-            return;
         } elseif ($type == PropType::FAMILIAR) {
             /* TODO: Familiar loading */
-            return;
         } elseif ($type == PropType::BANKMANAGER) {
             $this->bracket = BankBracket::name_to_enum($tmp_obj['bracket']);
-            return;
         }
 
         foreach ($tmp_obj as $key => $value) {
@@ -349,7 +353,8 @@ trait PropSync {
 
             $key = $this->tblcol_to_clsprop($key);
 
-            if ($value !== null && $value !== 'NULL' && $value) {                $this->$key = $value;
+            if ($value !== null && $value !== 'NULL' && $value) {
+                $this->$key = $value;
             }
         }
     } 
