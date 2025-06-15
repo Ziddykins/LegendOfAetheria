@@ -16,7 +16,6 @@
                         <span class="small text-body-secondary float-end pe-3" style="font-size: 10px;">
                             Character created <?php echo $character->get_dateCreated(); ?>
                         </span>
-                        
                     </div>
                     <div class="hr">
                     <div class="d-flex">
