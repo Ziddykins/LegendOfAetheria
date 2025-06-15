@@ -4,7 +4,7 @@ namespace Game\Familiar;
 use Game\Inventory\Enums\ObjectRarity;
 use Game\Traits\PropSuite\PropSuite;
 
-require_once "bootstrap.php";
+require_once SYSTEM_DIRECTORY . '/bootstrap.php';
 
 class Familiar {
     use PropSuite;

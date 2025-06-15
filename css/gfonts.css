@@ -119,6 +119,16 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* latin */
+@font-face {
+  font-family: 'VT323';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/vt323/v17/pxiKyp0ihIEF2isfFJU.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 
 /* fallback */
 @font-face {
@@ -168,22 +178,20 @@
 }
 
 
-.main-font {
-
+.josefin-slab {
   font-family: "Josefin Slab", serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
 }
 
-/*.main-font {
+.syne-mono {
   font-family: "Syne Mono", monospace;
   font-weight: 200;
   font-style: normal;
 }*/
 
-/*.afacad-flux-loa {*/
-/*.main-font {
+.afacad-flux-loa {
   font-family: "Afacad Flux", serif;
   font-optical-sizing: auto;
   font-weight: 200;
@@ -192,17 +200,25 @@
     "slnt" 0;
 }
 
-.main-font {
+.press-start-2p {
   font-family: "Press Start 2P", serif;
   font-weight: 600;
   font-size: 12px;
   font-style: normal;
 }
 
-/*.main-font {
+.jacquarda {
   font-family: "Jacquarda Bastarda 9", serif;
   font-weight: 100;
   font-size: 32px;
   font-style: normal;
 }
 */
+
+/*.vt323-regular {*/
+.main-font {
+  font-family: "VT323", monospace;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 32px;
+}

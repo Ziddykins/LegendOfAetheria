@@ -7,14 +7,11 @@
 	define('LOG_DIRECTORY', WEBROOT . '/system/logs');
 	define('WHITELABEL_DIRECTORY', UPLOAD_DIRECTORY . '/whitelabel');
 	define('TEMP_DIRECTORY', UPLOAD_DIRECTORY . '/temp');
-	
-	define('RELATIVE_UPLOAD_DIRECTORY', '/uploads');
-	define('RELATIVE_WHITELABEL_DIRECTORY', '/uploads/whitelabel');
-	define('RELATIVE_SYSTEM_DIRECTORY', '/system');
+	define('SYSTEM_DIRECTORY', WEBROOT . '/system');
 
-	define('ADMIN_WEBROOT', '##REPL_WEB_DOCROOT###/admini/strator');
+	define('ADMIN_WEBROOT', '###REPL_WEB_DOCROOT###/admini/strator');
 
-	const MAX_STARTING_INVWEIGHT = 500;
-	const MAX_STARTING_INVSLOTS = 30;
-	const MAX_ASSIGNABLE_AP = 40;
-	const REGEN_PER_TICK = 3;
+	const STARTING_GOLD = 1000;
+	const STARTING_INVWEIGHT = 500;
+	const STARTING_INVSLOTS = 30;
+	const STARTING_ASSIGNABLE_AP = 40;

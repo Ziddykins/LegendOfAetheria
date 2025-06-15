@@ -7,7 +7,8 @@
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 
-    require_once "bootstrap.php";
+    require_once 'constants.php';
+    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
 
     $account = new Account($_SESSION['email']);
     $account->load();

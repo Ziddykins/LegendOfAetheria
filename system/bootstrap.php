@@ -2,21 +2,21 @@
 declare(strict_types=1);
 
 /* Core requirements */
-require_once 'vendor/autoload.php';
+require_once WEBROOT . '/vendor/autoload.php';
 
 use Game\System\System;
 
 $system = new System(0);
-require_once 'constants.php';
+require_once WEBROOT . '/constants.php';
 
 /* Funcs etc */
-require_once WEBROOT . '/logger.php';
-require_once WEBROOT . '/db.php';
+require_once SYSTEM_DIRECTORY . '/logger.php';
+require_once SYSTEM_DIRECTORY . '/db.php';
 require_once WEBROOT . '/functions.php';
 require_once WEBROOT . '/mailer.php';
 
 /* .env */
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv = Dotenv\Dotenv::createImmutable(WEBROOT);
 $dotenv->safeLoad();
 
 /* tables */
@@ -33,7 +33,7 @@ $t['monsters']   = $_ENV['SQL_MNST_TBL'];
 $t['statistics'] = $_ENV['SQL_STAT_TBL'];
 $t['bank']       = $_ENV['SQL_BANK_TBL'];
 
-if ($_SERVER['SCRIPT_NAME'] !== '/index.php' && $_SERVER['SCRIPT_NAME'] !== '/cron.php') {
+if ($_SERVER['SCRIPT_NAME'] !== '/index.php' && $_SERVER['SCRIPT_NAME'] !== '/system/cron.php') {
     if (check_session() === true) {
         // Session timeout check - 30 minutes
 

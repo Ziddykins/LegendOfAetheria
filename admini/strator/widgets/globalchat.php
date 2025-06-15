@@ -1,6 +1,8 @@
 <?php
-    require_once WEBROOT . '/bootstrap.php';
+    require_once "../../constants.php";
+    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
     global $db;
+
     $messages = [];
     $sql_query = <<<SQL
         SELECT * FROM {$t['chat']}

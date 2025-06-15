@@ -51,11 +51,11 @@
             </div>
 
             <div class="input-group mb-3">
-                <span class="input-group-text" id="icon-password"><i class="bi bi-key"></i></span>
-                <div class="form-floating flex-grow-1">
-                    <input type="password" class="form-control" id="login-password" name="login-password" placeholder="Password" aria-label="Password" aria-describedby="icon-password" required />
-                    <label for="login-password">Password</label>
-                </div>
+                <span class="input-group-text" id="login-icon-password">
+                    <i class="bi bi-key"></i>
+                </span>
+                <input type="password" class="form-control" id="login-password" name="login-password" placeholder="Password" aria-label="Password" aria-describedby="icon-password password-addon" required />
+                <span class="input-group-text" data-loa="pw_toggle">Show</span>
             </div>
 
             <div class="vstack gap-1">
@@ -96,21 +96,17 @@
                         <span class="input-group-text" id="register-icon-password">
                             <i class="bi bi-key"></i>
                         </span>
-                        <div class="form-floating flex-grow-1">
-                            <input type="password" class="form-control" id="register-password" name="register-password" placeholder="Password" aria-label="Password" aria-describedby="register-icon-password" required>
-                            <label for="login-password">Password</label>
-                        </div>
+                        <input type="password" class="form-control" id="register-password" name="register-password" placeholder="Password" aria-label="Password" aria-describedby="icon-password password-addon" required />
+                        <span class="input-group-text" data-loa="pw_toggle">Show</span>
                     </div>
 
                     <div class="input-group">
-                        <span class="input-group-text" id="register-icon-password">
+                        <span class="input-group-text" id="register-icon-password-confirm">
                             <i class="bi bi-key"></i>
                             <sup style="margin-left: -14px; margin-top: -8px;">x2</sup>
                         </span>
-                        <div class="form-floating flex-grow-1">
-                            <input type="password" class="form-control" id="register-password-confirm" name="register-password-confirm" placeholder="Password (Confirm)" aria-label="Password" aria-describedby="register-icon-password-confirm" required>
-                            <label for="login-password">Password (Confirm)</label>
-                        </div>
+                        <input type="password" class="form-control" id="register-password-confirm" name="register-password-confirm" placeholder="Password (confirm)" aria-label="Password" aria-describedby="icon-password password-addon" required />
+                        <span class="input-group-text" data-loa="pw_toggle">Show</span>
                     </div>
                 </div>
             </div>
@@ -163,6 +159,10 @@
                         <?php
                         $images = scandir('img/avatars');
                         for ($i = 2; $i < count($images); $i++) {
+                            if (preg_match('/unknown/', $images[$i])) {
+                                continue;
+                            }
+
                             $split = explode('.', $images[$i]);
                             $title = explode('avatar-', $split[0]);
                             $pic_title = $title[1];
@@ -333,6 +333,40 @@
             </a>
         </div>
     </div>
+
+    <div class="tab-pane fade" id="admin-tab-pane" role="tabpanel" aria-labelledby="admin-tab" tabindex="4">
+        <form id="admin-form" name="admin-form" action="/" method="POST">
+            <div class="border">
+                <div class="d-flex text-bg-danger opacity-50 bg-gradient border shadow">
+                    <div class="p-2">
+                        <h6><i class="bi bi-person-fill-gear"></i> Administrator Portal</h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-text" id="icon-email"><i class="bi bi-envelope-plus"></i></span>
+                <div class="form-floating flex-grow-1">
+                    <input type="email" class="form-control" aria-label="Email" aria-describedby="icon-email" id="admin-email" name="admin-email" placeholder="Email" required />
+                    <label for="admin-email">E-mail</label>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="admin-icon-password">
+                    <i class="bi bi-key"></i>
+                </span>
+                <input type="password" class="form-control" id="admin-password" name="admin-password" placeholder="Password" aria-label="Password" aria-describedby="icon-password password-addon" required />
+                <span class="input-group-text" data-loa="pw_toggle">Show</span>
+            </div>
+
+            <div class="vstack gap-1">
+                <button class="btn btn-primary" id="admin-submit" name="admin-submit" value="1">
+                    <i class="bi bi-door-open-fill"></i> Login
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -350,7 +384,7 @@
     }
 
     document.getElementById("random").addEventListener("click", function() {
-    
+
     });
 
     document.getElementById("debug").addEventListener("click", function() {
@@ -365,15 +399,29 @@
         pw.value = genString(10);
         pw2.value = pw.value;
         charname.value = "TestChar" + genString(5);
-        race.selectedIndex = parseInt(Math.random()*race.options.length)
-        avatar.selectedIndex = parseInt(Math.random()*avatar.options.length)
+        race.selectedIndex = parseInt(Math.random() * race.options.length)
+        avatar.selectedIndex = parseInt(Math.random() * avatar.options.length)
 
         var stats = ["str", "def", "int"];
-        for (let i=0; i<10; i++) {
-            var which = stats[Math.floor(Math.random() * 3)];
-            stat_adjust(which + '-plus').click();
 
+        for (let i = 0; i < 10; i++) {
+            let which = stats[Math.floor(Math.random() * 3)];
+            stat_adjust(which + '-plus').click();
         }
-        
+    });
+
+    document.querySelectorAll("[data-loa=pw_toggle]").forEach((e) => {
+        e.addEventListener("click", (ev) => {
+            var cur_ele_textbox = ev.target.previousElementSibling;
+            var cur_type = cur_ele_textbox.type;
+
+            if (cur_type == 'password') {
+                ev.target.textContent = 'Hide';
+                cur_ele_textbox.type = 'text';
+            } else {
+                ev.target.textContent = 'Show';
+                cur_ele_textbox.type = 'password';
+            }
+        });
     });
 </script>

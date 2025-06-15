@@ -7,6 +7,7 @@ use Game\Character\Stats;
 use Game\Inventory\Inventory;
 use Game\Bank\BankManager;
 use Game\Character\Enums\Races;
+use Game\Character\Enums\Status;
 use ReflectionEnumPureCase;
 
 class Character {
@@ -30,6 +31,7 @@ class Character {
     private string $name = 'NoName';
     private string $avatar = '';
     private string $lastAction = '';
+    private Status $status = Status::HEALTHY;
 
     /* enum Races */
     private ?Races $race = null;
@@ -51,10 +53,8 @@ class Character {
         $this->stats = new Stats($characterID ?? 0);
 
         if ($characterID) {
-            
             $this->id = $characterID;
             $this->inventory = new Inventory($this->id);
-            $this->race = Races::random_enum();
             $this->load($this->id);
             $this->stats->set_id($this->id);
         }
@@ -63,7 +63,6 @@ class Character {
     public function __call($method, $params) {
         global $db, $log;
 
-        
         if (!count($params)) {
             $params = null;
         }

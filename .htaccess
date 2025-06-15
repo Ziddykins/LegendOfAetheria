@@ -1,4 +1,7 @@
 ErrorDocument 404 /404.php
+<FilesMatch "\.env$|.*\.ready|.*\.template$|.*\.pl$|.*\.ini$|.*\.log$|.*\.sh$">
+	Require all denied
+</FilesMatch>
 
 <IfModule mod_rewrite.c>
     RewriteEngine on
@@ -13,4 +16,7 @@ ErrorDocument 404 /404.php
     # No reading .txt files!
     RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.txt[? ].*$"
     RewriteRule .* - [L,R=404]
+
+    RewriteCond %{HTTPS} !=on [NC]
+    RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R,L]
 </IfModule>
