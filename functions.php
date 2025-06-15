@@ -427,23 +427,19 @@
          * @param string $race The race to validate.
          * @return string The validated or randomly selected race.
          */
-        function validate_race($race): string {
+        function validate_race($race): Races {
             global $log, $account;
 
             $valid_race = 0;
-
+            
+            
             foreach (Races::cases() as $enum_race) {
                 if ($race === $enum_race->name) {
-                    $valid_race = 1;
+                    return $enum_race;
                 }
             }
-
-            if (!$valid_race) {
-                $race = Races::random_enum()->name;
-                $log->critical("Possible POST modify in race selection", ['Race' => $race, 'AID' => $account->get_id()]);
-            }
-            
-            return $race;
+            $log->critical("Possible POST modify in race selection", ['Race' => $race, 'AID' => $account->get_id()]);
+            return Races::random_enum();
         }
 
         /**
@@ -507,7 +503,6 @@
             global $db, $log, $t;
 
             if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
-
                 return false;
             }
 
@@ -607,7 +602,7 @@
         }
 
         function shuffle_array(array &$array, int $iterations): void {
-            for ($i=0; $i < $iterations; $i++) {
+            for ($i=0; $i<$iterations; $i++) {
                 $r1 = mt_rand(0, count($array) - 1);
                 $r2 = mt_rand(0, count($array) - 1);
                 $tmp = $array[$r1];

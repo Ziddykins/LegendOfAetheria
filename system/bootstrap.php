@@ -7,14 +7,14 @@ require_once WEBROOT . '/vendor/autoload.php';
 use Game\System\System;
 
 $system = new System(0);
-require_once WEBROOT . '/constants.php';
+require_once SYSTEM_DIRECTORY . '/constants.php';
 
 /* Funcs etc */
-require_once SYSTEM_DIRECTORY . '/logger.php';
+
 require_once SYSTEM_DIRECTORY . '/db.php';
 require_once WEBROOT . '/functions.php';
 require_once WEBROOT . '/mailer.php';
-
+require_once SYSTEM_DIRECTORY . '/logger.php';
 /* .env */
 $dotenv = Dotenv\Dotenv::createImmutable(WEBROOT);
 $dotenv->safeLoad();

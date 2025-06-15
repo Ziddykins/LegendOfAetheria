@@ -1,6 +1,6 @@
 <?php
     declare(strict_types = 1);
-    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+
 
     use Game\System\Enums\LOAError;
     use Game\System\Enums\Weather;

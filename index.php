@@ -1,13 +1,13 @@
 <?php
-    require_once 'constants.php';
-    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+    require_once "vendor/autoload.php";
+    require_once "system/constants.php";
+    require_once "system/bootstrap.php";
 
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
     use Game\Character\Enums\Status;
     use Game\System\Enums\AbuseType;
-use Random\Randomizer;
 
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
         $email = $_POST['login-email'];
@@ -59,21 +59,21 @@ use Random\Randomizer;
 
                 header('Location: /select');
                 exit();
-            } else {
-                $failed_attempts = $account->get_failedLogins() + 1;
-                $account->set_failedLogins($failed_attempts);
-                
-                write_log('LOGIN_ATTEMPT', 'Failed login attempt', $ip);
-                
-                if ($failed_attempts >= 10) {
-                    $account->set_banned('True');
-                    $log->alert('Account locked due to excessive failed attempts', 
-                        ['email' => $email, 'ip' => $ip]);
-                }
-                
-                header('Location: /?failed_login');
-                exit();
             }
+
+            $failed_attempts = $account->get_failedLogins() + 1;
+            $account->set_failedLogins($failed_attempts);
+
+            write_log('LOGIN_ATTEMPT', 'Failed login attempt', $ip);
+
+            if ($failed_attempts >= 10) {
+                $account->set_banned('True');
+                $log->alert('Account locked due to excessive failed attempts',
+                    ['email' => $email, 'ip' => $ip]);
+            }
+
+            header('Location: /?failed_login');
+            exit();
         } else {
             $log->warning('Attempted login with a non-existing account', [ 'Email' => $email ]);
             header("Location: /?do_register&email=$email");
@@ -87,7 +87,7 @@ use Random\Randomizer;
         $time_sqlformat     = get_mysql_datetime();
         $ip_address         = $_SERVER['REMOTE_ADDR'];
         $verification_code  = strrev(hash('sha256', session_id()));
-        $verification_code .= substr(hash('sha256', strval(mt_rand(0,100))), 0, VERIFICATION_CODE_LENGTH);
+        $verification_code .= substr(hash('sha256', strval(random_int(0,100))), 0, VERIFICATION_CODE_LENGTH);
         $tmp_arr = str_split($verification_code);
         shuffle_array($tmp_arr, 1000);
         $verification_code = join('', $tmp_arr);
@@ -158,6 +158,8 @@ use Random\Randomizer;
                     $character->stats->set_maxHP(100);
                     $character->stats->set_mp(100);
                     $character->stats->set_maxMP(100);
+
+                    $race->set_stat_adjust($character->stats);
 
                     $character->stats->set_status(Status::HEALTHY);
 

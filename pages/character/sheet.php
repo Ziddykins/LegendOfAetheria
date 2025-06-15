@@ -1,8 +1,14 @@
 <?php
     include 'snippets/snip-charstats.php';
+    $index = 1;
+    $max_index = count($stats_map);
+
+    if ($character->stats->get_ap() > 0) {
+        $href = '';
+    }
 ?>
         <div class="d-flex justify-content-center">
-            <div class="container"style="max-width: 700px;">
+            <div class="container"style="max-width: 850px;">
                 <div class="card ps-3 mb-3 pt-3"  ">
                     <div class="card-title lead">
                         <?php echo "$char_name the level $char_level {$char_race->name}"; ?>
@@ -45,62 +51,27 @@
                                     </div>
                                 </div>
 
-                                <div class="container border shadow-sm">
+                                <div class="d-grid border justify-content-evenly">
+                                    <?php
+                                    $index = 0;
+                                    $total = count($stats_map);
+                                    foreach ($stats_map as $stats):
+                                        if ($index % 3 === 0): ?>
+                                            <div class="d-flex justify-content-evenly small mb-3 ms-3 mt-3 me-3 fs-3">
+                                        <?php endif; ?>
 
-                                    <?php 
-                                        $class = get_class($character->stats);
-                                        $reflect = new ReflectionClass($class);
-                                        $props   = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
-                                    ?>
-
-                                    <?php foreach ($props as $prop): ?>
-                                            <?php if (count_chars($prop->getName()) == 4): ?>
-                                                <?php
-                                                    $prop_name = $prop->getName();
-                                                    $func_get  = "get_" . $prop->getName();
-                                                ?>
-                                            <?php else: ?>
-                                                <?php
-                                                    global $log;
-                                                    $log->debug("Skipping " . $prop->getName());
-                                                ?>
-                                                <?php continue; ?>
-                                            <?php endif; ?>
-                                                
-                                    <div class="row mb-3 mt-3">
-                                        <span class="col">
-                                            <i class="bi bi-hammer me-3"></i>
-                                            <span class="d-none d-md-inline"><?php echo substr($prop->getName(), 0, 4); ?></span>
-                                        </span>
                                         
-                                        <span class="col"><?php echo $character->stats->$func_get(); ?></span>
-                                        <?php if ($character->get_ap()): ?>
-                                            <span class="col text-success material-symbols-sharp">add</span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <?php endforeach; ?>
+                                            <a class="d-flex align-items-center link-underline link-underline-opacity-0 text-white" href="#" data-bs-toggle="tooltip" data-bs-title="<?php echo $stats['name']; ?>"><span class="material-symbols-outlined me-2 ms-3"><?php echo $stats['icon']; ?></span>
 
-                                    <div class="row mb-3">
-                                        <span class="col">
-                                            <i class="bi bi-shield-fill me-3"></i>
-                                            <span class="d-none d-md-inline">Defense</span>
-                                        </span>
-                                        <span class="col"><?php echo $char_def; ?></span>
-                                        <?php if ($character->get_ap()): ?>
-                                        <span class="col text-success material-symbols-sharp">add</span>
-                                        <?php endif; ?>
-                                    </div>
+                                            <span class="ms-auto fw-bold me-3"><?php echo $stats['value']; ?></span></a>
 
-                                    <div class="row mb-3">
-                                        <span class="col">
-                                            <i class="bi bi-journal-bookmark-fill me-3"></i>
-                                            <span class="d-none d-md-inline small">Intelligence</span>
-                                        </span>
-                                        <span class="col"><?php echo $char_int; ?></span>
-                                        <?php if ($character->get_ap()): ?>
-                                        <span class="col text-success material-symbols-sharp">add</span>
-                                        <?php endif; ?>
-                                    </div>
+
+                                        <?php
+                                        $index++;
+                                        if ($index % 3 === 0 || $index === $total): ?>
+                                            </div>
+                                        <?php endif;
+                                    endforeach; ?>
                                 </div>
                                 
                                 <div class="container border shadow-sm">
@@ -135,4 +106,4 @@
             </div>
         </div>
         
-        <script src="/js/loading-bar.js"></script>
+

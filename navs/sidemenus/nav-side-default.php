@@ -1,5 +1,5 @@
 <?php
-require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+;
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\Mail\Folder\Enums\FolderType;
@@ -7,7 +7,7 @@ use Game\Mail\MailBox\MailBox;
 use Game\Character\Enums\FriendStatus;
 use Game\Account\Enums\Privileges;
 
-require_once "constants.php";
+require_once "system/constants.php";
 
 $account   = new Account($_SESSION['email']); 
 $character = new Character($account->get_id(), $_SESSION['character-id']); 
@@ -521,16 +521,8 @@ $currentSub = $_GET['sub'] ?? '';
                             </a>
                         </li>                        
                     </ul>
-                    <!-- div class="pb-5 mb-5 mt-5 d-flex w-100 align-content-center justify-content-center">
-                        <a href="/logout" class="btn bg-dark-subtle shadow">
-                            <span class="d-flex align-content-around">
-                                <span class="material-symbols-outlined float-start">move_item</span>
-                                <span class="float-end">&nbsp;&nbsp;&nbsp;Sign out</span>
-                            </span>
 
-                        </a>
-                    </div> -->
-                    <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 position-absolute bottom-0 ms-3 ps-3 start-0 w-100 bg-dark" style="z-index: 1030; min-height: 70px;">
+                    <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 position-absolute bottom-0 ms-3 ps-3 start-0 w-100 bg-dark mb-3" style="z-index: 1030; min-height: 70px;">
                             <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
                                 <span><img src="img/avatars/<?php echo $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
                             </a>
@@ -585,7 +577,7 @@ $currentSub = $_GET['sub'] ?? '';
                                     $privileges = $account->get_privileges()->name;
                                             
                                     if ($privileges > Privileges::ADMINISTRATOR->value) {
-                                        $href = ADMIN_WEBROOT;
+                                        $href = "/admini/strator/";
                                         echo "<li>\n\t\t\t\t\t\t\t\t\t";
                                     
                                         echo "<a class=\"dropdown-item\" href=\"$href\">Administrator</a>";

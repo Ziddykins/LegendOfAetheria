@@ -1,7 +1,9 @@
 <?php
     declare(strict_types = 1);
-    require_once "constants.php";
-    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+    require_once "vendor/autoload.php";
+    require_once "system/constants.php";
+    require_once SYSTEM_DIRECTORY . "/bootstrap.php";
+
 
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;

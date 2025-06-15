@@ -1,12 +1,13 @@
 <?php
 declare(strict_types = 1);
+global $account;
 
 use Game\Account\Account;
 use Game\Account\Enums\Privileges;
 use Game\Character\Character;
 use Game\Monster\Pool;
 
-require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+;
 
 if (check_session() === true) {
     if ($account->get_privileges() >= Privileges::ADMINISTRATOR) {

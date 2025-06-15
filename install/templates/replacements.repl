@@ -1,10 +1,13 @@
 = Template replacements
 = ---------------------
 = Anything with a .template extension will have these replacements performed on them
+=
 = The format is:
 = - target%%%replacement
+=
 = To reference a config.ini variable, use the following format:
 = - target%%%cfg(variable)
+=
 = To reference a SQL variable, use the following format:
 = - target%%%sql(variable)
 

@@ -13,6 +13,8 @@ use Getopt::Long;
 use Data::Dumper;
 use File::Find;
 use File::Copy;
+use Cwd 'abs_path';
+use File::Basename;
 use Carp;
 
 GetOptions(
@@ -126,8 +128,8 @@ if (!$fqdn) {
     $fqdn = lc $fqdn;
 }
 
-chomp(my $loc_check = `pwd`);
-$loc_check =~ s/\/install//;
+$loc_check = abs_path($loc_check); # Ensure absolute path
+$loc_check =~ s/\/install$//;
 $cfg{web_root} = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
 
 if (-d $cfg{web_root}) {
@@ -138,11 +140,34 @@ if (-d $cfg{web_root}) {
     if (ask_user("The installation files will have to be moved to the webroot we just created.\n"
                . "Would you like to do that now?", 'y', 'yesno')) {
 
-        my $mkdir_cmd = "mkdir -p $cfg{web_root}";
-        tell_user('SYSTEM', `$mkdir_cmd`);
+        mkdir($cfg{web_root}, 0755) or croak "Failed to create web root directory: $!";
 
-        move("$loc_check/", $cfg{web_root}) or croak "Failed to move files: $!";
-        $loc_check = $cfg{web_root};
+        open my $fh, '>', '/tmp/mover.pl';
+        print $fh <<'EOF';
+        #!/usr/bin/env perl
+        use File::Copy::Recursive qw(rmove);
+        rmove($ARGV[0], $ARGV[1]) or die "Failed to move $ARGV[0] to $ARGV[1]: $!";
+
+        if (my $pid = fork) {
+            print "Move has finished. Re-launching the AutoInstaller script from the new directory!";
+            exit;
+        } elsif (defined $pid) {
+            exec($^X, $ARGV[1] . '/install/AutoInstaller.pl');
+        } else {
+            croak "Failed to fork: $!";
+        }
+EOF
+        close $fh;
+
+        if (my $pid = fork) {
+            tell_user('SYSTEM', "Launching post-install mover and exiting...");
+            exit;
+        } elsif (defined $pid) {
+            exec($^X, $mover_path);
+        } else {
+            croak "Failed to fork: $!";
+        }
+
         
         tell_user('SUCCESS', "Moved installation files to web root directory '$cfg{web_root}'");
     } else {
@@ -577,15 +602,22 @@ sub step_vhost_ssl {
 
 sub step_fix_permissions {
     # Web root files
+    tell_user('INFO', "Settings general permissions baseline in webroot");
+    
+    tell_user('INFO', "Processing files...");
     `find $cfg{web_root} -type f -exec chmod 644 {} + 2>&1`;
+
+    tell_user('INFO', "Processing directories...");
     `find $cfg{web_root} -type d -exec chmod 755 {} + 2>&1`;
 
     # Configuration files
-    chmod 0600, "$cfg{web_root}/.env" if -e "$cfg{web_root}/.env";
+    tell_user('INFO', 'Processing configuration files...');
+    chmod 0600, "$cfg{web_root}/.env" if -e "$cfg{web_root}/.env" ;
     chmod 0600, "$cfg{web_root}/install/config.ini" if -e "$cfg{web_root}/install/config.ini";
     chmod 0600, "$cfg{web_root}/install/config.ini.default" if -e "$cfg{web_root}/install/config.ini.default";
 
     # Script files
+    tell_user('INFO', 'Processing script files...');
     chmod 0600, "$cfg{web_root}/install/AutoInstaller.pl" if -e "$cfg{web_root}/install/AutoInstaller.pl";
 
     opendir my $sd, $cfg{scripts_dir};
@@ -596,16 +628,19 @@ sub step_fix_permissions {
     closedir $sd;
 
     # Log files
-    chmod 0640, "$cfg{web_root}/install/setup.log" if -e "$cfg{web_root}/install/setup.log";
-    chmod 0640, "$cfg{web_root}/gamelog.txt" if -e "$cfg{web_root}/gamelog.txt";
+    tell_user('INFO', 'Processing log files...');
+    chmod 0640, "$cfg{web_root}/system/logs/setup.log" if -e "$cfg{web_root}/system/logs/setup.log";
+    chmod 0640, "$cfg{web_root}/system/logs/gamelog.txt" if -e "$cfg{web_root}/system/logs/gamelog.txt";
 
     # Apache configuration files
+    tell_user('INFO', 'Processing Apache configuration files...');
     chmod 0644, $cfg{virthost_conf_file} if -e $cfg{virthost_conf_file};
     if ($cfg{enable_ssl}) {
         chmod 0644, $cfg{virthost_conf_file_ssl} if -e $cfg{virthost_conf_file_ssl};
     }
 
     # Template directory
+    tell_user('INFO', 'Processing templates...');
     opendir my $td, $cfg{template_dir};
     while (readdir($td)) {
         next if $_ =~ /^\./;
@@ -614,6 +649,7 @@ sub step_fix_permissions {
     closedir $td;
 
     # Owner/group
+    tell_user('INFO', 'Setting ownership...');
     tell_user('SYSTEM', `chown -R $cfg{apache_runas}:$cfg{apache_runas} $cfg{web_root} 2>&1`);
     tell_user('SUCCESS', 'Permissions fixed!');
 }
@@ -900,8 +936,8 @@ sub step_process_templates {
     tell_user('INFO', "Copying over $cfg{htaccess_template}.ready to $cfg{web_root}/.htaccess");
     file_write("$cfg{web_root}/.htaccess", "$cfg{htaccess_template}.ready", 'file');
 
-    tell_user('INFO', "Copying over $cfg{constants_template}.ready to $cfg{web_root}/constants.php");
-    file_write("$cfg{web_root}/constants.php", "$cfg{constants_template}.ready", 'file');
+    tell_user('INFO', "Copying over $cfg{constants_template}.ready to $cfg{web_root}/system/constants.php");
+    file_write("$cfg{web_root}/system/constants.php", "$cfg{constants_template}.ready", 'file');
 
     tell_user('INFO', "Installing our cronjobs under user $cfg{apache_runas}");
 
@@ -1401,7 +1437,7 @@ sub populate_hashdata {
 
     $cfg{template_dir} = $cfg{web_root} . '/install/templates';
     $cfg{scripts_dir}  = $cfg{web_root} . '/install/scripts';
-    $cfg{setup_log}    = $cfg{web_root} . '/install/setup.log';
+    $cfg{setup_log}    = $cfg{web_root} . '/system/logs/setup.log';
 
     $cfg{virthost_ssl_template} = "$cfg{template_dir}/virtual_host_ssl.template";
     $cfg{virthost_template}     = "$cfg{template_dir}/virtual_host.template";

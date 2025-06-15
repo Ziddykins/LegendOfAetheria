@@ -39,16 +39,16 @@
         xp/gold
   * [ ] maybe once per day a golden egg grants boosts or equip
 
-* [ ] Livechat - ~~PHP/MySQL/jQuery/AJAX~~ websockets
+* [x] Livechat - ~~PHP/MySQL/jQuery/AJAX~~ ~~websockets~~ PHP/MySQL/jQuery
 
 
 
 
 # AutoInstaller
 
-  - [ ] Update hosts file
+  - [x] Update hosts file
   - [x] Script closes before composer/perms, fix
-  - [ ] creation of ssl vhost doesn't happen
+  - [x] creation of ssl vhost doesn't happen
 
 # Select Character (select.php)
 
@@ -66,9 +66,9 @@
 - [x] Change INSTALL paths, include "install" i.e. install/scripts
 - [x]  ubuntu php, need sed on apt sources.d ->
        sed -i 's/Components: main/Components: main\nTrusted: yes/' /etc/apt/sources.list.d/ondrej-ubuntu-php-plucky.sources
-- [ ]  script needs to be re-ran in new dir after moving, running in memory after move isn't great
-- [ ]  re-copy config file default to new location as script will have populated the fqdn lol
-- [ ]  ssl apache vhost still not created >:|
+- [x]  script needs to be re-ran in new dir after moving, running in memory after move isn't great
+- [x]  re-copy config file default to new location as script will have populated the fqdn lol
+- [x]  ssl apache vhost still not created >:|
 - [x]  #REM and #SSLREM not removed in template processing
 
 

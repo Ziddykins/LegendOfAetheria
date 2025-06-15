@@ -1,5 +1,5 @@
 <?php
-
+use Game\Components\Modals\Modals;
 function generate(Components $which, $data_object) {
     $produced_html = null;
 

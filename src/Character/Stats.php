@@ -13,6 +13,7 @@ class Stats {
     private int $maxMP  = 100;
     private int $ep     = 100;
     private int $maxEP  = 100;
+    private int $ap = 0;
 
     private int $str = 10;
     private int $int = 10;
@@ -27,9 +28,7 @@ class Stats {
     private int $blck = 0;
     private int $accu = 0;
     private int $rsst = 0;
-    private int $evsn = 0;
     private int $rgen = 0;
-    private int $absb = 0;
     
     public function __construct($characterID = 0) {
         $this->id = $characterID;

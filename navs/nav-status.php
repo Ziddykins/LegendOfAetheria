@@ -1,6 +1,7 @@
 <?php
     use Game\System\Enums\Weather;
-    
+    global $character;
+
     $hp = $character->get_hp();
     $max_hp = $character->get_maxHP();
     $icon = 'bi bi-emoji-smile-fill';

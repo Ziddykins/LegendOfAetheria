@@ -1,5 +1,5 @@
 <?php
-    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+
     use Game\Account\Account;
     use Game\Character\Character;
     use Game\OpenAI\NPC\Tutorial\Frank;

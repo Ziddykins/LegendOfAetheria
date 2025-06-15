@@ -1,6 +1,6 @@
 <?php
     require_once "../../constants.php";
-    require_once SYSTEM_DIRECTORY . '/bootstrap.php';
+
     global $db;
 
     $messages = [];
