@@ -39,12 +39,11 @@ web-accessible browser game (provided your A/CNAME records are set up of course!
 The script must be ran as root, so again, be aware of what is going on if you are installing this
 on a machine with existing services (PHP configs, SQL configs, Apache, etc).
 
-### CPAN dependencies
-
+### CPAN dependencies, Sury repos
 ```sh
-yes | sudo cpan Config::IniFiles
-yes | sudo cpan Term::ReadKey
-```9
+chmod +x install/scripts/bootstrap.sh
+./install/scripts/bootstrap.sh
+```
 
 ```sh
 cd install
@@ -72,20 +71,7 @@ sudo ./AutoInstaller.pl
  
 ## Software
 
-LoA requires a bunch of packages, which can be installed with the commands below. You'll also need the Sury repository (https://deb.sury.org/).
-
-#### Sury
-```bash
-apt-get update
-
-apt-get -y install lsb-release ca-certificates curl
-
-curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
-
-sh -c 'echo "deb [trusted=yes signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
-
-apt-get update
-```
+LoA requires a bunch of packages, which can be installed with the commands below. You'll also need the Sury repository, for Debian/Ubuntu.
 
 ```bash
 apt update && apt upgrade -y
@@ -93,14 +79,14 @@ apt update && apt upgrade -y
 apt install -y php8.4 php8.4-cli php8.4-common php8.4-curl php8.4-dev php8.4-fpm php8.4-mysql mariadb-server apache2 libapache2-mod-php8.4 composer letsencrypt python-is-python3 python3-certbot-apache
 ```
 
-
 ### Templates
 
-LoA comes packaged with a bunch of template files, which get their values from the AutoInstaller script. Make sure the template values are all filled in, and suit your system and software. The entire SQL schema will be generated and imported. A random password is chosen for the SQL user, 16 characters long. If you're setting this up manually, I've included a --flag for the utoInstaller which will only process templates, which will make your life a lot easier, especially for importing SQL schema.
+LoA comes packaged with a bunch of template files, which get their values from the AutoInstaller script. Make sure the template values are all filled in, and suit your system and software. The entire SQL schema will be generated and imported. A random password is chosen for the SQL user, 16 characters long. If you're setting this up manually, I've included a --flag for the AutoInstaller which will only process templates, which will make your life a lot easier, especially for importing SQL schema.
 
 ```sh
 sudo perl AutoInstaller.pl --templates
 ```
+
 ### Apache
 
 Virtual Hosts, for non-SSL:
@@ -218,6 +204,7 @@ a2enmod php8.4 headers http2 ssl
 
 > [!IMPORTANT]
 > The following lines should only be added to the http-version .conf file **AFTER** you've applied a valid SSL to the FQDN of your domain or subdomain, otherwise, you will not be able to get a certificate from certbot/letsencrypt.
+> -
 >```conf
 > RewriteEngine on
 > RewriteCond %{SERVER_NAME} =loa.example.com
@@ -270,21 +257,21 @@ replace install with update if you're updating the software.
 
 ### Templates
 
-    ## Generation
+## Generation
 
         To generate the templates/schema required to make the game work, you'll need to use the autoinstaller.
 
         `perl install/AutoInstaller.pl --step TEMPLATES --fqdn
+
 ### CRONJobs
 
 ### Credits
 
-    [Bootstrap 5.3](https://github.com/twbs)
-    [AdminLTE4](https://github.com/ColorlibHQ/AdminLTE)
-    [Tabulator](https://tabulator.info)
+[Bootstrap 5.3](https://github.com/twbs)
 
+[AdminLTE4](https://github.com/ColorlibHQ/AdminLTE)
 
-
+[Tabulator](https://tabulator.info)
 
 
 
