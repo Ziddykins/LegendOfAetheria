@@ -57,17 +57,17 @@ sudo ./AutoInstaller.pl
 
 | Step             | Explanation/Manual Setup           |
 | ---------------: | :----------------------------------:   
-| Software         | [Jump To Software](Software)       |
-| Templates        | [Jump To Templates](Templates)     |
-| Apache           | [Jump To Apache](Apache)           |
-| Certificates/SSL | [Jump To SSL](SSL)                 |
-| PHP Config       | [Jump To PHP](PHP)                 | 
-| Composer         | [Jump To Composer](Composer)       |
-| System Services  | [Jump To Composer](Composer)       |
-| Permissions      | [Jump To Permissions](Permissions) |
-| CRON Jobs        | [Jump To CRONJobs](CRONJobs)       |
-| OpenAI           | [Jump To OpenAI](OpenAI)           |
-| Clean-Up         | [Jump To CleanUp](CleanUp)         |
+| Software         | [Jump To Software](#Software)       |
+| Templates        | [Jump To Templates](#Templates)     |
+| Apache           | [Jump To Apache](#Apache)           |
+| Certificates/SSL | [Jump To SSL](#SSL)                 |
+| PHP Config       | [Jump To PHP](#PHP)                 | 
+| Composer         | [Jump To Composer](#Composer)       |
+| System Services  | [Jump To Services](#Services)       |
+| Permissions      | [Jump To Permissions](#Permissions) |
+| CRON Jobs        | [Jump To CRONJobs](#CRONJobs)       |
+| OpenAI           | [Jump To OpenAI](#OpenAI)           |
+| Clean-Up         | [Jump To CleanUp](#CleanUp)         |
  
 ## Software
 
@@ -182,6 +182,7 @@ Here are working examples:
     </VirtualHost>
 </IfModule>
 ```
+**Make sure the certificate paths match up for certificates generated from [the SSL step](#SSL)**
 
 Once those are setup:
 
