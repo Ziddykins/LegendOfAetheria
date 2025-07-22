@@ -224,7 +224,7 @@ The certificate should be activated and downloaded after that.
 openssl req -x509 -nodes -days 365 \
 -newkey rsa:2048 \
 -keyout /etc/ssl/private/loa.key \
--out /etc/ssl/certs/loa.crt \ 
+-out /etc/ssl/certs/loa.crt \
 -subj '/CN=fqdn.loa.local/O=fqdn.loa.local/C=US' \
 -batch
 ```
