@@ -287,6 +287,18 @@ mysql DATABASE -u USERNAME -p'PASSWORD' < install/templates/sql.template.ready
 Replace variables accordingly.
 
 ### CRONJobs
+Many game functions are executed on regular intervals, and to achieve this we use cron.php coupled with scheduled tasks, or cronjobs.
+
+If you havent generated templates with the AutoInstaller, replace the values in `install/templates/cron.template` to reflect your setup, then run the command below.
+
+Any existing cronjobs will be retained.
+
+#### Linux
+```bash
+(sudo -u www-data crontab -l; \
+cat install/templates/cron.template.ready; \
+echo;) | sudo -u www-data crontab -
+```
 
 ### Credits
 
