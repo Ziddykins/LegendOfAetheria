@@ -84,7 +84,7 @@ apt install -y php8.4 php8.4-cli php8.4-common php8.4-curl php8.4-dev php8.4-fpm
 LoA comes packaged with a bunch of template files, which get their values from the AutoInstaller script. Make sure the template values are all filled in, and suit your system and software. The entire SQL schema will be generated and imported. A random password is chosen for the SQL user, 16 characters long. If you're setting this up manually, I've included a --flag for the AutoInstaller which will only process templates, which will make your life a lot easier, especially for importing SQL schema.
 
 ```sh
-sudo perl AutoInstaller.pl --templates
+sudo perl AutoInstaller.pl --step TEMPLATES --only ---fqdn fqdn.right.here
 ```
 
 ### Apache
@@ -276,7 +276,7 @@ replace install with update if you're updating the software.
 To generate the templates/schema required to make the game work, you'll need to use the autoinstaller.
 
 ```sh
-sudo perl install/AutoInstaller.pl --step TEMPLATES --fqdn --only
+sudo perl install/AutoInstaller.pl --step TEMPLATES --fqdn fqdn.right.here --only
 ```
 
 You'll be left with a file called `sql.template.ready` in `install/templates` which you can import right i to your database with:
