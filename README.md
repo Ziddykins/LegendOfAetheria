@@ -204,22 +204,37 @@ a2enmod php8.4 headers http2 ssl
 
 > [!IMPORTANT]
 > The following lines should only be added to the http-version .conf file **AFTER** you've applied a valid SSL to the FQDN of your domain or subdomain, otherwise, you will not be able to get a certificate from certbot/letsencrypt.
-> -
 >```conf
 > RewriteEngine on
 > RewriteCond %{SERVER_NAME} =loa.example.com
 > RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 > ```
 
+## SSL
 Then go ahead and get your certificate:
 ```bash
-certbot -d <fqdn>
+certbot -d <fqdn> --apache
+```
+The certificate should be activated and downloaded after that.
+
+**If you need to use a self signed certificate:**
+
+```bash
+openssl req -x509 -nodes -days 365 \
+-newkey rsa:2048 \
+-keyout /etc/ssl/private/loa.key \
+-out /etc/ssl/certs/loa.crt \ 
+-subj '/CN=fqdn.loa.local/O=fqdn.loa.local/C=US' \
+-batch
 ```
 
-The certificate should be activated and downloaded after that
+Replace the 'fqdn.loa.local' with your local fqdn, and update your `/etc/hosts` file to reflect the cert:
+
+`127.0.1.1    fqdn.loa.local`
+
+or similar.
 
 ### PHP
-
 The main PHP section is mostly updating some of your php.ini variables
 Locate the below variables and make the appropriate replacements:
 
@@ -246,7 +261,6 @@ session.cache_expire = 30
 > Don't forget to change the session.cookie_domain to your own information
 
 ### Composer
-
 Open a terminal and navigate to your webroot, then just issue 
 
 ```sh
@@ -255,13 +269,21 @@ sudo -u www-data composer --working-dir <GAME_WEB_ROOT> install
 
 replace install with update if you're updating the software.
 
-### Templates
+## Templates
+### Generation
 
-## Generation
+To generate the templates/schema required to make the game work, you'll need to use the autoinstaller.
 
-        To generate the templates/schema required to make the game work, you'll need to use the autoinstaller.
+```sh
+sudo perl install/AutoInstaller.pl --step TEMPLATES --fqdn --only
+```
 
-        `perl install/AutoInstaller.pl --step TEMPLATES --fqdn
+You'll be left with a file called `sql.template.ready` in `install/templates` which you can import right i to your database with:
+
+```bash
+mysql DATABASE -u USERNAME -p'PASSWORD' < install/templates/sql.template.ready
+```
+Replace variables accordingly.
 
 ### CRONJobs
 
