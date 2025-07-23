@@ -40,3 +40,4 @@ pages/game-screen.php
 .idea/vcs.xml
 .idea/inspectionProfiles/Project_Default.xml
 qodana.yaml
+install/scripts/temp/perl-installer.msi
