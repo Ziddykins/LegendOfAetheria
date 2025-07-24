@@ -1,3 +1,5 @@
+$checkWinget = Get-Command -Name "winget" -ErrorAction SilentlyContinue
+
 $choices = @'
 Choose method of setup
 1) XAMPP
@@ -11,27 +13,32 @@ Choose method of setup
 $choice = Read-Host -Prompt $choices
 
 # Define download URLs — adjust as needed once official PHP 8.4 is released
-$phpUrl      = "https://windows.php.net/downloads/releases/php-8.4.10-Win32-vs17-x64.zip"
-$composerUrl = "https://getcomposer.org/installer"
-$xamppUrl    = "https://www.apachefriends.org/xampp-files/8.2.4/xampp-windows-x64-8.2.4-0-VS16-installer.exe"
-$perlUrl     = "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_54021_64bit_UCRT/strawberry-perl-5.40.2.1-64bit.msi"
+$files = @(
+    "https://windows.php.net/downloads/releases/php-8.4.10-Win32-vs17-x64.zip",
+    "https://getcomposer.org/installer",
+    "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_54021_64bit_UCRT/strawberry-perl-5.40.2.1-64bit.msi"
+);
 
 # Define save paths
 $downloadFolder = Get-Location | Select-Object -ExpandProperty Path | Join-Path -ChildPath "\temp"
 New-Item -ItemType Directory -Force -Path $downloadFolder
 
-$phpZip = Join-Path $downloadFolder "php.zip"
-$composerInstaller = Join-Path $downloadFolder "composer-setup.php"
-$xamppInstaller = Join-Path $downloadFolder "xampp-installer.exe"
-$perlInstaller = Join-Path $downloadFolder "perl-installer.msi"
+if ($choice -eq "1") {
+    $xamppInstaller = "$downloadFolder\xampp.exe"
+    Invoke-WebRequest -Uri "https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.2.12/xampp-windows-x64-8.2.12-0-VS16-installer.exe" -Outfile $xamppInstaller
+    Start-Process -FilePath $xamppInstaller -ArgumentList "--mode unattended --unattendedmodeui minimal --components apache,mysql,perl,php" -Wait
+    Write-Host "Downloads and installations complete."
+} else {
+    $files | ForEach-Object {
+        if (-Not (Test-Path -Path $_)) {
+            Write-Host "Downloading $_ to $downloadFolder"
+            Invoke-WebRequest -Uri $_ -OutFile (Join-Path -Path $downloadFolder -ChildPath (Split-Path -Path $_ -Leaf))
+        } else {
+            Write-Host "$_ already exists, skipping download."
+            return
+        }
+    }
 
-# Download files
-Invoke-WebRequest -Uri $phpUrl -OutFile $phpZip
-Invoke-WebRequest -Uri $composerUrl -OutFile $composerInstaller
-Invoke-WebRequest -Uri $xamppUrl -OutFile $xamppInstaller
-Invoke-WebRequest -Uri $perlUrl -OutFile $perlInstaller
-
-if ($choice -eq "2") {
     Write-Host "Extracting PHP to $downloadFolder"
     Expand-Archive -LiteralPath $phpZip -DestinationPath "$downloadFolder\php" -Force
     Write-Host "Done!"
@@ -43,7 +50,4 @@ if ($choice -eq "2") {
     Write-Host "Silently installing perl"
     Start-Process msiexec.exe -ArgumentList "/i `"$perlInstaller`" /quiet" -Wait
     Write-Host "Done!"
-} else {
-    Start-Process -FilePath $xamppInstaller -ArgumentList "--mode unattended --unattendedmodeui minimal --components apache,mysql,perl,php" -Wait
-    Write-Host "Downloads and installations complete."
 }
