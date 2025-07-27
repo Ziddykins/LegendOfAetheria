@@ -1,3 +1,20 @@
+function file_exists {
+    param (
+        [string]$filePath
+    )
+    return Test-Path -Path $filePath
+}
+
+function do_mover_script {
+    Set-Content -Path $env:TEMP\mover.ps1 -Value @"
+    Move-Item -Path 'C:\xampp\' -Destination '$webParent' -Force
+    Move-Item -Path '$webRoot' -Destination '$webParent\htdocs' -Force
+    Set-Content -Path Env:\Temp\mover.success -Value 'true'
+    Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `$MyInvocation.MyCommand.Path`" -Wait
+"@
+}
+
+
 $checkWinget = Get-Command -Name "winget" -ErrorAction SilentlyContinue
 
 $choices = @'
@@ -21,16 +38,29 @@ $files = @(
 
 # Define save paths
 $downloadFolder = Get-Location | Select-Object -ExpandProperty Path | Join-Path -ChildPath "\temp"
+$webRoot = (((Get-Item (Get-Location)).Parent).Parent).Parent.FullName
+$webParent = ((((Get-Item (Get-Location)).Parent).Parent).Parent).Parent.FullName
 New-Item -ItemType Directory -Force -Path $downloadFolder
 
 if ($choice -eq "1") {
     $xamppInstaller = "$downloadFolder\xampp.exe"
-    Invoke-WebRequest -Uri "https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.2.12/xampp-windows-x64-8.2.12-0-VS16-installer.exe" -Outfile $xamppInstaller
-    Start-Process -FilePath $xamppInstaller -ArgumentList "--mode unattended --unattendedmodeui minimal --components apache,mysql,perl,php" -Wait
-    Write-Host "Downloads and installations complete."
+
+    if (-Not (file_exists $xamppInstaller)) {
+        Write-Host "Downloading XAMPP installer to $downloadFolder"
+        Invoke-WebRequest -Uri "https://1007.filemail.com/api/file/get?filekey=8LSq8Jrg8I3ML8_rugX0xnkwdGf2LvB5vg-aVEx0KhhPoOa1OljjBJC6zmfhA1_VbJeLG6b_cmxSAJ8hVGu9L_0ejf8KkIqRWreFurHbyA&pk_vid=e84a89bdc9232818175359830893e286" -Outfile $xamppInstaller
+    } else {
+        Write-Host "XAMPP installer already exists, skipping download."
+    }
+
+    if (Get-Item -Path "HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" -ErrorAction SilentlyContinue) {
+         Write-Host "XAMPP Installed already"
+    } else {
+        Start-Process -FilePath $xamppInstaller -ArgumentList "--unattendedmodeui none --mode unattended --enable-components xampp_mysql,xampp_perl --prefix $webParent" -Wait
+        Write-Host "Downloads and installations complete."
+    }
 } else {
     $files | ForEach-Object {
-        if (-Not (Test-Path -Path $_)) {
+        if (-Not (file_exists $_)) {
             Write-Host "Downloading $_ to $downloadFolder"
             Invoke-WebRequest -Uri $_ -OutFile (Join-Path -Path $downloadFolder -ChildPath (Split-Path -Path $_ -Leaf))
         } else {
@@ -50,4 +80,12 @@ if ($choice -eq "1") {
     Write-Host "Silently installing perl"
     Start-Process msiexec.exe -ArgumentList "/i `"$perlInstaller`" /quiet" -Wait
     Write-Host "Done!"
+}
+
+if (-Not (file_exists $env:TEMP\mover.success)) {
+    Write-Host "Creating mover script and executing"
+    do_mover_script
+} else {
+    Write-Host "Mover script has completed and now we will continue the bootstrap process"
+    continue_script
 }
