@@ -232,7 +232,7 @@ if ($cfg{step} == TEMPLATES) {
     parse_replacements(\@replacements);
     
     tell_user('INFO', "I'ma let you run some templates, but first I just needa know...");
-    if (ask_user("Will you want to enable SSL?", 'y', 'yesno')) {
+    if (ask_user("Will you be using SSL (self-signed is fine)", 'y', 'yesno')) {
         step_vhost_ssl();
     }    
 
@@ -977,6 +977,7 @@ sub step_update_hosts {
 }
 
 # ====================================[ steps-end ]====================================== #
+
 # ==================================[ internal-start ]=================================== #
 sub replace_in_file {
     my ($search, $replace, $file_in, $file_out) = @_;
@@ -1430,6 +1431,10 @@ sub populate_hashdata {
         %def = %{$ini{lin_examples}};
     } else {
         %def = %{$ini{win_examples}};
+
+        if (-e $cfg{web_root} . '/temp/xampp.exe') {
+            %def = %{$ini{xampp_examples}};
+        }
     }
 
     merge_hashes(\%cfg, \%def);
@@ -1512,6 +1517,10 @@ sub help {
     print "  -f, --fqdn\t\tSpecify a domain to use\n";
     print "  -s, --step\t\tSpecify a step to start at\n";
     print "  -l, --list-steps\tList the available steps to supply to -s/--step\n";
+    print "  -o, --only\t\tSpecify the step to run, and exit once complete\n";
+    print "  -g, --generate\t\tGenerates and processes templates - this also\n";
+    print "\t\t\t\timports the generated db schema. This should really only be used\n";
+    print "\t\t\t\tif you're manually setting up the server\n\n"
     exit 0;
 }
 

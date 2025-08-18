@@ -60,15 +60,14 @@ php_ini=C:\xampp\php\php.ini
 step=1
 
 [win_examples]
-web_root=C:\xampp\htdocs
+web_root=C:\Program Files\Apache Software Foundation\Apache2.4\htdocs
 php_binary=C:\xampp\php\php.exe
 sql_config_file=C:\xampp\mysql\bin\my.ini
-apache_directory=C:\xampp\apache
-virthost_conf_file=C:\xampp\apache\conf\httpd.conf
+apache_directory=C:\Program Files\Apache Software Foundation\Apache2.4\
+virthost_conf_file=C:\Program Files\Apache Software Foundation\Apache2.4\conf\httpd.conf
 ssl_fullcer=C:\xampp\apache\conf\ssl.crt\server.crt
 ssl_privkey=C:\xampp\apache\conf\ssl.key\server.key
 hosts_file=C:\windows\system32\drivers\etc\hosts
-php_ini=C:\xampp\php\php.ini
 step=1
 
 [sql_tables]

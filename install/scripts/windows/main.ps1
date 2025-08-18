@@ -1,3 +1,6 @@
+$tempDir = "$env:LOCALAPPDATA\loatemp"
+$null = New-Item -Path $tempDir -ItemType Directory -Force
+
 function file_exists {
     param (
         [string]$filePath
@@ -5,25 +8,56 @@ function file_exists {
     return Test-Path -Path $filePath
 }
 
-function do_mover_script {
-    Set-Content -Path $env:TEMP\mover.ps1 -Value @"
-    Move-Item -Path 'C:\xampp\' -Destination '$webParent' -Force
-    Move-Item -Path '$webRoot' -Destination '$webParent\htdocs' -Force
-    Set-Content -Path Env:\Temp\mover.success -Value 'true'
-    Read-Host -Prompt "Press Enter to exit mover scripr"
-    Start-Process powershell.exe -ArgumentList "-ExecutionPolicy Bypass -File `$MyInvocation.MyCommand.Path`" -Wait
-        
+function continue_script {
+    Read-Host Complete
+}
 
+function do_mover_script {
+    Set-Content -Force -Path "$tempDir\mover.ps1" -Value @"
+    function Log {
+        param (
+            [string]`$message,
+            [string]`$logFile = "$env:LOCALAPPDATA\loatemp\mover.log"
+        )
+        `$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        Add-Content -Path `$logFile -Value "`$timestamp - `$message"
+    }
+
+    try {
+        Move-Item -Path 'C:\xampp\' -Destination "$webParent\xampp\" -Force
+        Log "Moved XAMPP into $webParent"
+    } catch {
+        Log "ERROR moving XAMPP: `$(`$_.Exception.Message)"
+    }
+
+    try {
+        Remove-Item -Path "$webParent\xampp\htdocs\" -Force -Recurse
+        Log "Removed default htdocs"
+    } catch {
+        Log "ERROR removing htdocs: `$(`$_.Exception.Message)"
+    }
+
+    try {
+        Move-Item -Path "$webRoot" -Destination "$webParent\xampp\htdocs\" -Force
+        Log "Moved webRoot files into new htdocs"
+    } catch {
+        Log "ERROR moving webRoot: `$(`$_.Exception.Message)"
+    }
+
+    try {
+        New-Item -Path "$env:LOCALAPPDATA\loatemp\mover.success" -ItemType File
+        Log "Created mover.success marker"
+    } catch {
+        Log "ERROR creating mover.success: `$(`$_.Exception.Message)"
+    }
 "@
 }
 
-
 $checkWinget = Get-Command -Name "winget" -ErrorAction SilentlyContinue
 
-if (file_exists "$env:TEMP\mover.success") {
+if (file_exists "$tempDir\mover.success") {
     Write-Host "Files moved, resuming bootstrap process"
 } else {
-
     $choices = @'
     Choose method of setup
     1) XAMPP
@@ -38,7 +72,7 @@ if (file_exists "$env:TEMP\mover.success") {
 
     # Define download URLs — adjust as needed once official PHP 8.4 is released
     $files = @(
-        "https://windows.php.net/downloads/releases/php-8.4.10-Win32-vs17-x64.zip",
+        "https://windows.php.net/downloads/releases/latest/php-8.4-Win32-vs17-x86-latest.zip"
         "https://getcomposer.org/installer",
         "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_54021_64bit_UCRT/strawberry-perl-5.40.2.1-64bit.msi"
     );
@@ -47,14 +81,14 @@ if (file_exists "$env:TEMP\mover.success") {
     $downloadFolder = Get-Location | Select-Object -ExpandProperty Path | Join-Path -ChildPath "\temp"
     $webRoot = (((Get-Item (Get-Location)).Parent).Parent).Parent.FullName
     $webParent = ((((Get-Item (Get-Location)).Parent).Parent).Parent).Parent.FullName
-    New-Item -ItemType Directory -Force -Path $downloadFolder
+    $null = New-Item -ItemType Directory -Force -Path $downloadFolder
 
     if ($choice -eq "1") {
         $xamppInstaller = "$downloadFolder\xampp.exe"
 
         if (-Not (file_exists $xamppInstaller)) {
             Write-Host "Downloading XAMPP installer to $downloadFolder"
-            Invoke-WebRequest -Uri "https://1007.filemail.com/api/file/get?filekey=8LSq8Jrg8I3ML8_rugX0xnkwdGf2LvB5vg-aVEx0KhhPoOa1OljjBJC6zmfhA1_VbJeLG6b_cmxSAJ8hVGu9L_0ejf8KkIqRWreFurHbyA&pk_vid=e84a89bdc9232818175359830893e286" -Outfile $xamppInstaller
+            Invoke-WebRequest -Uri "https://www.asan7.com/update/xampp-windows-x64-8.2.12-0-VS16-installer.exe" -Outfile $xamppInstaller
         } else {
             Write-Host "XAMPP installer already exists, skipping download."
         }
@@ -62,7 +96,7 @@ if (file_exists "$env:TEMP\mover.success") {
         if (Get-Item -Path "HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" -ErrorAction SilentlyContinue) {
             Write-Host "XAMPP Installed already"
         } else {
-            Start-Process -FilePath $xamppInstaller -ArgumentList "--unattendedmodeui none --mode unattended --enable-components xampp_mysql,xampp_perl --prefix $webParent" -Wait
+            Start-Process -FilePath $xamppInstaller -ArgumentList "--unattendedmodeui none --mode unattended --disable-components xampp_mercury,xampp_tomcat,xampp_webalizer" -Wait
             Write-Host "Downloads and installations complete."
         }
     } else {
@@ -90,12 +124,10 @@ if (file_exists "$env:TEMP\mover.success") {
     }
 }
 
-if (-Not (file_exists $env:TEMP\mover.success)) {
+if (-Not (file_exists "$tempDir\mover.success")) {
     Write-Host "Creating mover script and executing"
     do_mover_script
 } else {
     Write-Host "Mover script has completed and now we will continue the bootstrap process"
     continue_script
 }
-
-Read-Host -Prompt "Press Enter to exit"
