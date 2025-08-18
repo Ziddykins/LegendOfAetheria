@@ -31,13 +31,6 @@ phpunit.xml
 .blackboxrules
 pages/game-screen.php
 .history/*
-.idea/.gitignore
-.idea/dataSources.xml
-.idea/loa.iml
-.idea/modules.xml
-.idea/php.xml
-.idea/sqldialects.xml
-.idea/vcs.xml
-.idea/inspectionProfiles/Project_Default.xml
+.idea/*
 qodana.yaml
 **/temp/**
