@@ -13,7 +13,7 @@ use Getopt::Long;
 use Data::Dumper;
 use File::Find;
 use File::Copy;
-use Cwd 'abs_path';
+use Cwd qw(abs_path getcwd);
 use File::Basename;
 use Carp;
 
@@ -27,7 +27,7 @@ GetOptions(
     'v|version'    => sub { print "AutoInstaller.pl v$VERSION\n"; exit; },
 );
 
-$opt_fqdn = lc $opt_fqdn;
+$opt_fqdn = lc $opt_fqdn if $opt_fqdn;
 
 if ($opt_step && $opt_step =~ /[a-z]/i) {
     my $t_step = name_to_const(uc $opt_step);
@@ -128,6 +128,7 @@ if (!$fqdn) {
     $fqdn = lc $fqdn;
 }
 
+my $loc_check = getcwd;;
 $loc_check = abs_path($loc_check); # Ensure absolute path
 $loc_check =~ s/\/install$//;
 $cfg{web_root} = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
@@ -163,7 +164,7 @@ EOF
             tell_user('SYSTEM', "Launching post-install mover and exiting...");
             exit;
         } elsif (defined $pid) {
-            exec($^X, $mover_path);
+            exec($^X, '/tmp/mover.pl');
         } else {
             croak "Failed to fork: $!";
         }
@@ -1520,7 +1521,7 @@ sub help {
     print "  -o, --only\t\tSpecify the step to run, and exit once complete\n";
     print "  -g, --generate\t\tGenerates and processes templates - this also\n";
     print "\t\t\t\timports the generated db schema. This should really only be used\n";
-    print "\t\t\t\tif you're manually setting up the server\n\n"
+    print "\t\t\t\tif you're manually setting up the server\n\n";
     exit 0;
 }
 

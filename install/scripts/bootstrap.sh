@@ -1,6 +1,11 @@
 #!/bin/bash
-
+CWD=$(pwd | tr '/' ' ' | awk '{print $NF}')
 DISTRO=$(cat /etc/os-release | grep '^ID')
+
+if [[ "$CWD" != "scripts" ]]; then
+	echo "must be ran from loa's script dir (/install/scripts)"
+	exit 1
+fi
 
 if [[ "$USER" != "root" ]]; then
 	echo "need root"
@@ -17,8 +22,6 @@ function cowrite() {
 	COLOR="$1"
 	MESSAGE="$2"
 	OUTPUT=""
-
-	echo "color $COLOR message $MESSAGE"
 
 	if [[ "$COLOR" == "RED" ]]; then
 		OUTPUT="\e[31m$MESSAGE\e[0m"
