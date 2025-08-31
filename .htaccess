@@ -1,6 +1,6 @@
 ErrorDocument 404 /404.php
 <FilesMatch "\.env$|.*\.ready|.*\.template$|.*\.pl$|.*\.ini$|.*\.log$|.*\.sh$">
-	Require all denied
+    Require all denied
 </FilesMatch>
 
 <IfModule mod_rewrite.c>

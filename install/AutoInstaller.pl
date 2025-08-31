@@ -1526,10 +1526,9 @@ sub help {
 }
 
 sub parse_replacements {
-    my $replacements = $_[0];
-    my @local = @{$replacements};
+    my $replacements = shift;
 
-    open my $fh, '<', 'templates/replacementns.repl';
+    open my $fh, '<', 'templates/replacements.repl';
 
     while (my $line = <$fh>) {
         chomp $line;
@@ -1538,7 +1537,6 @@ sub parse_replacements {
 
         my ($target, $replace) = split '%%%', $line;
 
-        push @local, "$target%%%$replace" if $target and $replace;
+        push @$replacements, "$target%%%$replace" if $target and $replace;
     }
-    $replacements = @local;
 }
