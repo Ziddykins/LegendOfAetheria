@@ -1,11 +1,11 @@
-# REM <Directory ###REPL_WEB_DOCROOT###>
-# REM     Options -Indexes
+# REM <Directory ###REPL_WEB_DOCROOT###/>
+# REM    Options -Indexes
 # REM    AllowOverride All
 # REM    Require all granted
 # REM </Directory>
 
 <IfModule mod_ssl.c>
-    <VirtualHost ###REPL_WEB_FQDN###:###REPL_APACHE_HTTPS_PORT###>
+    <VirtualHost *:###REPL_APACHE_HTTPS_PORT###>
         ServerName ###REPL_WEB_FQDN###
        	ServerAdmin ###REPL_WEB_ADMIN_EMAIL###
        	DocumentRoot ###REPL_WEB_DOCROOT###

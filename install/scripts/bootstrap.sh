@@ -1,6 +1,7 @@
 #!/bin/bash
 CWD=$(pwd | tr '/' ' ' | awk '{print $NF}')
-DISTRO=$(cat /etc/os-release | grep '^ID')
+DISTRO=$(cat /etc/os-release | grep '^ID' | sed 's/ID=//')
+echo "DISTRO: $DISTRO"
 
 if [[ "$CWD" != "scripts" ]]; then
 	echo "must be ran from loa's script dir (/install/scripts)"
@@ -12,9 +13,11 @@ if [[ "$USER" != "root" ]]; then
 	exit 1
 fi
 
+
 function req_software() {
+	echo "Found running $DISTRO"
 	if [[ "$DISTRO" == "debian" || "$DISTRO" == "ubuntu" ]]; then
-		apt install -y make
+		apt install -y make gcc build-essential
 	fi	
 }
 
@@ -69,6 +72,7 @@ function check_rc() {
 	fi
 }
 
+req_software
 sury
 perldeps
 

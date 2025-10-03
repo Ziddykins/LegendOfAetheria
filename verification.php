@@ -1,14 +1,15 @@
 <?php
     declare(strict_types = 1);
+    require_once "vendor/autoload.php";
+    require_once "system/constants.php";
+    require_once "system/bootstrap.php";
+    
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
-        require 'vendor/autoload.php';
+
 
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
-
-
-
 
     $account = new Account($_SESSION['email']);
     $account->load();

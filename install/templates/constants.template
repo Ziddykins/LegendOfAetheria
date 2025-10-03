@@ -11,7 +11,12 @@
 
 	define('ADMIN_WEBROOT', '###REPL_WEB_DOCROOT###/admini/strator');
 
-	const STARTING_GOLD = 1000;
-	const STARTING_INVWEIGHT = 500;
-	const STARTING_INVSLOTS = 30;
-	const STARTING_ASSIGNABLE_AP = 40;
+	const VERIFICATION_CODE_LENGTH =   32;
+	const STARTING_ASSIGNABLE_AP   =   40;
+	const STARTING_INVWEIGHT       =  500;
+	const STARTING_INVSLOTS        =   30;
+	const STARTING_GOLD            = 1000;
+	
+	
+	
+	

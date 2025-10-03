@@ -71,11 +71,13 @@
                                 $page_string .= "pages/character/sheet.php";
                             }
 
+                            
                             if (file_exists($page_string)) {
                                 include "$page_string";
                             } else {
                                 include 'pages/character/sheet.php';
                             }
+                            
                         }
                     ?>
                     </div>

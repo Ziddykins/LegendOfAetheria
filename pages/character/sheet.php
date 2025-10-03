@@ -8,6 +8,7 @@
     }
 ?>
         <div class="d-flex justify-content-center">
+            
             <div class="container"style="max-width: 850px;">
                 <div class="card ps-3 mb-3 pt-3"  ">
                     <div class="card-title lead">
@@ -28,24 +29,23 @@
                         
                         <div class="card-body">
                             <div class="flex-grow-1">
-                                <div class="container shadow-sm border">
-                                    <div class="row mb-3 mt-3 text-center fw-bold">
-                                        <div class="col">HP:</div>
-                                        <div class="col">MP:</div>
-                                        <div class="col">EP:</div>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <div class="col">
-                                            <span id="hp" name="hp" class="ldBar label-center" data-value="<?php echo $cur_hp; ?>" data-max="<?php echo $max_hp; ?>" data-type="stroke" data-content="hp" data-stroke="red"></span>
+                                <div class="rpgui-content">
+                                    <div class="rpgui-container container framed-grey shadow-sm border">
+                                        <div class="row mb-3 mt-3 text-center fw-bold">
+                                            <div class="col">HP:</div>
+                                            <div class="col">MP:</div>
+                                            <div class="col">EP:</div>
                                         </div>
 
-                                        <div class="col">
-                                            <span id="mp" name="mp" class="ldBar label-center" data-max="<?php echo $cur_mp; ?>" data-type="stroke" data-content="mp" data-stroke="blue"></span>
-                                        </div>
-
-                                        <div class="col">
-                                            <span id="ep" name="ep" class="ldBar label-center" data-value="<?php echo $cur_ep; ?>" data-max="<?php echo $max_ep; ?>" data-type="stroke" data-content="ep" data-stroke="yellow"></span>
+                                        <div class="row mb-3">
+                                            <div class="col">
+                                                <div id="health-bar" class="rpgui-progress red"></div>
+                                                <script>
+                                                    let health_bar = document.getElementById('health-bar');
+                                                    
+                                                    RPGUI.set_value(health_bar, <?php echo $hp_percent_full; ?>);
+                                                </script>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

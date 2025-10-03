@@ -1,9 +1,14 @@
-<?php include 'html/opener.html'; ?>
+<?php
+    include 'html/opener.html';
+    include 'system/constants.php';
+ ?>
+
 <head>
-    <?php include 'html/headers.html'; ?>
-    <link rel="stylesheet" href="css/spooky.css">
-    <script src="js/tweenmax.min.js"></script>
-    <script src="js/timelinemax.min.js"></script>
+    <?php include '/html/headers.html'; ?>
+    <link rel="stylesheet" href="/css/spooky.css">
+    <script src="/js/tweenmax.min.js"></script>
+    <script src="/js/timelinemax.min.js"></script>
+    
     <style>
         .return-btn {
             background-color: #6c757d;
@@ -37,7 +42,7 @@
         <div class="glitch__container">
             <div class="error-container">
                 <div class="logo-container">
-                    <img src="./img/logos/logo-banner-no-bg.webp" alt="Logo" style="max-width: 400px; width: 100%;">
+                    <img src="/img/logos/logo-banner-no-bg.webp" alt="Logo" style="max-width: 400px; width: 100%;">
                 </div>
                 <div class="glitch__text">
                     <h1 class="glitch__text__title glitch-effect">
@@ -46,13 +51,13 @@
                         <span class="glitch-effect-text-clr2">404</span>
                     </h1>
                     <p class="error-message">The page you are looking for has vanished into the void.</p>
-                    <a href="/" class="return-btn">Return to Homepage</a>
+                    <a href="/game" class="return-btn">Return to Homepage</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <?php include 'html/footers.html'; ?>
-    <script src="js/404.js"></script>
+    <?php include '/html/footers.html'; ?>
+    <script src="/js/404.js"></script>
 </body>
 </html>

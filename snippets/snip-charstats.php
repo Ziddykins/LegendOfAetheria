@@ -35,8 +35,11 @@
 
     $ep_icon  = 'bi-battery-full';
     $ep_color = 'success';
-    $ep_percent_full = ($cur_ep / $max_ep) * 100;
     
+    $ep_percent_full = $cur_ep / $max_ep;
+    $mp_percent_full = $cur_mp / $max_mp;
+    $hp_percent_full = $cur_hp / $max_hp;
+
     if ($ep_percent_full > 25 && $ep_percent_full < 75) {
         $ep_icon  = 'bi-battery-half';
         $ep_color = 'warning';

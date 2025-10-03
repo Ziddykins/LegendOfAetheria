@@ -39,7 +39,7 @@
 ###REPL_SQL_TBL_STATISTICS###%%%sql(tbl_statistics)
 ###REPL_SQL_TBL_BANK###%%%sql(tbl_bank)
 
-# REM%%%\t
+# REM%%%    
 
 ###REPL_OPENAI_APIKEY###%%%cfg(openai_apikey)
 

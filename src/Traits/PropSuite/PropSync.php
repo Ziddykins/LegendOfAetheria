@@ -165,6 +165,7 @@ trait PropSync {
                 break;
             case PropType::CHARACTER:
                 $id = $this->id;
+                
 
                 if ($prop === 'monster') {
                     $tmp_monster = $params[0];
@@ -189,6 +190,20 @@ trait PropSync {
 
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $table) || !preg_match('/^[a-zA-Z0-9_]+$/', $table_col)) {
             throw new ValueError('Invalid input');
+        }
+
+        $type_query = <<<SQL
+            SELECT DATA_TYPE
+            FROM information_schema.COLUMNS
+            WHERE
+                TABLE_NAME = ? AND
+                COLUMN_NAME = ?
+        SQL;
+
+        $column_type = $db->execute_query($type_query, [ $table, $table_col ])->fetch_column();
+
+        if ($column_type === 'enum') {
+            $params[0] = $params[0]->name;
         }
 
         $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";
@@ -301,7 +316,7 @@ trait PropSync {
             }
 
             if (isset($tmp_obj['monster'])) {
-                $tmp_monster = new Monster(MonsterScope::PERSONAL, $this->id);
+                $tmp_monster = new Monster(MonsterScope::PERSONAL);
                 $monster_data = $tmp_obj['monster'];
                 $this->monster = $tmp_monster->propRestore($monster_data);
             }
@@ -342,7 +357,7 @@ trait PropSync {
             return null;
         }
 
-        $typeName = is_string($type) ? $type : $type->getName();
+        $typeName = is_string($type) ? $type : $type->__tostring();
         
         // Handle enum types
         if (enum_exists($typeName)) {
@@ -359,7 +374,7 @@ trait PropSync {
                 }
                 // Handle unit enums (without values)
                 return constant("$typeName::$value");
-            } catch (\ValueError $e) {
+            } catch (ValueError $e) {
                 throw new \TypeError("Cannot convert value '$value' to enum type $typeName");
             }
         }

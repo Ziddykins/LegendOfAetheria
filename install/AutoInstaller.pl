@@ -141,7 +141,11 @@ if (-d $cfg{web_root}) {
     if (ask_user("The installation files will have to be moved to the webroot we just created.\n"
                . "Would you like to do that now?", 'y', 'yesno')) {
 
-        mkdir($cfg{web_root}, 0755) or croak "Failed to create web root directory: $!";
+        make_path($cfg{web_root}, {
+	    mode => 0755,
+    	    user => "www-data",
+            group => "www-data"
+	}) or croak("Failed to create web root directory: $!");
 
         open my $fh, '>', '/tmp/mover.pl';
         print $fh <<'EOF';
@@ -182,6 +186,7 @@ get_sysinfo();
 
 if (!$opt_step) {
     step_firstrun();
+    $cfg{step} = SOFTWARE;
 } else {
     %cfg = %{$ini{$fqdn}};
     $cfg{step} = $opt_step;
@@ -239,7 +244,7 @@ if ($cfg{step} == TEMPLATES) {
 
     if ($cfg{ssl_enabled}) {
         if ($cfg{redir_status}) {
-            push @replacements, "# SSLREM %%%\t";
+            push @replacements, "# SSLREM %%%    ";
         }
         push @replacements, "###REPL_PROTOCOL###%%\%https";
     } else {
@@ -346,7 +351,7 @@ sub step_firstrun {
     } else {
         tell_user('WARN', 'No configuration for this FQDN, creating new entry');
         $ini{$fqdn} = {};
-        $ini{$fqdn}{step} = 2;
+        $ini{$fqdn}{step} = SOFTWARE;
         handle_cfg({}, CFG_W_MAIN, $fqdn);
     }
 
@@ -534,9 +539,6 @@ sub step_vhost_ssl {
     $cfg{redir_status} = 1;
     my $answer = -1;
     my $linecheck;
-
-    # FIXME: Temp fix.
-    `touch $cfg{apache_directory}/ssl-$cfg{fqdn}.conf`;
 
     print "    - Current SSL certificate set -\n"
         . "Certificate: $cfg{ssl_fullcer}\n"
@@ -913,7 +915,7 @@ sub step_process_templates {
 
     $sqlrpw = '';
     if ($tmp) {
-        $sqlrpw = "-p $tmp";
+        $sqlrpw = "-p$tmp";
     }
 
     $sql_cmd = "mysql -u root $sqlrpw < $cfg{sql_template}.ready 2>&1";
@@ -1480,15 +1482,19 @@ sub read_hosts {
 sub choose_host {
 	my @list = keys %hosts;
 	my $cur = 1;
+    my $default;
 
 	foreach my $key (@list) {
 		tell_user('INFO',  $cur++ . ". $key\n");
+        if ($list[$choice] eq "127.0.1.1") {
+            $default = $cur;
+        }
 	}
 
 	my $choice = 99;
 
 	while (!$list[$choice]) {
-		$choice = ask_user("Which IP would you like the fqdn added under?\n\tChoice: ", '127.0.1.1', 'input');
+		$choice = ask_user("Which IP would you like the fqdn added under?\n\tChoice: ", $default, 'input');
 		my ($sub, $apex, $tld) = split /\./, $cfg{fqdn};
 		$choice--;
 		$hosts{$list[$choice]}{hosts}{"$apex.$tld"} = 1;
@@ -1532,6 +1538,8 @@ sub parse_replacements {
 
     while (my $line = <$fh>) {
         chomp $line;
+	next if length $line < 2;
+
         $line =~ s/cfg\((.*?)\)/$cfg{$1}/;
         $line =~ s/sql\((.*?)\)/$sql{$1}/;
 
