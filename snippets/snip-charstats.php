@@ -34,7 +34,7 @@
     $max_ep = $character->stats->get_maxEP();
 
     $ep_icon  = 'bi-battery-full';
-    $ep_color = 'success';
+    $ep_color = 'success'; 
     
     $ep_percent_full = $cur_ep / $max_ep;
     $mp_percent_full = $cur_mp / $max_mp;
