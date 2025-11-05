@@ -1,7 +1,7 @@
 <?php
     use Game\Account\Enums\Privileges;
-    use Game\OpenAI\OpenAI;
-    use Game\OpenAI\Enums\HttpMethod;
+    use Game\AI\OpenAI;
+    use Game\AI\Enums\HttpMethod;
 
     $user_privs = Privileges::name_to_enum($account->get_privileges());
 

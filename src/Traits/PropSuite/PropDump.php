@@ -3,13 +3,29 @@ namespace Game\Traits\PropSuite;
 
 use ReflectionClass;
 use ReflectionProperty;
+use ReflectionException;
 
+/**
+ * Provides deep serialization and deserialization for game objects.
+ * Handles nested objects, enums, and complex property types while preserving type information.
+ * 
+ * Used for:
+ * - Saving complex objects to database TEXT/JSON columns
+ * - Session storage of game state
+ * - Deep copying objects with nested structures
+ * 
+ * Supports:
+ * - Nested objects (recursive serialization)
+ * - Enums (both unit and backed enums)
+ * - Null values
+ * - Private/protected properties from parent classes
+ */
 trait PropDump { 
     /**
-     * Dumps an object and all its nested objects into a JSON structure
-     * that preserves type information and null values.
+     * Serializes this object and all nested objects to JSON.
+     * Preserves type information and handles circular references.
      * 
-     * @return string JSON representation of the object
+     * @return string JSON representation with type metadata
      */
     private function propDump(): string {
         return json_encode($this->dumpObject($this));
@@ -31,9 +47,14 @@ trait PropDump {
     }
 
     /**
-     * Internal method to recursively dump an object and its properties
+     * Internal recursive method to dump an object tree.
+     * Extracts all properties (including private from parents) and recursively serializes nested objects.
+     * 
+     * @param object $obj Object to dump
+     * @return array Associative array with __class and properties keys
      */
     private function dumpObject(object $obj): array {
+        global $log;
         $reflection = new ReflectionClass($obj);
         $data = [
             '__class' => $reflection->getName(),
@@ -71,8 +92,8 @@ trait PropDump {
                         // Handle nested objects
                         if ($value instanceof \UnitEnum) {
                             $propertyData['value'] = [
-                                'name' => $value->name,
-                                'value' => property_exists($value, 'value') ? $value->value : null
+                            'name' => $value->name,
+                            'value' => property_exists($value, 'value') ? $value->value : null
                             ];
                         } else {
                             $propertyData['value'] = $this->dumpObject($value);
@@ -83,8 +104,8 @@ trait PropDump {
                 }
 
                 $data['properties'][$name] = $propertyData;
-            } catch (\ReflectionException $e) {
-                continue;
+            } catch (ReflectionException $e) {
+                $log->error("PropDump: Failed to dump property $name - " . $e->getMessage());
             }
         }
 
@@ -98,14 +119,16 @@ trait PropDump {
         if (!$data) {
             return null;
         }
+
         $className = $data['__class'];
+
         if (!class_exists($className)) {
             throw new \RuntimeException("Cannot restore class $className - class not found");
         }
 
         // Create new instance without calling constructor
         $reflection = new ReflectionClass($className);
-        $instance = $reflection->newInstanceWithoutConstructor();
+        $instance   = $reflection->newInstanceWithoutConstructor();
 
         foreach ($data['properties'] as $name => $propertyData) {
             try {

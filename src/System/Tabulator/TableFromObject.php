@@ -5,18 +5,45 @@ use Game\System\Tabulator\Enums\DataType;
 use Game\System\Tabulator\Enums\LayoutType;
 use ReflectionClass;
 
+/**
+ * Converts PHP objects to Tabulator.js table configurations.
+ * Uses reflection to generate column headers and row data for JavaScript table library.
+ * Work in progress - TABLE_DATA type not yet implemented.
+ */
 class TableFromObject {
+    /** @var object Source object to convert to table */
     private $object;
+    
+    /** @var mixed Column definitions for table headers */
     private $columnData;
+    
+    /** @var mixed Row data for table body */
     private $rowData;
+    
+    /** @var LayoutType Table layout mode (fit columns, fit data, etc.) */
     private LayoutType $layout;
+    
+    /** @var mixed Accumulated output string during generation */
     private $output;
 
+    /**
+     * Creates a table generator from an object.
+     * 
+     * @param object $object Source object to convert
+     */
     public function __construct($object) {
         $this->object = $object;
     }
     
-    
+    /**
+     * Converts object to Tabulator JSON configuration.
+     * HEADER_DATA: generates column definitions with editable cells.
+     * TABLE_DATA: not yet implemented.
+     * 
+     * @param object $object Object to convert
+     * @param DataType $type Type of data to generate (HEADER_DATA or TABLE_DATA)
+     * @return string JSON configuration string
+     */
     public function objectToJson(object $object, DataType $type): string {
         $refl = new ReflectionClass($object);
         $cls = get_class($object);
@@ -47,6 +74,13 @@ class TableFromObject {
         return $return_data;
     }
 
+    /**
+     * Sanitizes output for Tabulator.js format.
+     * Removes quotes from property names and handles null values.
+     * 
+     * @param string $input Raw JSON-like string
+     * @return string Sanitized output for Tabulator
+     */
     private function tabulatorSanitize(string $input): string {
         $output = preg_replace('/"(.*?) ":("?.*?"?),/', '$1:$2, ', $input);
         $output = preg_replace('/, "(.*?)":/', ', $1:', $output);

@@ -46,3 +46,4 @@ pages/game-screen.php
 .idea/inspectionProfiles/Project_Default.xml
 qodana.yaml
 **/temp/**
+system/constants.php

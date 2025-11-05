@@ -36,7 +36,7 @@
     if (isset($_POST['flee-monster']) && $_POST['flee-monster'] == 1) {
         check_csrf($_POST['csrf-token']);
         if ($mon_loaded) {
-            $character->set_monster(null);
+            $character->set_monster(monster: null);
         }
     }
     if ($mon_loaded) {

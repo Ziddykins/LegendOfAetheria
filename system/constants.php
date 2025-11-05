@@ -1,7 +1,7 @@
 <?php
-	define('MAIN_SITE_BASEURL', 'https://tessst.loa.local');
-	define('SYSTEM_EMAIL_ADDRESS', "webmaster@tessst.loa.local");
-	define('WEBROOT', '/var/www/html/loa');
+	define('MAIN_SITE_BASEURL', 'https://loa.test.local');
+	define('SYSTEM_EMAIL_ADDRESS', "webmaster@loa.test.local");
+	define('WEBROOT', '/home/ziddy/legendofaetheria');
     
 	define('UPLOAD_DIRECTORY', WEBROOT . '/uploads');
 	define('LOG_DIRECTORY', WEBROOT . '/system/logs');
@@ -9,7 +9,7 @@
 	define('TEMP_DIRECTORY', UPLOAD_DIRECTORY . '/temp');
 	define('SYSTEM_DIRECTORY', WEBROOT . '/system');
 
-	define('ADMIN_WEBROOT', '/var/www/html/loa/admini/strator');
+	define('ADMIN_WEBROOT', '/home/ziddy/legendofaetheria/admini/strator');
 
 	const VERIFICATION_CODE_LENGTH =   32;
 	const STARTING_ASSIGNABLE_AP   =   40;

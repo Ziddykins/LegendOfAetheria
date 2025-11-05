@@ -183,6 +183,8 @@ trait PropSync {
                 if ($prop === 'settings') {
                     $tmp_settings = $params[0];
                     $params[0] = $tmp_settings->propDump();    
+                } else if ($prop == 'loggedIn') {
+                    $params[0] = $params[0] ? 1 : 0;
                 }
 
                 break;
@@ -203,8 +205,15 @@ trait PropSync {
         $column_type = $db->execute_query($type_query, [ $table, $table_col ])->fetch_column();
 
         if ($column_type === 'enum') {
-            $params[0] = $params[0]->name;
+            if ($params[0] === 'True') {
+                $params[0] = true;
+            } else if ($params[0] === 'False') {
+                $params[0] = false;
+            } else {
+                $params[0] = $params[0]->name;
+            }
         }
+
 
         $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";
         $db->execute_query($sql_query, [ $params[0], $id ]);

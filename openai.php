@@ -4,8 +4,8 @@
 
     use Game\Account\Account;
     use Game\Character\Character;
-    use Game\OpenAI\OpenAI;
-    use Game\OpenAI\Enums\HttpMethod;
+    use Game\AI\OpenAI;
+    use Game\AI\Enums\HttpMethod;
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
 

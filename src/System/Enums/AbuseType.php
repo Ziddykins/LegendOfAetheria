@@ -1,10 +1,23 @@
 <?php
 namespace Game\System\Enums;
 
+/**
+ * Defines categories of rule violations and abusive behavior.
+ * Used for moderation, logging, and enforcement actions.
+ */
 enum AbuseType {
-    case CHEATING;    /* General cheating/abuse of game mechanics etc. */
-    case AUTOBOTTING; /* Using autoclickers to play for you */
-    case MULTISIGNUP; /* Abusing the signup form/multi-characters */
-    case TAMPERING;   /* Modifying POST requests */
+    /** General cheating or exploiting game mechanics */
+    case CHEATING;
+    
+    /** Using automated tools/bots to play the game */
+    case AUTOBOTTING;
+    
+    /** Creating multiple accounts to abuse signup rewards */
+    case MULTISIGNUP;
+    
+    /** Manipulating POST requests or client-side data */
+    case TAMPERING;
+    
+    /** Inappropriate behavior in chat system */
     case CHATABUSE;
 }

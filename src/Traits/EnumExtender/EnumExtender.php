@@ -1,6 +1,11 @@
 <?php
     namespace Game\Traits\EnumExtender;
 
+    /**
+     * Extends PHP enum functionality with utility methods for conversion and randomization.
+     * Provides name-to-enum, value-to-enum, name-to-value conversions, and random enum selection.
+     * Used by many game enums (FriendStatus, Races, Weather, etc.) to add these helper methods.
+     */
     trait EnumExtender {
         /**
          * Convert a name to the corresponding enum.

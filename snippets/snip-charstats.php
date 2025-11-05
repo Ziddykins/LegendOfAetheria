@@ -69,71 +69,85 @@
         'str' => [
             'name' => 'Strength',
             'icon' => 'swords',
-            'value' => $char_str
+            'value' => $char_str,
+            'description' => 'Increases physical attack damage'
         ],
         'def' => [
             'name' => 'Defense',
             'icon' => 'security',
-            'value' => $char_def
+            'value' => $char_def,
+            'description' => 'Reduces incoming physical damage'
         ],
         'int' => [
             'name' => 'Intelligence',
             'icon' => 'neurology',
-            'value' => $char_int            
+            'value' => $char_int,
+            'description' => 'Increases magical attack power'
         ],
         'luck' => [
             'name' => 'Luck',
             'icon' => 'poker_chip',
-            'value' => $char_luck
+            'value' => $char_luck,
+            'description' => 'Affects item drops and random events'
         ],
         'char' => [
             'name' => 'Charisma',
             'icon' => 'favorite',
-            'value' => $char_chsm
+            'value' => $char_chsm,
+            'description' => 'Influences NPC interactions and prices'
         ],
         'dext' => [
             'name' => 'Dexterity',
             'icon' => 'import_contacts',
-            'value' => $char_dext
+            'value' => $char_dext,
+            'description' => 'Improves crafting and precision skills'
         ],
         'sped' => [
             'name' => 'Speed',
             'icon' => 'sprint',
-            'value' => $char_sped
+            'value' => $char_sped,
+            'description' => 'Determines turn order in combat'
         ],
         'mdef' => [
             'name' => 'Magic Defense',
             'icon' => 'shield_moon',
-            'value' => $char_mdef
+            'value' => $char_mdef,
+            'description' => 'Reduces incoming magical damage'
         ],
         'crit' => [
             'name' => 'Critical',
             'icon' => 'brightness_alert',
-            'value' => $char_crit
+            'value' => $char_crit,
+            'description' => 'Chance to deal critical hit damage'
         ],
         'dodg' => [
             'name' => 'Dodge',
             'icon' => 'switch_left',
-            'value' => $char_dodg
+            'value' => $char_dodg,
+            'description' => 'Chance to evade physical attacks'
         ],
         'blck' => [
             'name' => 'Block',
             'icon' => 'encrypted_minus_circle',
-            'value' => $char_blck
+            'value' => $char_blck,
+            'description' => 'Chance to block and reduce damage'
         ],
         'accu' => [
             'name' => 'Accuracy',
             'icon' => 'target',
-            'value' => $char_accu
+            'value' => $char_accu,
+            'description' => 'Increases chance to hit targets'
         ],
         'rsst' => [
             'name' => 'Resist',
             'icon' => 'special_character',
-            'value' => $char_rsst
+            'value' => $char_rsst,
+            'description' => 'Resistance to status effects'
         ],
         'rgen' => [
             'name' => 'Regeneration',
             'icon' => 'compost',
-            'value' => $char_rgen
+            'value' => $char_rgen,
+            'description' => 'Restores HP/MP over time'
         ]
     ];

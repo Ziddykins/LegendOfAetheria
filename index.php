@@ -67,7 +67,7 @@
             write_log('LOGIN_ATTEMPT', 'Failed login attempt', $ip);
 
             if ($failed_attempts >= 10) {
-                $account->set_banned('True');
+                $account->set_banned(true);
                 $log->alert('Account locked due to excessive failed attempts',
                     ['email' => $email, 'ip' => $ip]);
             }
@@ -125,7 +125,7 @@
                     }
 
                     /* ya forgin' posts I know it */
-                    if (($str < 10 || $def < 10 || $int < 10)) {
+                    if ($str < 10 || $def < 10 || $int < 10 || ($str + $int + $def) > 40) {
                         $ip = $_SERVER['REMOTE_ADDR'];
                         write_log(AbuseType::TAMPERING->name, "Sign-up attributes modified", $ip);
                         check_abuse(AbuseType::TAMPERING, $account->get_id(), $ip, 2);

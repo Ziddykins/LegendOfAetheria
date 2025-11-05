@@ -29,73 +29,65 @@
                         
                         <div class="card-body">
                             <div class="flex-grow-1">
-                                <div class="rpgui-content">
-                                    <div class="rpgui-container container framed-grey shadow-sm border">
-                                        <div class="row mb-3 mt-3 text-center fw-bold">
-                                            <div class="col">HP:</div>
-                                            <div class="col">MP:</div>
-                                            <div class="col">EP:</div>
-                                        </div>
-
-                                        <div class="row mb-3">
-                                            <div class="col">
-                                                <div id="health-bar" class="rpgui-progress red"></div>
-                                                <script>
-                                                    let health_bar = document.getElementById('health-bar');
-                                                    
-                                                    RPGUI.set_value(health_bar, <?php echo $hp_percent_full; ?>);
-                                                </script>
+                                <div>
+                                    <div class="container framed-grey shadow-sm border align-items-center">
+                                        <div class="row mb-3 mt-3">
+                                            <div class="col text-center">
+                                                <span class="fw-bold">HP:</span> <?php echo "$cur_hp / $max_hp"; ?>
+                                            </div>
+                                            <div class="col text-center">
+                                                <span class="fw-bold">MP:</span> <?php echo "$cur_mp / $max_mp"; ?>
+                                            </div>
+                                            <div class="col text-center">
+                                                <span class="fw-bold">EP:</span> <?php echo "$cur_ep / $max_ep"; ?>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="d-grid border justify-content-evenly">
-                                    <?php
-                                    $index = 0;
-                                    $total = count($stats_map);
-                                    foreach ($stats_map as $stats):
-                                        if ($index % 3 === 0): ?>
-                                            <div class="d-flex justify-content-evenly small mb-3 ms-3 mt-3 me-3 fs-3">
-                                        <?php endif; ?>
-
-                                        
-                                            <a class="d-flex align-items-center link-underline link-underline-opacity-0 text-white" href="#" data-bs-toggle="tooltip" data-bs-title="<?php echo $stats['name']; ?>"><span class="material-symbols-outlined me-2 ms-3"><?php echo $stats['icon']; ?></span>
-
-                                            <span class="ms-auto fw-bold me-3"><?php echo $stats['value']; ?></span></a>
-
-
-                                        <?php
-                                        $index++;
-                                        if ($index % 3 === 0 || $index === $total): ?>
+                                <div class="container border">
+                                    <div class="row">
+                                        <?php foreach ($stats_map as $stats): ?>
+                                            <div class="col-6 mb-2 mt-2 px-3" data-bs-toggle="tooltip" data-bs-title="<?php echo $stats['description']; ?>">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="material-symbols-outlined me-2" style="font-size: 18px; width: 24px; flex-shrink: 0;"><?php echo $stats['icon']; ?></span>
+                                                    <span class="small" style="min-width: 110px;"><?php echo $stats['name']; ?>:</span>
+                                                    <span class="fw-bold small"><?php echo $stats['value']; ?></span>
+                                                </div>
                                             </div>
-                                        <?php endif;
-                                    endforeach; ?>
+                                        <?php endforeach; ?>
+                                    </div>
                                 </div>
                                 
                                 <div class="container border shadow-sm">
-                                    <div class="row mb-3 mt-3">
-                                        <div class="col">
-                                            Alignment: <?php echo $char_align; ?>
+                                    <div class="row mb-2 mt-2">
+                                        <div class="col px-3" data-bs-toggle="tooltip" data-bs-title="Your moral alignment score">
+                                            <div class="d-flex align-items-center">
+                                                <img src="img/svg/alignment.svg" class="me-2" style="width: 24px; height: 24px; flex-shrink: 0;" alt="alignment">
+                                                <span class="small" style="min-width: 110px;">Alignment:</span>
+                                                <span class="fw-bold small"><?php echo $char_align; ?></span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="row mb-3">
-                                        <div class="col">
-                                            Gold&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <?php echo $character->get_gold(); ?>
+                                    <div class="row mb-2">
+                                        <div class="col px-3">
+                                            <div class="d-flex align-items-center">
+                                                <span class="material-symbols-outlined me-2" style="font-size: 18px; width: 24px; flex-shrink: 0;">monetization_on</span>
+                                                <span class="small" style="min-width: 110px;">Gold:</span>
+                                                <span class="fw-bold small"><?php echo $character->get_gold(); ?></span>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="row mb-3">
-                                        <div class="col">
-                                            Floor&nbsp;&nbsp;&nbsp;&nbsp;: <?php echo $character->get_floor(); ?>
+                                    <div class="row mb-2">
+                                        <div class="col px-3">
+                                            <div class="d-flex align-items-center">
+                                                <span class="material-symbols-outlined me-2" style="font-size: 18px; width: 24px; flex-shrink: 0;">stairs</span>
+                                                <span class="small" style="min-width: 110px;">Floor:</span>
+                                                <span class="fw-bold small"><?php echo $character->get_floor(); ?></span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        
                                     </div>
                                 </div>
                             </div>
@@ -104,5 +96,4 @@
                 </div>
             </div>
         </div>
-        
-
+      

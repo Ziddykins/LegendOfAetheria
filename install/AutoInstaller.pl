@@ -1484,14 +1484,14 @@ sub choose_host {
 	my $cur = 1;
     my $default;
 
+	my $choice = 99;
+    
 	foreach my $key (@list) {
 		tell_user('INFO',  $cur++ . ". $key\n");
         if ($list[$choice] eq "127.0.1.1") {
             $default = $cur;
         }
 	}
-
-	my $choice = 99;
 
 	while (!$list[$choice]) {
 		$choice = ask_user("Which IP would you like the fqdn added under?\n\tChoice: ", $default, 'input');
