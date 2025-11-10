@@ -3,20 +3,20 @@
     use Game\Account\Account;
     use Game\Character\Character;
  
-    require_once "../../constants.php";
+    require_once "../../system/constants.php";
 
     require_once 'system/functions.php';
 
     $account = null;
     $character = null;
 
-    if (check_session()) {
+    /*if (check_session()) {
         $account = new Account($_SESSION['email']);
         $character = new Character($account->get_id(), $_SESSION['character-id']);
         $character->load();
     } else {
         header('Location: /?no_login');
-    }
+    }*/
 ?>
 
 <?php include WEBROOT . '/html/opener.html'; ?>

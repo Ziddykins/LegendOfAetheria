@@ -39,7 +39,7 @@
 
             if (strlen($ip) >= 7 && strlen($ip) <= 15) {
                 if (preg_match('/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/', $ip)) {
-                    $account->set_ipLock('True');
+                    $account->set_ipLock(true);
                     $account->set_ipLockAddr($ip);
                     echo "Successfully turned on IP Lock";
                 } else {

@@ -10,19 +10,21 @@
     use Game\Character\Character;
     use Game\Components\Sidebar\Enums\SidebarType;
     use Game\System\System;
+    use Game\AI\LoAllama;
     use Game\Account\Settings;
     use Game\AI\NPC\Tutorial\Frank;
     //use Game\Familiar\Familiar;
 
     $system = new System(0);
     $system->load_sheet();
+    $llama = new LoAllama(1, 'Frank', 'smollm2:360m');
 
     $account   = new Account($_SESSION['email']);
     $character = new Character($account->get_id(), $_SESSION['character-id']);
     
     $color_mode = $account->get_settings()->get_colorMode();
     
-    $account->get_settings()->set_sideBar(SidebarType::LTE_DEFAULT);
+    $account->get_settings()->set_sideBar(SidebarType::LOA_CLASSIC);
     $sidebar_rel_link = $account->get_settings()->get_sideBar()->value;
 
 

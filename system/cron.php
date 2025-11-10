@@ -8,6 +8,7 @@
     use Game\Account\Account;
 
     require_once "functions.php";
+    require_once "constants.php";
 
     
     if (!isset($argv)) {
@@ -139,7 +140,7 @@
 
         foreach ($results as $account) {
             $temp_acct = new Account($account['email']);
-            $temp_acct->set_sessionID(null);
+            $temp_acct->set_sessionID("");
             $log->info("Session Expire", ['Account' => $temp_acct->get_email(), 'Session ID' => $account['session_id']]);
         }
     }

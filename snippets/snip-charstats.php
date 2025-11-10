@@ -70,84 +70,98 @@
             'name' => 'Strength',
             'icon' => 'swords',
             'value' => $char_str,
-            'description' => 'Increases physical attack damage'
+            'description' => 'Increases physical attack damage',
+			'color' => 'secondary'
         ],
         'def' => [
             'name' => 'Defense',
             'icon' => 'security',
             'value' => $char_def,
-            'description' => 'Reduces incoming physical damage'
+            'description' => 'Reduces incoming physical damage',
+			'color' => 'primary'
         ],
         'int' => [
             'name' => 'Intelligence',
             'icon' => 'neurology',
             'value' => $char_int,
-            'description' => 'Increases magical attack power'
+            'description' => 'Increases magical attack power',
+			'color' => 'light'
         ],
         'luck' => [
             'name' => 'Luck',
             'icon' => 'poker_chip',
             'value' => $char_luck,
-            'description' => 'Affects item drops and random events'
+            'description' => 'Affects item drops and random events',
+			'color' => 'success'
         ],
         'char' => [
             'name' => 'Charisma',
             'icon' => 'favorite',
             'value' => $char_chsm,
-            'description' => 'Influences NPC interactions and prices'
+            'description' => 'Influences NPC interactions and prices',
+			'color' => 'danger'
         ],
         'dext' => [
             'name' => 'Dexterity',
             'icon' => 'import_contacts',
             'value' => $char_dext,
-            'description' => 'Improves crafting and precision skills'
+            'description' => 'Improves crafting and precision skills',
+			'color' => 'info'
         ],
         'sped' => [
             'name' => 'Speed',
             'icon' => 'sprint',
             'value' => $char_sped,
-            'description' => 'Determines turn order in combat'
+            'description' => 'Determines turn order in combat',
+			'color' => 'warning'
         ],
         'mdef' => [
             'name' => 'Magic Defense',
             'icon' => 'shield_moon',
             'value' => $char_mdef,
-            'description' => 'Reduces incoming magical damage'
+            'description' => 'Reduces incoming magical damage',
+			'color' => 'primary'
         ],
         'crit' => [
             'name' => 'Critical',
             'icon' => 'brightness_alert',
             'value' => $char_crit,
-            'description' => 'Chance to deal critical hit damage'
+            'description' => 'Chance to deal critical hit damage',
+			'color' => 'danger'
         ],
         'dodg' => [
             'name' => 'Dodge',
             'icon' => 'switch_left',
             'value' => $char_dodg,
-            'description' => 'Chance to evade physical attacks'
+            'description' => 'Chance to evade physical attacks',
+			'color' => 'warning'
         ],
         'blck' => [
             'name' => 'Block',
             'icon' => 'encrypted_minus_circle',
             'value' => $char_blck,
-            'description' => 'Chance to block and reduce damage'
+            'description' => 'Chance to block and reduce damage',
+			'color' => 'secondary'
         ],
         'accu' => [
             'name' => 'Accuracy',
             'icon' => 'target',
             'value' => $char_accu,
-            'description' => 'Increases chance to hit targets'
+            'description' => 'Increases chance to hit targets',
+			'color' => 'info'
         ],
         'rsst' => [
             'name' => 'Resist',
             'icon' => 'special_character',
             'value' => $char_rsst,
-            'description' => 'Resistance to status effects'
+            'description' => 'Resistance to status effects',
+			'color' => 'black'
         ],
         'rgen' => [
             'name' => 'Regeneration',
             'icon' => 'compost',
             'value' => $char_rgen,
-            'description' => 'Restores HP/MP over time'
+            'description' => 'Restores HP/MP over time',
+			'color' => 'success'
         ]
     ];

@@ -132,15 +132,15 @@
                     }
 
                     if ($account->get_id() === 1) {
-                        $account->set_privileges(Privileges::ADMINISTRATOR->value);
+                        $account->set_privileges(Privileges::ADMINISTRATOR);
                     } else {
-                        $account->set_privileges(Privileges::UNVERIFIED->value);
+                        $account->set_privileges(Privileges::UNVERIFIED);
                     }
 
                     $account->set_password($password);
                     $account->set_dateRegistered($time_sqlformat);
                     $account->set_ipAddress($ip_address);
-                    $account->set_loggedIn('False');
+                    $account->set_loggedIn(false);
                     $account->set_verificationCode($verification_code);
 
                     $character = new Character($account->get_id());

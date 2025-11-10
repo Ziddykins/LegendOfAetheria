@@ -14,7 +14,7 @@ use Game\Components\Modals\Enums\ModalButtonType;
             <div class="container">
                 <div class="d-flex justify-items-center align-items-center">
                     <div class="col">
-                        <?php $ap = $character->stats->get_ap(5); ?>
+                        <?php $ap = $character->stats->get_ap(); ?>
                         <div class="h3 josefin-slab-text">
                                 <?php if ($ap): ?>
                                     <i class="bi bi-capslock-fill text-success"></i>

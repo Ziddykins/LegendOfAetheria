@@ -3,6 +3,7 @@
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\Character\Enums\FriendStatus;
+
     global $db, $log;
     $account = new Account($_SESSION['email']);
     $account->load();

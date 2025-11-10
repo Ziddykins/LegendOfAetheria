@@ -4,6 +4,7 @@ namespace Game\Familiar;
 use Game\Inventory\Enums\ObjectRarity;
 use Game\Traits\PropSuite\PropSuite;
 
+
 /**
  * Represents a character's companion familiar creature with stats, leveling, and egg mechanics.
  * Familiars are acquired as eggs, hatch after a time period, and provide combat assistance.

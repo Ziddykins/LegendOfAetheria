@@ -1,6 +1,7 @@
 <?php
 namespace Game\Character\Enums;
 use Game\Traits\EnumExtender\EnumExtender;
+use function PHPUnit\Framework\isNumeric;
 
 /**
  * Represents the friendship status between two characters.

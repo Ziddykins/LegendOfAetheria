@@ -17,7 +17,7 @@
         /** Companion familiar data (tbl_familiars) */
         case FAMILIAR;
         
-        /** Character inventory data (tbl_inventory) */
+        /** Character inventory data (tbl_characters) */
         case INVENTORY;
         
         /** Enemy monster data (tbl_monsters) */
@@ -26,13 +26,19 @@
         /** Account settings/preferences (tbl_settings) */
         case SETTINGS;
 
-        /** Character combat statistics (tbl_character_stats) */
+        /** Character combat statistics (tbl_characters) */
         case CSTATS;
 
-        /** Monster combat statistics (tbl_monster_stats) */
+        /** Monster combat statistics (tbl_monsters) */
         case MSTATS;
+
+        /** Familiar combat statistics (tbl_familiar) */
         
         /** Banking system data (tbl_bank) */
         case BANKMANAGER;
+
+        /** Future AI incorporation */
+        case LLAMA;
+
     }
 ?>

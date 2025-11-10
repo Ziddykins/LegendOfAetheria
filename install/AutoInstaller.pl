@@ -296,7 +296,6 @@ if ($cfg{step} == HOSTS) {
     if (ask_user("Update hosts file?", 'y', 'yesno')) {
         step_update_hosts();
     }
-    next_step();
 }
 
 print "$clr{green}All steps completed$clr{reset}\n";

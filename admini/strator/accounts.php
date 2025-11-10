@@ -31,7 +31,7 @@ if (check_session()) {
 
         switch ($action) {
             case 'ban':
-                $sql_query = "UPDATE {$t['accounts']} SET `banned` = 'True' WHERE `id` = ?";
+                $sql_query = "UPDATE {$t['accounts']} SET `banned` = true WHERE `id` = ?";
                 $db->execute_query($sql_query, [ $account_id ]);
                 $sql_query = "INSERT INTO {$t['banned']} (`expires`, `reason, `account_id`) VALUES (?, ?, ?)";
                 $db->execute_query($sql_query, [ "NOW() + INTERVAL 1 DAY", "Admin Ban", $account_id ]);

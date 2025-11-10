@@ -230,3 +230,35 @@ use Game\Character\Character;
         }
         function add_global_message($character_id, $message) {
         }
+
+                /**
+         * Validates the current session for the logged-in user.
+         *
+         * Checks session variables and database records to ensure the session is valid.
+         *
+         * @return bool True if the session is valid, false otherwise.
+         */
+        function check_session(): bool {
+            global $db, $log, $t;
+
+            if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
+                return false;
+            }
+
+            $sql_query = "SELECT `session_id` FROM {$t['accounts']} WHERE `id` = ?";
+            $result = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc();
+            
+            if (!$result) {
+                $log->warning("session_id not found");
+                return false;
+            }
+
+            $session = $result['session_id'];
+            
+            if ($session != session_id()) {
+                $log->warning("Session ID in db doesn't match browser session id", [ 'SessionDB' => $session, 'SessionBrowser' => session_id() ]);
+                return false;
+            }
+
+            return true;
+        }

@@ -16,6 +16,7 @@
 	const STARTING_INVWEIGHT       =  500;
 	const STARTING_INVSLOTS        =   30;
 	const STARTING_GOLD            = 1000;
+	const REGEN_PER_TICK           =    3;
 	
 	
 	

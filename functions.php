@@ -119,7 +119,7 @@
          * @param int $character_id The ID of the character to check the friendship status with.
          * @return Game\Character\Enums\FriendStatus The friendship status or an error if determination fails.
          */
-        function status(int $character_id): FriendStatus {
+        function friend_status(int $character_id): FriendStatus {
             global $db, $log, $t;
 
             $status    = FriendStatus::NONE;
@@ -149,7 +149,7 @@
         function accept_friend_req($sender):bool {
             global $db, $log, $t;
 
-            if (status($sender) === FriendStatus::REQUEST_RECV) {
+            if (friend_status($sender) === FriendStatus::REQUEST_RECV) {
                 $sql_query = "UPDATE {$t['friends']} SET `status` = ? WHERE `recipient_id` = ?";
                 $db->execute_query($sql_query, [ FriendStatus::MUTUAL->value, $_SESSION['character-id'] ]);
                 $log->info('Friend request accepted', [ 'sender' => $sender, 'recipient' => $_SESSION['character-id'] ]);
@@ -177,6 +177,7 @@
                           GROUP BY `friend_status`";
             
             $result = $db->execute_query($sql_query, [$character->get_id(), $character->get_id()]);
+            
             if ($result) {
                 while ($row = $result->fetch_assoc()) {
                     $statuses[$row['friend_status']] = (int)$row['count'];
@@ -407,7 +408,7 @@
         function ban_user($account_id, $length_secs, $reason): void {
             global $db, $t;
             $expires = get_mysql_datetime("+$length_secs seconds");
-            $sql_query = "UPDATE {$t['accounts']} SET `banned` = 'True' WHERE `id` = ?";
+            $sql_query = "UPDATE {$t['accounts']} SET `banned` = true WHERE `id` = ?";
             $db->execute_query($sql_query, [ $account_id ]);
 
             $sql_query = <<<SQL
@@ -610,3 +611,5 @@
                 $array[$r2] = $tmp;
             }
         }
+
+        

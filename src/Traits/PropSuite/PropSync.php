@@ -204,7 +204,7 @@ trait PropSync {
 
         $column_type = $db->execute_query($type_query, [ $table, $table_col ])->fetch_column();
 
-        if ($column_type === 'enum') {
+        /*if ($column_type === 'enum') {
             if ($params[0] === 'True') {
                 $params[0] = true;
             } else if ($params[0] === 'False') {
@@ -212,7 +212,7 @@ trait PropSync {
             } else {
                 $params[0] = $params[0]->name;
             }
-        }
+        }*/
 
 
         $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";

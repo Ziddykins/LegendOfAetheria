@@ -149,7 +149,7 @@ trait PropDump {
                 }
 
                 $property->setValue($instance, $value);
-            } catch (\ReflectionException $e) {
+            } catch (ReflectionException $e) {
                 continue;
             }
         }
