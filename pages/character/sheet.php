@@ -59,19 +59,19 @@
                                     </div>
                                 </div>
                                 
-                                <div class="container border shadow-sm">
+                                <div class="container justify-content-center border shadow-sm">
                                     <div class="row mb-2 mt-2">
-                                        <div class="col text-center" data-bs-toggle="tooltip" data-bs-title="Your moral alignment score">
+                                        <div class="d-flex align-items-center col text-center" data-bs-toggle="tooltip" data-bs-title="Your moral alignment score">
                                             <img src="img/svg/alignment.svg" class="me-2" style="width: 24px; height: 24px; flex-shrink: 0;" alt="alignment">
                                             <span class="fw-bold ms-2">Alignment: <?php echo $char_align; ?></span>
                                         </div>
 
-                                        <div class="col text-center" data-bs-toggle="tooltip" data-bs-title="Current gold on-hand">
+                                        <div class="d-flex col text-center align-items-center" data-bs-toggle="tooltip" data-bs-title="Current gold on-hand">
                                             <span class="material-symbols-outlined me-2" style="font-size: 18px; width: 24px; flex-shrink: 0;">monetization_on</span>
                                             <span class="fw-bold ms-2">Gold: <?php echo $character->get_gold(); ?></span>
                                         </div>
 
-                                        <div class="col text-center" data-bs-toggle="tooltip" data-bs-title="Current dungeon floor">
+                                        <div class="d-flex align-items-center col text-center" data-bs-toggle="tooltip" data-bs-title="Current dungeon floor">
                                             <span class="material-symbols-outlined me-2" style="font-size: 18px; width: 24px; flex-shrink: 0;">stairs</span>
                                             <span class="fw-bold ms-2">Floor: <?php echo $character->get_floor(); ?></span>
                                         </div>

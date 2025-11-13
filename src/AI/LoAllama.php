@@ -2,6 +2,7 @@
 
     namespace Game\AI;
     use Game\Traits\PropSuite\PropSuite;
+    use Game\Traits\PropSuite\Enums\PropType;
     
     
     class LoAllama {

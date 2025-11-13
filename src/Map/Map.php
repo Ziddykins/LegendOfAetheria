@@ -19,4 +19,10 @@ class Map {
     public function loadZones($map_id): void {
     
     }
+
+    public function generateMap(string $map_id): void {
+        if (!$this->first_run) {
+            
+        }
+    }
 }

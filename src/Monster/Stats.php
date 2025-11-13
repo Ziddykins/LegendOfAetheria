@@ -1,7 +1,7 @@
 <?php
 namespace Game\Monster;
 use Game\Traits\PropSuite\Enums\PropType;
-use Game\Traits\PropSuite\PropSuite;
+use Game\Abstract\BaseStats;
 
 /**
  * Manages combat statistics for monster entities.
@@ -46,47 +46,12 @@ use Game\Traits\PropSuite\PropSuite;
  * @method void add_def(int $amount) Increases defense
  * @method void add_luk(int $amount) Increases luck
  */
-class Stats {
-    use PropSuite;
-
-    /** @var int Stats identifier (matches monster ID) */
-    private int $id;
-    
-    /** @var int Current health points */
-    private int $hp     = 100;
-    
-    /** @var int Maximum health points */
-    private int $maxHP  = 100;
-    
-    /** @var int Current mana points */
-    private int $mp     = 100;
-    
-    /** @var int Maximum mana points */
-    private int $maxMP  = 100;
-    
-    /** @var int Current energy points */
-    private int $ep     = 100;
-    
-    /** @var int Maximum energy points */
-    private int $maxEP  = 100;
-
-    /** @var int Strength (physical attack power) */
-    private int $str    = 10;
-    
-    /** @var int Intelligence (magic power) */
-    private int $int    = 10;
-    
-    /** @var int Defense (damage reduction) */
-    private int $def    = 10;
-    
-    /** @var int Luck (affects critical hits, drops) */
-    private int $luk    = 3;
-    
+class Stats extends BaseStats {
     /** @var float Experience points awarded when monster defeated */
-    private float $expAwarded = 0;
+    protected float $expAwarded = 0;
     
     /** @var float Gold currency awarded when monster defeated */
-    private float $goldAwarded = 0;
+    protected float $goldAwarded = 0;
 
     /**
      * Creates monster stats instance.
@@ -94,41 +59,10 @@ class Stats {
      * @param int $monsterID ID of parent monster
      */
     public function __construct($monsterID = 0) {
-        $this->id = $monsterID;
+        parent::__construct($monsterID);
     }
 
-    /**
-     * Magic method routing calls to PropSuite components.
-     * Handles get_/set_ (propSync), add_/sub_/mul_/div_ (propMod), propDump/propRestore.
-     * Uses PropType::MSTATS for database table routing.
-     * 
-     * @param string $method Method name
-     * @param array $params Method parameters
-     * @return mixed Result from PropSuite method
-     */
-    public function __call($method, $params) {
-        global $db;
-
-        if (!count($params)) {
-            $params = null;
-        }
-
-        if (preg_match('/^(add|sub|exp|mod|mul|div)_/', $method)) {
-            return $this->propMod($method, $params);
-        } elseif (preg_match('/^(propDump|propRestore)$/', $method, $matches)) {
-            $func = $matches[1];
-            return $this->$func($params[0] ?? null);
-        } else {
-            return $this->propSync($method, $params, PropType::MSTATS);
-        }
-    }
-
-    /**
-     * Serializes stats to array for JSON encoding.
-     * 
-     * @return array All stat properties as associative array
-     */
-    public function jsonSerialize(): array {
-        return get_object_vars($this);
+    protected function getType(): PropType {
+        return PropType::MSTATS;
     }
 }

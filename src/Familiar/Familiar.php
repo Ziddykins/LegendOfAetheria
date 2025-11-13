@@ -3,6 +3,7 @@ namespace Game\Familiar;
 
 use Game\Inventory\Enums\ObjectRarity;
 use Game\Traits\PropSuite\PropSuite;
+use Game\Familiar\Stats;
 
 
 /**
@@ -259,7 +260,7 @@ class Familiar {
      * @param int $rarity_roll Dice roll result to determine rarity
      * @return void
      */
-    public function generateEgg($familiar, $rarity_roll) {
+    public function generateEgg(Familiar $familiar, float $rarity_roll) {
         global $log;
         
         $rarity       = ObjectRarity::getObjectRarity($rarity_roll);

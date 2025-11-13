@@ -14,13 +14,13 @@ enum ObjectRarity: string {
      * @param float $roll Dice roll result (0.0-100.0)
      * @return string Rarity name (e.g., "LEGENDARY", "COMMON")
      */
-    public static function getObjectRarity(float $roll): string {
+    public static function getObjectRarity(float $roll): ObjectRarity {
         foreach (self::cases() as $rarity) {
             if ($roll >= $rarity->value) {
-                return $rarity->name;
+                return $rarity;
             }
         }
-        return "none";
+        return ObjectRarity::WORTHLESS;
     }
 
     /** Junk tier - rolls 50.0+ (50% chance) */

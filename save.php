@@ -53,7 +53,7 @@
                 exit();
             }
         } else {
-            $account->set_ipLock('False');
+            $account->set_ipLock(false);
             $account->set_ipLockAddr('off');
             echo "Successfully turned off IP Lock";
         }

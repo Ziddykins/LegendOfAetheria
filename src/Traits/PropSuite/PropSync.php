@@ -204,17 +204,16 @@ trait PropSync {
 
         $column_type = $db->execute_query($type_query, [ $table, $table_col ])->fetch_column();
 
-        /*if ($column_type === 'enum') {
-            if ($params[0] === 'True') {
-                $params[0] = true;
-            } else if ($params[0] === 'False') {
-                $params[0] = false;
-            } else {
+        if ($column_type === 'enum' or gettype($params[0]) == 'object') {
+            try {
                 $params[0] = $params[0]->name;
+            } catch (ValueError $e) {
+                echo $e->getMessage() .'\n';
             }
-        }*/
-
-
+        } else if ($column_type === 'set') {
+            $params[0] = $params[0]->value;
+        }
+ 
         $sql_query = "UPDATE $table SET `$table_col` = ? WHERE `id` = ?";
         $db->execute_query($sql_query, [ $params[0], $id ]);
     }
@@ -293,7 +292,7 @@ trait PropSync {
     private function handle_load($type, $params, $table) {
 		global $db;
 
-        $objects = [ 'privileges', 'bracket', 'scope', 'settings', 'privileges', 'bank', 'stats', 'inventory', 'race', 'monster', 'status' ];
+        $objects = [ 'bracket', 'scope', 'settings', 'privileges', 'bank', 'stats', 'inventory', 'race', 'monster', 'status' ];
 
         $tmp_obj = null;
         $sql_query = "SELECT * FROM $table WHERE `id` = ?";

@@ -1,17 +1,17 @@
 <?php
-namespace Game\Character;
+namespace Game\Familiar;
 use Game\Traits\PropSuite\Enums\PropType;
 use Game\Abstract\BaseStats As BaseStats;
 
 /**
- * Stats class manages character combat and attribute statistics.
+ * Stats class manages familiar combat and attribute statistics.
  * 
  * Tracks health, mana, energy, and various combat attributes.
  * Uses PropSuite trait for dynamic property management and database synchronization.
  * 
- * @package Game\Character
+ * @package Game\Familiar
  * 
- * @method int get_id() Gets the character ID
+ * @method int get_id() Gets the familiar ID
  * @method int get_hp() Gets current HP
  * @method int get_maxHP() Gets maximum HP
  * @method int get_mp() Gets current MP
@@ -89,25 +89,16 @@ class Stats extends BaseStats {
     /** @var int Ability points available for spending */
     protected int $ap = 0;
 
-    /** @var int Luck - affects drops and random events */
-    protected int $luck = 3;
-    
-    /** @var int Charisma - affects NPC interactions */
-    protected int $chsm = 3;
-    
-    /** @var int Dexterity - affects crafting and precision */
-    protected int $dext = 3;
-    
     /** @var int HP/MP regeneration rate */
     protected int $rgen = 0;
     
     /**
      * Constructs a new Stats instance.
      * 
-     * @param int $characterID Character ID these stats belong to
+     * @param int $familiarID Familiar ID these stats belong to
      */
-    public function __construct($characterID = 0) {
-        parent::__construct($characterID);
+    public function __construct($familiarID = 0) {
+        parent::__construct($familiarID);
     }
 
     /**
@@ -123,6 +114,6 @@ class Stats extends BaseStats {
      */
 
     protected function getType(): PropType {
-        return PropType::CSTATS;
+        return PropType::FSTATS;
     }
 }

@@ -53,7 +53,7 @@ use Game\Account\Enums\Privileges;
  * @method void set_failedLogins(int $count) Sets failed login attempt count
  * @method void set_ipAddress(string $ip) Sets IP address
  * @method void set_sessionID(string $session) Sets session ID
- * @method void set_ipLock(string $status) Sets IP lock status
+ * @method void set_ipLock(bool $status) Sets IP lock status
  * @method void set_ipLockAddr(string $address) Sets IP lock address
  * @method void set_banned(bool $banned) Sets account ban status
  * @method void set_muted(bool $muted) Sets account mute status

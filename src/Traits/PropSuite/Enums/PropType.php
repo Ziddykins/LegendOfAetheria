@@ -33,6 +33,7 @@
         case MSTATS;
 
         /** Familiar combat statistics (tbl_familiar) */
+        case FSTATS;
         
         /** Banking system data (tbl_bank) */
         case BANKMANAGER;

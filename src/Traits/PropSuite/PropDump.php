@@ -4,6 +4,12 @@ namespace Game\Traits\PropSuite;
 use ReflectionClass;
 use ReflectionProperty;
 use ReflectionException;
+use ReflectionType;
+use ReflectionNamedType;
+use ReflectionUnionType;
+use ReflectionIntersectionType;
+
+
 
 /**
  * Provides deep serialization and deserialization for game objects.
@@ -28,7 +34,8 @@ trait PropDump {
      * @return string JSON representation with type metadata
      */
     private function propDump(): string {
-        return json_encode($this->dumpObject($this));
+        $visited = [];
+        return json_encode($this->dumpObject($this, $visited));
     }
 
     /**
@@ -53,11 +60,55 @@ trait PropDump {
      * @param object $obj Object to dump
      * @return array Associative array with __class and properties keys
      */
-    private function dumpObject(object $obj): array {
+    /**
+     * Normalize a ReflectionType into a string representation.
+     */
+    private function getReflectionTypeName(?ReflectionType $type): string {
+        if (!$type) {
+            return 'mixed';
+        }
+
+        if ($type instanceof ReflectionNamedType) {
+            return $type->getName();
+        }
+
+        if ($type instanceof ReflectionUnionType || $type instanceof ReflectionIntersectionType) {
+            $names = [];
+            foreach ($type->getTypes() as $t) {
+                if ($t instanceof ReflectionNamedType) {
+                    $names[] = $t->getName();
+                } else {
+                    $names[] = (string)$t;
+                }
+            }
+            return implode('|', $names);
+        }
+
+        return (string)$type;
+    }
+
+    /**
+     * Internal recursive method to dump an object tree.
+     * Handles circular references via the $visited map.
+     *
+     * @param object $obj Object to dump
+     * @param array<string,int> $visited Map of spl_object_hash => ref id
+     * @return array Associative array with __class and properties keys
+     */
+    private function dumpObject(object $obj, array &$visited = []): array {
         global $log;
+        $objId = spl_object_hash($obj);
+        if (isset($visited[$objId])) {
+            return ['__ref' => $visited[$objId]];
+        }
+
+        $refId = count($visited) + 1;
+        $visited[$objId] = $refId;
+
         $reflection = new ReflectionClass($obj);
         $data = [
             '__class' => $reflection->getName(),
+            '__id' => $refId,
             'properties' => []
         ];
 
@@ -80,10 +131,10 @@ trait PropDump {
             try {
                 $value = $prop->getValue($obj);
                 $type = $prop->getType();
-                
+
                 $propertyData = [
                     'name' => $name,
-                    'type' => $type ? $type->getName() : 'mixed',
+                    'type' => $this->getReflectionTypeName($type),
                     'value' => null
                 ];
 
@@ -92,11 +143,13 @@ trait PropDump {
                         // Handle nested objects
                         if ($value instanceof \UnitEnum) {
                             $propertyData['value'] = [
-                            'name' => $value->name,
-                            'value' => property_exists($value, 'value') ? $value->value : null
+                                'enum' => true,
+                                'name' => $value->name,
+                                'backed' => ($value instanceof \BackedEnum),
+                                'value' => ($value instanceof \BackedEnum) ? $value->value : null
                             ];
                         } else {
-                            $propertyData['value'] = $this->dumpObject($value);
+                            $propertyData['value'] = $this->dumpObject($value, $visited);
                         }
                     } else {
                         $propertyData['value'] = $value;
@@ -115,9 +168,22 @@ trait PropDump {
     /**
      * Internal method to recursively restore an object from dumped data
      */
-    private function restoreObject(array $data): object|null {
+    /**
+     * Internal method to recursively restore an object from dumped data
+     * Supports reference resolution via $refs map
+     *
+     * @param array $data
+     * @param array<int,object> $refs
+     * @return object|null
+     */
+    private function restoreObject(array $data, array &$refs = []): object|null {
         if (!$data) {
             return null;
+        }
+
+        if (isset($data['__ref'])) {
+            $refId = $data['__ref'];
+            return $refs[$refId] ?? null;
         }
 
         $className = $data['__class'];
@@ -130,26 +196,70 @@ trait PropDump {
         $reflection = new ReflectionClass($className);
         $instance   = $reflection->newInstanceWithoutConstructor();
 
+        $refId = $data['__id'] ?? null;
+        if ($refId !== null) {
+            $refs[$refId] = $instance;
+        }
+
         foreach ($data['properties'] as $name => $propertyData) {
             try {
+                if (!$reflection->hasProperty($name)) {
+                    continue;
+                }
+
                 $property = $reflection->getProperty($name);
                 $property->setAccessible(true);
 
                 $value = $propertyData['value'];
+
+                // Nested object or reference
                 if (is_array($value) && isset($value['__class'])) {
-                    // Restore nested object
-                    $value = $this->restoreObject($value);
-                } elseif (is_array($value) && isset($value['name'])) {
-                    $propertyType = $property->getType();
-                    if ($propertyType && enum_exists($propertyType->getName())) {
-                        // Restore enum using the actual enum class from property type
-                        $enumClass = $propertyType->getName();
-                        $value = constant("$enumClass::{$value['name']}");
+                    $nested = $this->restoreObject($value, $refs);
+                    $property->setValue($instance, $nested);
+                    continue;
+                }
+
+                if (is_array($value) && isset($value['__ref'])) {
+                    $nested = $this->restoreObject($value, $refs);
+                    $property->setValue($instance, $nested);
+                    continue;
+                }
+
+                // Enum handling
+                if (is_array($value) && isset($value['enum']) && $value['enum'] === true) {
+                    $typeName = $propertyData['type'] ?? null;
+                    if ($typeName && enum_exists($typeName)) {
+                        $enumClass = $typeName;
+                        if (!empty($value['backed'])) {
+                            // backed enum: restore from scalar value
+                            $property->setValue($instance, $enumClass::from($value['value']));
+                        } else {
+                            // unit enum: restore by case name
+                            $property->setValue($instance, $enumClass::{$value['name']});
+                        }
+                        continue;
                     }
                 }
 
+                // Primitive or array
                 $property->setValue($instance, $value);
             } catch (ReflectionException $e) {
+                // Reflection failures are non-fatal for restore; log and continue
+                if (isset($GLOBALS['log'])) {
+                    $GLOBALS['log']->error("PropRestore: Reflection error on $name - " . $e->getMessage());
+                }
+                continue;
+            } catch (\TypeError $e) {
+                // Typed property mismatch - log and continue
+                if (isset($GLOBALS['log'])) {
+                    $GLOBALS['log']->error("PropRestore: TypeError setting $name on $className - " . $e->getMessage());
+                }
+                continue;
+            } catch (\Throwable $e) {
+                // Any other error - log and continue
+                if (isset($GLOBALS['log'])) {
+                    $GLOBALS['log']->error("PropRestore: Unexpected error on $name - " . $e->getMessage());
+                }
                 continue;
             }
         }
