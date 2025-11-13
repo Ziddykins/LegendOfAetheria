@@ -47,7 +47,7 @@ ssl_fullcer=/etc/ssl/certs/ssl-cert-snakeoil.pem
 ssl_privkey=/etc/ssl/private/ssl-cert-snakeoil.key
 step=1
 
-[win_examples]
+[xampp_examples]
 web_root=C:\xampp\htdocs
 php_binary=C:\xampp\php\php.exe
 sql_config_file=C:\xampp\mysql\bin\my.ini
@@ -57,6 +57,17 @@ ssl_fullcer=C:\xampp\apache\conf\ssl.crt\server.crt
 ssl_privkey=C:\xampp\apache\conf\ssl.key\server.key
 hosts_file=C:\windows\system32\drivers\etc\hosts
 php_ini=C:\xampp\php\php.ini
+step=1
+
+[win_examples]
+web_root=C:\Program Files\Apache Software Foundation\Apache2.4\htdocs
+php_binary=C:\xampp\php\php.exe
+sql_config_file=C:\xampp\mysql\bin\my.ini
+apache_directory=C:\Program Files\Apache Software Foundation\Apache2.4\
+virthost_conf_file=C:\Program Files\Apache Software Foundation\Apache2.4\conf\httpd.conf
+ssl_fullcer=C:\xampp\apache\conf\ssl.crt\server.crt
+ssl_privkey=C:\xampp\apache\conf\ssl.key\server.key
+hosts_file=C:\windows\system32\drivers\etc\hosts
 step=1
 
 [sql_tables]
@@ -72,6 +83,7 @@ tbl_logs=tbl_logs
 tbl_banned=tbl_banned
 tbl_globalchat=tbl_globalchat
 tbl_statistics=tbl_statistics
+tbl_bank=tbl_bank
 
 [colors]
 red=[31m

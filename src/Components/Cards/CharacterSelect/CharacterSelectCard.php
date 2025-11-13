@@ -1,15 +1,37 @@
 <?php
 namespace Game\Components\Cards\CharacterSelect;
+use Game\Character\Stats;
 
+/**
+ * Renders a Bootstrap card component for character selection screen.
+ * Displays character information (avatar, name, level, race, stats) for existing characters,
+ * or an empty slot card with "New Character" button for unused slots.
+ */
 class CharacterSelectCard {
+    /** @var int|null Character ID if slot is occupied, null if empty */
     private $characterID;
+    
+    /** @var int Slot number (1-3) for this character selection card */
     private $slot;
 
+    /**
+     * Creates a character selection card.
+     * 
+     * @param int|null $characterID Character ID or null for empty slot
+     * @param int $slot Slot number (1-3)
+     */
     public function __construct($characterID, $slot) {
         $this->characterID = $characterID;
         $this->slot = $slot;
     }
 
+    /**
+     * Renders the character select card HTML.
+     * For existing characters: shows avatar, stats, Load/Delete buttons.
+     * For empty slots: shows placeholder avatar, zero stats, New Character button.
+     * 
+     * @return string Bootstrap card HTML markup
+     */
     public function render(): string {
         global $db, $log, $t;
         $cardHtml = null;
@@ -17,9 +39,10 @@ class CharacterSelectCard {
         if ($this->characterID) {
             $sqlQuery = "SELECT `name`, `avatar`, `race`, `stats`, `level` FROM {$t['characters']} WHERE `id` = ?";
             $character = $db->execute_query($sqlQuery, [ $this->characterID ])->fetch_assoc();
-            $stats = safe_serialize($character['stats'], true);
+            $stats = new Stats($this->characterID);
+            $stats->propRestore($character['stats']);
 
-            $cardHtml = '<div class="card text-center me-3 ms-1" data-loa-slot="' . $this->slot . '">
+            $cardHtml = '<div class="card text-center me-3" data-loa-slot="' . $this->slot . '" style="width: 15rem;">
                     <span class="small text-bg-dark bg-gradient float-right">Slot ' . $this->slot . '</span>
                     <div class="card-header">
                     <img src="img/avatars/' . $character['avatar'] . '" class="rounded-circle" width="100" height="100" />

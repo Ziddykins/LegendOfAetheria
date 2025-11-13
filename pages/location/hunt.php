@@ -36,12 +36,9 @@
     if (isset($_POST['flee-monster']) && $_POST['flee-monster'] == 1) {
         check_csrf($_POST['csrf-token']);
         if ($mon_loaded) {
-            $character->set_monster(null);
+            $character->set_monster(monster: null);
         }
     }
-
-
-
     if ($mon_loaded) {
         $mon_name  = $monster->get_name();
         $mon_hp    = $monster->stats->get_hp();
@@ -198,8 +195,6 @@
             </div>
         </div>
     </div>
-
-
     <div class="container-fluid border border-1 mb-1 overflow-hidden" style="max-height: 65.0vh!important; height: 65.0vh;">
         <div class="d-flex" style="height: 65.0vh;">
             <div id="battle-log" name="battle-log" class="lh-1 flex-fill flex-row-reverse h-100">

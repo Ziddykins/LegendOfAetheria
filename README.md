@@ -39,12 +39,11 @@ web-accessible browser game (provided your A/CNAME records are set up of course!
 The script must be ran as root, so again, be aware of what is going on if you are installing this
 on a machine with existing services (PHP configs, SQL configs, Apache, etc).
 
-### CPAN dependencies
-
+### CPAN dependencies, Sury repos
 ```sh
-yes | sudo cpan Config::IniFiles
-yes | sudo cpan Term::ReadKey
-```9
+chmod +x install/scripts/bootstrap.sh
+./install/scripts/bootstrap.sh
+```
 
 ```sh
 cd install
@@ -58,34 +57,21 @@ sudo ./AutoInstaller.pl
 
 | Step             | Explanation/Manual Setup           |
 | ---------------: | :----------------------------------:   
-| Software         | [Jump To Software](Software)       |
-| Templates        | [Jump To Templates](Templates)     |
-| Apache           | [Jump To Apache](Apache)           |
-| Certificates/SSL | [Jump To SSL](SSL)                 |
-| PHP Config       | [Jump To PHP](PHP)                 | 
-| Composer         | [Jump To Composer](Composer)       |
-| System Services  | [Jump To Composer](Composer)       |
-| Permissions      | [Jump To Permissions](Permissions) |
-| CRON Jobs        | [Jump To CRONJobs](CRONJobs)       |
-| OpenAI           | [Jump To OpenAI](OpenAI)           |
-| Clean-Up         | [Jump To CleanUp](CleanUp)         |
+| Software         | [Jump To Software](#Software)       |
+| Templates        | [Jump To Templates](#Templates)     |
+| Apache           | [Jump To Apache](#Apache)           |
+| Certificates/SSL | [Jump To SSL](#SSL)                 |
+| PHP Config       | [Jump To PHP](#PHP)                 | 
+| Composer         | [Jump To Composer](#Composer)       |
+| System Services  | [Jump To Services](#Services)       |
+| Permissions      | [Jump To Permissions](#Permissions) |
+| CRON Jobs        | [Jump To CRONJobs](#CRONJobs)       |
+| OpenAI           | [Jump To OpenAI](#OpenAI)           |
+| Clean-Up         | [Jump To CleanUp](#CleanUp)         |
  
 ## Software
 
-LoA requires a bunch of packages, which can be installed with the commands below. You'll also need the Sury repository (https://deb.sury.org/).
-
-#### Sury
-```bash
-apt-get update
-
-apt-get -y install lsb-release ca-certificates curl
-
-curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
-
-sh -c 'echo "deb [trusted=yes signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
-
-apt-get update
-```
+LoA requires a bunch of packages, which can be installed with the commands below. You'll also need the Sury repository, for Debian/Ubuntu.
 
 ```bash
 apt update && apt upgrade -y
@@ -93,14 +79,14 @@ apt update && apt upgrade -y
 apt install -y php8.4 php8.4-cli php8.4-common php8.4-curl php8.4-dev php8.4-fpm php8.4-mysql mariadb-server apache2 libapache2-mod-php8.4 composer letsencrypt python-is-python3 python3-certbot-apache
 ```
 
-
 ### Templates
 
-LoA comes packaged with a bunch of template files, which get their values from the AutoInstaller script. Make sure the template values are all filled in, and suit your system and software. The entire SQL schema will be generated and imported. A random password is chosen for the SQL user, 16 characters long. If you're setting this up manually, I've included a --flag for the utoInstaller which will only process templates, which will make your life a lot easier, especially for importing SQL schema.
+LoA comes packaged with a bunch of template files, which get their values from the AutoInstaller script. Make sure the template values are all filled in, and suit your system and software. The entire SQL schema will be generated and imported. A random password is chosen for the SQL user, 16 characters long. If you're setting this up manually, I've included a --flag for the AutoInstaller which will only process templates, which will make your life a lot easier, especially for importing SQL schema.
 
 ```sh
-sudo perl AutoInstaller.pl --templates
+sudo perl AutoInstaller.pl --step TEMPLATES --only ---fqdn fqdn.right.here
 ```
+
 ### Apache
 
 Virtual Hosts, for non-SSL:
@@ -196,6 +182,7 @@ Here are working examples:
     </VirtualHost>
 </IfModule>
 ```
+**Make sure the certificate paths match up for certificates generated from [the SSL step](#SSL)**
 
 Once those are setup:
 
@@ -224,15 +211,31 @@ a2enmod php8.4 headers http2 ssl
 > RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
 > ```
 
+## SSL
 Then go ahead and get your certificate:
 ```bash
-certbot -d <fqdn>
+certbot -d <fqdn> --apache
+```
+The certificate should be activated and downloaded after that.
+
+**If you need to use a self signed certificate:**
+
+```bash
+openssl req -x509 -nodes -days 365 \
+-newkey rsa:2048 \
+-keyout /etc/ssl/private/loa.key \
+-out /etc/ssl/certs/loa.crt \
+-subj '/CN=fqdn.loa.local/O=fqdn.loa.local/C=US' \
+-batch
 ```
 
-The certificate should be activated and downloaded after that
+Replace the 'fqdn.loa.local' with your local fqdn, and update your `/etc/hosts` file to reflect the cert:
+
+`127.0.1.1    fqdn.loa.local`
+
+or similar.
 
 ### PHP
-
 The main PHP section is mostly updating some of your php.ini variables
 Locate the below variables and make the appropriate replacements:
 
@@ -259,7 +262,6 @@ session.cache_expire = 30
 > Don't forget to change the session.cookie_domain to your own information
 
 ### Composer
-
 Open a terminal and navigate to your webroot, then just issue 
 
 ```sh
@@ -268,23 +270,43 @@ sudo -u www-data composer --working-dir <GAME_WEB_ROOT> install
 
 replace install with update if you're updating the software.
 
-### Templates
+## Templates
+### Generation
 
-    ## Generation
+To generate the templates/schema required to make the game work, you'll need to use the autoinstaller.
 
-        To generate the templates/schema required to make the game work, you'll need to use the autoinstaller.
+```sh
+sudo perl install/AutoInstaller.pl --step TEMPLATES --fqdn fqdn.right.here --only
+```
 
-        `perl install/AutoInstaller.pl --step TEMPLATES --fqdn
+You'll be left with a file called `sql.template.ready` in `install/templates` which you can import right i to your database with:
+
+```bash
+mysql DATABASE -u USERNAME -p'PASSWORD' < install/templates/sql.template.ready
+```
+Replace variables accordingly.
+
 ### CRONJobs
+Many game functions are executed on regular intervals, and to achieve this we use cron.php coupled with scheduled tasks, or cronjobs.
+
+If you havent generated templates with the AutoInstaller, replace the values in `install/templates/cron.template` to reflect your setup, then run the command below.
+
+Any existing cronjobs will be retained.
+
+#### Linux
+```bash
+(sudo -u www-data crontab -l; \
+cat install/templates/cron.template.ready; \
+echo;) | sudo -u www-data crontab -
+```
 
 ### Credits
 
-    [Bootstrap 5.3](https://github.com/twbs)
-    [AdminLTE4](https://github.com/ColorlibHQ/AdminLTE)
-    [Tabulator](https://tabulator.info)
+[Bootstrap 5.3](https://github.com/twbs)
 
+[AdminLTE4](https://github.com/ColorlibHQ/AdminLTE)
 
-
+[Tabulator](https://tabulator.info)
 
 
 

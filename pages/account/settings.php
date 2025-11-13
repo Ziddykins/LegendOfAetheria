@@ -1,7 +1,7 @@
 <?php
     extract([
-        'ip_lock_checked' => $account->get_ipLock() === 'True' ? 'checked' : '',
-        'ip_hidden' => $account->get_ipLock() === 'True' ? '' : 'invisible'
+        'ip_lock_checked' => $account->get_ipLock() === true ? 'checked' : '',
+        'ip_hidden' => $account->get_ipLock() === true ? '' : 'invisible'
     ]);
 ?>
 

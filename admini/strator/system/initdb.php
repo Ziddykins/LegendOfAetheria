@@ -1,21 +1,18 @@
 <?php
 declare(strict_types = 1);
-
 require_once '../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable('../');
 $dotenv->safeLoad();
-
-require_once 'constants.php';
-require_once 'db.php';
+;
+require_once SYSTEM_DIRECTORY . '/db.php';
+require_once SYSTEM_DIRECTORY . '/logger.php';
 require_once 'functions.php';
-require_once 'logger.php';
 
 if (!isset($argv)) {
     $log->warning('Access to cron.php directly is not allowed!', ['POST' => print_r($_POST, true)]);
     echo 'Access to initdb.php directly is not allowed!';
     exit;
 }
-
 $create_users = 'CREATE TABLE IF NOT EXISTS `tbl_users` (
                     `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `company_id` INT(10) UNSIGNED NULL DEFAULT NULL,
@@ -41,7 +38,6 @@ $create_users = 'CREATE TABLE IF NOT EXISTS `tbl_users` (
                 )
                 COLLATE="utf8mb4_general_ci"
                 ENGINE=InnoDB;';
-
 $create_company = 'CREATE TABLE `tbl_companies` (
                     `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
                     `account_id` INT NULL,
@@ -57,7 +53,6 @@ $create_company = 'CREATE TABLE `tbl_companies` (
                 )
                 COLLATE="utf8mb4_general_ci"
                 ENGINE=InnoDB';
-
 $create_whitelabel = 'CREATE TABLE `tbl_whitelabel` (
                         `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
                         `account_id` INT UNSIGNED NULL,
@@ -69,7 +64,6 @@ $create_whitelabel = 'CREATE TABLE `tbl_whitelabel` (
                     )
                     COLLATE="utf8mb4_general_ci"
                     ENGINE=InnoDB;';
-
 $db->execute_query($create_company);
 echo 'done';
 $db->execute_query($create_users);

@@ -1104,7 +1104,7 @@
                     }
                 }
             },
-            "PropManager": {
+            "PropSuite": {
                 "type": "object",
                 "description": "Trait system for managing dynamic properties with database synchronization.",
                 "properties": {

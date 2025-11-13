@@ -2,27 +2,83 @@
 namespace Game\Familiar;
 
 use Game\Inventory\Enums\ObjectRarity;
-use Game\Traits\PropManager\PropManager;
+use Game\Traits\PropSuite\PropSuite;
+use Game\Familiar\Stats;
 
-require_once "bootstrap.php";
 
+/**
+ * Represents a character's companion familiar creature with stats, leveling, and egg mechanics.
+ * Familiars are acquired as eggs, hatch after a time period, and provide combat assistance.
+ * Uses PropSuite for database synchronization and custom __call() for dynamic get_/set_ methods.
+ * 
+ * @method int get_id() Gets familiar ID
+ * @method int get_characterID() Gets owning character ID
+ * @method int get_level() Gets familiar level
+ * @method int get_experience() Gets current experience points
+ * @method int get_nextLevel() Gets experience needed for next level
+ * @method string get_name() Gets familiar's name
+ * @method string get_avatar() Gets familiar avatar image path
+ * @method Stats get_stats() Gets familiar combat stats
+ * 
+ * @method void set_id(int $id) Sets familiar ID
+ * @method void set_characterID(int $characterID) Sets owning character ID
+ * @method void set_level(int $level) Sets familiar level
+ * @method void set_experience(int $experience) Sets experience points
+ * @method void set_nextLevel(int $nextLevel) Sets experience threshold
+ * @method void set_name(string $name) Sets familiar's name
+ * @method void set_avatar(string $avatar) Sets avatar image path
+ * @method void set_stats(Stats $stats) Sets combat stats
+ * @method void set_rarityColor(string $color) Sets egg rarity color
+ * @method void set_rarity(ObjectRarity $rarity) Sets egg rarity
+ * @method void set_lastRoll(int $roll) Sets last rarity dice roll
+ * @method void set_dateAcquired(string $datetime) Sets acquisition timestamp
+ * @method void set_hatchTime(string $datetime) Sets when egg will hatch
+ * @method void set_eggsOwned(int $count) Sets total eggs owned
+ * @method void set_eggsSeen(int $count) Sets total eggs encountered
+ */
 class Familiar {
-    use PropManager;
+    use PropSuite;
 
-    private int $id;
-    private int $characterID;
-    private int $level;
-    private int $experience;
-    private int $nextLevel;
-    private string $name;
-    private $avatar;
+    /** @var int|null Unique familiar identifier */
+    private ?int $id = null;
+    
+    /** @var int|null ID of character who owns this familiar */
+    private ?int $characterID = null;
+    
+    /** @var int Current level of the familiar */
+    private int $level = 1;
+    
+    /** @var int Current experience points earned */
+    private int $experience = 0;
+    
+    /** @var int Experience points needed to reach next level */
+    private int $nextLevel = 100;
+    
+    /** @var string|null Display name of the familiar */
+    private ?string $name = null;
+    
+    /** @var mixed Avatar image file path */
+    private $avatar = null;
    
-    private $stats;
+    /** @var Stats|null Combat statistics for the familiar */
+    private ?Stats $stats = null;
 
+    /**
+     * Creates a new familiar instance.
+     * 
+     * @param int $characterID Character who owns this familiar
+     * @param string $table Database table name (legacy parameter)
+     */
     public function __construct($characterID, $table) {
         $this->characterID = $characterID;
     }
 
+    /**
+     * Registers a new familiar in the database with default values.
+     * Creates database entry, retrieves generated ID, sets initial properties, and saves.
+     * 
+     * @return void
+     */
     public function registerFamiliar() {
         global $db, $t;
         $sqlQuery = "INSERT INTO {$t['characters']} (`character_id`) VALUES (?)";
@@ -43,6 +99,12 @@ class Familiar {
         $this->saveFamiliar(); 
     }
 
+    /**
+     * Persists familiar state to database.
+     * Updates all properties using snake_case column names converted from camelCase properties.
+     * 
+     * @return void
+     */
     public function saveFamiliar() {
         global $db;
 
@@ -74,6 +136,13 @@ class Familiar {
 
     }
 
+    /**
+     * Generates HTML card for familiar display.
+     * Returns 'empty' card for no familiar, or 'current' card showing familiar/egg status.
+     * 
+     * @param string $which Card type: 'empty' or 'current'
+     * @return string|null HTML markup for familiar card
+     */
     public function getCard($which = 'current') {
         if ($which === 'empty') {
             $html = file_get_contents(
@@ -97,6 +166,14 @@ class Familiar {
         }
     }
 
+    /**
+     * Loads familiar data from database by character ID.
+     * If no familiar exists, automatically registers a new one.
+     * Converts database columns (snake_case) to object properties (camelCase).
+     * 
+     * @param int $characterID Character whose familiar to load
+     * @return void
+     */
     public function loadFamiliar($characterID) {
         global $db, $log, $t;
 
@@ -123,6 +200,13 @@ class Familiar {
         }
     }
 
+    /**
+     * Maps ObjectRarity enum to hex color code for visual representation.
+     * Used to colorize familiar eggs based on their rarity level.
+     * 
+     * @param ObjectRarity $rarity Rarity level enum
+     * @return string Hex color code (e.g., "#FF2501" for GODLY)
+     */
     public function getRarityColor($rarity) {
         $color = null;
         
@@ -168,7 +252,15 @@ class Familiar {
         return $color;
     }
 
-    public function generateEgg($familiar, $rarity_roll) {
+    /**
+     * Generates a new familiar egg with random rarity and hatch timer.
+     * Sets level to 1, calculates rarity from dice roll, assigns color, sets hatch time (+8 hours).
+     * 
+     * @param Familiar $familiar Familiar object to configure as egg
+     * @param int $rarity_roll Dice roll result to determine rarity
+     * @return void
+     */
+    public function generateEgg(Familiar $familiar, float $rarity_roll) {
         global $log;
         
         $rarity       = ObjectRarity::getObjectRarity($rarity_roll);

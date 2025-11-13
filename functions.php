@@ -2,10 +2,10 @@
 
     require_once 'bootstrap.php';
     use Game\Components\Modals\Enums\ModalButtonType;
-    use Game\LoASys\Enums\AbuseType;
+    use Game\System\Enums\AbuseType;
     use Game\Character\Enums\FriendStatus;
     use Game\Character\Enums\Races;
-    use Game\LoASys\Enums\LOAError;
+    use Game\System\Enums\LOAError;
 
 
 
@@ -17,9 +17,7 @@
          * @param string $modifier A string modifier for datetime calculation (e.g., '+1 day'). Defaults to 'now'.
          * @return string The formatted MySQL datetime string.
          */
-        function get_mysql_datetime($modifier = 'now') {
-            global $log;
-
+        function get_mysql_datetime($modifier = 'now'): string {
             if ($modifier !== 'now') {
                 $operand  = substr($modifier, 0, 1);
                 $amount   = substr($modifier, 1);
@@ -54,13 +52,13 @@
          * @param string $which The name of the global configuration to retrieve.
          * @return string|null The value of the global configuration, or null if not found.
          */
-        function get_globals($which) {
+        function get_globals(string $which): ?string {
             global $db, $t;
-            $ret_val = '';
-            $sql_query = "SELECT `value` FROM {$t['globals']} WHERE `name` = '$which'";
-            $result = $db->query($sql_query);
-            $row = $result->fetch_assoc();
-
+            $sql_query = "SELECT `value` FROM {$t['globals']} WHERE `name` = ?";
+            $result = $db->execute_query($sql_query, [$which]);
+            if (!$result || !($row = $result->fetch_assoc())) {
+                return null;
+            }
             return $row['value'];
         }
 
@@ -76,8 +74,8 @@
         function set_globals($name, $value) {
             global $db, $t;
 
-            $sql_query = "UPDATE {$t['globals']} SET `value` = '$value' WHERE `name` = '$name'";
-            $db->query($sql_query);
+            $sql_query = "UPDATE {$t['globals']} SET `value` = ? WHERE `name` = ?";
+            $db->execute_query($sql_query, [ $value, $name ]);
         }
 
         /**
@@ -102,17 +100,19 @@
          * @param string $what The type of email to check. Only 'unread' is supported.
          * @return int|LOAError|string The count of unread emails or an error if the directive is unsupported.
          */
-        function check_mail($what): int|LOAError|string {
-            global $db, $log, $t;
-
-            switch ($what) {
-                case 'unread':
-                    $sql_query = "SELECT * FROM {$t['mail']} WHERE NOT FIND_IN_SET('READ', `status`) AND `r_aid` = ?";
-                    $result = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->num_rows;
-                    return $result;
-                default:
-                    return LOAError::MAIL_UNKNOWN_DIRECTIVE;
+        function check_mail(string $what): int {
+            global $db, $t;
+    
+            if ($what === 'unread') {
+                $sql_query = "SELECT COUNT(*) as count FROM {$t['mail']} WHERE NOT FIND_IN_SET('READ', `status`) AND `r_aid` = ?";
+                $result = $db->execute_query($sql_query, [$_SESSION['account-id']]);
+                if (!$result) {
+                    return 0;
+                }
+                $row = $result->fetch_assoc();
+                return (int)($row['count'] ?? 0);
             }
+            return 0;
         }
 
         /**
@@ -123,7 +123,7 @@
          * @param int $character_id The ID of the character to check the friendship status with.
          * @return Game\Character\Enums\FriendStatus The friendship status or an error if determination fails.
          */
-        function status(int $character_id): FriendStatus {
+        function friend_status(int $character_id): FriendStatus {
             global $db, $log, $t;
 
             $status    = FriendStatus::NONE;
@@ -153,7 +153,7 @@
         function accept_friend_req($sender):bool {
             global $db, $log, $t;
 
-            if (status($sender) === FriendStatus::REQUEST_RECV) {
+            if (friend_status($sender) === FriendStatus::REQUEST_RECV) {
                 $sql_query = "UPDATE {$t['friends']} SET `status` = ? WHERE `recipient_id` = ?";
                 $db->execute_query($sql_query, [ FriendStatus::MUTUAL->value, $_SESSION['character-id'] ]);
                 $log->info('Friend request accepted', [ 'sender' => $sender, 'recipient' => $_SESSION['character-id'] ]);
@@ -172,48 +172,47 @@
          * @param bool $return_list Whether to return a list of character IDs (default: false).
          * @return array An array containing friendship statuses and optionally character IDs.
          */
-        function get_friend_counts(?FriendStatus $status, bool $return_list=false): array {
+        function get_friend_counts(?FriendStatus $status, bool $return_list = false): array {
             global $db, $character, $t;
-            $count = 0;
-            $ids = [];
+            $statuses = [];
 
-            $sql_query = <<<SQL
-                SELECT 
-                    `friend_status`,
-                    COUNT(`friend_status`) AS `count`
-                FROM {$t['friends']}
-                WHERE
-                    recipient_id = ? OR
-                    sender_id = ?
-                GROUP BY `friend_status`
-            SQL;
+            $sql_query = "SELECT `friend_status`, COUNT(*) AS `count` FROM {$t['friends']} 
+                          WHERE recipient_id = ? OR sender_id = ? 
+                          GROUP BY `friend_status`";
+            
+            $result = $db->execute_query($sql_query, [$character->get_id(), $character->get_id()]);
+            
+            if ($result) {
+                while ($row = $result->fetch_assoc()) {
+                    $statuses[$row['friend_status']] = (int)$row['count'];
+                }
+            }
 
-            $statuses = $db->execute_query($sql_query, 
-                [ $character->get_id(), $character->get_id()
-            ])->fetch_all(MYSQLI_ASSOC);
-
-            $statuses['MUTUAL'] ?? 0;
-            $statuses['REQUEST_RECV'] ?? 0;
-            $statuses['REQUEST_SENT'] ?? 0;
-            $statuses['BLOCKED'] ?? 0;
+            // Set default values for missing statuses
+            $statuses['MUTUAL'] = $statuses['MUTUAL'] ?? 0;
+            $statuses['REQUEST_RECV'] = $statuses['REQUEST_RECV'] ?? 0;
+            $statuses['REQUEST_SENT'] = $statuses['REQUEST_SENT'] ?? 0;
+            $statuses['BLOCKED'] = $statuses['BLOCKED'] ?? 0;
 
             if ($return_list) {
-                $status_clause = null;
-                if ($status !== null) {
-                    $status_clause = " AND `friend_status` = '" . $status->name . "'";
+                $ids = [];
+                $status_clause = $status !== null ? " AND `friend_status` = '" . $status->name . "'" : '';
+                
+                $sql_query = "SELECT DISTINCT IF(`recipient_id` = ?, `sender_id`, `recipient_id`) AS `character_id` 
+                              FROM {$t['friends']} 
+                              WHERE `recipient_id` = ? OR `sender_id` = ? $status_clause";
+                
+                $result = $db->execute_query($sql_query, [$character->get_id(), $character->get_id(), $character->get_id()]);
+                if ($result) {
+                    while ($row = $result->fetch_assoc()) {
+                        $ids[] = $row;
+                    }
                 }
-
-                $sql_query = <<<SQL
-                    SELECT DISTINCT
-                        IF(`recipient_id` = ?, `sender_id`, `recipient_id`) AS `character_id`
-                    FROM {$t['friends']}
-                    WHERE `recipient_id` = ? OR `sender_id` = ? $status_clause
-                SQL;
-                $ids = $db->execute_query($sql_query, [$character->get_id(), $character->get_id(), $character->get_id()])->fetch_all(MYSQLI_ASSOC);
-                $data = [];
-                $data['statuses'] = $statuses;
-                $data['ids'] = $ids;
-                return $data;
+                
+                return [
+                    'statuses' => $statuses,
+                    'ids' => $ids
+                ];
             }
             
             return $statuses;
@@ -268,43 +267,35 @@
          *
          * Performs abuse detection by querying logs for suspicious activity.
          *
-         * @param Game\LoASys\Enums\AbuseType $type The type of abuse to check for.
+         * @param Game\System\Enums\AbuseType $type The type of abuse to check for.
          * @param int $account_id The account ID to check abuse for.
          * @param string $ip The IP address to check abuse for.
          * @param int $threshold The threshold for abuse detection (default: 1).
          * @return bool True if abuse is detected, false otherwise.
          */
-        function check_abuse(AbuseType $type, $account_id, $ip, $threshold = 1): bool {
-            global $db, $log, $t;
+        function check_abuse(AbuseType $type, int $account_id, string $ip, int $threshold = 1): bool {
+            global $db, $t;
 
             switch ($type) {
                 case AbuseType::MULTISIGNUP:
-                    $sql_query = <<<SQL
-                                    SELECT `id` FROM {$t['logs']}
-                                    WHERE `type` = ?
-                                        AND `ip` = ?
-                                        AND `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()
-                                SQL;
-                    $count = $db->execute_query($sql_query, [ $type->name, $ip ])->num_rows;
-
-                    if ($count > $threshold) {
-                        return true;
+                    $sql_query = "SELECT COUNT(*) as count FROM {$t['logs']} 
+                                 WHERE `type` = ? AND `ip` = ? 
+                                 AND `date` BETWEEN (NOW() - INTERVAL 1 HOUR) AND NOW()";
+                    $result = $db->execute_query($sql_query, [$type->name, $ip]);
+                    if (!$result) {
+                        return false;
                     }
+                    $row = $result->fetch_assoc();
+                    return ((int)$row['count']) > $threshold;
 
-                    return false;
                 case AbuseType::TAMPERING:
-                    $sql_query = <<<SQL
-                        SELECT `id` FROM {$t['logs']}
-                        WHERE `type` = ? AND `ip` = ?
-                    SQL;
-                    $count = $db->execute_query($sql_query, [ $type->name, $ip ])->num_rows;
-
-                    if ($count > $threshold) {
-                        return true;
+                    $sql_query = "SELECT COUNT(*) as count FROM {$t['logs']} WHERE `type` = ? AND `ip` = ?";
+                    $result = $db->execute_query($sql_query, [$type->name, $ip]);
+                    if (!$result) {
+                        return false;
                     }
-                    return false;
-                default:
-                    $log->error("No type specified for abuse lookup");
+                    $row = $result->fetch_assoc();
+                    return ((int)$row['count']) > $threshold;
             }
 
             return false;
@@ -375,10 +366,18 @@
          * @param string $table The name of the table to retrieve the next ID for.
          * @return int The next available ID.
          */
-        function getNextTableID($table): int {
-            global $db, $t;
+        function getNextTableID($table): int|LOAError {
+            global $db, $t, $log;
+
+            if (!is_valid_table($table)) {
+                $log->error("Unknown table '$table' passed to " . __FUNCTION__);
+                return LOAError::SQLDB_UNKNOWN_TABLE;
+            }
+            
             $sql_query = "SELECT IF(MAX(`id`) IS NULL, 1, MAX(`id`)+1) AS `next_id` FROM $table";
             $next_id = $db->execute_query($sql_query)->fetch_assoc()['next_id'];
+
+            $log->debug("Checking next table ID: '$next_id' for table '$table'", [ 'Query' => $sql_query ]);
             
             return $next_id;
         }
@@ -413,7 +412,7 @@
         function ban_user($account_id, $length_secs, $reason): void {
             global $db, $t;
             $expires = get_mysql_datetime("+$length_secs seconds");
-            $sql_query = "UPDATE {$t['accounts']} SET `banned` = 'True' WHERE `id` = ?";
+            $sql_query = "UPDATE {$t['accounts']} SET `banned` = true WHERE `id` = ?";
             $db->execute_query($sql_query, [ $account_id ]);
 
             $sql_query = <<<SQL
@@ -433,23 +432,19 @@
          * @param string $race The race to validate.
          * @return string The validated or randomly selected race.
          */
-        function validate_race($race): string {
+        function validate_race($race): Races {
             global $log, $account;
 
             $valid_race = 0;
-
+            
+            
             foreach (Races::cases() as $enum_race) {
                 if ($race === $enum_race->name) {
-                    $valid_race = 1;
+                    return $enum_race;
                 }
             }
-
-            if (!$valid_race) {
-                $race = Races::random_enum()->name;
-                $log->critical("Possible POST modify in race selection", ['Race' => $race, 'AID' => $account->get_id()]);
-            }
-            
-            return $race;
+            $log->critical("Possible POST modify in race selection", ['Race' => $race, 'AID' => $account->get_id()]);
+            return Races::random_enum();
         }
 
         /**
@@ -481,26 +476,27 @@
             return $avatar;
         }
 
-        /**
+        /** DEPRECATED
          * Safely serializes or unserializes data using base64 encoding.
          *
          * @param mixed $data The data to serialize or unserialize.
          * @param bool|null $unserialize Whether to unserialize the data (default: false).
          * @return mixed The serialized or unserialized data.
-         */
-        function safe_serialize($data, ?bool $unserialize=null): mixed {
-            global $log;
-            $ret_data = null;
-
-            if ($unserialize === true) {
-                $ret_data = unserialize(base64_decode($data));
-            } else {
-                $ret_data = base64_encode(serialize($data));
-            }
-
-            return $ret_data;
-        }
-
+         *
+         * function safe_serialize($data, ?bool $unserialize=null): mixed {
+         *   global $log;
+         *   $ret_data = null;
+         *      
+         *       if ($unserialize === true) {
+        *            $ret_data = unserialize(base64_decode($data));
+        *        } else {
+        *            $ret_data = base64_encode(serialize($data));
+        *        }
+        *
+        *        return $ret_data;
+        *  }
+        */
+        
         /**
          * Validates the current session for the logged-in user.
          *
@@ -517,7 +513,6 @@
             global $db, $log, $t;
 
             if (!isset($_SESSION['logged-in']) || $_SESSION['logged-in'] != 1) {
-
                 return false;
             }
 
@@ -609,3 +604,21 @@
 
             return "$name's";
         }
+
+        function is_valid_table($table): bool {
+            global $t;
+
+            return in_array($table, $t);
+        }
+
+        function shuffle_array(array &$array, int $iterations): void {
+            for ($i=0; $i<$iterations; $i++) {
+                $r1 = mt_rand(0, count($array) - 1);
+                $r2 = mt_rand(0, count($array) - 1);
+                $tmp = $array[$r1];
+                $array[$r1] = $array[$r2];
+                $array[$r2] = $tmp;
+            }
+        }
+
+        

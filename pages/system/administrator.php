@@ -1,17 +1,9 @@
 <?php
     use Game\Account\Enums\Privileges;
-    use Game\OpenAI\OpenAI;
-    use Game\openai\Enums\HttpMethod;
-    use Game\OpenAI\Enums\Models;
+    use Game\AI\OpenAI;
+    use Game\AI\Enums\HttpMethod;
 
-
-    require_once "constants.php";
-    require_once "functions.php";
-    global $system;
-
-
-
-    $user_privs = $account->get_privileges();
+    $user_privs = Privileges::name_to_enum($account->get_privileges());
 
     if ($user_privs->value < Privileges::ADMINISTRATOR->value) {
         echo "F O R B I D D E N";

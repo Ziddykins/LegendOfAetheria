@@ -1,13 +1,15 @@
 <?php
     declare(strict_types = 1);
+    require_once "vendor/autoload.php";
+    require_once "system/constants.php";
+    require_once "system/bootstrap.php";
+    
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
-        require 'vendor/autoload.php';
+
 
     $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
     $dotenv->safeLoad();
-
-    require_once "bootstrap.php";
 
     $account = new Account($_SESSION['email']);
     $account->load();
@@ -28,15 +30,15 @@
             set privileges to a registered user
         */
         if ($results->num_rows) {
-            $current_privs = $account->get_privileges()->value;
+            $current_privs =  $account->get_privileges()->value;
             
-            if ($account->get_verified() === 'True' || $current_privs >= Privileges::USER->value) {
+            if ($account->get_verified() === true || $current_privs >= Privileges::USER) {
                 $query_path = "/game?already_verified=1&email={$account->get_email()}";
                 header("Location: $query_path");
                 exit();
             }
 
-            $sql_query = "UPDATE {$t['accounts']} SET `privileges` = '" . Privileges::USER->name . "', `verified` = 'True' WHERE `id` = {$account->get_id()}";
+            $sql_query = "UPDATE {$t['accounts']} SET `privileges` = '" . Privileges::USER->value . "', `verified` = true WHERE `id` = {$account->get_id()}";
             $db->execute_query($sql_query);
 
             $log->info("User verification successful", [

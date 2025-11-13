@@ -2,7 +2,7 @@
 
 use Game\Account\Account;
 use Game\Character\Character;
-    require_once 'bootstrap.php';
+
     $account = new Account($_SESSION['email']);
     $account->set_sessionID(null);
     $character = new Character($_SESSION['account-id'], $_SESSION['character-id']);

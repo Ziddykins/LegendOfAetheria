@@ -1,21 +1,24 @@
 <?php
     declare(strict_types = 1);
-    use Game\LoASys\LoASys;
+    require_once "vendor/autoload.php";
+    require_once "system/constants.php";
+    require_once SYSTEM_DIRECTORY . "/bootstrap.php";
 
-    require_once "bootstrap.php";
-    
+
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
     use Game\Components\Sidebar\Enums\SidebarType;
+    use Game\AI\LoAllama;
     use Game\Account\Settings;
-    use Game\OpenAI\NPC\Tutorial\Frank;
+    use Game\AI\NPC\Tutorial\Frank;
     //use Game\Familiar\Familiar;
 
     $contents = file_get_contents(("php://input"));
 
-    $system = new LoASys(0);
+    $system = new System(0);
     $system->load_sheet();
+    $llama = new LoAllama(1, 'Frank', 'smollm2:360m');
 
     $account   = new Account($_SESSION['email']);
     $character = new Character($account->get_id(), $_SESSION['character-id']);
@@ -23,8 +26,9 @@
     
     $color_mode = $account->get_settings()->get_colorMode();
     
-    $account->get_settings()->set_sideBar(SidebarType::LTE_DEFAULT);
+    $account->get_settings()->set_sideBar(SidebarType::LOA_CLASSIC);
     $sidebar_rel_link = $account->get_settings()->get_sideBar()->value;
+
 
     //$familiar = new Familiar($character->get_id(), $t['familiars']);
     //$familiar->loadFamiliar($character->get_id());
@@ -32,7 +36,8 @@
     $_SESSION['name'] = $character->get_name();
     $cur_floor        = $character->get_floor();
     $avatar           = $character->get_avatar();
-    $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now")));
+    $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now"))); 
+    $log->debug("WE MADE IT TO GAME");
 
     // Tutorial logic: check if this is the user's first time in game.php after character selection
     $show_tutorial = false;
@@ -89,12 +94,14 @@
                                 $page_string .= "pages/character/sheet.php";
                             }
 
+                            
                             if (file_exists($page_string)) {
                                 include (string) $page_string;
 
                             } else {
                                 include 'pages/character/sheet.php';
                             }
+                            
                         }
                     ?>
                     </div>

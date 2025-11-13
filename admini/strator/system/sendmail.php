@@ -3,12 +3,9 @@
     use PHPMailer\PHPMailer\SMTP;
     use PHPMailer\PHPMailer\Exception;
     use Game\Account\Account;
-
     require_once 'functions.php';
-
     function send_registration_email(Account $account) {
         $mail = new PHPMailer(true);
-
         try {
             //Server settings
             //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
@@ -19,16 +16,13 @@
             $mail->Port       = $_ENV['SMTP_PORT'];
             $mail->SMTPAuth   = true;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;        
-
             //Recipients
             $mail->setFrom(SYSTEM_EMAIL_ADDRESS, 'Mailer');
             $mail->addAddress($account->get_email(), get_full_name($account));
-
             //Content
             $mail->isHTML(true);                                  //Set email format to HTML
             $mail->Subject = 'Complete Your Registration';
             $mail->Body    = '<!-- https://stripo.email -->
-
 <div dir="ltr" class="es-wrapper-color">
     <!--[if gte mso 9]>
         <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
@@ -159,7 +153,6 @@
     </table>
 </div>';
             $mail->AltBody = 'time2upgrade';
-
             $mail->send();
             
         } catch (Exception $e) {
@@ -169,5 +162,4 @@
         header('Location: /setup/profiles');
         exit();
     }
-
     

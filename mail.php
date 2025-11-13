@@ -5,7 +5,7 @@
     use Game\Character\Enums\FriendStatus;
     use Game\Mail\Folder\Enums\FolderType;
 
-    require_once "bootstrap.php";
+
 
     if (check_session()) {
         $rawData = file_get_contents('php://input');

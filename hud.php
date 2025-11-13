@@ -1,6 +1,9 @@
 <?php
     declare(strict_types = 1);
-    require_once 'bootstrap.php';
+    require_once "vendor/autoload.php";
+    require_once "system/constants.php";
+    require_once "system/bootstrap.php";
+
     use Game\Character\Character;
 
     $character = new Character($_SESSION['account-id'], $_SESSION['character-id']);

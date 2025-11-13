@@ -4,8 +4,15 @@ namespace Game\Mail\MailBox;
 use Game\Mail\Folder\Folder;
 use Game\Mail\Folder\Enums\FolderType;
 
+/**
+ * Manages a character's mail system with multiple folders and focused folder selection.
+ * Provides methods to switch between folders, populate with messages, and count folder contents.
+ */
 class MailBox {
+    /** @var int Character ID who owns this mailbox */
     public $characterID;
+    
+    /** @var Folder Currently active/visible folder */
     public $focusedFolder;
 
     /**
@@ -43,6 +50,14 @@ class MailBox {
         }
     }
 
+    /**
+     * Counts number of messages in a specific folder for a character.
+     * Static method for quick folder counts without instantiating MailBox.
+     * 
+     * @param FolderType $folder Folder to count messages in
+     * @param int $character_id Character whose messages to count
+     * @return int Number of messages in folder
+     */
     public static function getFolderCount(FolderType $folder, int $character_id): int {
         global $db, $t;
         $sql_query = "SELECT COUNT(`id`) FROM {$t['mail']} WHERE `r_cid` = ? AND `folder` = ?";

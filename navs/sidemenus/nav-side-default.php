@@ -1,9 +1,13 @@
 <?php
-require_once "bootstrap.php";
+;
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\Mail\Folder\Enums\FolderType;
 use Game\Mail\MailBox\MailBox;
+use Game\Character\Enums\FriendStatus;
+use Game\Account\Enums\Privileges;
+
+require_once "system/constants.php";
 
 $account   = new Account($_SESSION['email']); 
 $character = new Character($account->get_id(), $_SESSION['character-id']); 
@@ -36,7 +40,7 @@ $currentSub = $_GET['sub'] ?? '';
         <?php include 'navs/sidemenus/nav-quicknav.php'; ?>
     </div>
 
-    <div class="sidebar-wrapper" style="height: calc(100vh - 100px); overflow-y: auto;">
+    <div class="sidebar-wrapper" style="height: calc(100vh - 180px); overflow-y: auto; padding-bottom: 80px;">
         <nav class="nav-menu h-100 d-flex flex-column">
             <ul class="nav sidebar-menu flex-column flex-grow-1" data-lte-toggle="treeview" role="menu">
                 <!-- Character Section -->
@@ -510,22 +514,86 @@ $currentSub = $_GET['sub'] ?? '';
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        <li class="nav-item mb-3">
                             <a href="/game?page=settings&sub=account" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'settings' && $currentSub === 'account') ? 'active' : ''; ?>">
                                 <i class="nav-icon material-symbols-outlined">settings_account_box</i>
                                 <p class="ms-2">Settings</p>
                             </a>
                         </li>                        
                     </ul>
-                    <div class="pb-5 mb-5 mt-5 d-flex w-100 align-content-center justify-content-center">
-                        <a href="/logout" class="btn bg-dark-subtle shadow">
-                            <span class="d-flex align-content-around">
-                                <span class="material-symbols-outlined float-start">move_item</span>
-                                <span class="float-end">&nbsp;&nbsp;&nbsp;Sign out</span>
-                            </span>
 
-                        </a>
-                    </div>
+                    <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 position-absolute bottom-0 ms-3 ps-3 start-0 w-100 bg-dark mb-3" style="z-index: 1030; min-height: 70px;">
+                            <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
+                                <span><img src="img/avatars/<?php echo $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
+                            </a>
+                            
+                            <a href="#" class="text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="d-none d-md-inline mx-1 ms-3 fs-6">Account</span>
+                            </a>
+                        
+                            <ul class="dropdown-menu dropdown-menu text-small shadow">
+                                <li>
+                                    <a class="dropdown-item" href="?page=profile">Profile</a>
+                                    <ul class="dropdown-menu dropdown-menu text-small shadow">
+                                        <li>
+                                            <a class="dropdown-item" href="?page=profile">Profile</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=friends">Friends
+                                    <?php
+                                        $posts = 0;
+                                        $posts = get_friend_counts(FriendStatus::REQUEST_RECV);
+                                        $pill_bg  = 'bg-danger';
+
+                                        if (!$posts) {
+                                            $pill_bg = 'bg-primary';
+                                        }
+                                    ?>
+    <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo "woo"; ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=mail">Mail
+                                        <?php
+                                            $unread_mail = check_mail('unread');
+                                            $pill_bg = 'bg-danger';
+        
+                                            if ($unread_mail == 0) {
+                                                    $pill_bg = 'bg-primary';
+                                            }
+                                        ?>
+<span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $unread_mail; ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=settings">Settings</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <?php
+                                    $privileges = $account->get_privileges()->name;
+                                            
+                                    if ($privileges > Privileges::ADMINISTRATOR->value) {
+                                        $href = "/admini/strator/";
+                                        echo "<li>\n\t\t\t\t\t\t\t\t\t";
+                                    
+                                        echo "<a class=\"dropdown-item\" href=\"$href\">Administrator</a>";
+                                        echo "\n\t\t\t\t\t\t\t\t</li>\n";
+                                    }
+                                ?>
+                                
+                                <li>
+                                    <a class="dropdown-item" href="/select">Characters</a>
+                                </li>
+                                        
+                                <li>
+                                    <a class="dropdown-item" href="/logout">Sign out</a>
+                                </li>
+                            </ul>
+                        </div>
                 </li>
             </ul>
         </nav>
@@ -548,8 +616,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         activeLink.scrollIntoView({ behavior: "smooth", block: "center" });
     }
-
-
     
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {

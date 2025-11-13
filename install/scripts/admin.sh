@@ -1,13 +1,6 @@
 #!/bin/bash
 # LoA Admin Helper
 
-function make_admin() {
-    NUM=$RANDOM
-    mkdir -p ../../admin/$NUM/
-    cat ../templates/admin.php > ../../admin/$NUM/admin
-    echo -e "\nADMIN_PANEL='/admin/$NUM/admin'\n" >> ../../.env
-}
-
 # Generate mysqldumps for templates
 function do_dumpin() {
 
@@ -24,7 +17,7 @@ function do_dumpin() {
           FLUSH PRIVILEGES;" >> /tmp/db.sql;
 
     echo -e "\e[0;32m - Making schema replacements for templates\e[0m";
-    for i in ACCOUNTS BANNED CHARACTERS FAMILIARS FRIENDS GLOBALS LOGS MAIL MONSTERS BANK GLOBALCHAT STATISTICS;
+    for i in ACCOUNTS CHARACTERS FAMILIARS FRIENDS MAIL MONSTERS LOGS GLOBALS BANNED GLOBALCHAT STATISTICS BANK;
     do
         LCTBL=`echo $i | perl -e 'while(<>){chomp;print lc$_;}'`;
         SEDREPLTBL="'s/tbl_$LCTBL/###REPL_SQL_TBL_$i###/g'";

@@ -2,11 +2,12 @@ DROP DATABASE IF EXISTS `###REPL_SQL_DB###`;
 CREATE DATABASE `###REPL_SQL_DB###`;
 USE `###REPL_SQL_DB###`;
 
--- MariaDB dump 10.19-11.8.1-MariaDB, for debian-linux-gnu (x86_64)
+/*M!999999\- enable the sandbox mode */ 
+-- MariaDB dump 10.19-11.8.3-MariaDB, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: ###REPL_SQL_DB###
 -- ------------------------------------------------------
--- Server version	11.8.1-MariaDB-4-log
+-- Server version	11.8.3-MariaDB-1+b1 from Debian
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -31,13 +32,13 @@ CREATE TABLE `###REPL_SQL_TBL_ACCOUNTS###` (
   `email` varchar(255) NOT NULL,
   `password` varchar(255) DEFAULT NULL,
   `date_registered` datetime NOT NULL DEFAULT curdate(),
-  `verified` enum('True','False') DEFAULT 'False',
+  `verified` tinyint(1) DEFAULT 0,
   `verification_code` varchar(255) DEFAULT NULL,
-  `banned` enum('True','False') DEFAULT 'False',
-  `muted` enum('True','False') DEFAULT 'False',
+  `banned` tinyint(1) DEFAULT 0,
+  `muted` tinyint(1) DEFAULT 0,
   `privileges` set('BANNED','MUTED','UNREGISTERED','UNVERIFIED','USER','MODERATOR','SUPER_MODERATOR','GLOBAL_ADMINISTRATOR','ADMINISTRATOR','OWNER','ROOTED') DEFAULT 'UNREGISTERED',
   `last_login` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `logged_in` enum('True','False') DEFAULT 'False',
+  `logged_in` tinyint(1) DEFAULT 0,
   `failed_logins` int(10) unsigned DEFAULT 0,
   `ip_address` tinytext DEFAULT NULL,
   `credits` int(9) unsigned DEFAULT 10,
@@ -47,8 +48,7 @@ CREATE TABLE `###REPL_SQL_TBL_ACCOUNTS###` (
   `char_slot1` int(9) unsigned DEFAULT NULL,
   `char_slot2` int(9) unsigned DEFAULT NULL,
   `char_slot3` int(9) unsigned DEFAULT NULL,
-  `settings` blob DEFAULT NULL,
-  `jwt_secret` blob DEFAULT NULL,
+  `settings` mediumtext DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `slots` (`char_slot1`,`char_slot2`,`char_slot3`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -114,13 +114,13 @@ CREATE TABLE `###REPL_SQL_TBL_CHARACTERS###` (
   `gold` bigint(20) unsigned DEFAULT 1000,
   `floor` int(9) unsigned DEFAULT 1,
   `description` text DEFAULT 'None Provided',
-  `stats` blob DEFAULT NULL,
-  `inventory` blob DEFAULT NULL,
-  `monster` blob DEFAULT NULL,
-  `bank` blob DEFAULT NULL,
+  `stats` mediumtext DEFAULT NULL,
+  `inventory` mediumtext DEFAULT NULL,
+  `monster` mediumtext DEFAULT NULL,
+  `bank` mediumtext DEFAULT NULL,
   `date_created` datetime DEFAULT current_timestamp(),
   `last_action` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `spindels` float unsigned DEFAULT 0,
+  `status` set('HEALTHY','POISONED','BLINDED','SCARED','OVERENCUMBERED','OVERHEATED','STUNNED','FROZEN','BURNING','CONFUSED','CHARMED','SLEEPING','DEAD','BLEEDING') DEFAULT 'HEALTHY',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -136,7 +136,7 @@ CREATE TABLE `###REPL_SQL_TBL_FAMILIARS###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `character_id` int(9) unsigned NOT NULL,
   `name` varchar(128) DEFAULT '!Unset!',
-  `hatched` enum('True','False') DEFAULT 'False',
+  `hatched` tinyint(1) DEFAULT 0,
   `rarity` varchar(56) DEFAULT 'NONE',
   `date_acquired` datetime DEFAULT NULL,
   `hatch_time` datetime DEFAULT NULL,
@@ -183,7 +183,7 @@ CREATE TABLE `###REPL_SQL_TBL_GLOBALCHAT###` (
   `nickname` varchar(255) DEFAULT NULL,
   `room` varchar(255) DEFAULT '!main',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -261,9 +261,9 @@ CREATE TABLE `###REPL_SQL_TBL_MONSTERS###` (
   `exp_awarded` bigint(20) DEFAULT NULL,
   `gold_awarded` bigint(20) DEFAULT NULL,
   `monster_class` varchar(255) DEFAULT NULL,
-  `stats` blob DEFAULT NULL,
+  `stats` mediumtext DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -304,7 +304,7 @@ CREATE TABLE `###REPL_SQL_TBL_STATISTICS###` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2025-05-14  2:10:09
+-- Dump completed on 2025-11-11 20:09:43
 DROP USER IF EXISTS ###REPL_SQL_USER###;
 CREATE USER ###REPL_SQL_USER###;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ###REPL_SQL_DB###.* TO ###REPL_SQL_USER### IDENTIFIED BY '###REPL_SQL_PASS###';

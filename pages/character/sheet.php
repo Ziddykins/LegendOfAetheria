@@ -1,16 +1,22 @@
 <?php
     include 'snippets/snip-charstats.php';
+    $index = 1;
+    $max_index = count($stats_map);
+
+    if ($character->stats->get_ap() > 0) {
+        $href = '';
+    }
 ?>
         <div class="d-flex justify-content-center">
-            <div class="container"style="max-width: 750px;">
-                <div id="character-card" name="character-card" class="card ps-3 mb-3 pt-3"  ">
+            
+            <div class="container"style="max-width: 850px;">
+                <div class="card ps-3 mb-3 pt-3"  ">
                     <div class="card-title lead">
-                        <?php echo "$char_name the level $char_level $char_race"; ?>
+                        <?php echo "$char_name the level $char_level {$char_race->name}"; ?>
                         
                         <span class="small text-body-secondary float-end pe-3" style="font-size: 10px;">
                             Character created <?php echo $character->get_dateCreated(); ?>
                         </span>
-                        
                     </div>
                     <div class="hr">
                     <div class="d-flex">
@@ -23,86 +29,52 @@
                         
                         <div class="card-body">
                             <div class="flex-grow-1">
-                                <div class="container shadow-sm border">
-                                    <div class="row mb-3 mt-3 text-center fw-bold">
-                                        <div class="col">HP:</div>
-                                        <div class="col">MP:</div>
-                                        <div class="col">EP:</div>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <div class="col">
-                                            <span id="hp" name="hp" class="ldBar label-center" data-value="<?php echo $cur_hp; ?>" data-max="<?php echo $max_hp; ?>" data-type="stroke" data-content="hp" data-stroke="red"></span>
-                                        </div>
-
-                                        <div class="col">
-                                            <span id="mp" name="mp" class="ldBar label-center" data-max="<?php echo $cur_mp; ?>" data-type="stroke" data-content="mp" data-stroke="blue"></span>
-                                        </div>
-
-                                        <div class="col">
-                                            <span id="ep" name="ep" class="ldBar label-center" data-value="<?php echo $cur_ep; ?>" data-max="<?php echo $max_ep; ?>" data-type="stroke" data-content="ep" data-stroke="yellow"></span>
+                                <div>
+                                    <div class="container framed-grey shadow-sm border align-items-center">
+                                        <div class="row mb-3 mt-3">
+                                            <div class="col text-center">
+                                                <span class="bi bi-bookmark-heart-fill text-danger"></span><span class="fw-bold ms-2">HP: <?php echo "$cur_hp / $max_hp"; ?></span>
+                                            </div>
+                                            <div class="col text-center">
+                                                <span class="bi bi-bookmark-star-fill text-primary"></span><span class="fw-bold ms-2">MP:</span> <?php echo "$cur_mp / $max_mp"; ?>
+                                            </div>
+                                            <div class="col text-center">
+                                                <span class="bi bi-bookmark-plus-fill"></span><span class="fw-bold ms-2">EP:</span> <?php echo "$cur_ep / $max_ep"; ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="container border shadow-sm">
-                                    <div class="row mb-3 mt-3">
-                                        <span class="col">
-                                            <i class="bi bi-hammer me-3"></i>
-                                            <span class="d-none d-sm-inline">Strength</span>
-                                        </span>
-                                        <span class="col"><?php echo $char_str; ?></span>
-                                        <?php if ($character->stats->get_ap()): ?>
-                                        <span class="col text-success material-symbols-sharp">add</span>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <span class="col">
-                                            <i class="bi bi-shield-fill me-3"></i>
-                                            <span class="d-none d-sm-inline">Defense</span>
-                                        </span>
-                                        <span class="col"><?php echo $char_def; ?></span>
-                                        <?php if ($character->stats->get_ap()): ?>
-                                        <span class="col text-success material-symbols-sharp">add</span>
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <span class="col">
-                                            <i class="bi bi-journal-bookmark-fill me-3"></i>
-                                            <span class="d-none d-sm-inline small">Intelligence</span>
-                                        </span>
-                                        <span class="col"><?php echo $char_int; ?></span>
-                                        <?php if ($character->stats->get_ap()): ?>
-                                        <span class="col text-success material-symbols-sharp">add</span>
-                                        <?php endif; ?>
+                                <div class="container border">
+                                    <div class="row">
+                                        <?php foreach ($stats_map as $stats): ?>
+                                            <div class="col-6 mb-2 mt-2 px-3" data-bs-toggle="tooltip" data-bs-title="<?php echo $stats['description']; ?>">
+                                                <div class="d-flex align-items-center">
+                                                    <span class="material-symbols-outlined me-2" style="font-size: 18px; width: 24px; flex-shrink: 0;"><span class="text-<?php echo $stats['color']?>"><?php echo $stats['icon']; ?></span></span>
+                                                    <span class="small" style="min-width: 110px;"><?php echo $stats['name']; ?>:</span>
+                                                    <span class="fw-bold small"><?php echo $stats['value']; ?></span>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
                                     </div>
                                 </div>
                                 
-                                <div class="container border shadow-sm">
-                                    <div class="row mb-3 mt-3">
-                                        <div class="col">
-                                            Alignment: <?php echo $char_align; ?>
+                                <div class="container justify-content-center border shadow-sm">
+                                    <div class="row mb-2 mt-2">
+                                        <div class="d-flex align-items-center col text-center" data-bs-toggle="tooltip" data-bs-title="Your moral alignment score">
+                                            <img src="img/svg/alignment.svg" class="me-2" style="width: 24px; height: 24px; flex-shrink: 0;" alt="alignment">
+                                            <span class="fw-bold ms-2">Alignment: <?php echo $char_align; ?></span>
                                         </div>
-                                    </div>
 
-                                    <div class="row mb-3">
-                                        <div class="col">
-                                            Gold&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <?php echo $character->get_gold(); ?>
+                                        <div class="d-flex col text-center align-items-center" data-bs-toggle="tooltip" data-bs-title="Current gold on-hand">
+                                            <span class="material-symbols-outlined me-2" style="font-size: 18px; width: 24px; flex-shrink: 0;">monetization_on</span>
+                                            <span class="fw-bold ms-2">Gold: <?php echo $character->get_gold(); ?></span>
                                         </div>
-                                    </div>
 
-                                    <div class="row mb-3">
-                                        <div class="col">
-                                            Floor&nbsp;&nbsp;&nbsp;&nbsp;: <?php echo $character->get_floor(); ?>
+                                        <div class="d-flex align-items-center col text-center" data-bs-toggle="tooltip" data-bs-title="Current dungeon floor">
+                                            <span class="material-symbols-outlined me-2" style="font-size: 18px; width: 24px; flex-shrink: 0;">stairs</span>
+                                            <span class="fw-bold ms-2">Floor: <?php echo $character->get_floor(); ?></span>
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-4">
-                                        
                                     </div>
                                 </div>
                             </div>
@@ -111,5 +83,4 @@
                 </div>
             </div>
         </div>
-        
-        <script src="/js/loading-bar.js"></script>
+      

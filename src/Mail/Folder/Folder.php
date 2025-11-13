@@ -5,9 +5,18 @@ use Game\Mail\Folder\Enums\FolderType;
 use Game\Mail\Envelope\Envelope;
 use Game\Mail\Envelope\Enums\EnvelopeStatus;
 
+/**
+ * Represents a mail folder containing multiple envelopes (messages).
+ * Supports fetching messages from database, counting messages, and rendering folder HTML.
+ */
 class Folder {
+    /** @var array<Envelope> Collection of envelope messages in this folder */
     public $envelopes = [];
+    
+    /** @var FolderType Type of folder (INBOX, OUTBOX, DRAFTS, DELETED) */
     public $folderType;
+    
+    /** @var int ID of character who owns this folder */
     public $characterID;
 
     /**
@@ -77,6 +86,14 @@ class Folder {
         }
     }
 
+    /**
+     * Generates Bootstrap HTML for folder display with message list and pagination.
+     * Shows message subject, sender, date, status icons, and message preview.
+     * 
+     * @param bool $pagination Whether to show pagination controls (default false)
+     * @param int $per_page Messages per page (default 10)
+     * @return string HTML markup for folder display
+     */
     public function getFolderHTML(bool $pagination=false, int $per_page=10) {
         $html = null;
         $box_count = $this->getMessageCount();
@@ -114,8 +131,6 @@ class Folder {
             
             $status_int = EnvelopeStatus::value_from_flagstring($flagstring);
             $read       = $status_int & EnvelopeStatus::READ->value;
-
-
             $status_line = EnvelopeStatus::get_status_line($flagstring);
 
             $html .= '<div class="list-group w-50">';

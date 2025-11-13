@@ -22,6 +22,12 @@
             <i class="bi bi-xs bi-diamond" style="font-size: 10px;"></i> Status
         </button>
     </li>
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="status-tab" data-bs-toggle="tab" data-bs-target="#admin-tab-pane" type="button" role="tab" aria-controls="admin-tab-pane" aria-selected="false" onclick=tgl_active_signup(this)>
+            <i class="bi bi-xs bi-diamond" style="font-size: 10px;"></i> Admin
+        </button>
+    </li>
 </ul>
 
 <div class="tab-content mb-3" id="login-box-content">
@@ -45,11 +51,11 @@
             </div>
 
             <div class="input-group mb-3">
-                <span class="input-group-text" id="icon-password"><i class="bi bi-key"></i></span>
-                <div class="form-floating flex-grow-1">
-                    <input type="password" class="form-control" id="login-password" name="login-password" placeholder="Password" aria-label="Password" aria-describedby="icon-password" required />
-                    <label for="login-password">Password</label>
-                </div>
+                <span class="input-group-text" id="login-icon-password">
+                    <i class="bi bi-key"></i>
+                </span>
+                <input type="password" class="form-control" id="login-password" name="login-password" placeholder="Password" aria-label="Password" aria-describedby="icon-password password-addon" required />
+                <span class="input-group-text" data-loa="pw_toggle">Show</span>
             </div>
 
             <div class="vstack gap-1">
@@ -65,7 +71,12 @@
             <div class="mb-2">
                 <div class="d-flex text-bg-tertiary bg-gradient border shadow">
                     <div class="p-2 flex-grow-1">
-                        <h6><i class="bi bi-person-fill-gear"></i> Account</h6>
+                        <h6>
+                            <i class="bi bi-person-fill-gear"></i> Account
+                            <i id="random" class="bi bi-shuffle float-end me-4"></i>
+                            <i id="debug" class="bi bi-diamond-half float-end me-4"></i>
+                        </h6>
+
                     </div>
                 </div>
 
@@ -85,21 +96,17 @@
                         <span class="input-group-text" id="register-icon-password">
                             <i class="bi bi-key"></i>
                         </span>
-                        <div class="form-floating flex-grow-1">
-                            <input type="password" class="form-control" id="register-password" name="register-password" placeholder="Password" aria-label="Password" aria-describedby="register-icon-password" required>
-                            <label for="login-password">Password</label>
-                        </div>
+                        <input type="password" class="form-control" id="register-password" name="register-password" placeholder="Password" aria-label="Password" aria-describedby="icon-password password-addon" required />
+                        <span class="input-group-text" data-loa="pw_toggle">Show</span>
                     </div>
 
                     <div class="input-group">
-                        <span class="input-group-text" id="register-icon-password">
+                        <span class="input-group-text" id="register-icon-password-confirm">
                             <i class="bi bi-key"></i>
                             <sup style="margin-left: -14px; margin-top: -8px;">x2</sup>
                         </span>
-                        <div class="form-floating flex-grow-1">
-                            <input type="password" class="form-control" id="register-password-confirm" name="register-password-confirm" placeholder="Password (Confirm)" aria-label="Password" aria-describedby="register-icon-password-confirm" required>
-                            <label for="login-password">Password (Confirm)</label>
-                        </div>
+                        <input type="password" class="form-control" id="register-password-confirm" name="register-password-confirm" placeholder="Password (confirm)" aria-label="Password" aria-describedby="icon-password password-addon" required />
+                        <span class="input-group-text" data-loa="pw_toggle">Show</span>
                     </div>
                 </div>
             </div>
@@ -152,6 +159,10 @@
                         <?php
                         $images = scandir('img/avatars');
                         for ($i = 2; $i < count($images); $i++) {
+                            if (preg_match('/unknown/', $images[$i])) {
+                                continue;
+                            }
+
                             $split = explode('.', $images[$i]);
                             $title = explode('avatar-', $split[0]);
                             $pic_title = $title[1];
@@ -178,26 +189,25 @@
             </div>
 
             <div class="mb-2 mt-2">
-                <div class="d-flex text-bg-tertiary bg-gradient border shadow align-content-start">
-                    <div class="p-2 flex-grow-1">
-                        <h6><i class="bi bi-dice-5-fill"></i> Stats</h6>
-                    </div>
+                <div class="border">
+                    <div class="d-flex text-bg-tertiary bg-gradient border shadow align-content-start">
+                        <div class="p-2 flex-grow-1">
+                            <h6><i class="bi bi-dice-5-fill"></i> Stats</h6>
+                        </div>
 
-                    <div class="p-2 fw-bold">
-                        <i class="bi bi-capslock-fill"></i>
-                        AP:
-                    </div>
+                        <div class="p-2 fw-bold">
+                            <i class="bi bi-capslock-fill"></i>
+                            AP:
+                        </div>
 
-                    <div class="p-2" name="stats-remaining-ap" id="stats-remaining-ap">
-                        10
+                        <div class="p-2" name="stats-remaining-ap" id="stats-remaining-ap">
+                            10
+                        </div>
                     </div>
                 </div>
 
-
-                <div class="input-group border">
+                <div class="d-flex border">
                     <div class="p-2 fw-bold font-monospace flex-grow-1"><i class="bi bi-heart-arrow"></i> str:</div>
-                
-                    <div class="d-flex border">
                     <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-danger" onclick="stat_adjust('str-minus');">&minus;</a></div>
                     <div class="p-2" id="stats-str-cur">10</div>
                     <div class="p-2"><a href="#a" class="link-offset-2 link-underline link-underline-opacity-0 fw-bold link-success" onclick="stat_adjust('str-plus');">&plus;</a>
@@ -222,8 +232,6 @@
             <input type="text" id="str-ap" name="str-ap" hidden />
             <input type="text" id="def-ap" name="def-ap" hidden />
             <input type="text" id="int-ap" name="int-ap" hidden />
-
-
 
             <div class="vstack gap-1 mb-3">
                 <button class="btn btn-success mb-3" id="register-submit" name="register-submit" value="1">
@@ -268,44 +276,37 @@
     </div>
 
     <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="2">
-        <div class="container">
-            <div class="row">
-                <div class="col border border-success">
-                    <form id="contact-form" name="contact-form" action="/?contact_form_submitted=1" method="POST">
-                        <div class="border">
-                            <div class="d-flex bg-success-subtle bg-gradient">
-                                <div class="p-2 flex-grow-1">
-                                    <h6><i class="bi bi-envelope-heart"></i> Contact Me
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                            <span class="input-group-text" id="icon-name"><i class="bi bi-envelope-plus"></i></span>
-                            <div class="form-floating flex-grow-1">
-                                <input type="email" class="form-control" aria-label="Email" aria-describedby="icon-email" id="contact-email" name="contact-email" placeholder="Email" required>
-                                <label for="contact-email">E-mail<span class="form-text text-danger">*</span></label>
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                            <span class="input-group-text" id="icon-message"><i class="bi bi-chat-dots-fill"></i></span>
-                            <div class="form-floating flex-grow-1">
-                                <textarea class="form-control" id="contact-message" name="contact-message" placeholder="Message" aria-label="Message" aria-describedby="contact-message" style="height: 200px;" required></textarea>
-                                <label for="contact-message">Message</label>
-                            </div>
-                        </div>
-                        <p>
-                            <small class="form-text text-danger fw-bold" style="font-size: 10px;">* Required</small>
-                        </p>
-
-                        <button class="btn btn-primary mb-3" id="contact-submit" name="contact-submit" value="1">
-                            🤍 Submit
-                        </button>
-                    </form>
+        <form id="contact-form" name="contact-form" action="/" method="POST">
+            <div class="border">
+                <div class="d-flex text-bg-tertiary bg-gradient border shadow">
+                    <div class="p-2">
+                        <h6><i class="bi bi-person-fill-gear"></i> Contact Me</h6>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div class="input-group">
+                <span class="input-group-text" id="icon-email"><i class="bi bi-envelope-plus"></i></span>
+                <div class="form-floating flex-grow-1">
+                    <input type="email" class="form-control" aria-label="Email" aria-describedby="icon-email" id="contact-email" name="contact-email" placeholder="Email" required />
+                    <label for="contact-email">E-mail</label>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="bi bi-chat"></i></span>
+                <div class="form-floating flex-grow-1">
+                    <textarea class="form-control" id="contact-message" style="height: 50px;"></textarea>
+                    <label for="contact-message">Message</label>
+                </div>
+            </div>
+
+            <div class="vstack gap-1">
+                <button class="btn btn-primary" id="contact-submit" name="contact-submit" value="1">
+                    <i class="bi bi-door-open-fill"></i> Contact
+                </button>
+            </div>
+        </form>
     </div>
 
     <div class="tab-pane fade text-center" id="status-tab-pane" role="tabpanel" aria-labelledby="status-tab" tabindex="3">
@@ -332,6 +333,40 @@
             </a>
         </div>
     </div>
+
+    <div class="tab-pane fade" id="admin-tab-pane" role="tabpanel" aria-labelledby="admin-tab" tabindex="4">
+        <form id="admin-form" name="admin-form" action="/" method="POST">
+            <div class="border">
+                <div class="d-flex text-bg-danger opacity-50 bg-gradient border shadow">
+                    <div class="p-2">
+                        <h6><i class="bi bi-person-fill-gear"></i> Administrator Portal</h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <span class="input-group-text" id="icon-email"><i class="bi bi-envelope-plus"></i></span>
+                <div class="form-floating flex-grow-1">
+                    <input type="email" class="form-control" aria-label="Email" aria-describedby="icon-email" id="admin-email" name="admin-email" placeholder="Email" required />
+                    <label for="admin-email">E-mail</label>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="admin-icon-password">
+                    <i class="bi bi-key"></i>
+                </span>
+                <input type="password" class="form-control" id="admin-password" name="admin-password" placeholder="Password" aria-label="Password" aria-describedby="icon-password password-addon" required />
+                <span class="input-group-text" data-loa="pw_toggle">Show</span>
+            </div>
+
+            <div class="vstack gap-1">
+                <button class="btn btn-primary" id="admin-submit" name="admin-submit" value="1">
+                    <i class="bi bi-door-open-fill"></i> Login
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -342,5 +377,51 @@
         let html_string = "<img src=\"" + pic_path + ".webp\" style=\"width: 256px; height: auto;\" alt=\"" + chosen_pic + "\">";
 
         target_div.innerHTML = html_string;
+    });
+
+    function genString(length) {
+        return Math.random().toString(26).substring(2, length + 2);
+    }
+
+    document.getElementById("random").addEventListener("click", function() {
+
+    });
+
+    document.getElementById("debug").addEventListener("click", function() {
+        const email = document.getElementById("register-email");
+        const pw = document.getElementById("register-password");
+        const pw2 = document.getElementById("register-password-confirm");
+        const charname = document.getElementById("register-character-name");
+        const race = document.getElementById("race-select");
+        const avatar = document.getElementById("avatar-select");
+
+        email.value = "test" + genString(5) + "@example.com";
+        pw.value = genString(10);
+        pw2.value = pw.value;
+        charname.value = "TestChar" + genString(5);
+        race.selectedIndex = parseInt(Math.random() * race.options.length)
+        avatar.selectedIndex = parseInt(Math.random() * avatar.options.length)
+
+        var stats = ["str", "def", "int"];
+
+        for (let i = 0; i < 10; i++) {
+            let which = stats[Math.floor(Math.random() * 3)];
+            stat_adjust(which + '-plus').click();
+        }
+    });
+
+    document.querySelectorAll("[data-loa=pw_toggle]").forEach((e) => {
+        e.addEventListener("click", (ev) => {
+            var cur_ele_textbox = ev.target.previousElementSibling;
+            var cur_type = cur_ele_textbox.type;
+
+            if (cur_type == 'password') {
+                ev.target.textContent = 'Hide';
+                cur_ele_textbox.type = 'text';
+            } else {
+                ev.target.textContent = 'Show';
+                cur_ele_textbox.type = 'password';
+            }
+        });
     });
 </script>

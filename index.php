@@ -1,12 +1,16 @@
 <?php
-    require_once 'bootstrap.php';
+    require_once "vendor/autoload.php";
+    require_once "system/constants.php";
+    require_once "system/bootstrap.php";
 
     use Game\Bank\BankManager;
-    use Game\LoASys\Enums\AbuseType;
+    use Game\System\Enums\AbuseType;
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
     use Game\Character\Character;
-        
+    use Game\Character\Enums\Status;
+    use Game\System\Enums\AbuseType;
+
     if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
         $email = $_POST['login-email'];
         $password = $_POST['login-password'];
@@ -39,6 +43,7 @@
 
         if ($account_id > 0) {
             $account = new Account($email);
+            $account->load($account_id);
             
             if (password_verify($password, $account->get_password())) {
                 // Reset failed attempts on successful login
@@ -56,21 +61,21 @@
 
                 header('Location: /select');
                 exit();
-            } else {
-                $failed_attempts = $account->get_failedLogins() + 1;
-                $account->set_failedLogins($failed_attempts);
-                
-                write_log('LOGIN_ATTEMPT', 'Failed login attempt', $ip);
-                
-                if ($failed_attempts >= 10) {
-                    $account->set_banned('True');
-                    $log->alert('Account locked due to excessive failed attempts', 
-                        ['email' => $email, 'ip' => $ip]);
-                }
-                
-                header('Location: /?failed_login');
-                exit();
             }
+
+            $failed_attempts = $account->get_failedLogins() + 1;
+            $account->set_failedLogins($failed_attempts);
+
+            write_log('LOGIN_ATTEMPT', 'Failed login attempt', $ip);
+
+            if ($failed_attempts >= 10) {
+                $account->set_banned(true);
+                $log->alert('Account locked due to excessive failed attempts',
+                    ['email' => $email, 'ip' => $ip]);
+            }
+
+            header('Location: /?failed_login');
+            exit();
         } else {
             $log->warning('Attempted login with a non-existing account', [ 'Email' => $email ]);
             header("Location: /?do_register&email=$email");
@@ -84,7 +89,10 @@
         $time_sqlformat     = get_mysql_datetime();
         $ip_address         = $_SERVER['REMOTE_ADDR'];
         $verification_code  = strrev(hash('sha256', session_id()));
-        $verification_code .= substr(hash('sha256', strval(mt_rand(0,100))), 0, 15);
+        $verification_code .= substr(hash('sha256', strval(random_int(0,100))), 0, VERIFICATION_CODE_LENGTH);
+        $tmp_arr = str_split($verification_code);
+        shuffle_array($tmp_arr, 1000);
+        $verification_code = join('', $tmp_arr);
 
         /* Character information */
         $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $_POST['register-character-name']);
@@ -104,7 +112,7 @@
         /* Email doesn't exist */
         if ($account_id > 0) {
             /* AP assigned properly */
-            if ($str + $def + $int === MAX_ASSIGNABLE_AP) {
+            if ($str + $def + $int === STARTING_ASSIGNABLE_AP) {
                 /* Passwords match */
                 if ($password === $password_confirm) {
                     $password = password_hash($password, PASSWORD_BCRYPT);
@@ -119,22 +127,22 @@
                     }
 
                     /* ya forgin' posts I know it */
-                    if (($str < 10 || $def < 10 || $int < 10)) {
+                    if ($str < 10 || $def < 10 || $int < 10 || ($str + $int + $def) > 40) {
                         $ip = $_SERVER['REMOTE_ADDR'];
                         write_log(AbuseType::TAMPERING->name, "Sign-up attributes modified", $ip);
                         check_abuse(AbuseType::TAMPERING, $account->get_id(), $ip, 2);
                     }
 
                     if ($account->get_id() === 1) {
-                        $account->set_privileges(Privileges::ADMINISTRATOR->value);
+                        $account->set_privileges(Privileges::ADMINISTRATOR);
                     } else {
-                        $account->set_privileges(Privileges::UNVERIFIED->value);
+                        $account->set_privileges(Privileges::UNVERIFIED);
                     }
 
                     $account->set_password($password);
                     $account->set_dateRegistered($time_sqlformat);
                     $account->set_ipAddress($ip_address);
-                    $account->set_loggedIn('False');
+                    $account->set_loggedIn(false);
                     $account->set_verificationCode($verification_code);
 
                     $character = new Character($account->get_id());
@@ -153,7 +161,9 @@
                     $character->stats->set_mp(100);
                     $character->stats->set_maxMP(100);
 
-                    //$character->stats->set_status(CharacterStatus::HEALTHY);
+                    $race->set_stat_adjust($character->stats);
+
+                    $character->stats->set_status(Status::HEALTHY);
 
                     //send_mail($email, $account);
                     header('Location: /?register_success');
@@ -192,17 +202,6 @@
             </div>
         </div>
 
-        <?php if (isset($_COOKIES['email'])): ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                let up = new URLSearchParams(window.location.search);
-
-                if (up.has('failed_login')) {
-                    document.getElementById('login-email').value = decodeURIComponent(document.cookie).split(';')[0].split('=')[1];
-                }
-            });
-        </script>
-        <?php endif; ?>
         <?php include 'html/footers.html'; ?>
     </body>
 </html>

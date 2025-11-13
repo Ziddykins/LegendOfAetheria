@@ -1,22 +1,4 @@
 #!/usr/bin/env perl
-#===============================================================================
-#
-#         FILE: table_explore.pl
-#
-#        USAGE: ./table_explore.pl  
-#
-#  DESCRIPTION: 
-#
-#      OPTIONS: ---
-# REQUIREMENTS: ---
-#         BUGS: ---
-#        NOTES: ---
-#       AUTHOR: YOUR NAME (), 
-# ORGANIZATION: 
-#      VERSION: 1.0
-#      CREATED: 12/01/23 06:50:50
-#     REVISION: ---
-#===============================================================================
 
 use warnings;
 use strict;
