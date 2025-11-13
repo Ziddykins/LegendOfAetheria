@@ -2,6 +2,30 @@
     use Game\Account\Account;
     use Game\Character\Character;
     use Game\Character\Enums\FriendStatus;
+
+    $id = $account->get_id();
+    $sql_query = <<<'SQL'
+        SELECT
+            IF(f.sender_id = ?, f.recipient_id, f.sender_id) AS `their_id`,
+            a.email
+        FROM tbl_friends f
+        JOIN tbl_accounts a
+            ON IF(f.sender_id = ?, f.recipient_id, f.sender_id) = a.id
+        WHERE 
+            (f.sender_id = ? OR f.recipient_id = ?) AND
+            f.friend_status = ?;
+        SQL;
+
+    $friends = $db->execute_query(
+        $sql_query,
+        [
+            $id,
+            $id,
+            $id,
+            $id,
+            FriendStatus::MUTUAL->value
+        ]
+    )->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <div class="row">
@@ -14,9 +38,12 @@
 
 <?php
     for ($i = 0; $i < count($friends); $i++) {
-        $temp_account = new Account($friends[$i]['email_1']);
+        $email    = $friends[$i]['email'];
+        $their_id = $friends[$i]['their_id'];
+        
+        $temp_account = new Account($email);
         $temp_account->load();
-        $online         = $temp_account->get_sessionID();
+        $online = $temp_account->get_sessionID();
         $sender_account = new Character($temp_account->get_id());
         $sender_account->set_id(intval($temp_account->get_charSlot1()));
         $sender_account->load();
