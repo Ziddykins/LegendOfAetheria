@@ -2,12 +2,9 @@
 
 A browser-based RPG game written in PHP/JS using the [Bootstrap 5.3 framework](https://github.com/twbs), with a heavily modified version of [AdminLTE](https://github.com/ColorlibHQ/AdminLTE) for the administrative panel, which I've tailored to work with PHP and MySQL in a more modular fashion. See [Credits](#Credits) for more information on the technology used.
 
-> [!CAUTION]
-> The current state of the AutoInstaller is: **Not Working** -- Take care when cloning this until this banner is gone.
-
 # Getting Started
 
-The recommended method to install and configure LoA is by using the auto-installer, however, the auto installer is pretty hefty and a work-in-progress. You may find it easier to go through the manual steps provided below if you find yourself running into issues with the autoinstaller.
+The recommended method to install and configure LoA is by using the auto-installer, however, manual instructions will be provided.
 
 Please report any bugs found and they will be addressed.
 
@@ -41,8 +38,8 @@ on a machine with existing services (PHP configs, SQL configs, Apache, etc).
 
 ### CPAN dependencies, Sury repos
 ```sh
-chmod +x install/scripts/bootstrap.sh
-./install/scripts/bootstrap.sh
+cd install/scripts
+sudo bash bootstrap.sh
 ```
 
 ```sh
@@ -86,6 +83,8 @@ LoA comes packaged with a bunch of template files, which get their values from t
 ```sh
 sudo perl AutoInstaller.pl --step TEMPLATES --only ---fqdn fqdn.right.here
 ```
+
+Continue on until the schema is imported and the templates are processed.
 
 ### Apache
 
