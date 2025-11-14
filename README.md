@@ -3,7 +3,7 @@
 A browser-based RPG game written in PHP/JS using the [Bootstrap 5.3 framework](https://github.com/twbs), with a heavily modified version of [AdminLTE](https://github.com/ColorlibHQ/AdminLTE) for the administrative panel, which I've tailored to work with PHP and MySQL in a more modular fashion. See [Credits](#Credits) for more information on the technology used.
 
 > [!CAUTION]
-> The current state of the AutoInstaller is: **Not Working** -- Take care when cloning this until this banner is gone.
+> This is not the main branch. AI Playground was designed for experimenting with AI, possibly moving portions to the main branch. Use at own risk.
 
 # Getting Started
 
