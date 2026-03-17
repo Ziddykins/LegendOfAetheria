@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "overlayscrollbars": "^2.13.0"
+    "axios": "^1.13.6",
+    "overlayscrollbars": "^2.13.0",
+    "react-router-dom": "^7.13.1"
   }
 }

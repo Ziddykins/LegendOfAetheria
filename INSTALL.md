@@ -71,8 +71,10 @@ sudo ./AutoInstaller.pl
 
 Windows
 --------------------
-Soon
-
+**Software requirements**:
+        |¯¯ - MySQL/MariaDB
+XAMPP---|   - Apache
+        |__ - perl
 
 Mac
 --------------------
