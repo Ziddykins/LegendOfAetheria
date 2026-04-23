@@ -113,10 +113,10 @@ tie %ini, 'Config::IniFiles', (
 # ===================================[ cfg-end ]===================================== #
 
 # ==================================[ main-start ]=================================== #
-#if ($ENV{'USER'} ne 'root') {
-#    die $clr{red} . 'This script must be ran as root, not ',
-#        $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
-#}
+if ($ENV{'USER'} ne 'root') {
+    die $clr{red} . 'This script must be ran as root, not ',
+        $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
+}
 
 $fqdn = $opt_fqdn if $opt_fqdn;
 

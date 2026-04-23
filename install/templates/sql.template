@@ -1,11 +1,11 @@
-DROP DATABASE IF EXISTS `db_loa`;
-CREATE DATABASE `db_loa`;
-USE `db_loa`;
+DROP DATABASE IF EXISTS `###REPL_SQL_DB###`;
+CREATE DATABASE `###REPL_SQL_DB###`;
+USE `###REPL_SQL_DB###`;
 
 /*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19-11.8.3-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: db_loa
+-- Host: localhost    Database: ###REPL_SQL_DB###
 -- ------------------------------------------------------
 -- Server version	11.8.3-MariaDB-1+b1 from Debian
 
@@ -21,13 +21,13 @@ USE `db_loa`;
 /*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
 
 --
--- Table structure for table `tbl_accounts`
+-- Table structure for table `###REPL_SQL_TBL_ACCOUNTS###`
 --
 
-DROP TABLE IF EXISTS `tbl_accounts`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_ACCOUNTS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_accounts` (
+CREATE TABLE `###REPL_SQL_TBL_ACCOUNTS###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) DEFAULT NULL,
@@ -55,13 +55,13 @@ CREATE TABLE `tbl_accounts` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_bank`
+-- Table structure for table `###REPL_SQL_TBL_BANK###`
 --
 
-DROP TABLE IF EXISTS `tbl_bank`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_BANK###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_bank` (
+CREATE TABLE `###REPL_SQL_TBL_BANK###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(9) unsigned NOT NULL,
   `character_id` int(9) unsigned NOT NULL,
@@ -77,13 +77,13 @@ CREATE TABLE `tbl_bank` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_banned`
+-- Table structure for table `###REPL_SQL_TBL_BANNED###`
 --
 
-DROP TABLE IF EXISTS `tbl_banned`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_BANNED###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_banned` (
+CREATE TABLE `###REPL_SQL_TBL_BANNED###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(9) unsigned NOT NULL,
   `date` datetime DEFAULT NULL ON UPDATE current_timestamp(),
@@ -94,13 +94,13 @@ CREATE TABLE `tbl_banned` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_characters`
+-- Table structure for table `###REPL_SQL_TBL_CHARACTERS###`
 --
 
-DROP TABLE IF EXISTS `tbl_characters`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_CHARACTERS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_characters` (
+CREATE TABLE `###REPL_SQL_TBL_CHARACTERS###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(9) unsigned NOT NULL,
   `level` int(9) unsigned DEFAULT 1,
@@ -126,13 +126,13 @@ CREATE TABLE `tbl_characters` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_familiars`
+-- Table structure for table `###REPL_SQL_TBL_FAMILIARS###`
 --
 
-DROP TABLE IF EXISTS `tbl_familiars`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_FAMILIARS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_familiars` (
+CREATE TABLE `###REPL_SQL_TBL_FAMILIARS###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `character_id` int(9) unsigned NOT NULL,
   `name` varchar(128) DEFAULT '!Unset!',
@@ -152,13 +152,13 @@ CREATE TABLE `tbl_familiars` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_friends`
+-- Table structure for table `###REPL_SQL_TBL_FRIENDS###`
 --
 
-DROP TABLE IF EXISTS `tbl_friends`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_FRIENDS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_friends` (
+CREATE TABLE `###REPL_SQL_TBL_FRIENDS###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `sender_id` int(9) unsigned NOT NULL,
   `recipient_id` int(9) unsigned NOT NULL,
@@ -169,13 +169,13 @@ CREATE TABLE `tbl_friends` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_globalchat`
+-- Table structure for table `###REPL_SQL_TBL_GLOBALCHAT###`
 --
 
-DROP TABLE IF EXISTS `tbl_globalchat`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_GLOBALCHAT###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_globalchat` (
+CREATE TABLE `###REPL_SQL_TBL_GLOBALCHAT###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `character_id` int(9) unsigned NOT NULL,
   `message` mediumtext NOT NULL,
@@ -187,13 +187,13 @@ CREATE TABLE `tbl_globalchat` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_globals`
+-- Table structure for table `###REPL_SQL_TBL_GLOBALS###`
 --
 
-DROP TABLE IF EXISTS `tbl_globals`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_GLOBALS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_globals` (
+CREATE TABLE `###REPL_SQL_TBL_GLOBALS###` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL DEFAULT '0',
   `value` varchar(50) NOT NULL DEFAULT '0',
@@ -202,13 +202,13 @@ CREATE TABLE `tbl_globals` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_logs`
+-- Table structure for table `###REPL_SQL_TBL_LOGS###`
 --
 
-DROP TABLE IF EXISTS `tbl_logs`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_LOGS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_logs` (
+CREATE TABLE `###REPL_SQL_TBL_LOGS###` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `date` datetime DEFAULT current_timestamp(),
   `type` varchar(255) DEFAULT NULL,
@@ -219,13 +219,13 @@ CREATE TABLE `tbl_logs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_mail`
+-- Table structure for table `###REPL_SQL_TBL_MAIL###`
 --
 
-DROP TABLE IF EXISTS `tbl_mail`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_MAIL###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_mail` (
+CREATE TABLE `###REPL_SQL_TBL_MAIL###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `s_aid` int(9) unsigned NOT NULL,
   `s_cid` int(9) unsigned NOT NULL,
@@ -243,13 +243,13 @@ CREATE TABLE `tbl_mail` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_monsters`
+-- Table structure for table `###REPL_SQL_TBL_MONSTERS###`
 --
 
-DROP TABLE IF EXISTS `tbl_monsters`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_MONSTERS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_monsters` (
+CREATE TABLE `###REPL_SQL_TBL_MONSTERS###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(9) unsigned NOT NULL,
   `character_id` int(9) unsigned DEFAULT NULL,
@@ -267,13 +267,13 @@ CREATE TABLE `tbl_monsters` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `tbl_statistics`
+-- Table structure for table `###REPL_SQL_TBL_STATISTICS###`
 --
 
-DROP TABLE IF EXISTS `tbl_statistics`;
+DROP TABLE IF EXISTS `###REPL_SQL_TBL_STATISTICS###`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `tbl_statistics` (
+CREATE TABLE `###REPL_SQL_TBL_STATISTICS###` (
   `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
   `account_id` int(9) unsigned NOT NULL,
   `character_id` int(9) unsigned NOT NULL,
@@ -305,7 +305,7 @@ CREATE TABLE `tbl_statistics` (
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
 -- Dump completed on 2025-11-11 20:09:43
-DROP USER IF EXISTS user_loa;
-CREATE USER user_loa;
-GRANT SELECT, INSERT, UPDATE, DELETE ON db_loa.* TO user_loa IDENTIFIED BY 'passw3rdz';
+DROP USER IF EXISTS ###REPL_SQL_USER###;
+CREATE USER ###REPL_SQL_USER###;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ###REPL_SQL_DB###.* TO ###REPL_SQL_USER### IDENTIFIED BY '###REPL_SQL_PASS###';
 FLUSH PRIVILEGES;

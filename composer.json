@@ -25,7 +25,6 @@
     "config": {
         "allow-plugins": {
             "endroid/installer": true
-        },
-        "disable-tls": true
+        }
     }
 }

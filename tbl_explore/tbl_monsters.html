@@ -1,0 +1,17 @@
+<pre>
++---------------+-----------------------------------------+------+-----+---------+----------------+
+| Field         | Type                                    | Null | Key | Default | Extra          |
++---------------+-----------------------------------------+------+-----+---------+----------------+
+| id            | int(9) unsigned                         | NO   | PRI | NULL    | auto_increment |
+| account_id    | int(9) unsigned                         | NO   |     | NULL    |                |
+| character_id  | int(9) unsigned                         | YES  |     | NULL    |                |
+| level         | int(9) unsigned                         | YES  |     | 1       |                |
+| name          | varchar(255)                            | YES  |     | NULL    |                |
+| scope         | enum('NONE','PERSONAL','ZONE','GLOBAL') | YES  |     | NONE    |                |
+| seed          | varchar(255)                            | NO   |     | NULL    |                |
+| drop_level    | tinyint(4)                              | YES  |     | 1       |                |
+| exp_awarded   | bigint(20)                              | YES  |     | NULL    |                |
+| gold_awarded  | bigint(20)                              | YES  |     | NULL    |                |
+| monster_class | varchar(255)                            | YES  |     | NULL    |                |
+| stats         | varchar(255)                            | YES  |     | NULL    |                |
++---------------+-----------------------------------------+------+-----+---------+----------------+

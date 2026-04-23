@@ -612,7 +612,6 @@
             }
         }
 
-
 		function ai_serv_post(string $endpoint, mixed $data) {
 			$ch = curl_init();
 
@@ -635,4 +634,3 @@
 			return $response;
 		}
 ?>
-}
