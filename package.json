@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "overlayscrollbars": "^2.14.0"
+  }
     "@ai-rpg-engine/cli": "^2.0.9",
     "@babel/preset-env": "^7.29.2",
     "@devmade/express-hot-reload": "^1.0.5",
