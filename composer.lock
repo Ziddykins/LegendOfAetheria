@@ -1513,6 +1513,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
+            "version": "12.5.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
+                "reference": "4a9739b51cbcb355f6e95659612f92e282a7077b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/4a9739b51cbcb355f6e95659612f92e282a7077b",
+                "reference": "4a9739b51cbcb355f6e95659612f92e282a7077b",
             "version": "12.5.6",
             "source": {
                 "type": "git",
