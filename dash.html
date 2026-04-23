@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aetheria Admin - Database Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .aetheria-gradient {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+        }
+        
+        .glow-border {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+        }
+        
+        .entity-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .entity-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+        
+        .checkbox-custom {
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .checkbox-custom:checked {
+            background: #3b82f6;
+            border-color: #3b82f6;
+        }
+        .checkbox-custom:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .task-item {
+            transition: all 0.2s;
+        }
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .task-item.completed {
+            opacity: 0.5;
+        }
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #64748b;
+        }
+        
+        .db-status-connected { color: #10b981; }
+        .db-status-disconnected { color: #ef4444; }
+        
+        .tab-active {
+            background: rgba(59, 130, 246, 0.2);
+            border-bottom: 2px solid #3b82f6;
+            color: #60a5fa;
+        }
+        
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        .modal-enter {
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200 min-h-screen overflow-x-hidden">
+    <!-- Background -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full mix-blend-screen filter blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full mix-blend-screen filter blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="relative z-50 glass-panel border-b border-slate-700 sticky top-0">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg animate-pulse-glow">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            Aetheria Admin
+                        </h1>
+                        <p class="text-xs text-slate-400 mono flex items-center gap-2">
+                            <span id="db-status-dot" class="w-2 h-2 rounded-full bg-red-500"></span>
+                            <span id="db-status-text">Disconnected</span>
+                            <span class="text-slate-600">|</span>
+                            <span id="current-db">No Database</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button onclick="openDbModal()" class="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-all text-sm font-medium shadow-lg shadow-blue-500/20">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>Connect DB</span>
+                    </button>
+                    
+                    <div class="flex items-center space-x-3 pl-4 border-l border-slate-700">
+                        <img src="https://i.pravatar.cc/150?u=admin" alt="Admin" class="w-8 h-8 rounded-full border-2 border-blue-500">
+                        <span class="text-sm font-medium hidden sm:block">GM_Admin</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-7xl mx-auto px-6 py-6">
+        
+        <!-- Entity Management Grid -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-slate-100 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    Database Entities
+                </h2>
+                <div class="flex gap-2">
+                    <button onclick="refreshEntities()" class="p-2 hover:bg-slate-800 rounded-lg transition-colors" title="Refresh">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="entity-grid">
+                <!-- Accounts -->
+                <div class="entity-card glass-panel rounded-xl p-4 border border-slate-700" onclick="openEntityManager('accounts')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-blue-500/20 rounded-lg">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded mono" id="count-accounts">0</span>
+                    </div>
+                    <h3 class="font-semibold text-slate-100 mb-1">Accounts</h3>
+                    <p class="text-xs text-slate-500">User credentials, privileges, bans</p>
+                    <div class="mt-3 flex gap-2">
+                        <span class="text-xs text-slate-600 mono">email, password, privileges</span>
+                    </div>
+                </div>
+
+                <!-- Characters -->
+                <div class="entity-card glass-panel rounded-xl p-4 border border-slate-700" onclick="openEntityManager('characters')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-purple-500/20 rounded-lg">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded mono" id="count-characters">0</span>
+                    </div>
+                    <h3 class="font-semibold text-slate-100 mb-1">Characters</h3>
+                    <p class="text-xs text-slate-500">Player avatars, stats, inventory</p>
+                    <div class="mt-3 flex gap-2">
+                        <span class="text-xs text-slate-600 mono">level, race, location, gold</span>
+                    </div>
+                </div>
+
+                <!-- Familiars -->
+                <div class="entity-card glass-panel rounded-xl p-4 border border-slate-700" onclick="openEntityManager('familiars')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-green-500/20 rounded-lg">
+                            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded mono" id="count-familiars">0</span>
+                    </div>
+                    <h3 class="font-semibold text-slate-100 mb-1">Familiars</h3>
+                    <p class="text-xs text-slate-500">Companion creatures, eggs, rarity</p>
+                    <div class="mt-3 flex gap-2">
+                        <span class="text-xs text-slate-600 mono">rarity, level, hatched</span>
+                    </div>
+                </div>
+
+                <!-- Bank -->
+                <div class="entity-card glass-panel rounded-xl p-4 border border-slate-700" onclick="openEntityManager('bank')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-yellow-500/20 rounded-lg">
+                            <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded mono" id="count-bank">0</span>
+                    </div>
+                    <h3 class="font-semibold text-slate-100 mb-1">Bank</h3>
+                    <p class="text-xs text-slate-500">Gold storage, loans, interest</p>
+                    <div class="mt-3 flex gap-2">
+                        <span class="text-xs text-slate-600 mono">gold, spindels, bracket</span>
+                    </div>
+                </div>
+
+                <!-- Monsters -->
+                <div class="entity-card glass-panel rounded-xl p-4 border border-slate-700" onclick="openEntityManager('monsters')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-red-500/20 rounded-lg">
+                            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded mono" id="count-monsters">0</span>
+                    </div>
+                    <h3 class="font-semibold text-slate-100 mb-1">Monsters</h3>
+                    <p class="text-xs text-slate-500">Enemy entities, drops, stats</p>
+                    <div class="mt-3 flex gap-2">
+                        <span class="text-xs text-slate-600 mono">monster_class, seed, scope</span>
+                    </div>
+                </div>
+
+                <!-- Mail -->
+                <div class="entity-card glass-panel rounded-xl p-4 border border-slate-700" onclick="openEntityManager('mail')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-pink-500/20 rounded-lg">
+                            <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded mono" id="count-mail">0</span>
+                    </div>
+                    <h3 class="font-semibold text-slate-100 mb-1">Mail</h3>
+                    <p class="text-xs text-slate-500">In-game messaging system</p>
+                    <div class="mt-3 flex gap-2">
+                        <span class="text-xs text-slate-600 mono">folder, status, subject</span>
+                    </div>
+                </div>
+
+                <!-- Friends -->
+                <div class="entity-card glass-panel rounded-xl p-4 border border-slate-700" onclick="openEntityManager('friends')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-indigo-500/20 rounded-lg">
+                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded mono" id="count-friends">0</span>
+                    </div>
+                    <h3 class="font-semibold text-slate-100 mb-1">Friends</h3>
+                    <p class="text-xs text-slate-500">Social connections, requests</p>
+                    <div class="mt-3 flex gap-2">
+                        <span class="text-xs text-slate-600 mono">friend_status, sender, recipient</span>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="entity-card glass-panel rounded-xl p-4 border border-slate-700" onclick="openEntityManager('statistics')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="p-2 bg-cyan-500/20 rounded-lg">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xs bg-slate-800 text-slate-400 px-2 py-1 rounded mono" id="count-statistics">0</span>
+                    </div>
+                    <h3 class="font-semibold text-slate-100 mb-1">Statistics</h3>
+                    <p class="text-xs text-slate-500">Player metrics, achievements</p>
+                    <div class="mt-3 flex gap-2">
+                        <span class="text-xs text-slate-600 mono">kills, deaths, exp, logins</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Management Section (Todo Style) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Task Lists -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- High Priority Tasks -->
+                <div class="glass-panel rounded-xl border border-slate-700 overflow-hidden">
+                    <div class="px-4 py-3 bg-red-500/10 border-b border-red-500/20 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            <h3 class="font-semibold text-red-400">Critical Tasks</h3>
+                            <span class="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded mono" id="count-critical">0</span>
+                        </div>
+                        <button onclick="addTask('critical')" class="text-red-400 hover:text-red-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-4 space-y-2" id="critical-tasks">
+                        <!-- Tasks injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Medium Priority -->
+                <div class="glass-panel rounded-xl border border-slate-700 overflow-hidden">
+                    <div class="px-4 py-3 bg-yellow-500/10 border-b border-yellow-500/20 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                            <h3 class="font-semibold text-yellow-400">Moderate Priority</h3>
+                            <span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded mono" id="count-moderate">0</span>
+                        </div>
+                        <button onclick="addTask('moderate')" class="text-yellow-400 hover:text-yellow-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-4 space-y-2" id="moderate-tasks"></div>
+                </div>
+
+                <!-- Low Priority -->
+                <div class="glass-panel rounded-xl border border-slate-700 overflow-hidden">
+                    <div class="px-4 py-3 bg-blue-500/10 border-b border-blue-500/20 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <h3 class="font-semibold text-blue-400">Low Priority</h3>
+                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded mono" id="count-low">0</span>
+                        </div>
+                        <button onclick="addTask('low')" class="text-blue-400 hover:text-blue-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-4 space-y-2" id="low-tasks"></div>
+                </div>
+            </div>
+
+            <!-- Quick Actions & Info -->
+            <div class="space-y-6">
+                <!-- Database Info Card -->
+                <div class="glass-panel rounded-xl p-4 border border-slate-700">
+                    <h3 class="font-semibold text-slate-100 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Connection Info
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Host:</span>
+                            <span class="mono text-slate-300" id="info-host">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Database:</span>
+                            <span class="mono text-slate-300" id="info-db">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">User:</span>
+                            <span class="mono text-slate-300" id="info-user">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Tables:</span>
+                            <span class="mono text-slate-300" id="info-tables">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick SQL -->
+                <div class="glass-panel rounded-xl p-4 border border-slate-700">
+                    <h3 class="font-semibold text-slate-100 mb-4">Quick Query</h3>
+                    <textarea id="quick-sql" class="w-full h-24 bg-slate-800 border border-slate-700 rounded-lg p-3 text-xs mono text-slate-300 focus:outline-none focus:border-blue-500 resize-none" placeholder="SELECT * FROM accounts LIMIT 10;"></textarea>
+                    <button onclick="executeQuickQuery()" class="mt-3 w-full py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors">
+                        Execute Query
+                    </button>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="glass-panel rounded-xl p-4 border border-slate-700">
+                    <h3 class="font-semibold text-slate-100 mb-4">Recent Actions</h3>
+                    <div class="space-y-3 text-xs" id="recent-activity">
+                        <div class="text-slate-500 italic">No recent activity...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Database Connection Modal -->
+    <div id="db-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeDbModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md">
+            <div class="glass-panel rounded-xl border border-slate-700 p-6 modal-enter glow-border">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-slate-100">Database Connection</h2>
+                    <button onclick="closeDbModal()" class="text-slate-400 hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="db-form" class="space-y-4" onsubmit="connectDatabase(event)">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Host</label>
+                        <input type="text" id="db-host" value="localhost" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 mono">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Database Name</label>
+                        <input type="text" id="db-name" placeholder="legendofaetheria" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 mono">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Username</label>
+                        <input type="text" id="db-user" placeholder="aetheria_user" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 mono">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Password</label>
+                        <input type="password" id="db-pass" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 mono">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Port</label>
+                        <input type="number" id="db-port" value="3306" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 mono">
+                    </div>
+                    
+                    <div class="pt-4 flex gap-3">
+                        <button type="button" onclick="testConnection()" class="flex-1 py-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-800 transition-colors">
+                            Test
+                        </button>
+                        <button type="submit" class="flex-1 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors">
+                            Connect
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entity Manager Modal -->
+    <div id="entity-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeEntityModal()"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-[80vh]">
+            <div class="glass-panel rounded-xl border border-slate-700 h-full flex flex-col modal-enter glow-border">
+                <div class="flex items-center justify-between p-6 border-b border-slate-700">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-100 capitalize" id="entity-title">Entity Manager</h2>
+                        <p class="text-sm text-slate-500 mono mt-1" id="entity-subtitle">Manage database records</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="refreshEntityData()" class="p-2 hover:bg-slate-800 rounded-lg transition-colors">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </button>
+                        <button onclick="closeEntityModal()" class="text-slate-400 hover:text-white">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-4 border-b border-slate-700 flex gap-4">
+                    <input type="text" id="entity-search" placeholder="Search records..." class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500" onkeyup="searchEntity()">
+                    <button onclick="addEntityRecord()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add Record
+                    </button>
+                </div>
+                
+                <div class="flex-1 overflow-auto p-6" id="entity-content">
+                    <div class="text-center text-slate-500 py-12">
+                        <svg class="w-12 h-12 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+                        </svg>
+                        <p>Loading entity data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let dbConnection = null;
+        let currentEntity = null;
+        let tasks = {
+            critical: [
+                { id: 1, text: "Review banned accounts from automated detection", done: false, assignee: "GM_Security", date: "2026-04-14" },
+                { id: 2, text: "Fix character rollback for ID #4521 (inventory loss)", done: false, assignee: "GM_Dev", date: "2026-04-14" },
+                { id: 3, text: "Investigate gold duplication exploit in bank transfers", done: false, assignee: "GM_Lead", date: "2026-04-15" }
+            ],
+            moderate: [
+                { id: 4, text: "Update familiar rarity tables for new egg event", done: false, assignee: "GM_Content", date: "2026-04-16" },
+                { id: 5, text: "Clean up orphaned monster records (no character_id)", done: true, assignee: "GM_DBA", date: "2026-04-13" },
+                { id: 6, text: "Review pending friend requests > 30 days old", done: false, assignee: "GM_Support", date: "2026-04-17" }
+            ],
+            low: [
+                { id: 7, text: "Optimize statistics table indexes", done: false, assignee: "GM_DBA", date: "2026-04-20" },
+                { id: 8, text: "Archive old mail from deleted accounts", done: true, assignee: "GM_DBA", date: "2026-04-10" },
+                { id: 9, text: "Document new monster_class categories", done: false, assignee: "GM_Content", date: "2026-04-21" }
+            ]
+        };
+
+        // Entity schema based on SQL template
+        const entitySchema = {
+            accounts: {
+                columns: ['id', 'email', 'verified', 'banned', 'muted', 'privileges', 'last_login', 'logged_in', 'credits', 'char_slot1', 'char_slot2', 'char_slot3'],
+                display: ['id', 'email', 'privileges', 'banned', 'last_login']
+            },
+            characters: {
+                columns: ['id', 'account_id', 'name', 'race', 'level', 'location', 'alignment', 'gold', 'status', 'last_action'],
+                display: ['id', 'name', 'race', 'level', 'location', 'gold', 'status']
+            },
+            familiars: {
+                columns: ['id', 'character_id', 'name', 'rarity', 'level', 'hatched', 'slot'],
+                display: ['id', 'name', 'rarity', 'level', 'hatched', 'character_id']
+            },
+            bank: {
+                columns: ['id', 'account_id', 'character_id', 'gold_amount', 'spindels', 'loan', 'bracket'],
+                display: ['id', 'gold_amount', 'spindels', 'loan', 'bracket', 'account_id']
+            },
+            monsters: {
+                columns: ['id', 'name', 'monster_class', 'level', 'scope', 'seed', 'exp_awarded', 'gold_awarded'],
+                display: ['id', 'name', 'monster_class', 'level', 'scope', 'seed']
+            },
+            mail: {
+                columns: ['id', 's_aid', 'r_aid', 'folder', 'subject', 'status', 'date'],
+                display: ['id', 'subject', 'folder', 'status', 'date', 's_aid']
+            },
+            friends: {
+                columns: ['id', 'sender_id', 'recipient_id', 'friend_status', 'timestamp'],
+                display: ['id', 'sender_id', 'recipient_id', 'friend_status', 'timestamp']
+            },
+            statistics: {
+                columns: ['id', 'account_id', 'character_id', 'deaths', 'player_kills', 'monster_kill', 'total_exp', 'logins'],
+                display: ['id', 'deaths', 'player_kills', 'monster_kill', 'total_exp', 'logins']
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTasks();
+            updateCounts();
+            
+            // Simulate initial connection check
+            setTimeout(() => {
+                addActivity('System initialized, awaiting database connection...');
+            }, 500);
+        });
+
+        // Task Management
+        function renderTasks() {
+            ['critical', 'moderate', 'low'].forEach(priority => {
+                const container = document.getElementById(`${priority}-tasks`);
+                container.innerHTML = '';
+                
+                tasks[priority].forEach(task => {
+                    const div = document.createElement('div');
+                    div.className = `task-item flex items-center gap-3 p-3 rounded-lg ${task.done ? 'completed' : ''}`;
+                    div.innerHTML = `
+                        <input type="checkbox" class="checkbox-custom" ${task.done ? 'checked' : ''} onchange="toggleTask(${priority}, ${task.id})">
+                        <div class="flex-1 min-w-0">
+                            <p class="task-text text-sm text-slate-200 truncate">${task.text}</p>
+                            <div class="flex items-center gap-2 mt-1 text-xs text-slate-500">
+                                <span class="mono text-blue-400">${task.assignee}</span>
+                                <span>•</span>
+                                <span class="mono">${task.date}</span>
+                            </div>
+                        </div>
+                        <button onclick="deleteTask('${priority}', ${task.id})" class="opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    `;
+                    
+                    // Show delete button on hover
+                    div.addEventListener('mouseenter', () => {
+                        div.querySelector('button').style.opacity = '1';
+                    });
+                    div.addEventListener('mouseleave', () => {
+                        div.querySelector('button').style.opacity = '0';
+                    });
+                    
+                    container.appendChild(div);
+                });
+            });
+            
+            updateCounts();
+        }
+
+        function toggleTask(priority, id) {
+            const task = tasks[priority].find(t => t.id === id);
+            if (task) {
+                task.done = !task.done;
+                renderTasks();
+                addActivity(`Task "${task.text.substring(0, 30)}..." marked ${task.done ? 'complete' : 'incomplete'}`);
+            }
+        }
+
+        function addTask(priority) {
+            const texts = {
+                critical: "New critical task...",
+                moderate: "New moderate task...",
+                low: "New low priority task..."
+            };
+            
+            const newTask = {
+                id: Date.now(),
+                text: texts[priority],
+                done: false,
+                assignee: "GM_Unassigned",
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            tasks[priority].push(newTask);
+            renderTasks();
+            
+            // Make editable
+            setTimeout(() => {
+                const container = document.getElementById(`${priority}-tasks`);
+                const lastTask = container.lastElementChild;
+                const textEl = lastTask.querySelector('.task-text');
+                textEl.contentEditable = true;
+                textEl.focus();
+                
+                textEl.addEventListener('blur', () => {
+                    textEl.contentEditable = false;
+                    newTask.text = textEl.textContent;
+                });
+                
+                textEl.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        textEl.blur();
+                    }
+                });
+            }, 10);
+            
+            addActivity(`Added new ${priority} priority task`);
+        }
+
+        function deleteTask(priority, id) {
+            tasks[priority] = tasks[priority].filter(t => t.id !== id);
+            renderTasks();
+            addActivity(`Deleted task from ${priority} priority`);
+        }
+
+        function updateCounts() {
+            document.getElementById('count-critical').textContent = tasks.critical.filter(t => !t.done).length;
+            document.getElementById('count-moderate').textContent = tasks.moderate.filter(t => !t.done).length;
+            document.getElementById('count-low').textContent = tasks.low.filter(t => !t.done).length;
+        }
+
+        // Database Connection
+        function openDbModal() {
+            document.getElementById('db-modal').classList.remove('hidden');
+        }
+
+        function closeDbModal() {
+            document.getElementById('db-modal').classList.add('hidden');
+        }
+
+        function testConnection() {
+            // Simulate connection test
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = 'Testing...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.textContent = 'Connected!';
+                btn.classList.add('bg-green-600', 'text-white', 'border-green-600');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('bg-green-600', 'text-white', 'border-green-600');
+                }, 2000);
+            }, 1500);
+        }
+
+        function connectDatabase(e) {
+            e.preventDefault();
+            
+            const host = document.getElementById('db-host').value;
+            const name = document.getElementById('db-name').value;
+            const user = document.getElementById('db-user').value;
+            
+            // Simulate connection
+            dbConnection = { host, name, user, tables: 14 };
+            
+            // Update UI
+            document.getElementById('db-status-dot').className = 'w-2 h-2 rounded-full bg-green-500 animate-pulse';
+            document.getElementById('db-status-text').textContent = 'Connected';
+            document.getElementById('db-status-text').className = 'db-status-connected';
+            document.getElementById('current-db').textContent = name || 'aetheria_db';
+            
+            document.getElementById('info-host').textContent = host;
+            document.getElementById('info-db').textContent = name;
+            document.getElementById('info-user').textContent = user;
+            document.getElementById('info-tables').textContent = '14';
+            
+            // Simulate entity counts
+            document.getElementById('count-accounts').textContent = '1,247';
+            document.getElementById('count-characters').textContent = '3,891';
+            document.getElementById('count-familiars').textContent = '2,456';
+            document.getElementById('count-bank').textContent = '1,198';
+            document.getElementById('count-monsters').textContent = '15,234';
+            document.getElementById('count-mail').textContent = '45,892';
+            document.getElementById('count-friends').textContent = '8,234';
+            document.getElementById('count-statistics').textContent = '3,891';
+            
+            closeDbModal();
+            addActivity(`Connected to database ${name}@${host}`);
+        }
+
+        // Entity Management
+        function openEntityManager(entity) {
+            if (!dbConnection) {
+                alert('Please connect to a database first');
+                return;
+            }
+            
+            currentEntity = entity;
+            document.getElementById('entity-title').textContent = entity + ' Manager';
+            document.getElementById('entity-modal').classList.remove('hidden');
+            
+            loadEntityData(entity);
+        }
+
+        function closeEntityModal() {
+            document.getElementById('entity-modal').classList.add('hidden');
+            currentEntity = null;
+        }
+
+        function loadEntityData(entity) {
+            const content = document.getElementById('entity-content');
+            const schema = entitySchema[entity];
+            
+            // Simulate loading data
+            content.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-400 uppercase bg-slate-800/50">
+                            <tr>
+                                ${schema.display.map(col => `<th class="px-4 py-3 rounded-l-lg">${col}</th>`).join('')}
+                                <th class="px-4 py-3 rounded-r-lg text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            ${generateMockRows(entity, schema)}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 flex items-center justify-between text-xs text-slate-500">
+                    <span>Showing 1-10 of ${getEntityCount(entity)} records</span>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 bg-slate-800 rounded hover:bg-slate-700">Previous</button>
+                        <button class="px-3 py-1 bg-slate-800 rounded hover:bg-slate-700">Next</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateMockRows(entity, schema) {
+            const rows = [];
+            const count = 10;
+            
+            for (let i = 0; i < count; i++) {
+                const cells = schema.display.map(col => {
+                    let value = '';
+                    
+                    switch(col) {
+                        case 'id':
+                            value = `<span class="mono text-blue-400">${1000 + i}</span>`;
+                            break;
+                        case 'email':
+                            value = `player${i}@aetheria.game`;
+                            break;
+                        case 'name':
+                            value = ['Aragorn', 'Legolas', 'Gimli', 'Gandalf', 'Frodo', 'Sam', 'Boromir', 'Merry', 'Pippin', 'Strider'][i];
+                            break;
+                        case 'race':
+                            value = ['Human', 'Elf', 'Dwarf', 'Mage', 'Hobbit'][i % 5];
+                            break;
+                        case 'level':
+                            value = `<span class="mono text-yellow-400">${Math.floor(Math.random() * 100) + 1}</span>`;
+                            break;
+                        case 'gold':
+                            value = `<span class="mono text-yellow-400">${(Math.random() * 50000).toFixed(0)}</span>`;
+                            break;
+                        case 'privileges':
+                            value = `<span class="px-2 py-1 rounded text-xs ${i === 0 ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-700 text-slate-400'}">${i === 0 ? 'ADMINISTRATOR' : 'USER'}</span>`;
+                            break;
+                        case 'banned':
+                            value = i === 2 ? '<span class="text-red-500">YES</span>' : '<span class="text-green-500">NO</span>';
+                            break;
+                        case 'status':
+                            const statuses = ['HEALTHY', 'POISONED', 'BLINDED', 'SCARED'];
+                            const status = statuses[i % 4];
+                            const color = status === 'HEALTHY' ? 'text-green-400' : 'text-yellow-400';
+                            value = `<span class="${color}">${status}</span>`;
+                            break;
+                        case 'rarity':
+                            const rarities = ['COMMON', 'UNCOMMON', 'RARE', 'EPIC', 'LEGENDARY'];
+                            const rarity = rarities[i % 5];
+                            const rColors = ['text-gray-400', 'text-green-400', 'text-blue-400', 'text-purple-400', 'text-yellow-400'];
+                            value = `<span class="${rColors[i % 5]}">${rarity}</span>`;
+                            break;
+                        case 'hatched':
+                            value = i % 2 === 0 ? '<span class="text-green-400">Yes</span>' : '<span class="text-gray-500">No</span>';
+                            break;
+                        case 'bracket':
+                            const brackets = ['STANDARD', 'ELITE', 'PLATINUM', 'DIAMOND'];
+                            value = `<span class="mono text-cyan-400">${brackets[i % 4]}</span>`;
+                            break;
+                        case 'monster_class':
+                            const classes = ['Beast', 'Dragon', 'Undead', 'Elemental', 'Demon'];
+                            value = classes[i % 5];
+                            break;
+                        case 'folder':
+                            const folders = ['INBOX', 'DRAFTS', 'OUTBOX', 'DELETED'];
+                            value = `<span class="text-xs bg-slate-700 px-2 py-1 rounded">${folders[i % 4]}</span>`;
+                            break;
+                        case 'friend_status':
+                            const fstatus = ['NONE', 'REQUEST_SENT', 'REQUEST_RECV', 'MUTUAL'];
+                            value = `<span class="text-xs ${i % 4 === 3 ? 'text-green-400' : 'text-yellow-400'}">${fstatus[i % 4]}</span>`;
+                            break;
+                        default:
+                            value = `<span class="mono text-slate-400">${Math.floor(Math.random() * 10000)}</span>`;
+                    }
+                    
+                    return `<td class="px-4 py-3">${value}</td>`;
+                }).join('');
+                
+                rows.push(`
+                    <tr class="hover:bg-slate-800/50 transition-colors group">
+                        ${cells}
+                        <td class="px-4 py-3 text-right">
+                            <button onclick="editRecord(${1000 + i})" class="text-blue-400 hover:text-blue-300 mr-3 opacity-0 group-hover:opacity-100 transition-opacity">Edit</button>
+                            <button onclick="deleteRecord(${1000 + i})" class="text-red-400 hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity">Delete</button>
+                        </td>
+                    </tr>
+                `);
+            }
+            
+            return rows.join('');
+        }
+
+        function getEntityCount(entity) {
+            const counts = {
+                accounts: '1,247',
+                characters: '3,891',
+                familiars: '2,456',
+                bank: '1,198',
+                monsters: '15,234',
+                mail: '45,892',
+                friends: '8,234',
+                statistics: '3,891'
+            };
+            return counts[entity] || '0';
+        }
+
+        function refreshEntityData() {
+            if (currentEntity) {
+                loadEntityData(currentEntity);
+                addActivity(`Refreshed ${currentEntity} data`);
+            }
+        }
+
+        function searchEntity() {
+            const query = document.getElementById('entity-search').value.toLowerCase();
+            // Implement search logic here
+            if (query.length > 2) {
+                addActivity(`Searching ${currentEntity} for "${query}"...`);
+            }
+        }
+
+        function addEntityRecord() {
+            addActivity(`Creating new ${currentEntity} record...`);
+            alert(`Add new ${currentEntity} record functionality would open a form here`);
+        }
+
+        function editRecord(id) {
+            addActivity(`Editing ${currentEntity} record #${id}...`);
+        }
+
+        function deleteRecord(id) {
+            if (confirm(`Delete ${currentEntity} record #${id}?`)) {
+                addActivity(`Deleted ${currentEntity} record #${id}`);
+            }
+        }
+
+        function refreshEntities() {
+            if (!dbConnection) {
+                addActivity('No database connection to refresh');
+                return;
+            }
+            addActivity('Refreshing all entity counts...');
+            
+            // Simulate refresh animation
+            const cards = document.querySelectorAll('.entity-card span[id^="count-"]');
+            cards.forEach(card => {
+                card.style.opacity = '0.5';
+                setTimeout(() => card.style.opacity = '1', 500);
+            });
+        }
+
+        function executeQuickQuery() {
+            const query = document.getElementById('quick-sql').value;
+            if (!query.trim()) return;
+            
+            if (!dbConnection) {
+                alert('Connect to database first');
+                return;
+            }
+            
+            addActivity(`Executed: ${query.substring(0, 50)}...`);
+            
+            // Show results in entity modal
+            document.getElementById('entity-content').innerHTML = `
+                <div class="text-center py-12">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <p class="text-slate-300">Query executed successfully</p>
+                    <p class="text-sm text-slate-500 mt-2">10 rows affected</p>
+                </div>
+            `;
+            document.getElementById('entity-modal').classList.remove('hidden');
+            document.getElementById('entity-title').textContent = 'Query Results';
+        }
+
+        function addActivity(message) {
+            const container = document.getElementById('recent-activity');
+            const time = new Date().toLocaleTimeString();
+            
+            const div = document.createElement('div');
+            div.className = 'flex items-start gap-2 text-slate-400';
+            div.innerHTML = `
+                <span class="mono text-slate-600 shrink-0">[${time}]</span>
+                <span>${message}</span>
+            `;
+            
+            if (container.children[0]?.classList.contains('italic')) {
+                container.innerHTML = '';
+            }
+            
+            container.insertBefore(div, container.firstChild);
+            
+            // Keep only last 5
+            while (container.children.length > 5) {
+                container.removeChild(container.lastChild);
+            }
+        }
+    </script>
+</body>
+</html>
+

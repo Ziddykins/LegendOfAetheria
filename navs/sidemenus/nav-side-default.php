@@ -324,30 +324,37 @@ $currentSub = $_GET['sub'] ?? '';
                         <i class="ms-auto bi bi-chevron-right"></i>
                     </a>
                     
-                    <ul id="quest-list" class="nav nav-treeview">
+					<ul id="quest-list" class="nav nav-treeview">
+						<li class="nav-item">
+                            <a href="/game?page=intro&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'active' && $currentSub === 'quests') ? 'active' : ''; ?>" disabled>
+                                <i class="nav-icon material-symbols-outlined">step</i>
+                                <p class="ms-2">Introduction</p>
+                            </a>
+                        </li>
+ 
                         <li class="nav-item">
-                            <a href="/game?page=active&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'active' && $currentSub === 'quests') ? 'active' : ''; ?>">
+                            <a href="/game?page=active&sub=quests" class="nav-link text-secondary d-flex align-items-center ps-3 <?php echo ($currentPage === 'active' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">lists</i>
                                 <p class="ms-2">Active</p>
                             </a>
-                        </li>
+						</li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=accepted&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'accepted' && $currentSub === 'quests') ? 'active' : ''; ?>">
+                            <a href="/game?page=accepted&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'accepted' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">fact_check</i>
                                 <p class="ms-2">Accepted</p>
                             </a>
                         </li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=completed&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'completed' && $currentSub === 'quests') ? 'active' : ''; ?>">
+                            <a href="/game?page=completed&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'completed' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">done_all</i>
                                 <p class="ms-2">Completed</p>
                             </a>
                         </li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=abandoned&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'abandoned' && $currentSub === 'quests') ? 'active' : ''; ?>">
+                            <a href="/game?page=abandoned&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'abandoned' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">backspace</i>
                                 <p class="ms-2">Abandoned</p>
                             </a>
@@ -625,7 +632,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 sliver.style.justifyContent = "center";
                 sliver.style.backgroundColor = "rgba(5, 57, 28, 0.21)";
                 sliver.innerHTML = "<i class=\"bi bi-chevron-right\"></i>";
-                console.log("SIDEBAR CLOSED");
+				console.log("SIDEBAR CLOSED");
+				mutation.target.classList.remove('side-collapse');
             } else {
                 sliver.style.display = "none";
             }
