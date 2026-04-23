@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f7526fc9547eb49566f8d5b870e87d7a",
+    "content-hash": "93d5626c46a0b4db8fffb846ed49327f",
     "packages": [
         {
             "name": "composer/semver",
@@ -84,109 +84,30 @@
             "time": "2025-08-20T19:15:30+00:00"
         },
         {
-            "name": "contributte/di",
-            "version": "v0.5.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/contributte/di.git",
-                "reference": "49d6b93d46f57be319b1e811cd983bfed0c90979"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/contributte/di/zipball/49d6b93d46f57be319b1e811cd983bfed0c90979",
-                "reference": "49d6b93d46f57be319b1e811cd983bfed0c90979",
-                "shasum": ""
-            },
-            "require": {
-                "nette/di": "^3.1.0",
-                "nette/utils": "^3.2.8 || ^4.0",
-                "php": ">=7.2"
-            },
-            "conflict": {
-                "nette/schema": "<1.1.0"
-            },
-            "require-dev": {
-                "nette/bootstrap": "^3.1.4",
-                "nette/robot-loader": "^3.4.2 || ^4.0",
-                "ninjify/nunjuck": "^0.4",
-                "ninjify/qa": "^0.13",
-                "phpstan/phpstan": "^1.9.11",
-                "phpstan/phpstan-deprecation-rules": "^1.1.1",
-                "phpstan/phpstan-nette": "^1.2.0",
-                "phpstan/phpstan-strict-rules": "^1.4.5"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "0.6.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Contributte\\DI\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Milan Felix Šulc",
-                    "homepage": "https://f3l1x.io"
-                }
-            ],
-            "description": "Extra contrib to nette/di",
-            "homepage": "https://github.com/contributte/di",
-            "keywords": [
-                "dependency",
-                "inject",
-                "nette"
-            ],
-            "support": {
-                "issues": "https://github.com/contributte/di/issues",
-                "source": "https://github.com/contributte/di/tree/v0.5.6"
-            },
-            "funding": [
-                {
-                    "url": "https://contributte.org/partners.html",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/f3l1x",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-09-05T08:23:55+00:00"
-        },
-        {
             "name": "contributte/monolog",
-            "version": "v0.5.2",
+            "version": "v0.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/contributte/monolog.git",
-                "reference": "85511b300e5c6ac12b25bf09f5ece16de2fd2c18"
+                "reference": "540e92da57680652d96800a8d369b390b91ff412"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/contributte/monolog/zipball/85511b300e5c6ac12b25bf09f5ece16de2fd2c18",
-                "reference": "85511b300e5c6ac12b25bf09f5ece16de2fd2c18",
+                "url": "https://api.github.com/repos/contributte/monolog/zipball/540e92da57680652d96800a8d369b390b91ff412",
+                "reference": "540e92da57680652d96800a8d369b390b91ff412",
                 "shasum": ""
             },
             "require": {
-                "contributte/di": "^0.5.3",
                 "monolog/monolog": "^2.0.0 || ^3.0.0",
+                "nette/di": "^3.2",
                 "nette/utils": "^3.0.0 || ^4.0.0",
-                "php": ">=7.2"
+                "php": ">=8.2"
             },
             "require-dev": {
-                "ninjify/nunjuck": "^0.4",
-                "ninjify/qa": "^v0.13.0",
-                "phpstan/phpstan": "^1.8.11",
-                "phpstan/phpstan-deprecation-rules": "^1.0.0",
-                "phpstan/phpstan-nette": "^1.1.0",
-                "phpstan/phpstan-strict-rules": "^1.4.4",
-                "tracy/tracy": "^v2.9.4"
+                "contributte/phpstan": "^0.1.0",
+                "contributte/qa": "^0.4.0",
+                "contributte/tester": "^0.4.0",
+                "tracy/tracy": "^2.9.4"
             },
             "type": "library",
             "extra": {
@@ -218,7 +139,7 @@
             ],
             "support": {
                 "issues": "https://github.com/contributte/monolog/issues",
-                "source": "https://github.com/contributte/monolog/tree/v0.5.2"
+                "source": "https://github.com/contributte/monolog/tree/v0.6.0"
             },
             "funding": [
                 {
@@ -230,7 +151,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-07-21T08:28:12+00:00"
+            "time": "2026-01-02T13:53:23+00:00"
         },
         {
             "name": "doctrine/deprecations",
