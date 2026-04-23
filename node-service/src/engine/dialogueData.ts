@@ -4,7 +4,7 @@ export const dialogueDefinitions = [
 		ownerId: 'question-sage',
 		startNodeId: 'start',
 		entryNodeId: 'start',
-		speaker: ['Question Sage'],
+		speakers: ['Question Sage'],
 
 		nodes: {
 			start: {

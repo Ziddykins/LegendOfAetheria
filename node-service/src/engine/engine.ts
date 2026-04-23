@@ -24,7 +24,12 @@ export async function createGameEngine(existingData = null) {
 		playerId: 'hero',
 	});
 
-	const dialogueCoreRaw = createDialogueCore(dialogueDefinitions);
+	const normalizedDialogueDefinitions = dialogueDefinitions.map(dialogue => ({
+		...dialogue,
+		speakers: dialogue.speaker ?? [],
+	}));
+
+	const dialogueCoreRaw = createDialogueCore(normalizedDialogueDefinitions);
 	const dialogueModules = Array.isArray(dialogueCoreRaw)
 		? dialogueCoreRaw
 		: [dialogueCoreRaw];

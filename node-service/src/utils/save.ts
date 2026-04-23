@@ -53,7 +53,7 @@ export function loadEngine(): Engine {
 		],
 	});
 
-  const parsed = JSON.parse(save);
+  const parsed = JSON.parse(loadGame());
   const restoredStore = WorldStore.deserialize(
     parsed.world,
     (tmp_engine.store as any).events
