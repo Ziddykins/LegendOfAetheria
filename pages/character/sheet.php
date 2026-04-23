@@ -10,25 +10,27 @@
         <div class="d-flex justify-content-center">
             
             <div class="container"style="max-width: 850px;">
-                <div class="card ps-3 mb-3 pt-3"  ">
-                    <div class="card-title lead">
-                        <?php echo "$char_name the level $char_level {$char_race->name}"; ?>
+                <div class="card ps-3 mb-3 pt-3">
+                    <div class="card-title lead text-center">
+                        <?php echo "$char_name the level $char_level {$char_race->name}"; ?><p></p>
                         
-                        <span class="small text-body-secondary float-end pe-3" style="font-size: 10px;">
+                        <span class="small text-body-secondary float-lg-end pe-3" style="font-size: 10px;">
                             Character created <?php echo $character->get_dateCreated(); ?>
                         </span>
-                    </div>
-                    <div class="hr">
-                    <div class="d-flex">
+		    </div>
+
+		    <div class="hr">
+
+                    <div class="d-grid d-lg-flex">
                         <div class="flex-shrink-0">
-                            <img src="img/avatars/<?php echo $char_avatar; ?>" class="img-fluid rounded m-3" alt="character-avatar" style="width: 256px; height:256px;">
+                            <img src="img/avatars/<?php echo $char_avatar; ?>" class="img-fluid rounded m-6" alt="character-avatar" style="width: 256px; height:256px;">
                             <div class="small mb-3 pe-3 text-center">
                                 <?php echo "$char_location ($cur_x, $cur_y)"; ?>
                             </div>
                         </div>
                         
                         <div class="card-body">
-                            <div class="flex-grow-1">
+                            <div class="d-flex-grow-1">
                                 <div>
                                     <div class="container framed-grey shadow-sm border align-items-center">
                                         <div class="row mb-3 mt-3">

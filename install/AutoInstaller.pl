@@ -1257,6 +1257,8 @@ sub check_platform {
         return "windows";
     } elsif ($platform eq "linux") {
         return "linux";
+    } elsif ($platform eq "android") {
+	return "linux";
     }
     die "Unsupported OS!\n";
 }
