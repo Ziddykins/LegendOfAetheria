@@ -12,7 +12,8 @@ $log->debug("WE MADE IT TO SELECT");
 
 if (check_session()) {
     $account   = new Account($_SESSION['email']);
-    $character = new Character($account->get_id());
+	$character = new Character($account->get_id());
+	//ai_serv_post('logged_in', $account);
 
     if (isset($_POST['create-submit']) && $_POST['create-submit'] == 1) {
         if (isset($_POST['slot']) && $_POST['slot'] > 0 && $_POST['slot'] <= 3) {
@@ -171,7 +172,8 @@ if (check_session()) {
             });
         });
         const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+		
+		const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
     </script>
 
     <?php include "html/footers.html"; ?>    
