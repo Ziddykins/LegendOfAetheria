@@ -1,0 +1,65 @@
+<title>Legend of Aetheria</title>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Legend of Aetheria - A Fantasy-RPG, browser-based game full of exciting adventures">
+        <meta name="google-signin-client_id" content="905625455039-22nlqmke7jn849t3h7125i5tjtea89fb.apps.googleusercontent.com">
+        <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+        <meta http-equiv="Content-Security-Policy"
+                 content="script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client https://apis.google.com/js/platform.js;
+                         style-src 'self' 'unsafe-inline' https://accounts.google.com https://cdn.jsdelivr.net/npm/*;
+                         object-src 'none';
+                         base-uri 'self';
+                         connect-src *;
+                         font-src 'self' https://fonts.gstatic.com https://fonts.gstatic.com/*;
+                         frame-src 'self' https://accounts.google.com;
+                         manifest-src 'self';
+                         media-src 'self';
+                         worker-src 'none';">
+                         
+        <!-- local 'self' https://accounts.google.com;-->
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/bootstrap-icons.min.css">
+        <link rel="stylesheet" type="text/css" href="/css/gfonts.css" />
+        <link rel="stylesheet" type="text/css" href="/css/loa.css" />
+        <link rel="stylesheet" href="/css/adminlte.min.css">
+        <link type="text/css" href="/css/overlayscrollbars.min.css" rel="stylesheet" />
+
+        <!-- RPGUI: https://github.com/RonenNess/RPGUI -->
+        <script src="/js/rpgui.min.js"></script>
+        <link href="/css/rpgui.min.css" rel="stylesheet">
+  
+        <script src="/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+        <script src="/js/jquery-3.7.1.min.js" type="text/javascript"></script>
+
+        <!-- Progress bar library from https://loading.io -->
+        <link rel="stylesheet" type="text/css" href="/css/loading-bar.css"/>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <?php if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1): ?>
+        <?php if (!isset($_SESSION['csrf-token'])): ?>
+            $_SESSION['csrf-token'] = gen_csrf_token();
+        <?php endif; ?>
+
+        <meta content="<?php echo $_SESSION['csrf-token']; ?>" name="csrf-token" />
+
+        <script>                
+            var loa = {
+               u_email: "<?php echo $_SESSION['email']; ?>",
+                 u_aid: "<?php echo $_SESSION['account-id']; ?>",
+                u_csrf: "<?php echo $_SESSION['csrf-token']; ?>",
+                 u_sid: "<?php echo session_id(); ?>",
+                 chat_pos: 0,
+                 chat_history: [],
+            };
+        </script>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['character-id'])): ?>
+            <script>
+                loa.u_cid = "<?php echo $_SESSION['character-id']; ?>";
+                loa.u_name = "<?php echo $_SESSION['name']; ?>";
+            </script>
+        <?php endif; ?>

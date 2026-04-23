@@ -1,0 +1,311 @@
+DROP DATABASE IF EXISTS `db_loa`;
+CREATE DATABASE `db_loa`;
+USE `db_loa`;
+
+/*M!999999\- enable the sandbox mode */ 
+-- MariaDB dump 10.19-11.8.3-MariaDB, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: db_loa
+-- ------------------------------------------------------
+-- Server version	11.8.3-MariaDB-1+b1 from Debian
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
+
+--
+-- Table structure for table `tbl_accounts`
+--
+
+DROP TABLE IF EXISTS `tbl_accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_accounts` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `date_registered` datetime NOT NULL DEFAULT curdate(),
+  `verified` tinyint(1) DEFAULT 0,
+  `verification_code` varchar(255) DEFAULT NULL,
+  `banned` tinyint(1) DEFAULT 0,
+  `muted` tinyint(1) DEFAULT 0,
+  `privileges` set('BANNED','MUTED','UNREGISTERED','UNVERIFIED','USER','MODERATOR','SUPER_MODERATOR','GLOBAL_ADMINISTRATOR','ADMINISTRATOR','OWNER','ROOTED') DEFAULT 'UNREGISTERED',
+  `last_login` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `logged_in` tinyint(1) DEFAULT 0,
+  `failed_logins` int(10) unsigned DEFAULT 0,
+  `ip_address` tinytext DEFAULT NULL,
+  `credits` int(9) unsigned DEFAULT 10,
+  `session_id` varchar(255) DEFAULT NULL,
+  `ip_lock` varchar(64) DEFAULT NULL,
+  `ip_lock_addr` varchar(64) DEFAULT 'off',
+  `char_slot1` int(9) unsigned DEFAULT NULL,
+  `char_slot2` int(9) unsigned DEFAULT NULL,
+  `char_slot3` int(9) unsigned DEFAULT NULL,
+  `settings` mediumtext DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slots` (`char_slot1`,`char_slot2`,`char_slot3`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_bank`
+--
+
+DROP TABLE IF EXISTS `tbl_bank`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_bank` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(9) unsigned NOT NULL,
+  `character_id` int(9) unsigned NOT NULL,
+  `gold_amount` double DEFAULT NULL,
+  `interest_rate` double unsigned DEFAULT 0.5,
+  `spindels` int(9) unsigned DEFAULT 0,
+  `loan` double unsigned DEFAULT 0,
+  `dpr` double unsigned DEFAULT 25,
+  `bracket` enum('STANDARD','ELITE','PLATINUM','DIAMOND') DEFAULT 'STANDARD',
+  `transfer_limit` double unsigned DEFAULT 5000,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_banned`
+--
+
+DROP TABLE IF EXISTS `tbl_banned`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_banned` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(9) unsigned NOT NULL,
+  `date` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `expires` datetime DEFAULT NULL,
+  `reason` varchar(255) DEFAULT 'Not Specified',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_characters`
+--
+
+DROP TABLE IF EXISTS `tbl_characters`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_characters` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(9) unsigned NOT NULL,
+  `level` int(9) unsigned DEFAULT 1,
+  `name` varchar(50) DEFAULT NULL,
+  `race` varchar(50) DEFAULT NULL,
+  `avatar` varchar(50) DEFAULT 'avatar-unknown.jpg',
+  `x` int(9) DEFAULT 0,
+  `y` int(9) DEFAULT 0,
+  `location` varchar(127) DEFAULT 'The Shrine',
+  `alignment` int(9) DEFAULT 5,
+  `gold` bigint(20) unsigned DEFAULT 1000,
+  `floor` int(9) unsigned DEFAULT 1,
+  `description` text DEFAULT 'None Provided',
+  `stats` mediumtext DEFAULT NULL,
+  `inventory` mediumtext DEFAULT NULL,
+  `monster` mediumtext DEFAULT NULL,
+  `bank` mediumtext DEFAULT NULL,
+  `date_created` datetime DEFAULT current_timestamp(),
+  `last_action` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `status` set('HEALTHY','POISONED','BLINDED','SCARED','OVERENCUMBERED','OVERHEATED','STUNNED','FROZEN','BURNING','CONFUSED','CHARMED','SLEEPING','DEAD','BLEEDING') DEFAULT 'HEALTHY',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_familiars`
+--
+
+DROP TABLE IF EXISTS `tbl_familiars`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_familiars` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `character_id` int(9) unsigned NOT NULL,
+  `name` varchar(128) DEFAULT '!Unset!',
+  `hatched` tinyint(1) DEFAULT 0,
+  `rarity` varchar(56) DEFAULT 'NONE',
+  `date_acquired` datetime DEFAULT NULL,
+  `hatch_time` datetime DEFAULT NULL,
+  `rarity_color` varchar(56) DEFAULT '#000',
+  `level` int(9) unsigned DEFAULT 1,
+  `eggs_owned` int(9) unsigned DEFAULT 0,
+  `eggs_seen` int(9) unsigned DEFAULT 0,
+  `last_roll` float unsigned DEFAULT 0,
+  `avatar` varchar(255) DEFAULT 'img/generated/eggs/egg-unhatched.jpeg',
+  `slot` int(9) unsigned DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_friends`
+--
+
+DROP TABLE IF EXISTS `tbl_friends`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_friends` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `sender_id` int(9) unsigned NOT NULL,
+  `recipient_id` int(9) unsigned NOT NULL,
+  `friend_status` set('NONE','REQUEST_SENT','REQUEST_RECV','MUTUAL') DEFAULT 'NONE',
+  `timestamp` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_globalchat`
+--
+
+DROP TABLE IF EXISTS `tbl_globalchat`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_globalchat` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `character_id` int(9) unsigned NOT NULL,
+  `message` mediumtext NOT NULL,
+  `when` datetime DEFAULT current_timestamp(),
+  `nickname` varchar(255) DEFAULT NULL,
+  `room` varchar(255) DEFAULT '!main',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_globals`
+--
+
+DROP TABLE IF EXISTS `tbl_globals`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_globals` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '0',
+  `value` varchar(50) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_logs`
+--
+
+DROP TABLE IF EXISTS `tbl_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_logs` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `date` datetime DEFAULT current_timestamp(),
+  `type` varchar(255) DEFAULT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `ip` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_mail`
+--
+
+DROP TABLE IF EXISTS `tbl_mail`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_mail` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `s_aid` int(9) unsigned NOT NULL,
+  `s_cid` int(9) unsigned NOT NULL,
+  `r_aid` int(9) unsigned NOT NULL,
+  `r_cid` int(9) unsigned NOT NULL,
+  `folder` enum('INBOX','DRAFTS','OUTBOX','DELETED') NOT NULL,
+  `to` varchar(50) NOT NULL,
+  `from` varchar(50) NOT NULL,
+  `subject` varchar(50) NOT NULL,
+  `message` longtext NOT NULL,
+  `date` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `status` set('NONE','READ','REPLIED','FAVORITE','IMPORTANT') DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_monsters`
+--
+
+DROP TABLE IF EXISTS `tbl_monsters`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_monsters` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(9) unsigned NOT NULL,
+  `character_id` int(9) unsigned DEFAULT NULL,
+  `level` int(9) unsigned DEFAULT 1,
+  `name` varchar(255) DEFAULT NULL,
+  `scope` enum('NONE','PERSONAL','ZONE','GLOBAL') DEFAULT 'NONE',
+  `seed` varchar(255) NOT NULL,
+  `drop_level` tinyint(4) DEFAULT 1,
+  `exp_awarded` bigint(20) DEFAULT NULL,
+  `gold_awarded` bigint(20) DEFAULT NULL,
+  `monster_class` varchar(255) DEFAULT NULL,
+  `stats` mediumtext DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `tbl_statistics`
+--
+
+DROP TABLE IF EXISTS `tbl_statistics`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tbl_statistics` (
+  `id` int(9) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(9) unsigned NOT NULL,
+  `character_id` int(9) unsigned NOT NULL,
+  `critical_hits` bigint(20) unsigned DEFAULT 0,
+  `deaths` bigint(20) unsigned DEFAULT 0,
+  `global_fbs` bigint(20) unsigned DEFAULT 0,
+  `player_kills` bigint(20) unsigned DEFAULT 0,
+  `monster_kill` bigint(20) unsigned DEFAULT 0,
+  `biggest_hit` bigint(20) unsigned DEFAULT 0,
+  `total_exp` bigint(20) unsigned DEFAULT 0,
+  `total_goldeggs_found` bigint(20) unsigned DEFAULT 0,
+  `eggs_hatched` bigint(20) unsigned DEFAULT 0,
+  `highest_famlvl` bigint(20) unsigned DEFAULT 0,
+  `highest_famrarity` bigint(20) unsigned DEFAULT 0,
+  `biggest_famhit` bigint(20) unsigned DEFAULT 0,
+  `logins` bigint(20) unsigned DEFAULT 0,
+  `failed_logins` bigint(20) unsigned DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
+
+-- Dump completed on 2025-11-11 20:09:43
+DROP USER IF EXISTS user_loa;
+CREATE USER user_loa;
+GRANT SELECT, INSERT, UPDATE, DELETE ON db_loa.* TO user_loa IDENTIFIED BY 'passw3rdz';
+FLUSH PRIVILEGES;

@@ -1,0 +1,31 @@
+<li class="nav-item dropdown user-menu">
+    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+        <img src="/img/avatars/<?php echo $character->get_avatar()?>" class="user-image rounded-circle shadow" alt="User Image">
+        <span class="d-none d-md-inline"><?php echo $character->get_name(); ?></span>
+    </a>
+    
+    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+        <li class="user-header text-bg-primary">
+            <img src="/img/avatars/<?php echo $character->get_avatar()?>" class="rounded-circle shadow" alt="User Image" />
+            <p>
+                <sup><?php echo $account->get_email(); ?></sup>
+
+                <h5><?php echo $character->get_name(); ?></h5>
+                <h6><?php echo $character->get_race(); ?></h6>
+            </p>
+            <p>
+                <small><?php echo "Created " . $account->get_dateRegistered(); ?></small>
+            </p>
+        </li>
+
+        <li class="d-flex justify-content-evenly user-footer shadow border">
+            <a href="#" class="btn btn-default btn-flat flex-fill btn-outline-secondary me-2">
+                <i class="bi bi-person-bounding-box"></i> Profile
+            </a>
+            <a href="/logout" class="btn btn-default btn-flat flex-fill btn-outline-secondary">
+                <i class="bi bi-door-open"></i>
+                Logout
+            </a>
+        </li>
+    </ul>
+</li>

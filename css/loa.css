@@ -1,0 +1,9 @@
+#chatbox-bottom {
+    background: rgba(10, 10, 10, .2);
+    height: 15px;
+}
+
+#chatbox-bottom:hover {
+    background: rgba(2, 2, 2, 1);
+}
+

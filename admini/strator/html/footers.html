@@ -1,0 +1,22 @@
+    <script src="/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="js/overlayscrollbars.browser.es6.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/floating-ui-core.js"></script>
+	<script src="js/floating-ui-dom.js"></script>
+
+
+	<script src="js/adminlte.min.js" type="text/javascript"></script>
+
+	<script type="text/javascript" src="js/nav-scrollbars.js"></script>
+    <script type="text/javascript" src="js/gc.js"></script>
+
+    <script>
+		var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+		var toastList = toastElList.map(function(toastEl) {
+
+			return new bootstrap.Toast(toastEl);
+		})
+		toastList.forEach(toast => toast.show());
+    </script>
+
+	<script src="js/functions.js"></script>

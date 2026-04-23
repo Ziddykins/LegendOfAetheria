@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "@ai-rpg-engine/cli": "^2.0.9",
+    "@babel/preset-env": "^7.29.2",
+    "@devmade/express-hot-reload": "^1.0.5",
+    "babel-loader": "^10.1.1",
+    "babel-preset-env": "^1.7.0",
+    "overlayscrollbars": "^2.13.0"
+  },
+  "name": "htdocs",
+  "version": "1.0.0",
+  "description": "![Legend of Aetheria logo](https://github.com/Ziddykins/LegendOfAetheria/blob/master/img/logos/logo-banner-no-bg.webp)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^5.6.7",
+    "webpack": "^5.106.2",
+    "webpack-cli": "^7.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
