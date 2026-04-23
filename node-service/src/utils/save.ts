@@ -1,18 +1,29 @@
-import { Engine, EngineOptions, WorldStore } from '@ai-rpg-engine/core';
-import * as fs from 'node:fs';
-const SAVE_FILE = './loa.eng';
+import { Engine, WorldStore } from '@ai-rpg-engine/core';
+import { RulesetDefinition } from '@ai-rpg-engine/core';
 
-export async function loadGame() {
+import {
+	buildCombatStack,
+	traversalCore,
+	statusCore,
+	createDialogueCore,
+} from '@ai-rpg-engine/modules';
+
+import * as fs from 'node:fs';
+import { loaRuleset } from '../engine/ruleset.js';
+
+const SAVE_FILE = '../loa.eng';
+
+export function loadGame() {
 	try {
-		return await fs.readFileSync(SAVE_FILE, 'utf8');
+		return fs.readFileSync(SAVE_FILE, 'utf8');
 	} catch {
 		return null;
 	}
 }
 
-export async function saveGame(engine: Engine) {
+export function saveGame(engine: Engine) {
 	const data = JSON.stringify(engine);
-    await fs.writeFileSync(SAVE_FILE, data, 'utf8');
+    fs.writeFileSync(SAVE_FILE, data, 'utf8');
 }
 
 export function saveEngine(engine: Engine): string {
@@ -22,14 +33,14 @@ export function saveEngine(engine: Engine): string {
 	});
 }
 
-export function loadEngine(save: string, options: EngineOptions): Engine {
+export function loadEngine(): Engine {
 	const tmp_engine = new Engine({
 		manifest: {
 			id: 'loa',
 			title: 'Legend of Aetheria',
 			version: '1.0.0',
 			engineVersion: '2.3.1',
-			ruleset: loaRuleset,
+			ruleset: loaRuleset.id,
 			modules: [],
 			contentPacks: [],
 		},
