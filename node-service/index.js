@@ -34,6 +34,3 @@ async function init() {
 }
 
 init();
-
-
-
