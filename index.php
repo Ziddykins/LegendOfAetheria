@@ -1,7 +1,7 @@
 <?php
     require_once "vendor/autoload.php";
-    require_once "system/constants.php";
-    require_once "system/bootstrap.php";
+	require_once "system/constants.php";
+	require_once "system/bootstrap.php";
 
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;

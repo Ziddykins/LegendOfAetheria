@@ -6,7 +6,6 @@ import {
 	createDialogueCore,
 } from '@ai-rpg-engine/modules';
 
-import { dialogueDefinitions } from './dialogueData.js';
 import { saveGame, saveEngine, loadEngine } from '../utils/save.js';
 
 // build lookup map

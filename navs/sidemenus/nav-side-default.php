@@ -1,5 +1,4 @@
 <?php
-;
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\Mail\Folder\Enums\FolderType;
@@ -7,7 +6,7 @@ use Game\Mail\MailBox\MailBox;
 use Game\Character\Enums\FriendStatus;
 use Game\Account\Enums\Privileges;
 
-require_once "system/constants.php";
+#require_once "system/constants.php";
 
 $account   = new Account($_SESSION['email']); 
 $character = new Character($account->get_id(), $_SESSION['character-id']); 

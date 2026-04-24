@@ -2,12 +2,12 @@
 declare(strict_types=1);
 
 /* Core requirements */
+require_once 'system/constants.php';
 require_once WEBROOT . '/vendor/autoload.php';
 
 use Game\System\System;
 
 $system = new System(0);
-require_once SYSTEM_DIRECTORY . '/constants.php';
 
 /* Funcs etc */
 
