@@ -3,6 +3,8 @@ export const dialogueDefinitions = [
 		id: 'sage_intro',
 		ownerId: 'question-sage',
 		startNodeId: 'start',
+		entryNodeId: 'start',
+		speakers: ['Question Sage'],
 
 		nodes: {
 			start: {

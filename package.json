@@ -5,8 +5,7 @@
     "@babel/preset-env": "^7.29.2",
     "@devmade/express-hot-reload": "^1.0.5",
     "babel-loader": "^10.1.1",
-    "babel-preset-env": "^1.7.0",
-    "overlayscrollbars": "^2.13.0"
+    "babel-preset-env": "^1.7.0"
   },
   "name": "htdocs",
   "version": "1.0.0",
