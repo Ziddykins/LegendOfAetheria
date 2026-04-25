@@ -1,18 +1,19 @@
-export const dialogueDefinitions = [
-	{
+export function getDialogueDefinitions() {
+	let def = {
 		id: 'sage_intro',
 		ownerId: 'question-sage',
 		startNodeId: 'start',
 		entryNodeId: 'start',
 		speakers: ['Question Sage'],
 
+
 		nodes: {
 			start: {
 				text: "Welcome. You come seeking quests. Little do you know, you've been on one the minute you walked through that door.",
 				choices: [
-					{ 
+					{
 						text: '...huh?',
-						nextNodeId: 'clueless', 
+						nextNodeId: 'clueless',
 						type: {
 							color: 'primary',
 							icon: 'emoji-astonished-fill'
@@ -45,7 +46,7 @@ export const dialogueDefinitions = [
 						nextNodeId: 'reverse_1',
 						type: {
 							color: 'warning',
-							icon: 'emoji-neutrsl-fill'
+							icon: 'emoji-neutral-fill'
 						}
 					},
 				],
@@ -67,7 +68,7 @@ export const dialogueDefinitions = [
 						nextNodeId: 'bargain',
 						type: {
 							color: 'success',
-							icon: 'bi-flask-florence-fill' 
+							icon: 'bi-flask-florence-fill'
 						}
 					}
 				]
@@ -75,14 +76,14 @@ export const dialogueDefinitions = [
 
 			end_power: {
 				text: 'Good, good. Now we play the waiting game... +2 STR.',
-					effects: [
-						{
-							type: 'modifyStat',
-							targetId: 'hero',
-							stat: 'strength',
-							amount: 2,
-						},
-					],
+				effects: [
+					{
+						type: 'modifyStat',
+						targetId: 'hero',
+						stat: 'strength',
+						amount: 2,
+					},
+				],
 				end: true,
 			},
 
@@ -98,5 +99,7 @@ export const dialogueDefinitions = [
 				],
 			},
 		},
-	},
-];
+	}
+
+	return def;
+}

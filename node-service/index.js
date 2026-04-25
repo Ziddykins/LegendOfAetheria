@@ -1,10 +1,10 @@
 import express from 'express';
-import { createGameEngine, getDialogueMap } from './src/engine/engine.ts';
-import { loadGame, saveGame, loadEngine, saveEngine } from './src/utils/save.ts';
-import engineState from './src/routes/state.ts';
-import dialogueRoutes from './src/routes/dialogue.ts';
-import combatRoutes from './src/routes/combat.ts';
-import debugOutput from './src/routes/state.ts';
+import {createGameEngine, getDialogueMap} from './src/engine/engine.js';
+import {loadGame, saveGame} from './src/utils/save.js';
+import {engineState, debugOutput} from './src/routes/state.js';
+import dialogueRoutes from './src/routes/dialogue.js';
+import combatRoutes from './src/routes/combat.js';
+import {dialogueMap, dialogueRoutes} from '@ai-rpg-engine/modules'
 const app = express();
 app.use(express.json());
 
@@ -12,11 +12,12 @@ let engine;
 
 async function init() {
 	try {
-		const saveData = await loadGame();
-		console.log(saveData);
-		engine = await createGameEngine(saveData);
-
+		const saveData = loadGame();
 		const dialogueMap = getDialogueMap();
+		const saveTest = loadEngine();
+
+		console.log(saveTest);
+		engine = await createGameEngine(saveData);
 
 		app.use('/', dialogueRoutes(engine, dialogueMap, saveGame));
 		app.use('/', combatRoutes(engine, saveGame));

@@ -10,7 +10,7 @@
         <div class="d-flex justify-content-center">
             
             <div class="container"style="max-width: 850px;">
-                <div class="card ps-3 mb-3 pt-3">
+                <div class="card ps-1 mb-3 pt-3 text-center">
                     <div class="card-title lead text-lg-center">
                         <?php echo "$char_name the level $char_level {$char_race->name}"; ?><p></p>
 				    </div>

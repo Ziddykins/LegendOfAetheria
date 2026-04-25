@@ -17,7 +17,7 @@ export default function dialogueRoutes(engine, dialogueMap, saveGame) {
 		);
 
 		if (!dialogue) {
-			return res.ts({ text: "NPC has nothing to say." });
+			return res.ts({text: "NPC has nothing to say."});
 		}
 
 		engine.store.state.dialogueCore = {
@@ -37,12 +37,12 @@ export default function dialogueRoutes(engine, dialogueMap, saveGame) {
 	});
 
 	router.post('/choice', async (req, res) => {
-		const { choiceIndex } = req.body;
+		const {choiceIndex} = req.body;
 		const state = engine.store.state;
 		const ds = state.dialogueCore;
 
 		if (!ds) {
-			return res.ts({ error: "No active dialogue" });
+			return res.ts({error: "No active dialogue"});
 		}
 
 		const dialogue = dialogueMap[ds.activeDialogueId];
@@ -50,7 +50,7 @@ export default function dialogueRoutes(engine, dialogueMap, saveGame) {
 		const choice = node.choices?.[choiceIndex];
 
 		if (!choice) {
-			return res.ts({ error: "Invalid choice" });
+			return res.ts({error: "Invalid choice"});
 		}
 
 		// apply effects

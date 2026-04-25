@@ -57,13 +57,15 @@ enum Races: string {
      * @param Stats $character_stats Character stats object to modify
      * @return void
      */
-    public function set_stat_adjust(Stats $character_stats): void {
+    public function set_stat_adjust(Stats $character_stats): Stats {
         $stat_adjusters = $this->get_stat_adjust();
         
         foreach ($stat_adjusters as $key => $value) {
             $func = "set_$key";
-            $character_stats->$func($value);
-        }
+			$character_stats->$func($value);
+		}
+
+		return $character_stats;
     }
     
     private function get_stat_adjust(): array {
