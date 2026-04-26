@@ -1,23 +1,23 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 
-export default function dialogueRoutes(engine, dialogueMap, saveGame) {
+export default function dialogueRoutes(engine: any, dialogueMap: Record<string, any>, saveGame: any) {
 	const router = express.Router();
 
-	router.all('/{*splat}', (req, res, next) => {
-		console.debug(`===REQ===\nURL: ${req.originalUrl}\n${JSON.stringify(res.body)}\n===\n\n===RES===\n${JSON.stringify(req.body)}\n===\n\n`);
+	router.use((req: Request, res: Response, next: NextFunction) => {
+		console.debug(`===REQ===\nURL: ${req.originalUrl}\n${JSON.stringify(req.body)}\n===`);
 		next();
 	});
 
 
-	router.post('/talk/:npcId', async (req, res) => {
+	router.post('/talk/:npcId', async (req: Request, res: Response) => {
 		const npcId = req.params.npcId;
 
-		const dialogue = Object.values(dialogueMap).find(
-			d => d.ownerId === npcId
+		const dialogue = Object.values(dialogueMap as Record<string, any>).find(
+			d => (d as any).ownerId === npcId
 		);
 
 		if (!dialogue) {
-			return res.ts({text: "NPC has nothing to say."});
+			return res.json({text: "NPC has nothing to say."});
 		}
 
 		engine.store.state.dialogueCore = {
@@ -30,19 +30,19 @@ export default function dialogueRoutes(engine, dialogueMap, saveGame) {
 
 		const node = dialogue.nodes[dialogue.startNodeId];
 
-		res.ts({
+		res.json({
 			text: node.text,
 			choices: node.choices || []
 		});
 	});
 
-	router.post('/choice', async (req, res) => {
+	router.post('/choice', async (req: Request, res: Response) => {
 		const {choiceIndex} = req.body;
 		const state = engine.store.state;
 		const ds = state.dialogueCore;
 
 		if (!ds) {
-			return res.ts({error: "No active dialogue"});
+			return res.json({error: "No active dialogue"});
 		}
 
 		const dialogue = dialogueMap[ds.activeDialogueId];
@@ -50,7 +50,7 @@ export default function dialogueRoutes(engine, dialogueMap, saveGame) {
 		const choice = node.choices?.[choiceIndex];
 
 		if (!choice) {
-			return res.ts({error: "Invalid choice"});
+			return res.json({error: "Invalid choice"});
 		}
 
 		// apply effects
@@ -74,7 +74,7 @@ export default function dialogueRoutes(engine, dialogueMap, saveGame) {
 
 		await saveGame(engine);
 
-		res.ts({
+		res.json({
 			text: nextNode.text,
 			choices: nextNode.choices || [],
 			end: !!nextNode.end

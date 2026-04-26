@@ -2,6 +2,8 @@ import {Engine} from '@ai-rpg-engine/core'
 import {
 	buildCombatStack,
 	createDialogueCore,
+	traversalCore,
+	statusCore,
 } from '@ai-rpg-engine/modules';
 
 import {loadEngine, saveEngine} from '../utils/save.js';
@@ -17,22 +19,39 @@ let dialogueMap = Object.fromEntries(
 
 export async function createGameEngine(existingData = null) {
 	const combatStack = buildCombatStack({
-		statMapping: {attack: 'might', precision: 'agility', resolve: 'will'},
+		statMapping: {attack: 'strength', precision: 'intelligence', resolve: 'defense'},
 		playerId: 'hero',
 	});
 
-	const normalizedDialogueDefinitions = getDialogueDefinitions().map(dialogue => ({
+	const dialogueDefinitions = getDialogueDefinitions();
+	const normalizedDialogueDefinitions = dialogueDefinitions.map(dialogue => ({
 		...dialogue,
 		speakers: dialogue.speakers ?? [],
 	}));
 
-	const dialogueCoreRaw = createDialogueCore([normalizedDialogueDefinitions]);
+	const dialogueCoreRaw = createDialogueCore(normalizedDialogueDefinitions as any);
 	const dialogueModules = Array.isArray(dialogueCoreRaw)
 		? dialogueCoreRaw
 		: [dialogueCoreRaw];
 
-	let lol = new EngineOptions();
-	let engine = new Engine();
+	let engine = new Engine({
+		manifest: {
+			id: 'loa',
+			title: 'Legend of Aetheria',
+			version: '1.0.0',
+			engineVersion: '2.3.1',
+			ruleset: 'loa',
+			modules: [],
+			contentPacks: [],
+		},
+		seed: Math.floor(Math.random() * 1_000_000),
+		modules: [
+			statusCore,
+			traversalCore,
+			...combatStack.modules,
+			...dialogueModules,
+		],
+	});
 
 	try {
 		engine = loadEngine();
@@ -71,7 +90,7 @@ function bootstrapWorld(engine: Engine) {
 		id: 'hero',
 		type: 'player',
 		name: 'Hero',
-		stats: {might: 6, agility: 5, will: 4},
+		stats: {strength: 6, defense: 5, intelligence: 4},
 		resources: {hp: 25},
 		statuses: [],
 		blueprintId: "",
@@ -85,7 +104,7 @@ function bootstrapWorld(engine: Engine) {
 		id: 'wolf',
 		type: 'enemy',
 		name: 'Wolf',
-		stats: {might: 4, agility: 6, will: 2},
+		stats: {strength: 4, defense: 6, intelligence: 2},
 		resources: {hp: 12},
 		statuses: [],
 		zoneId: 'forest',
@@ -101,7 +120,7 @@ function bootstrapWorld(engine: Engine) {
 		zoneId: 'sanctuary',
 		blueprintId: "",
 		resources: {hp: 10},
-		stats: {might: 4, agility: 1, will: 8},
+		stats: {strength: 4, defense: 1, intelligence: 8},
 		statuses: []
 
 
@@ -119,9 +138,12 @@ function getDialogueDefinitions() {
 
 		nodes: {
 			start: {
+				id: 'start',
+				speaker: 'Question Sage',
 				text: "Welcome. You come seeking quests. Little do you know, you've been on one the minute you walked through that door.",
 				choices: [
 					{
+					id: 'choice-1',
 						text: '...huh?',
 						nextNodeId: 'clueless',
 						type: {
@@ -130,6 +152,7 @@ function getDialogueDefinitions() {
 						}
 					},
 					{
+					id: 'choice-2',
 						text: 'Shut it, old man! Out with the quests or die.',
 						nextNodeId: 'rude',
 						type: {
@@ -141,9 +164,12 @@ function getDialogueDefinitions() {
 			},
 
 			clueless: {
+				id: 'clueless',
+				speaker: 'Question Sage',
 				text: 'Oh, nothing. Here, drink this quest-enabling potion.',
 				choices: [
 					{
+					id: 'choice-3',
 						text: 'You got it, sport-o!',
 						nextNodeId: 'end_power',
 						type: {
@@ -152,6 +178,7 @@ function getDialogueDefinitions() {
 						}
 					},
 					{
+					id: 'choice-4',
 						text: "I ain't quaffin' a thing, later creep-o",
 						nextNodeId: 'reverse_1',
 						type: {
@@ -163,9 +190,12 @@ function getDialogueDefinitions() {
 			},
 
 			rude: {
+				id: 'rude',
+				speaker: 'Question Sage',
 				text: 'You fool... You foolish FOOL! You know what? I don\'t even wanna give you the only potion in the world that enables quests. Go live your questless life without quests, there, No-Quests. I\'ll just be over here, on a quest, questin\' it up.',
 				choices: [
 					{
+					id: 'choice-5',
 						text: 'Wait, the only one? Gimme it or die, old man!',
 						nextNodeId: 'reverse_1',
 						type: {
@@ -174,6 +204,7 @@ function getDialogueDefinitions() {
 						}
 					},
 					{
+					id: 'choice-6',
 						text: 'Well, can you sweeten the deal. Toss in another potuon maybe?',
 						nextNodeId: 'bargain',
 						type: {
@@ -185,6 +216,8 @@ function getDialogueDefinitions() {
 			},
 
 			end_power: {
+				id: 'end_power',
+				speaker: 'Question Sage',
 				text: 'Good, good. Now we play the waiting game... +2 STR.',
 				effects: [
 					{
@@ -198,6 +231,8 @@ function getDialogueDefinitions() {
 			},
 
 			bargain: {
+				id: 'bargain',
+				speaker: 'Question Sage',
 				text: 'Hrmph... Let me check the back room. Ah, yes, fine. Here.',
 				effects: [
 					{
@@ -211,5 +246,5 @@ function getDialogueDefinitions() {
 		},
 	}
 
-	return def;
+	return [def];
 }

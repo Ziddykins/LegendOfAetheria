@@ -1,9 +1,9 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 
-export default function combatRoutes(engine, saveGame) {
+export default function combatRoutes(engine: any, saveGame: any) {
 	const router = express.Router();
 
-	router.post('/attack/:targetId', async (req, res) => {
+	router.post('/attack/:targetId', async (req: Request, res: Response) => {
 		try {
 			engine.submitAction('attack', {
 				targetIds: [req.params.targetId],
@@ -11,9 +11,9 @@ export default function combatRoutes(engine, saveGame) {
 
 			await saveGame(engine);
 
-			res.ts(engine.store.state);
-		} catch (err) {
-			res.status(500).ts({ error: err.message });
+			res.json(engine.store.state);
+		} catch (err: unknown) {
+			res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
 		}
 	});
 

@@ -6,9 +6,9 @@ export const loaRuleset: RulesetDefinition = {
 	version: '1.0.0',
 
 	stats: [
-		{ id: 'strength', name: 'Strength', min: 10, default: 10 },
-		{ id: 'defense', name: 'Defense', min: 10, default: 10},
-		{ id: 'intelligence', name: 'Intelligence', min: 10, default: 10 },
+		{ id: 'strength', name: 'Strength', min: 1, default: 6 },
+		{ id: 'defense', name: 'Defense', min: 1, default: 5},
+		{ id: 'intelligence', name: 'Intelligence', min: 1, default: 4 },
 	],
 	  
 	resources: [

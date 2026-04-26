@@ -1,5 +1,4 @@
 import { Engine, WorldStore } from '@ai-rpg-engine/core';
-import { RulesetDefinition } from '@ai-rpg-engine/core';
 
 import {
 	buildCombatStack,
@@ -11,19 +10,23 @@ import {
 import * as fs from 'node:fs';
 import { loaRuleset } from '../engine/ruleset.js';
 
-const SAVE_FILE = '../loa.eng';
+const SAVE_FILE = new URL('../../loa.eng', import.meta.url);
 
 export function loadGame() {
 	try {
-		return fs.readFileSync(SAVE_FILE, 'utf8');
+		const contents = fs.readFileSync(SAVE_FILE, 'utf8').trim();
+		if (!contents || contents === 'undefined' || contents === 'null') {
+			return null;
+		}
+		return contents;
 	} catch {
 		return null;
 	}
 }
 
 export function saveGame(engine: Engine) {
-	const data = JSON.stringify(engine);
-    fs.writeFileSync(SAVE_FILE, data, 'utf8');
+	const data = saveEngine(engine);
+	fs.writeFileSync(SAVE_FILE, data, 'utf8');
 }
 
 export function saveEngine(engine: Engine): string {
@@ -34,6 +37,12 @@ export function saveEngine(engine: Engine): string {
 }
 
 export function loadEngine(): Engine {
+	const combatStack = buildCombatStack({
+		statMapping: {attack: 'might', precision: 'agility', resolve: 'will'},
+		playerId: 'hero',
+	});
+	const dialogueModule = createDialogueCore([] as any);
+
 	const tmp_engine = new Engine({
 		manifest: {
 			id: 'loa',
@@ -49,11 +58,16 @@ export function loadEngine(): Engine {
 			statusCore,
 			traversalCore,
 			...combatStack.modules,
-			...dialogueModules,
+			dialogueModule,
 		],
 	});
 
-  const parsed = JSON.parse(loadGame());
+  const saveData = loadGame();
+  if (!saveData) {
+	throw new Error('Save file is missing or empty');
+  }
+
+  const parsed = JSON.parse(saveData);
   const restoredStore = WorldStore.deserialize(
     parsed.world,
     (tmp_engine.store as any).events

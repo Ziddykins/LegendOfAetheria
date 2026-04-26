@@ -1,13 +1,13 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 
-export default function engineState(engine) {
+export default function engineState(engine: any) {
 	const router = express.Router();
 
-	router.post('/state', async (req, res) => {
+	router.post('/state', async (req: Request, res: Response) => {
 		try {
 			res.send(engine.serialize());
-		} catch (err) {
-			res.status(500).json({ error: err.message });
+		} catch (err: unknown) {
+			res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
 		}
 	});
 
