@@ -1,6 +1,8 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import { saveEngine } from '../utils/save.js';
 
-export default function dialogueRoutes(engine: any, dialogueMap: Record<string, any>, saveGame: any) {
+export default function dialogueRoutes(engine: any, dialogueMap: Record<string, any>, saveEngine: any) {
 	const router = express.Router();
 
 	router.use((req: Request, res: Response, next: NextFunction) => {
@@ -8,9 +10,9 @@ export default function dialogueRoutes(engine: any, dialogueMap: Record<string, 
 		next();
 	});
 
-
-	router.post('/talk/:npcId', async (req: Request, res: Response) => {
+	router.post('/talk/:npcId{/:nodeId}', async (req: Request, res: Response) => {
 		const npcId = req.params.npcId;
+		const nodeId = req.params.nodeId;
 
 		const dialogue = Object.values(dialogueMap as Record<string, any>).find(
 			d => (d as any).ownerId === npcId
@@ -20,16 +22,21 @@ export default function dialogueRoutes(engine: any, dialogueMap: Record<string, 
 			return res.json({text: "NPC has nothing to say."});
 		}
 
+		if (typeof nodeId !== 'undefined' && nodeId !== 'reset') {
+			dialogue.startNodeId = nodeId;
+		}
+
 		engine.store.state.dialogueCore = {
 			activeDialogueId: dialogue.id,
 			activeNodeId: dialogue.startNodeId,
 			npcId
 		};
 
-		await saveGame(engine);
+		saveEngine(engine);
 
 		const node = dialogue.nodes[dialogue.startNodeId];
 
+		console.debug(`===RES===\nURL: ${JSON.stringify({text: node.text, choices: node.choices || []})}\n===`);
 		res.json({
 			text: node.text,
 			choices: node.choices || []
@@ -72,7 +79,7 @@ export default function dialogueRoutes(engine: any, dialogueMap: Record<string, 
 			state.dialogueCore = null;
 		}
 
-		await saveGame(engine);
+		await saveEngine(engine);
 
 		res.json({
 			text: nextNode.text,

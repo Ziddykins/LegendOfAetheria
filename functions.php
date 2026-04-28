@@ -612,7 +612,7 @@
             }
         }
 
-		function ai_serv_post(string $endpoint, mixed $data) {
+		function ai_serv_post(string $endpoint, mixed $data = null) {
 			$ch = curl_init();
 
 			curl_setopt($ch, CURLOPT_URL, "http://localhost:3000/$endpoint");
@@ -623,7 +623,10 @@
 
 			curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 			curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+			if ($data !== null) {
+				curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+			}
 
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 

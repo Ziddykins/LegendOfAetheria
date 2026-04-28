@@ -1,11 +1,10 @@
 export function getDialogueDefinitions() {
-	let def = {
+	return [{
 		id: 'sage_intro',
 		ownerId: 'question-sage',
 		startNodeId: 'start',
 		entryNodeId: 'start',
 		speakers: ['Question Sage'],
-
 
 		nodes: {
 			start: {
@@ -43,7 +42,7 @@ export function getDialogueDefinitions() {
 					},
 					{
 						text: "I ain't quaffin' a thing, later creep-o",
-						nextNodeId: 'reverse_1',
+						nextNodeId: 'rude',
 						type: {
 							color: 'warning',
 							icon: 'emoji-neutral-fill'
@@ -57,14 +56,14 @@ export function getDialogueDefinitions() {
 				choices: [
 					{
 						text: 'Wait, the only one? Gimme it or die, old man!',
-						nextNodeId: 'reverse_1',
+						nextNodeId: 'end_power',
 						type: {
 							color: 'warning',
 							icon: 'bi-award-fill'
 						}
 					},
 					{
-						text: 'Well, can you sweeten the deal. Toss in another potuon maybe?',
+						text: 'Well, can you sweeten the deal a little, maybe toss in another potion? That green one looks tasty. I\'d quaff that.',
 						nextNodeId: 'bargain',
 						type: {
 							color: 'success',
@@ -75,7 +74,7 @@ export function getDialogueDefinitions() {
 			},
 
 			end_power: {
-				text: 'Good, good. Now we play the waiting game... +2 STR.',
+				text: 'Good, good. Now we play the waiting game...',
 				effects: [
 					{
 						type: 'modifyStat',
@@ -93,13 +92,17 @@ export function getDialogueDefinitions() {
 					{
 						type: 'modifyStat',
 						targetId: 'hero',
-						stat: 'might',
-						amount: 2,
+						stat: 'strength',
+						amount: 2
 					},
+					{
+						type: 'modifyStat',
+						targetId: 'hero',
+						stat: 'dexterity' ,
+						amount: 1
+					}
 				],
 			},
 		},
-	}
-
-	return def;
+	}];
 }

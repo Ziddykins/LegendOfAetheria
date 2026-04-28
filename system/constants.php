@@ -1,7 +1,7 @@
 <?php
-	define('MAIN_SITE_BASEURL', 'https://didactic-goldfish-97g65q7rg97wf4p-8000.app.github.dev');
+	define('MAIN_SITE_BASEURL', 'https://localhost:8443');
 	define('SYSTEM_EMAIL_ADDRESS', "ziddy@memelife.ca");
-	define('WEBROOT', '/workspaces/LegendOfAetheria');
+	define('WEBROOT', '/data/data/com.termux/files/usr/share/apache2/default-site/htdocs');
     
 	define('UPLOAD_DIRECTORY', WEBROOT . '/uploads');
 	define('LOG_DIRECTORY', WEBROOT . '/system/logs');

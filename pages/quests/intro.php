@@ -2,9 +2,13 @@
 	$quest_npc = 'question-sage';
 	$data      = [ 'targetIds' => 1 ];
 	$endpoint  = "talk/$quest_npc";
-	$state     = json_decode(ai_serv_post('state', null));
+	$state     = ai_serv_post('state');
+	$state_obj = json_decode($state);
+	$dialogue = null;
 
-	dump_to_html($state, 1);
+	if (isset($state_obj->store?->state?->dialogueCore?->activeNodeId)) {
+		$dialogue = $state_obj->store->state->dialogueCore;
+	}
 
 	if (isset($_GET['choiceIndex']) && $_GET['choiceIndex'] != null) {
 		$choice  = $_GET['choiceIndex'];
@@ -12,17 +16,22 @@
 		$endpoint = 'choice';
 
 		$data = [ 
-			'dialogueId'  => 'sage_intro',
+			'dialogueId'  => 'rude',
 			'choiceIndex' => preg_replace('/[^0-9]/', '', $choice),
 			'nodeId'      => preg_replace('/[^a-zA-Z_-]/', '', $node_id)
 		];
-	} else {
+	} else if ($dialogue !== null) {
+		$endpoint = "talk/{$dialogue->npcId}/{$dialogue->activeNodeId}";
+		$data = [
+			'dialogueId' => $dialogue->activeDialogueId,
+			'nodeId' => $dialogue->activeNodeId
+		];
 	}
 
 	$message = json_decode(ai_serv_post($endpoint, $data));
 ?>
 	<div class="d-flex text-center align-content-center justify-content-center">
-    	<div class="card shadow-sm w-75 border-light">
+    	<div class="card shadow-sm w-75 border-light p-3">
 			<div class="row">
 				<div class="col-md-4">
 					<img class="img-fluid" src="/img/avatars/npc/question-sage.jpg" />
@@ -34,7 +43,7 @@
 							QUESTion Giver
 						</div>
 
-						<div class="lead">
+						<div class="lead mb-3 bg-gradient bg-dark">
 						<?php
 							echo $message->text;
 						?>
@@ -58,7 +67,7 @@
 								echo '</a>';
 							}
 							
-							if ($message->effects) {
+							if (isset($message->effects)) {
 
 							}
 

@@ -1,4 +1,4 @@
-import {Engine} from '@ai-rpg-engine/core'
+import {Engine, WorldStore} from '@ai-rpg-engine/core'
 import {
 	buildCombatStack,
 	createDialogueCore,
@@ -6,10 +6,56 @@ import {
 	statusCore,
 } from '@ai-rpg-engine/modules';
 
-import {loadEngine, saveEngine} from '../utils/save.js';
+import { loaRuleset } from './ruleset.js'
+import { saveEngine } from '../utils/save.js';
+import { getDialogueDefinitions } from './dialogueData.js';
+import * as fs from 'node:fs'
 
 export function getDialogueMap() {
 	return dialogueMap;
+}
+
+function loadEngine() {
+	const contents = fs.readFileSync('loa.eng', 'utf8').trim();
+	const dialogueModule = createDialogueCore([] as any);
+	const combatStack = buildCombatStack({
+		statMapping: {attack: 'strength', precision: 'dexterity', resolve: 'intelligence'},
+		playerId: 'hero',
+	});
+
+	let tmp_engine;
+
+	if (contents && contents !== 'undefined' || contents !== 'null') {
+		tmp_engine = new Engine({
+			manifest: {
+				id: 'loa',
+				title: 'Legend of Aetheria',
+				version: '1.0.0',
+				engineVersion: '2.3.1',
+				ruleset: loaRuleset.id,
+				modules: [],
+				contentPacks: [],
+			},
+			seed: Math.floor(Math.random() * 1_000_000),
+			modules: [
+				statusCore,
+				traversalCore,
+				...combatStack.modules,
+				dialogueModule,
+			],
+		});
+
+		const parsed = JSON.parse(contents);
+	    const restoredStore = WorldStore.deserialize(
+			parsed.world,
+			(tmp_engine.store as any).events
+		);
+
+		(tmp_engine as any).store = restoredStore;
+		(tmp_engine as any).actionLog = parsed.actionLog ?? [];
+	}
+	
+	return (tmp_engine as any);
 }
 
 let dialogueDefinitions = getDialogueDefinitions();
@@ -17,13 +63,13 @@ let dialogueMap = Object.fromEntries(
 	dialogueDefinitions.map(d => [d.id, d])
 );
 
-export async function createGameEngine(existingData = null) {
+export async function createGameEngine() {
 	const combatStack = buildCombatStack({
 		statMapping: {attack: 'strength', precision: 'intelligence', resolve: 'defense'},
 		playerId: 'hero',
 	});
 
-	const dialogueDefinitions = getDialogueDefinitions();
+	const dialogueDefinitions = getDialogueDefinitions();	
 	const normalizedDialogueDefinitions = dialogueDefinitions.map(dialogue => ({
 		...dialogue,
 		speakers: dialogue.speakers ?? [],
@@ -38,8 +84,8 @@ export async function createGameEngine(existingData = null) {
 		manifest: {
 			id: 'loa',
 			title: 'Legend of Aetheria',
-			version: '1.0.0',
-			engineVersion: '2.3.1',
+			version: '1.1.0',
+			engineVersion: '1.1.0',
 			ruleset: 'loa',
 			modules: [],
 			contentPacks: [],
@@ -99,6 +145,8 @@ function bootstrapWorld(engine: Engine) {
 
 	engine.store.state.playerId = 'hero';
 	engine.store.state.locationId = 'sanctuary';
+	engine.store.state
+
 
 	engine.store.addEntity({
 		id: 'wolf',
@@ -122,129 +170,5 @@ function bootstrapWorld(engine: Engine) {
 		resources: {hp: 10},
 		stats: {strength: 4, defense: 1, intelligence: 8},
 		statuses: []
-
-
 	});
-}
-
-function getDialogueDefinitions() {
-	let def = {
-		id: 'sage_intro',
-		ownerId: 'question-sage',
-		startNodeId: 'start',
-		entryNodeId: 'start',
-		speakers: ['Question Sage'],
-
-
-		nodes: {
-			start: {
-				id: 'start',
-				speaker: 'Question Sage',
-				text: "Welcome. You come seeking quests. Little do you know, you've been on one the minute you walked through that door.",
-				choices: [
-					{
-					id: 'choice-1',
-						text: '...huh?',
-						nextNodeId: 'clueless',
-						type: {
-							color: 'primary',
-							icon: 'emoji-astonished-fill'
-						}
-					},
-					{
-					id: 'choice-2',
-						text: 'Shut it, old man! Out with the quests or die.',
-						nextNodeId: 'rude',
-						type: {
-							color: 'danger',
-							icon: 'emoji-angry-fill'
-						}
-					},
-				],
-			},
-
-			clueless: {
-				id: 'clueless',
-				speaker: 'Question Sage',
-				text: 'Oh, nothing. Here, drink this quest-enabling potion.',
-				choices: [
-					{
-					id: 'choice-3',
-						text: 'You got it, sport-o!',
-						nextNodeId: 'end_power',
-						type: {
-							color: 'success',
-							icon: 'emoji-sunglasses-fill'
-						}
-					},
-					{
-					id: 'choice-4',
-						text: "I ain't quaffin' a thing, later creep-o",
-						nextNodeId: 'reverse_1',
-						type: {
-							color: 'warning',
-							icon: 'emoji-neutral-fill'
-						}
-					},
-				],
-			},
-
-			rude: {
-				id: 'rude',
-				speaker: 'Question Sage',
-				text: 'You fool... You foolish FOOL! You know what? I don\'t even wanna give you the only potion in the world that enables quests. Go live your questless life without quests, there, No-Quests. I\'ll just be over here, on a quest, questin\' it up.',
-				choices: [
-					{
-					id: 'choice-5',
-						text: 'Wait, the only one? Gimme it or die, old man!',
-						nextNodeId: 'reverse_1',
-						type: {
-							color: 'warning',
-							icon: 'bi-award-fill'
-						}
-					},
-					{
-					id: 'choice-6',
-						text: 'Well, can you sweeten the deal. Toss in another potuon maybe?',
-						nextNodeId: 'bargain',
-						type: {
-							color: 'success',
-							icon: 'bi-flask-florence-fill'
-						}
-					}
-				]
-			},
-
-			end_power: {
-				id: 'end_power',
-				speaker: 'Question Sage',
-				text: 'Good, good. Now we play the waiting game... +2 STR.',
-				effects: [
-					{
-						type: 'modifyStat',
-						targetId: 'hero',
-						stat: 'strength',
-						amount: 2,
-					},
-				],
-				end: true,
-			},
-
-			bargain: {
-				id: 'bargain',
-				speaker: 'Question Sage',
-				text: 'Hrmph... Let me check the back room. Ah, yes, fine. Here.',
-				effects: [
-					{
-						type: 'modifyStat',
-						targetId: 'hero',
-						stat: 'might',
-						amount: 2,
-					},
-				],
-			},
-		},
-	}
-
-	return [def];
 }

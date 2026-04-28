@@ -1,15 +1,19 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
+import type { Request, Response } from 'express';
+import type { Engine } from '@ai-rpg-engine/core';
+import { saveEngine } from '../utils/save.js';
 
-export default function combatRoutes(engine: any, saveGame: any) {
+
+export default function combatRoutes(engine: Engine) {
 	const router = express.Router();
 
 	router.post('/attack/:targetId', async (req: Request, res: Response) => {
 		try {
 			engine.submitAction('attack', {
-				targetIds: [req.params.targetId],
+				targetIds: ([req.params.targetId] as string[]),
 			});
 
-			await saveGame(engine);
+			saveEngine(engine);
 
 			res.json(engine.store.state);
 		} catch (err: unknown) {
