@@ -1,4 +1,5 @@
 <?php
+	use Game\Inventory\Items\Item;
 	$quest_npc = 'question-sage';
 	$data      = [ 'targetIds' => 1 ];
 	$endpoint  = "talk/$quest_npc";
@@ -66,10 +67,27 @@
 								echo '    </li>';
 								echo '</a>';
 							}
-							
+						// type stat amount	
 							if (isset($message->effects)) {
+								foreach ($message->effects as $effect) {
+									if ($message->effects->type == 'adjustStat') {
+										$stat    = $message->effects->stat;
+										$amount  = $message->effects->amount;
+										$item_id = $message->effects->itemId;
+										$item_type = $message->effects->itemType;
+										$item = new Item($item_type, $item_id);
 
+										print_r($item);
+
+										$badge = '<div class="status-pill bg-success-subtle text-success">' .
+										         '    <img src="/img/items/potions/thumbs/red_potion.png" class="avatar">' .
+												 '     <span class="label">' . "$stat +$amount</span>" . 
+										    	 '     <button class="btn-close"></button>' .
+												 '</div>';
+									}
+								}
 							}
+						
 
 						?>
 						</ol>

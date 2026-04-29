@@ -3,6 +3,7 @@ import {createGameEngine, getDialogueMap} from './src/engine/engine.ts';
 import engineState from './src/routes/state.ts';
 import dialogueRoutes from './src/routes/dialogue.ts';
 import combatRoutes from './src/routes/combat.ts';
+import itemRoutes from './src/routes/item.ts';
 import { saveEngine } from './src/utils/save.js';
 const app = express();
 app.use(express.json());
@@ -17,6 +18,7 @@ async function init() {
 		app.use('/', dialogueRoutes(engine, dialogueMap, saveEngine));
 		app.use('/', combatRoutes(engine));
 		app.use('/', engineState(engine, saveEngine));
+		app.use('/', itemRoutes(engine));
 
 		app.listen(3000, () => {
 			console.log('🚀 Server running at http://localhost:3000');

@@ -1,0 +1,152 @@
+{
+  "Items": {
+    "helmet": [
+      {
+        "type": "helmet",
+        "itemId": 1,
+        "name": "Rustbound Helm",
+        "image": "img/items/equipment/helmet/rustbound_helm.png",
+        "weight": 7,
+        "maxSockets": 1,
+        "rarity": null,
+        "expireTick": null,
+
+        "implicit": [
+          { "target": "def", "range": [3, 7] }
+        ],
+
+        "affixPool": [
+          { "target": "def",   "range": [2, 10] },
+          { "target": "rsst",  "range": [2, 8] },
+          { "target": "maxHP", "range": [10, 40] },
+          { "target": "hp",    "range": [5, 25] },
+          { "target": "mdef",  "range": [2, 8] }
+        ],
+
+        "description": "A corroded helm that still holds firm."
+      },
+      {
+        "type": "helmet",
+        "itemId": 2,
+        "name": "Cerebral Hood",
+        "image": "img/items/equipment/helmet/cerebral_hood.png",
+        "weight": 3,
+        "maxSockets": 2,
+        "rarity": null,
+        "expireTick": null,
+
+        "implicit": [
+          { "target": "int", "range": [4, 9] }
+        ],
+
+        "affixPool": [
+          { "target": "int",   "range": [3, 12] },
+          { "target": "maxMP", "range": [15, 60] },
+          { "target": "mdef",  "range": [4, 12] },
+          { "target": "rsst",  "range": [3, 10] },
+          { "target": "hp",    "range": [10, 40] }
+        ],
+
+        "description": "Enhances cognitive and arcane capacity."
+      }
+    ],
+
+    "boots": [
+      {
+        "type": "boots",
+        "itemId": 1,
+        "name": "Stormrunner Boots",
+        "image": "img/items/equipment/boots/stormrunner_boots.png",
+        "weight": 3,
+        "maxSockets": 2,
+        "rarity": null,
+        "expireTick": null,
+
+        "implicit": [
+          { "target": "sped", "range": [2, 5] }
+        ],
+
+        "affixPool": [
+          { "target": "sped",  "range": [2, 10] },
+          { "target": "dodg",  "range": [1, 8] },
+          { "target": "dext",  "range": [2, 10] },
+          { "target": "hp",    "range": [10, 40] },
+          { "target": "maxHP", "range": [5, 25] },
+          { "target": "rgen",  "range": [1, 6] }
+        ],
+
+        "description": "Boots that crackle with kinetic energy."
+      },
+      {
+        "type": "boots",
+        "itemId": 2,
+        "name": "Gravepath Treads",
+        "image": "img/items/equipment/boots/gravepath_treads.png",
+        "weight": 4,
+        "maxSockets": 2,
+        "rarity": null,
+        "expireTick": null,
+
+        "implicit": [
+          { "target": "dodg", "range": [2, 6] }
+        ],
+
+        "affixPool": [
+          { "target": "sped",  "range": [2, 10] },
+          { "target": "dodg",  "range": [2, 10] },
+          { "target": "dext",  "range": [2, 10] },
+          { "target": "hp",    "range": [10, 50] },
+          { "target": "rgen",  "range": [1, 6] }
+        ],
+
+        "description": "Leaves faint echoes with every step."
+      }
+    ],
+
+    "weapons": [
+      {
+        "type": "sword",
+        "itemId": 1,
+        "name": "Ashen Fang",
+        "image": "img/items/weapons/swords/ashen_fang.png",
+        "weight": 9,
+        "maxSockets": 3,
+        "rarity": null,
+        "expireTick": null,
+
+        "implicit": [
+          { "target": "str", "range": [4, 8] }
+        ],
+
+        "affixPool": [
+          { "target": "str",  "range": [2, 12] },
+          { "target": "crit", "range": [2, 10] },
+          { "target": "accu", "range": [3, 12] },
+          { "target": "sped", "range": [1, 8] },
+          { "target": "hp",   "range": [10, 50] },
+          { "target": "dext", "range": [2, 10] }
+        ],
+
+        "description": "A blade forged in dying fire."
+      }
+    ],
+
+    "consumables": [
+      {
+        "type": "potion",
+        "itemId": 1,
+        "name": "Quest Enabler",
+        "image": "img/items/potions/quest_enabler.png",
+        "weight": 1,
+        "maxSockets": 0,
+        "rarity": null,
+        "expireTick": null,
+
+        "implicit": [],
+        "affixPool": [],
+
+        "description": "The only potion in the world that unseals hidden paths and awakens dormant quests."
+      }
+    ]
+  }
+}
