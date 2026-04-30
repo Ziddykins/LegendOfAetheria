@@ -79,13 +79,19 @@ $message = json_decode(ai_serv_post($endpoint, $data));
 										$item = new Item($item_type, $item_id);
 
 										$badge = "<div class=\"status-pill bg-success-subtle text-success\">" .
-												 "    <img src=\"{$item->get_image()}\" class=\"avatar\">" .
-											"     <span class=\"label\">$stat +$amount</span>" .
-											"     <button class=\"btn-close\"></button>" .
-											"</div>";
+												 "    <img src=\"/{$item->get_image()}\" class=\"avatar\">" .
+												 "     <div class=\"label mb-3\">{$item->get_name()}</div>" .
+												 "     <div class=\"description\">{$item->get_description()}</div>" .
+												 "     <div class=\"border border-success mb-3\">" .
+												 "     	   <button id=\"use-item\" name=\"use-item\" loa-data=\"itemId={$item->get_itemId()};itemType={$item->get_itemType()}\" class=\"btn btn-success\">Use</button>" .
+												 "     </div>" .
+												 "     <button class=\"btn-c\"></button>" .
+												 "</div>";
 
 
 										print_r($item);
+
+										echo $badge;
 									}
 
 								}
