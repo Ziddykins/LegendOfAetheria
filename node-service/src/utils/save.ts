@@ -10,7 +10,7 @@ import {
 import * as fs from 'node:fs';
 import { loaRuleset } from '../engine/ruleset.js';
 
-const SAVE_FILE = '/data/data/com.termux/files/usr/share/apache2/default-site/htdocs/node-service/loa.eng';
+const SAVE_FILE = '../../loa.eng';
 
 export function loadEngine() {
 	const contents = fs.readFileSync(SAVE_FILE, 'utf8').trim();

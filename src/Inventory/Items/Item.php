@@ -7,23 +7,45 @@ use Game\AI\Enums\HttpMethod;
 /**
  * Represents an inventory item with weight, gem sockets, and stat modifiers.
  * Items can have multiple sockets for gems and provide various stat modifications.
+ * The class fetches item details from a remote service based on item type and ID.
  */
 class Item {
-	/** @var int The ID of the item, relating to the SQL entry
+	/** @var int The ID of the item, relating to the SQL entry */
 	private int $id;
 
 	/** @var string $name Display name of the item */
 	private string $name = "None";
 
-	/** @var string $image The items image path, defaultsnto an unknown placeholder */	
+	/** @var string $image The items image path, defaults to an unknown placeholder */
 	private string $image = "items/unknown.png";
     
     /** @var int $weight Weight value (contributes to encumbrance) */
 	private int $weight = 0;
 
-	/** @var int $itemId Item ID to fetch the schema for that item
+	/** @var int $itemId Item ID to fetch the schema for that item */
 	private int $itemId = 0;
-    
+    	
+	/** @var string $itemType Item type to fetch the schema for that item */
+	private string $itemType = "";
+
+	/** @var int $maxSockets Number of gem sockets */
+	private int $maxSockets = 0;
+
+	/** @var string|null $rarity Item rarity */
+	private ?string $rarity = null;
+
+	/** @var int|null $expireTick Optional expiration tick */
+	private ?int $expireTick = null;
+
+	/** @var array $implicit Implicit stat modifiers */
+	private array $implicit = [];
+
+	/** @var array $affixPool Available affix pool for this item */
+	private array $affixPool = [];
+
+	/** @var string $description Item description */
+	private string $description = "";
+
     /** @var array<Socket> Array of Socket objects for gem insertion */
     private array $sockets = [];
     
@@ -31,18 +53,32 @@ class Item {
     private array $modifiers = [];
 
     /**
-     * Creates a new item with specified properties.
-     * Initializes empty Socket objects based on socket count.
+     * Creates a new item instance and hydrates it from the remote item schema.
+     * If no itemType/itemId are supplied, an empty placeholder item is created.
      * 
-     * @param string $name Item display name
-     * @param int $weight Item weight
-     * @param int $socketCount Number of gem sockets (default 1)
+     * @param string $itemType Item type to fetch from item service
+     * @param int $itemId Item ID to fetch from item service
      */
-    public function __construct(string $itemType, int $itemId) {
-		$item = $this->get_item_details($itemType, $itemId);
-		
-		$this->name = $item->name;
-		
+    public function __construct(string $itemType = "", int $itemId = 0) {
+		$this->itemType = $itemType;
+		$this->itemId = $itemId;
+
+		if ($this->itemType !== "" && $this->itemId > 0) {
+			$item = $this->get_item_details();
+			if (is_object($item)) {
+				$this->name = $item->name ?? $this->name;
+				$this->image = $item->image ?? $this->image;
+				$this->weight = $item->weight ?? $this->weight;
+				$this->itemId = $item->itemId ?? $this->itemId;
+				$this->itemType = $item->type ?? $this->itemType;
+				$this->maxSockets = $item->maxSockets ?? $this->maxSockets;
+				$this->rarity = $item->rarity ?? $this->rarity;
+				$this->expireTick = $item->expireTick ?? $this->expireTick;
+				$this->implicit = $item->implicit ?? $this->implicit;
+				$this->affixPool = $item->affixPool ?? $this->affixPool;
+				$this->description = $item->description ?? $this->description;
+			}
+		}
 
 /*		for ($i=0; $i<$socketCount; $i++) {
             $this->sockets[$i] = new Socket($i);
@@ -52,7 +88,7 @@ class Item {
 	private function get_item_details() {
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, "http://localhost:3000/item/$itemType/$itemId");
+		curl_setopt($ch, CURLOPT_URL, "http://localhost:3000/item/{$this->itemType}/{$this->itemId}");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, [
 			'Content-Type: application/json',
 			'Accept: application/json'
@@ -64,7 +100,7 @@ class Item {
 
 		$response = curl_exec($ch);
 
-		curl_close($ch);
+		unset($ch);
 
 		return json_decode($response);
 	}
@@ -94,5 +130,18 @@ class Item {
 			"potion" => ["hp", "mp", "ep"],
 			"misc"   => ["luck", "chsm", "rgen"]
 		];	
+	}
+
+
+	public function __call($method, $params) {
+		$var = lcfirst(substr($method, 4));
+
+		if (strncasecmp($method, "get_", 4) === 0) {
+			return $this->$var;
+		}
+
+		if (strncasecmp($method, "set_", 4) === 0) {
+			$this->$var = $params[0];
+		}
 	}
 }

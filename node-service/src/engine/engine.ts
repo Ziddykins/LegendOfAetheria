@@ -145,8 +145,6 @@ function bootstrapWorld(engine: Engine) {
 
 	engine.store.state.playerId = 'hero';
 	engine.store.state.locationId = 'sanctuary';
-	engine.store.state
-
 
 	engine.store.addEntity({
 		id: 'wolf',

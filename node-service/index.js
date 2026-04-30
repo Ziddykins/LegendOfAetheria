@@ -1,5 +1,5 @@
 import express from 'express';
-import {createGameEngine, getDialogueMap} from './src/engine/engine.ts';
+import { createGameEngine, getDialogueMap } from './src/engine/engine.ts';
 import engineState from './src/routes/state.ts';
 import dialogueRoutes from './src/routes/dialogue.ts';
 import combatRoutes from './src/routes/combat.ts';
