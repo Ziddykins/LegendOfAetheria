@@ -1,6 +1,6 @@
 <?php
 namespace Game\Inventory\Items;
-
+use Game\Inventory\Enums\ObjectRarity;
 use Game\AI\Enums\HttpMethod;
 
 
@@ -17,7 +17,10 @@ class Item {
 	private string $name = "None";
 
 	/** @var string $image The items image path, defaults to an unknown placeholder */
-	private string $image = "items/unknown.png";
+	private string $image = "img/items/potions/unknown.png";
+
+	/** @var string $img_thumb The items image thumbnail path, defaults to an unknown placeholder */
+	private string $imgThumb = "img/items/potions/thumbs/unknown.png";
     
     /** @var int $weight Weight value (contributes to encumbrance) */
 	private int $weight = 0;
@@ -25,14 +28,18 @@ class Item {
 	/** @var int $itemId Item ID to fetch the schema for that item */
 	private int $itemId = 0;
     	
-	/** @var string $itemType Item type to fetch the schema for that item */
-	private string $itemType = "";
+	/** @var string $type Item type to fetch the schema for that item */
+	private string $type = "";
+	
+	/** @var string $subtype Item subtype to fetch the schema for that item */
+	private string $subtype = "";
+
 
 	/** @var int $maxSockets Number of gem sockets */
 	private int $maxSockets = 0;
 
 	/** @var string|null $rarity Item rarity */
-	private ?string $rarity = null;
+	private ObjectRarity $rarity = ObjectRarity::NONE;
 
 	/** @var int|null $expireTick Optional expiration tick */
 	private ?int $expireTick = null;
@@ -50,29 +57,38 @@ class Item {
     private array $sockets = [];
     
     /** @var array $modifiers Stat modifiers provided by this item */
-    private array $modifiers = [];
+	private array $modifiers = [];
+
+	/** @var bool $stackable Whether or not the item is stackable */
+	private bool $stackable = false;
+
 
     /**
      * Creates a new item instance and hydrates it from the remote item schema.
-     * If no itemType/itemId are supplied, an empty placeholder item is created.
+     * If no type/itemId are supplied, an empty placeholder item is created.
      * 
-     * @param string $itemType Item type to fetch from item service
+     * @param string $type Item type to fetch from item service
      * @param int $itemId Item ID to fetch from item service
      */
-    public function __construct(string $itemType = "", int $itemId = 0) {
-		$this->itemType = $itemType;
+	public function __construct(string $type = "", int $itemId = 0) {
+		global $log;
+		$this->type = $type;
 		$this->itemId = $itemId;
 
-		if ($this->itemType !== "" && $this->itemId > 0) {
+		$log->warning("it $type iid $itemId");
+
+		if ($this->type !== "" && $this->itemId > 0) {
 			$item = $this->get_item_details();
 			if (is_object($item)) {
 				$this->name = $item->name ?? $this->name;
 				$this->image = $item->image ?? $this->image;
+				$this->imgThumb = preg_replace('/(.*)\/(.*?).png$/', '$1/thumbs/$2.png', $this->image);
 				$this->weight = $item->weight ?? $this->weight;
 				$this->itemId = $item->itemId ?? $this->itemId;
-				$this->itemType = $item->type ?? $this->itemType;
+				$this->type = $item->type ?? $this->type;
+				$this->subtype = $item->subtype ?? $this->subtype;
 				$this->maxSockets = $item->maxSockets ?? $this->maxSockets;
-				$this->rarity = $item->rarity ?? $this->rarity;
+				$this->rarity = ObjectRarity::name_to_enum($item->rarity) ?? $this->rarity;
 				$this->expireTick = $item->expireTick ?? $this->expireTick;
 				$this->implicit = $item->implicit ?? $this->implicit;
 				$this->affixPool = $item->affixPool ?? $this->affixPool;
@@ -88,7 +104,7 @@ class Item {
 	private function get_item_details() {
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, "http://localhost:3000/item/{$this->itemType}/{$this->itemId}");
+		curl_setopt($ch, CURLOPT_URL, "http://localhost:3000/item/{$this->type}/{$this->itemId}");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, [
 			'Content-Type: application/json',
 			'Accept: application/json'
@@ -133,7 +149,7 @@ class Item {
 	}
 
 
-	public function __call($method, $params) {
+	public function __call($method, $params): mixed {
 		$var = lcfirst(substr($method, 4));
 
 		if (strncasecmp($method, "get_", 4) === 0) {

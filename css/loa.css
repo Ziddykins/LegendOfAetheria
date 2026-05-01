@@ -7,3 +7,59 @@
     background: rgba(2, 2, 2, 1);
 }
 
+.rpg-title {
+  font-family: 'Uncial Antiqua', serif;
+}
+
+/* glow */
+.rpg-glow {
+  position: relative;
+}
+
+.rpg-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: var(--glow);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  filter: blur(8px);
+  animation: pulse 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%,100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* rarities */
+.rarity-common { --glow: rgba(200,200,200,.5); }
+.rarity-rare { --glow: rgba(77,166,255,.7); }
+.rarity-epic { --glow: rgba(184,77,255,.8); }
+.rarity-legendary { --glow: rgba(255,184,77,.9); }
+.rarity-cursed { --glow: rgba(255,60,60,.9); }
+
+/* glitch (cursed only) */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  25% { transform: translate(-1px,1px); }
+  50% { transform: translate(1px,-1px); }
+  75% { transform: translate(-1px,-1px); }
+  100% { transform: translate(0); }
+}
+
+.rarity-cursed img {
+  animation: glitch 0.15s infinite;
+  filter: contrast(1.2) saturate(1.3);
+}
+
+/* badge style tweak */
+.rarity-badge {
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+}

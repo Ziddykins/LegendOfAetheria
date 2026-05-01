@@ -77,10 +77,10 @@ export function getDialogueDefinitions() {
 				text: 'Good, good. Now we play the waiting game...',
 				effects: [
 					{
-						type: 'modifyStat',
+						type: 'addItem',
 						targetId: 'hero',
-						stat: 'strength',
-						amount: 2,
+						itemId: 1,
+						itemType: 'consumables'
 					},
 				],
 				end: true,
@@ -90,18 +90,19 @@ export function getDialogueDefinitions() {
 				text: 'Hrmph... Let me check the back room. Ah, yes, fine. Here.',
 				effects: [
 					{
-						type: 'modifyStat',
+						type: 'addItem',
 						targetId: 'hero',
-						stat: 'strength',
-						amount: 2
+						itemId: 4,
+						itemType: 'consumables'
 					},
 					{
-						type: 'modifyStat',
+						type: 'addItem',
 						targetId: 'hero',
-						stat: 'dexterity' ,
-						amount: 1
+						itemId: 1,
+						itemType: 'consumables'
 					}
 				],
+				end: true
 			},
 		},
 	}];

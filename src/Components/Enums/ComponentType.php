@@ -7,5 +7,6 @@
         case CHARACTER_SELECT;
         case MODAL;
         case SIDEBAR;
-        case STATS;
+		case STATS;
+		case ITEMCARD;
     }

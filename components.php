@@ -1,7 +1,10 @@
 <?php
     use Game\Components\Modals\Modals;
     use Game\Components\Enums\ComponentType;
-    use Game\System\Enums\LOAError;
+	use Game\System\Enums\LOAError;
+	use Game\Inventory\Items\Item;
+	use Game\Inventory\Enums\ObjectRarity;
+	use Game\Inventory\Enums\ObjectType;
 
     function generate(ComponentType $which, $data_object) {
         $produced_html = null;
@@ -55,11 +58,89 @@
                     $produced_html .= '   </div>';
                     $produced_html .= '</div>';
                     
-                    break;
+					break;
+				case ComponentType::ITEMCARD:
+		/*			$produced_html = null;
+					$rarity        = strtolower($data_object->rarity);
+					$item_type     = $data_object->type;
+					$item_subtype  = $data_object->subtype;
+					$item_name     = $data_object->name;
+					$item_desc     = $data_object->description;
+					$item_stats    = $data_object->modifiers;
+					$item_thumb    = $data_object->imgThumb;
+					$item_weight   = $data_object->weight;
+					$item_sockets  = $data_object->maxSockets;
+					$item_modifiers = $data_object->modifiers;
+
+
+
+					$produced_html  = '<div class="card bg-dark text-light border-0 rounded p-2 rpg-glow rarity-' . $item_rarity . '">';
+                    $produced_html .= '    <div class="d-flex gap-2 align-items-start">';
+                    $produced_html .= '        <img src="' . $item_thumb . '" class="rounded" />';
+                    $produced_html .= '        <div class="flex-grow-1">';
+				    $produced_html .= '            <div class="d-flex justify-content-between">';
+					$produced_html .= '                <div class="rpg-title">' . $item_name . '</div>';
+					$produced_html .= '                <span class="badge bg-secondary rarity-badge">';
+					$produced_html .= '                    <i class="bi bi-circle"></i> Common';
+					$produced_html .= '                </span>';
+				    $produced_html .= '            </div>';
+				    $produced_html .= '            <div class="small text-secondary">Reliable. Barely.</div>';
+				    $produced_html .= '            <div class="small text-success">+5 ATK</div>';
+				    $produced_html .= '        </div>';
+			        $produced_html .= '    </div>';
+			        $produced_html .= '</div>';
+		 */
+
+
+break;
+
                 default:
                     return LOAError::FUNCT_GENCOMP_UNKNOWN;
         }
 
         return $produced_html;
     }
+
+	function render_item_card(Item $item): string {
+		$rarity = $item->get_rarity()->data();
+		$type = ObjectType::name_to_enum(strtoupper($item->get_type()));
+	    return '
+    <div class="card bg-dark text-light border-0 rounded p-2 rpg-glow rarity-'.$rarity['key'].'">
+        <div class="d-flex gap-2 align-items-start">
+
+            <img src="'.$item->get_imgThumb() .'" class="rounded" width="64" height="64" />
+
+            <div class="flex-grow-1">
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="rpg-title">' . $item->get_name() . '</div>
+
+                    <span class="badge bg-'.$rarity['class'].' rarity-badge">
+                        '.$type->icon().' '.$rarity['label'].'
+                    </span>
+                </div>
+
+                <div class="small text-secondary">' . $item->get_description() . '</div>
+
+                <div class="small">
+                    ' . format_stats($item->get_modifiers()) . '
+
+                </div>
+
+            </div>
+        </div>
+    </div>';
+	}
+
+	function format_stats(array $stats): string {
+		$out = '';
+
+		foreach ($stats as $stat => $val) {
+			$class = $val >= 0 ? 'text-success' : 'text-danger';
+			$sign  = $val >= 0 ? '+' : '';
+			$out  .= "<span class=\"$class\">{$sign}{$val} {$stat}</span> ";
+		}
+
+		return $out;
+	}
 ?>

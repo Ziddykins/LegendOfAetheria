@@ -1,5 +1,6 @@
 <?php
 use Game\Inventory\Items\Item;
+require_once 'components.php';
 $quest_npc = 'question-sage';
 $data = ['targetIds' => 1];
 $endpoint = "talk/$quest_npc";
@@ -30,6 +31,7 @@ if (isset($_GET['choiceIndex']) && $_GET['choiceIndex'] != null) {
 }
 
 $message = json_decode(ai_serv_post($endpoint, $data));
+$log->warning(print_r($message, 1));
 ?>
 <div class="d-flex text-center align-content-center justify-content-center">
 	<div class="card shadow-sm w-75 border-light p-3">
@@ -70,16 +72,17 @@ $message = json_decode(ai_serv_post($endpoint, $data));
 							// type stat amount
 							if (isset($message->effects)) {
 								foreach ($message->effects as $effect) {
-									if ($message->effects->type == 'modifyStat') {
-										$stat = $message->effects->stat;
-										$amount = $message->effects->amount;
-									} else if ($message->effects->type == 'addItem') {
-										$item_id = $message->effects->itemId;
-										$item_type = $message->effects->itemType;
+									if ($effect->type == 'modifyStat') {
+										$stat = $effect->stat;
+										$amount = $effect->amount;
+									} else if ($effect->type == 'addItem') {
+										$log->warning("ADD ITEM: " . print_r($effect, 1));
+										$item_id = $effect->itemId;
+										$item_type = $effect->itemType;
 										$item = new Item($item_type, $item_id);
 
-										$badge = "<div class=\"status-pill bg-success-subtle text-success\">" .
-												 "    <img src=\"/{$item->get_image()}\" class=\"avatar\">" .
+/*										$badge = "<div class=\"status-pill bg-success-subtle text-success\">" .
+												 "    <img src=\"/{$item->get_imgThumb()}\" class=\"avatar\">" .
 												 "     <div class=\"label mb-3\">{$item->get_name()}</div>" .
 												 "     <div class=\"description\">{$item->get_description()}</div>" .
 												 "     <div class=\"border border-success mb-3\">" .
@@ -89,9 +92,10 @@ $message = json_decode(ai_serv_post($endpoint, $data));
 												 "</div>";
 
 
-										print_r($item);
 
 										echo $badge;
+ */
+										echo render_item_card($item);
 									}
 
 								}

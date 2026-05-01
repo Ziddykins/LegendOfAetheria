@@ -80,10 +80,12 @@ export default function dialogueRoutes(engine: any, dialogueMap: Record<string, 
 		}
 
 		await saveEngine(engine);
+		console.debug(`===REQ===\nURL: ${req.originalUrl}\nBody: ${JSON.stringify(req.body)}\nChoice:\n${JSON.stringify(choice)}\n`);
 
 		res.json({
 			text: nextNode.text,
 			choices: nextNode.choices || [],
+			effects: nextNode.effects || [],
 			end: !!nextNode.end
 		});
 	});

@@ -1,12 +1,13 @@
 <?php
 namespace Game\Inventory\Enums;
-
+use Game\Traits\EnumExtender\EnumExtender;
 /**
  * Defines rarity tiers for game objects (items, familiars, etc.) with probability thresholds.
  * Uses descending percentage values where higher rolls yield better rarities.
  * Provides static method to convert dice roll to rarity name.
  */
 enum ObjectRarity: string {
+	use EnumExtender;
     /**
      * Determines rarity based on random roll percentage.
      * Compares roll against threshold values to find matching tier.
@@ -22,6 +23,23 @@ enum ObjectRarity: string {
         }
         return ObjectRarity::WORTHLESS;
     }
+	
+	public function data(): array {
+		return match($this) {
+			ObjectRarity::WORTHLESS => ['key'=>'worthless','label'=>'Worthless','class'=>'secondary','mult'=>0.3],
+			ObjectRarity::TARNISHED => ['key'=>'tarnished','label'=>'Tarnished','class'=>'secondary','mult'=>0.5],
+			ObjectRarity::COMMON    => ['key'=>'common','label'=>'Common','class'=>'secondary','mult'=>1.0],
+			ObjectRarity::ENCHANTED => ['key'=>'enchanted','label'=>'Enchanted','class'=>'info','mult'=>1.3],
+			ObjectRarity::MAGICAL   => ['key'=>'magical','label'=>'Magical','class'=>'primary','mult'=>1.6],
+			ObjectRarity::LEGENDARY => ['key'=>'legendary','label'=>'Legendary','class'=>'warning','mult'=>2.2],
+			ObjectRarity::EPIC      => ['key'=>'epic','label'=>'Epic','class'=>'purple','mult'=>2.8],
+			ObjectRarity::MYSTIC    => ['key'=>'mystic','label'=>'Mystic','class'=>'info','mult'=>3.5],
+			ObjectRarity::HEROIC    => ['key'=>'heroic','label'=>'Heroic','class'=>'success','mult'=>4.5],
+			ObjectRarity::INFAMOUS  => ['key'=>'infamous','label'=>'Infamous','class'=>'danger','mult'=>6.0],
+			ObjectRarity::GODLY     => ['key'=>'godly','label'=>'Godly','class'=>'warning','mult'=>10.0],
+			default         => ['key'=>'none','label'=>'None','class'=>'secondary','mult'=>1.0],
+		};
+	}
 
     /** Junk tier - rolls 50.0+ (50% chance) */
     case WORTHLESS = "50.0";

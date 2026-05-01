@@ -133,19 +133,80 @@
 
     "consumables": [
       {
-        "type": "potion",
+        "type": "consumables",
+		"subtype": "potion",
         "itemId": 1,
         "name": "Quest Enabler",
         "image": "img/items/potions/quest_enabler.png",
         "weight": 1,
         "maxSockets": 0,
-        "rarity": null,
+        "rarity": "LEGENDARY",
         "expireTick": null,
 
         "implicit": [],
         "affixPool": [],
 
-        "description": "The only potion in the world that unseals hidden paths and awakens dormant quests."
+        "description": "The only potion in the world that unseals hidden paths and awakens dormant quests.",
+		"stackable": true
+      },
+	  {
+        "type": "consumables",
+		"subtype": "potion",
+        "itemId": 2,
+        "name": "Small Potion of Longevity",
+        "image": "img/items/potions/longevity.png",
+        "weight": 1,
+        "maxSockets": 0,
+        "rarity": "COMMON",
+        "expireTick": null,
+
+        "implicit": [
+			{ "target": "hp", "range": [25, 25] }
+		],
+        "affixPool": [],
+
+        "description": "Heals your wounds when you're all bleedy.",
+		"stackable": true
+	  },
+	  {
+        "type": "consumables",
+		"subtype": "potion",
+        "itemId": 3,
+        "name": "Small Potion of the Arcane",
+        "image": "img/items/potions/arcane.png",
+        "weight": 1,
+        "maxSockets": 0,
+        "rarity": "COMMON",
+        "expireTick": null,
+
+        "implicit": [
+			{ "target": "mp", "range": [25, 25] }
+		],
+
+        "affixPool": [],
+
+        "description": "Restores 25 mana; not too much, maybe too little.",
+		"stackable": true
+      },
+      {
+        "type": "consumables",
+		"subtype": "potion",
+        "itemId": 4,
+        "name": "Small Potion of Resistance",
+        "image": "img/items/potions/resistance.png",
+        "weight": 1,
+        "maxSockets": 0,
+        "rarity": "ENCHANTED",
+        "expireTick": null,
+
+        "implicit": [
+			{ "target": "rsst", "range": [1, 5] }
+		],
+
+        "affixPool": [],
+
+        "description": "Permanently contributes your ability to resist things like catching on fire and being bitten by snakes.",
+		"stackable": true
       }
     ]
   }
