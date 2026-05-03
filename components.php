@@ -115,7 +115,7 @@ break;
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="rpg-title">' . $item->get_name() . '</div>
 
-                    <span class="badge bg-'.$rarity['class'].' rarity-badge">
+                    <span class="badge '.$rarity['class'].' rarity-badge">
                         '.$type->icon().' '.$rarity['label'].'
                     </span>
                 </div>

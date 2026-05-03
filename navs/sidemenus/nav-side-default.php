@@ -611,8 +611,8 @@ $currentSub = $_GET['sub'] ?? '';
 document.addEventListener("DOMContentLoaded", function() {
     const activeLink = document.querySelector(".nav-link.active");
     const sidebar = document.getElementById("sidebar");
-    const sliver = document.getElementById("sidebar-sliver");
-    
+	const sliver = document.getElementById("sidebar-sliver");
+    sidebar.classList.add('sidebar-open');
     if (activeLink) {
         let parent = activeLink.closest(".nav-item.menu-open");
         while (parent) {
@@ -624,7 +624,8 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
+		mutations.forEach(function(mutation) {
+			const sb = document.getElementById('terst');
             if (mutation.target.classList.contains("sidebar-collapse")) {
                 sliver.style.display = "flex";
                 sliver.style.alignItems = "center";
@@ -632,9 +633,29 @@ document.addEventListener("DOMContentLoaded", function() {
                 sliver.style.backgroundColor = "rgba(5, 57, 28, 0.21)";
                 sliver.innerHTML = "<i class=\"bi bi-chevron-right\"></i>";
 				console.log("SIDEBAR CLOSED");
-				mutation.target.classList.remove('side-collapse');
+				
+				mutation.target.classList.remove('sidebar-open');
+				mutation.target.classList.add('sidebar-closed');
+
+				if (sb) {
+					sb.classList.classList.remove('sidebar-open');
+					sb.classList.classList.add('sidebar-closed');
+				}
+
+				sliver.style.visibility = 'true';
             } else {
-                sliver.style.display = "none";
+				mutation.target.classList.add('sidebar-open');
+				mutation.target.classList.remove('sidebar-closed');
+
+				if (sb) {
+					sb.classList.classList.add('sidebar-open');
+					sb.classList.classList.remove('sidebar-closed');
+					sb.style.position = 'relative';
+				}
+
+				sliver.style.visibility = 'false';
+
+				
             }
         });
     });

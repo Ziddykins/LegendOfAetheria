@@ -63,3 +63,7 @@
   font-size: 0.65rem;
   letter-spacing: 0.05em;
 }
+
+.ra {
+    filter: drop-shadow(0 0 4px currentColor);
+}

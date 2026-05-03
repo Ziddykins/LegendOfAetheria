@@ -5,6 +5,8 @@
     "@devmade/express-hot-reload": "^1.0.5",
     "babel-loader": "^10.1.1",
     "babel-preset-env": "^1.7.0",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "overlayscrollbars": "^2.14.0",
     "rpg-awesome": "^0.2.0"
   },
@@ -16,6 +18,8 @@
     "doc": "docs"
   },
   "devDependencies": {
+    "eruda": "^3.4.3",
+    "eruda-timing": "^2.0.1",
     "html-webpack-plugin": "^5.6.7",
     "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2"

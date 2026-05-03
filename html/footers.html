@@ -23,4 +23,16 @@
             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
         </script>
+		<script>
+			const sb = document.getElementById('terst');
+			const sliver = document.getElementById('sliver');
+
+			if (sb && sliver) {
+				sb.classList.classList.add('sidebar-open');
+				sb.classList.classList.remove('sidebar-closed');
+				sb.style.position = 'relative';
+				sliver.style.visibility = 'false';
+			}
+		</script>
+
 

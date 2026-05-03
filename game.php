@@ -69,7 +69,7 @@
                                 $requested_sub = preg_replace('/[^a-z-]+/', '', $_GET['sub']);
                                 $page_string .= "$requested_sub/$requested_page.php";
                             } else {
-                                $page_string .= "pages/character/sheet.php";
+                                $page_string .= "pages/character/profile.php";
                             }
 
                             

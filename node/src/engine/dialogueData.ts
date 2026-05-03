@@ -14,7 +14,7 @@ export function getDialogueDefinitions() {
 						text: '...huh?',
 						nextNodeId: 'clueless',
 						type: {
-							color: 'primary',
+							color: 'bg-primary',
 							icon: 'emoji-astonished-fill'
 						}
 					},
@@ -22,7 +22,7 @@ export function getDialogueDefinitions() {
 						text: 'Shut it, old man! Out with the quests or die.',
 						nextNodeId: 'rude',
 						type: {
-							color: 'danger',
+							color: 'bg-danger',
 							icon: 'emoji-angry-fill'
 						}
 					},
@@ -36,7 +36,7 @@ export function getDialogueDefinitions() {
 						text: 'You got it, sport-o!',
 						nextNodeId: 'end_power',
 						type: {
-							color: 'success',
+							color: 'bg-success',
 							icon: 'emoji-sunglasses-fill'
 						}
 					},
@@ -44,7 +44,7 @@ export function getDialogueDefinitions() {
 						text: "I ain't quaffin' a thing, later creep-o",
 						nextNodeId: 'rude',
 						type: {
-							color: 'warning',
+							color: 'bg-warning',
 							icon: 'emoji-neutral-fill'
 						}
 					},
@@ -58,16 +58,16 @@ export function getDialogueDefinitions() {
 						text: 'Wait, the only one? Gimme it or die, old man!',
 						nextNodeId: 'end_power',
 						type: {
-							color: 'warning',
-							icon: 'bi-award-fill'
+							color: 'bg-warning',
+							icon: 'award-fill'
 						}
 					},
 					{
 						text: 'Well, can you sweeten the deal a little, maybe toss in another potion? That green one looks tasty. I\'d quaff that.',
 						nextNodeId: 'bargain',
 						type: {
-							color: 'success',
-							icon: 'bi-flask-florence-fill'
+							color: 'bg-success',
+							icon: 'flask-florence-fill'
 						}
 					}
 				]

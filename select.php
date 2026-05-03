@@ -7,8 +7,6 @@ use Game\Account\Account;
 use Game\Character\Character;
 use Game\System\Enums\AbuseType;
 use Game\Components\Cards\CharacterSelect\CharacterSelectCard;
-$log->debug("WE MADE IT TO SELECT");
-
 
 if (check_session()) {
     $account   = new Account($_SESSION['email']);
@@ -49,7 +47,7 @@ if (check_session()) {
                 $_SESSION['focused-slot'] = (int)$slot;
                 $_SESSION['character-id'] = (int)$char_id;
                 $_SESSION['name'] = $character->get_name();
-                header('Location: /game?page=sheet&sub=character');
+                header('Location: /game?page=profile&sub=character');
                 exit();
             case 'new':
                 $char_name   = $_POST['create-character-name'];
