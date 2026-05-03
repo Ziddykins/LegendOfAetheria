@@ -159,8 +159,8 @@
                     $character->stats->set_mp(100);
                     $character->stats->set_maxMP(100);
 
-					$tmp = $race->set_stat_adjust($character->stats);
-					$character->stats = array_merge($character->stats, $tmp);
+                    $tmp = $race->set_stat_adjust($character->stats);
+                    $character->stats = $tmp;
 
                     $character->stats->set_status(Status::HEALTHY);
 

@@ -149,7 +149,7 @@ class Item {
 	}
 
 
-	public function __call($method, $params): mixed {
+	public function __call($method, $params) {
 		$var = lcfirst(substr($method, 4));
 
 		if (strncasecmp($method, "get_", 4) === 0) {

@@ -108,9 +108,7 @@ class Inventory {
     /**
      * Adds a new item to the next available inventory slot.
      * 
-     * @param string $name Item name
-     * @param int $weight Item weight
-     * @param int $numSockets Number of gem sockets
+     * @param Item $item The items to add to the next available slot
      * @return void
      */
     private function addItem(Item $item) {

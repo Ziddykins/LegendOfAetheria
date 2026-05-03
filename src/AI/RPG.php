@@ -34,14 +34,15 @@ class RPG {
 	 * @param bool $secure If true, requests will be sent over https
 	 * 
      */
-	public function __construct(string $url, int $port, bool $secure) {
-		$this->protocol = $secure ? 'https' : 'http';
-		$this->serverPort = preg_replace('/[^0-9]+/', '', $port);
-		$this->baseUrl = "{$protocol}://$url";
+    public function __construct(string $url, int $port, bool $secure) {
+        $this->protocol = $secure ? 'https' : 'http';
+        $this->serverPort = (int) preg_replace('/[^0-9]+/', '', (string) $port);
+        $protocol = $secure ? 'https' : 'http';
+        $this->baseUrl = "{$protocol}://$url";
 
-		if ($port !== 443 & $port !== 80) {
-			$this->baseUrl .= ":{$port}"
-		}
+        if ($port !== 443 && $port !== 80) {
+            $this->baseUrl .= ":{$port}";
+        }
     }
 
     /**
@@ -51,9 +52,9 @@ class RPG {
      * @param array $data Unencoded body payload of a POST request
      * @return string|false Response body or false on failure
      */
-    public function send(string $endpoint, HttpMethod $method, array $data = null) {
+    public function send(string $endpoint, HttpMethod $method, array | null $data = null): bool|string {
 		$ch  = curl_init();
-		$url = "{$this->baseUrl}/$endpoint"
+		$url = "{$this->baseUrl}/$endpoint";
 
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
@@ -72,7 +73,7 @@ class RPG {
         
         $response = curl_exec($ch);
 
-        curl_close($ch);
+        unset($ch);
         
         return $response;
 	}
