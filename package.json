@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@ai-rpg-engine/cli": "^2.0.9",
+    "@ai-rpg-engine/cli": "^2.1.0",
     "@babel/preset-env": "^7.29.2",
     "@devmade/express-hot-reload": "^1.0.5",
     "babel-loader": "^10.1.1",
