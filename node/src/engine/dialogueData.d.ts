@@ -43,8 +43,8 @@ export declare function getDialogueDefinitions(): {
             effects: {
                 type: string;
                 targetId: string;
-                stat: string;
-                amount: number;
+                itemId: number;
+                itemType: string;
             }[];
             end: boolean;
         };
@@ -53,10 +53,11 @@ export declare function getDialogueDefinitions(): {
             effects: {
                 type: string;
                 targetId: string;
-                stat: string;
-                amount: number;
+                itemId: number;
+                itemType: string;
             }[];
+            end: boolean;
         };
     };
-};
+}[];
 //# sourceMappingURL=dialogueData.d.ts.map

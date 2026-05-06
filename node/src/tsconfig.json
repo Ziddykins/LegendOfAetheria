@@ -3,6 +3,10 @@
   "compilerOptions": {
     // File Layout
     "rootDir": "./",
+<<<<<<< HEAD
+=======
+    "outDir": "../dist",
+>>>>>>> cca016ec177952b2f87f50a252129bab7117217f
 
 
     // Environment Settings

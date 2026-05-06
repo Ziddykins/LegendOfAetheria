@@ -1,3 +1,7 @@
+import { register } from "node:module";
+import { pathToFileURL } from "node:url";
+register("ts-node/esm", pathToFileURL("./"));
+
 import express from 'express';
 import { createGameEngine, getDialogueMap } from './src/engine/engine.ts';
 import engineState from './src/routes/state.ts';

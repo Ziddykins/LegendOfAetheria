@@ -8,11 +8,8 @@ export declare function getDialogueMap(): {
         speakers: string[];
         nodes: {
             start: {
-                id: string;
-                speaker: string;
                 text: string;
                 choices: {
-                    id: string;
                     text: string;
                     nextNodeId: string;
                     type: {
@@ -22,11 +19,8 @@ export declare function getDialogueMap(): {
                 }[];
             };
             clueless: {
-                id: string;
-                speaker: string;
                 text: string;
                 choices: {
-                    id: string;
                     text: string;
                     nextNodeId: string;
                     type: {
@@ -36,11 +30,8 @@ export declare function getDialogueMap(): {
                 }[];
             };
             rude: {
-                id: string;
-                speaker: string;
                 text: string;
                 choices: {
-                    id: string;
                     text: string;
                     nextNodeId: string;
                     type: {
@@ -50,27 +41,24 @@ export declare function getDialogueMap(): {
                 }[];
             };
             end_power: {
-                id: string;
-                speaker: string;
                 text: string;
                 effects: {
                     type: string;
                     targetId: string;
-                    stat: string;
-                    amount: number;
+                    itemId: number;
+                    itemType: string;
                 }[];
                 end: boolean;
             };
             bargain: {
-                id: string;
-                speaker: string;
                 text: string;
                 effects: {
                     type: string;
                     targetId: string;
-                    stat: string;
-                    amount: number;
+                    itemId: number;
+                    itemType: string;
                 }[];
+                end: boolean;
             };
         };
     };
