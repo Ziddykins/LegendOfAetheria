@@ -8,7 +8,7 @@ export function getDialogueMap() {
     return dialogueMap;
 }
 function loadEngine() {
-    const contents = fs.readFileSync('loa.eng', 'utf8').trim();
+    const contents = fs.readFileSync('../loa.eng', 'utf8').trim();
     const dialogueModule = createDialogueCore([]);
     const combatStack = buildCombatStack({
         statMapping: { attack: 'strength', precision: 'dexterity', resolve: 'intelligence' },
