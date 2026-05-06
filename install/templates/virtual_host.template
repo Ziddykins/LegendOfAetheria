@@ -1,0 +1,20 @@
+# REM <Directory ###REPL_WEB_DOCROOT###/>
+# REM    Options -Indexes
+# REM    AllowOverride All
+# REM    Require all granted
+# REM </Directory>
+
+<VirtualHost *:###REPL_APACHE_HTTP_PORT###>
+	ServerName ###REPL_WEB_FQDN###
+	ServerAdmin ###REPL_WEB_ADMIN_EMAIL###
+	DocumentRoot ###REPL_WEB_DOCROOT###
+    
+    LogLevel info ssl:warn
+	ErrorLog ${APACHE_LOG_DIR}/###REPL_WEB_FQDN###-error.log
+	CustomLog ${APACHE_LOG_DIR}/###REPL_WEB_FQDN###-access.log combined
+
+    # Will be uncommented if SSL enabled
+    # SSLREM RewriteEngine on
+    # SSLREM RewriteCond %{SERVER_NAME} =###REPL_WEB_FQDN###
+    # SSLREM RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>

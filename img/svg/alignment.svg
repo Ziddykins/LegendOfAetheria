@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <!-- Halo (right side - blue/good) -->
+  <ellipse cx="16" cy="4" rx="4" ry="1.5" fill="none" stroke="#0d6efd" stroke-width="1.2" opacity="0.9"/>
+  
+  <!-- Devil horns (left side - red/evil) -->
+  <path d="M 6 8 Q 5 5 4 4 Q 4.5 6 6 8 Z" fill="#dc3545" stroke="#8b0000" stroke-width="0.5"/>
+  <path d="M 10 8 Q 11 5 12 4 Q 11.5 6 10 8 Z" fill="#dc3545" stroke="#8b0000" stroke-width="0.5"/>
+  
+  <!-- Head circle -->
+  <circle cx="12" cy="13" r="7" fill="#f8f9fa" stroke="#333" stroke-width="0.8"/>
+  
+  <!-- Simple face -->
+  <circle cx="10" cy="12" r="0.8" fill="#333"/>
+  <circle cx="14" cy="12" r="0.8" fill="#333"/>
+  <path d="M 10 15 Q 12 16 14 15" fill="none" stroke="#333" stroke-width="0.8" stroke-linecap="round"/>
+</svg>

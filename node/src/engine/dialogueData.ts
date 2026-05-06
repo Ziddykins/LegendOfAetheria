@@ -1,0 +1,109 @@
+export function getDialogueDefinitions() {
+	return [{
+		id: 'sage_intro',
+		ownerId: 'question-sage',
+		startNodeId: 'start',
+		entryNodeId: 'start',
+		speakers: ['Question Sage'],
+
+		nodes: {
+			start: {
+				text: "Welcome. You come seeking quests. Little do you know, you've been on one the minute you walked through that door.",
+				choices: [
+					{
+						text: '...huh?',
+						nextNodeId: 'clueless',
+						type: {
+							color: 'bg-primary',
+							icon: 'emoji-astonished-fill'
+						}
+					},
+					{
+						text: 'Shut it, old man! Out with the quests or die.',
+						nextNodeId: 'rude',
+						type: {
+							color: 'bg-danger',
+							icon: 'emoji-angry-fill'
+						}
+					},
+				],
+			},
+
+			clueless: {
+				text: 'Oh, nothing. Here, drink this quest-enabling potion.',
+				choices: [
+					{
+						text: 'You got it, sport-o!',
+						nextNodeId: 'end_power',
+						type: {
+							color: 'bg-success',
+							icon: 'emoji-sunglasses-fill'
+						}
+					},
+					{
+						text: "I ain't quaffin' a thing, later creep-o",
+						nextNodeId: 'rude',
+						type: {
+							color: 'bg-warning',
+							icon: 'emoji-neutral-fill'
+						}
+					},
+				],
+			},
+
+			rude: {
+				text: 'You fool... You foolish FOOL! You know what? I don\'t even wanna give you the only potion in the world that enables quests. Go live your questless life without quests, there, No-Quests. I\'ll just be over here, on a quest, questin\' it up.',
+				choices: [
+					{
+						text: 'Wait, the only one? Gimme it or die, old man!',
+						nextNodeId: 'end_power',
+						type: {
+							color: 'bg-warning',
+							icon: 'award-fill'
+						}
+					},
+					{
+						text: 'Well, can you sweeten the deal a little, maybe toss in another potion? That green one looks tasty. I\'d quaff that.',
+						nextNodeId: 'bargain',
+						type: {
+							color: 'bg-success',
+							icon: 'flask-florence-fill'
+						}
+					}
+				]
+			},
+
+			end_power: {
+				text: 'Good, good. Now we play the waiting game...',
+				effects: [
+					{
+						type: 'addItem',
+						targetId: 'hero',
+						itemId: 1,
+						itemType: 'consumables'
+					},
+				],
+				end: true,
+			},
+
+			bargain: {
+				text: 'Hrmph... Let me check the back room. Ah, yes, fine. Here.',
+				effects: [
+					{
+						type: 'addItem',
+						targetId: 'hero',
+						itemId: 4,
+						itemType: 'consumables'
+					},
+					{
+						type: 'addItem',
+						targetId: 'hero',
+						itemId: 1,
+						itemType: 'consumables'
+					}
+				],
+				end: true
+			},
+		},
+	}];
+}
