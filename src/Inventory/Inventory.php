@@ -114,7 +114,7 @@ class Inventory {
      */
     private function addItem(Item $item) {
         $targetSlot = $this->nextAvailableSlot++;
-        $this->slots[$targetSlot]->item = $item;
+        $this->slots[$targetSlot] = $item;
     }
 
     /**

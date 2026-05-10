@@ -20,8 +20,8 @@ class MailBox {
      *
      * @param int $characterID The unique identifier for the account linked to this mailbox.
      */
-    public function __construct(int $character_id) {
-        $this->characterID = $character_id;
+    public function __construct(int $characterID) {
+        $this->characterID = $characterID;
     }
 
     /**

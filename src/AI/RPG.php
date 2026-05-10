@@ -15,10 +15,10 @@ use Game\AI\Enums\HttpMethod;
  */
 class RPG {
 	/* @var string $baseUrl The base URL for the node server */
-	private string $baseUrl = '$ENV{CODESPACES_NODEJS_PORT}';
+	private string $baseUrl = $_ENV{AIRPG_HOST}‌;
 
 	/* @var int $serverPort The port for the server; defaults to 3000 */
-	private int $serverPort = 3000;
+    private int $serverPort = $_ENV{AIRPG_PORT} ?? 3000;
 	
 	/* @var string $protocol If $secure is true, protocol will be https, http otherwise */
 	private string $protocol = 'http';
