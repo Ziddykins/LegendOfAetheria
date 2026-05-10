@@ -29,6 +29,7 @@ use Game\Traits\PropSuite\PropSuite;
  */
 class Inventory {
     use PropSuite;
+
     /** @var int Inventory identifier (matches character ID) */
     private int $id;
     

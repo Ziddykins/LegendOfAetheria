@@ -15,7 +15,7 @@ use Game\AI\Enums\HttpMethod;
  */
 class RPG {
 	/* @var string $baseUrl The base URL for the node server */
-	private string $baseUrl = 'localhost';
+	private string $baseUrl = '$ENV{CODESPACES_NODEJS_PORT}';
 
 	/* @var int $serverPort The port for the server; defaults to 3000 */
 	private int $serverPort = 3000;
@@ -40,7 +40,7 @@ class RPG {
         $protocol = $secure ? 'https' : 'http';
         $this->baseUrl = "{$protocol}://$url";
 
-        if ($port !== 443 && $port !== 80) {
+        if ($port !== 443 && $port !== 80 && !preg_match('/github\.dev/', $url)) {
             $this->baseUrl .= ":{$port}";
         }
     }

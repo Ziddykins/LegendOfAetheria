@@ -114,7 +114,8 @@ vite.config.ts.timestamp-*
 node-service/loa.eng
 constants.php
 system/constants.php
-node/src/**/*.js$
-node/src/**/*.map$
+node/src/**/*.js
+node/src/**/*.map
 loa.eng
 loa.eng.bk
+constants.php

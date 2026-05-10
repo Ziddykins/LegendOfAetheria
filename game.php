@@ -43,7 +43,7 @@
     </head>
     <script>loa.u_name = '<?php echo $_SESSION['name']; ?>';</script>
 
-    <body class="main-font" data-bs-theme="<?php echo $color_mode; ?>" data-overlayscrollbars-initialize>
+    <body class="uncial" data-bs-theme="<?php echo $color_mode; ?>" data-overlayscrollbars-initialize>
         <div class="d-flex-fill overflow-hidden" style="height: 100vh;">
             <span id="terst" class="row g-0 h-100 app-wrapper layout-fixed sidebar-expand-lg ms-n3">
             <?php include $sidebar_rel_link; ?>

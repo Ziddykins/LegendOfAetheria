@@ -1,18 +1,26 @@
 let icon_holder = null;
 
 function spinner_swap(element, original_icon, unswap) {
+    let el_child = element.children[0];
+
+    if (typeof el_child === 'undefined' || !el_child) {
+        return;
+    } 
+
+    console.log(el_child);
+    
     if (unswap) {
-        element.children[0].classList.remove('spinner-border');
-        element.children[0].remove('spinner-border-sm');
-        element.children[0].add(icon_holder);
+        el_child.classList.remove('spinner-border');
+        el_child.classList.remove('spinner-border-sm');
+        el_child.classList.add(icon_holder);
         icon_holder = null;
     } else {
         icon_holder = original_icon; // will be like, 'bi-whatever'
         console.log("add spinner");
         console.log("original icon:" + original_icon);
-        element.children[0].remove(original_icon);
-        element.children[0].add('spinner-border');
-        element.children[0].add('spinner-border-sm');
+        el_child.classList.remove(original_icon);
+        el_child.classList.add('spinner-border');
+        el_child.classList.add('spinner-border-sm');
     }
     return;
 }
@@ -60,12 +68,14 @@ document.querySelectorAll('button').forEach(function(element) {
                     body: JSON.stringify(data)
                 }).then((response) => {
                     if (!response.ok) {
-                        spinner_swap(element, original_icon, true);
-                        throw new Error(response.text());                        
-                    } else {
-                        spinner_swap(element, original_icon, true);
-                        return response.json();
+                        return response.text().then((text) => {
+                            spinner_swap(element, original_icon, true);
+                            throw new Error(text);
+                        });
                     }
+
+                    spinner_swap(element, original_icon, true);
+                    return response.json();
                 }).then((data) => {
                     console.log(data);
                 }).catch((error) => {

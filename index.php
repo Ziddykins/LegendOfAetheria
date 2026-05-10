@@ -183,7 +183,7 @@
 
     </head>
 
-    <body data-bs-theme="dark" class="main-font">
+    <body data-bs-theme="dark" class="uncial">
         <div class="d-flex align-items-center min-vh-100" style="min-width: 60%;">
             <div id="login-container" class="container shadow border border-round border-1 border-tertiary" style="max-width:550px; width: 100%;">
                 <div class="row">

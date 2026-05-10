@@ -28,7 +28,7 @@ $currentPage = $_GET['page'] ?? '';
 $currentSub = $_GET['sub'] ?? '';
 ?>
 
-<aside id="sidebar" class="app-sidebar shadow overflow-hidden ps-3" data-bs-theme="<?php echo $color_mode; ?>" style="width: 240px; min-width: 240px; height: 100vh;">
+<aside id="sidebar" class="app-sidebar shadow overflow-hidden ps-3 uncial" data-bs-theme="<?php echo $color_mode; ?>" style="width: 240px; min-width: 240px; height: 100vh;">
     <div class="sidebar-brand d-flex align-items-center">
         <a href="/game" class="brand-link ms-2">
             <img src="/img/logos/logo-banner-no-bg.webp" alt="Legend of Aetheria Logo" class="brand-image img-fluid">
@@ -633,29 +633,22 @@ document.addEventListener("DOMContentLoaded", function() {
                 sliver.style.backgroundColor = "rgba(5, 57, 28, 0.21)";
                 sliver.innerHTML = "<i class=\"bi bi-chevron-right\"></i>";
 				console.log("SIDEBAR CLOSED");
-				
-				mutation.target.classList.remove('sidebar-open');
-				mutation.target.classList.add('sidebar-closed');
-
-				if (sb) {
-					sb.classList.classList.remove('sidebar-open');
-					sb.classList.classList.add('sidebar-closed');
-				}
-
+                sb.classList.add('sidebar-collapse');
+                sb.classList.remove('sidebar-open');
 				sliver.style.visibility = 'true';
-            } else {
-				mutation.target.classList.add('sidebar-open');
-				mutation.target.classList.remove('sidebar-closed');
-
-				if (sb) {
-					sb.classList.classList.add('sidebar-open');
-					sb.classList.classList.remove('sidebar-closed');
-					sb.style.position = 'relative';
-				}
-
-				sliver.style.visibility = 'false';
-
-				
+                sliver.addEventListener('click', () => {
+                if (document.getElementById('sidebar-wrapper').classList.contains('sidebar-collapse')) {
+                    sliver.children[0].classList.remove('bi-chevron-right');
+                    sliver.children[0].classList.add('bi-chevron-left');
+                    sliver.appendChild(document.getElementById('sidebar'));
+                    sliver.style.position = 'relative';
+                } else {
+                    sliver.children[0].classList.add('bi-chevron-right');
+                    sliver.children[0].classList.remove('bi-chevron-left');
+                    sliver.appendChild(document.getElementById('main-section'));
+                    sliver.style.position = 'fixed';
+                }
+            });
             }
         });
     });

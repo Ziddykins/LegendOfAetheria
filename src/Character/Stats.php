@@ -110,18 +110,6 @@ class Stats extends BaseStats {
         parent::__construct($characterID);
     }
 
-    /**
-     * Magic method for dynamic property access and modification.
-     * 
-     * Handles get/set operations, mathematical operations (add, sub, mul, div, exp, mod),
-     * and property dump/restore operations via PropSuite trait.
-     * Note: add/sub operations on HP/MP/EP are automatically capped at their max values.
-     * 
-     * @param string $method Method name to invoke
-     * @param array $params Parameters for the method
-     * @return mixed Result of the invoked method
-     */
-
     protected function getType(): PropType {
         return PropType::CSTATS;
     }

@@ -33,4 +33,5 @@ enum ObjectType {
 	case AMULET;
 	case RING;
 	case WINGS;
+	case QUEST; 
 }
