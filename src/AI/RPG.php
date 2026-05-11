@@ -15,10 +15,10 @@ use Game\AI\Enums\HttpMethod;
  */
 class RPG {
 	/* @var string $baseUrl The base URL for the node server */
-	private string $baseUrl = $_ENV{AIRPG_HOST}‌;
+	private string $baseUrl = "http://localhost:3000";
 
 	/* @var int $serverPort The port for the server; defaults to 3000 */
-    private int $serverPort = $_ENV{AIRPG_PORT} ?? 3000;
+    private int $serverPort = 3000;
 	
 	/* @var string $protocol If $secure is true, protocol will be https, http otherwise */
 	private string $protocol = 'http';
@@ -38,10 +38,10 @@ class RPG {
         $this->protocol = $secure ? 'https' : 'http';
         $this->serverPort = (int) preg_replace('/[^0-9]+/', '', (string) $port);
         $protocol = $secure ? 'https' : 'http';
-        $this->baseUrl = "{$protocol}://$url";
+        $this->baseUrl = "$protocol://$url";
 
         if ($port !== 443 && $port !== 80 && !preg_match('/github\.dev/', $url)) {
-            $this->baseUrl .= ":{$port}";
+            $this->baseUrl .= ":$port";
         }
     }
 

@@ -605,7 +605,7 @@ $currentSub = $_GET['sub'] ?? '';
         </nav>
     </div>
 </aside>
-<div id="sidebar-sliver" class="text-center" style="position: fixed; left: 0; top: 0; width: 10px; height: 100vh; z-index: 999; cursor: pointer; display: none;" onclick="document.body.classList.remove('sidebar-collapse'); document.body.classList.add('sidebar-open');">&gt;</div>
+<div id="sidebar-sliver" class="text-center" style="position: fixed; left: 0; top: 0; width: 10px; height: 100vh; z-index: 999; cursor: pointer; display: none;" onclick="document.querySelector('#terst').classList.remove('sidebar-collapse'); document.querySelector('#terst').classList.add('sidebar-open');">&gt;</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
