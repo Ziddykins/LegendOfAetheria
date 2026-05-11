@@ -29,6 +29,7 @@ use Game\Traits\PropSuite\PropSuite;
  */
 class Inventory {
     use PropSuite;
+
     /** @var int Inventory identifier (matches character ID) */
     private int $id;
     
@@ -113,7 +114,7 @@ class Inventory {
      */
     private function addItem(Item $item) {
         $targetSlot = $this->nextAvailableSlot++;
-        $this->slots[$targetSlot]->item = $item;
+        $this->slots[$targetSlot] = $item;
     }
 
     /**

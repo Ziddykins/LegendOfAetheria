@@ -77,8 +77,10 @@
                     </div>
                 
                     <script>
-                        $("#avatar-select").change(function(event) {
-                            document.getElementById("avatar-img").classList.remove("invisible");
+                        document.addEventListener("DOMContentLoaded", () => {
+                            $("#avatar-select").change(function(event) {
+                                document.getElementById("avatar-img").classList.remove("invisible");
+                            });
                         });
                     </script>
                     
@@ -131,7 +133,7 @@
                 </div>
                 
                 <script>
-                    $("#create-submit").on("click", function (e) {
+                    document.getElementById('create-submit').addEventListener("click", function (e) {
                         document.querySelector("#str-ap").value = document.querySelector("#stats-str-cur").innerHTML;
                         document.querySelector("#def-ap").value = document.querySelector("#stats-def-cur").innerHTML;
                         document.querySelector("#int-ap").value = document.querySelector("#stats-int-cur").innerHTML;

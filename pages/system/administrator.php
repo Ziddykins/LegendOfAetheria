@@ -242,7 +242,7 @@ if (isset($_POST['gen-images']) && $_POST['gen-images'] == 1) {
         curl_setopt($ch, CURLOPT_FILE, $fp);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_exec($ch);
-        curl_close($ch);
+        unset($ch);
         fclose($fp);
 
         echo "Saved $img_file\n<br>";

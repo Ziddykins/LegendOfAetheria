@@ -471,35 +471,7 @@
 
             return $avatar;
         }
-
-        /** DEPRECATED
-         * Safely serializes or unserializes data using base64 encoding.
-         *
-         * @param mixed $data The data to serialize or unserialize.
-         * @param bool|null $unserialize Whether to unserialize the data (default: false).
-         * @return mixed The serialized or unserialized data.
-         *
-         * function safe_serialize($data, ?bool $unserialize=null): mixed {
-         *   global $log;
-         *   $ret_data = null;
-         *      
-         *       if ($unserialize === true) {
-        *            $ret_data = unserialize(base64_decode($data));
-        *        } else {
-        *            $ret_data = base64_encode(serialize($data));
-        *        }
-        *
-        *        return $ret_data;
-        *  }
-        */
         
-        /**
-         * Validates the current session for the logged-in user.
-         *
-         * Checks session variables and database records to ensure the session is valid.
-         *
-         * @return bool True if the session is valid, false otherwise.
-         */
         function check_session(): bool {
             global $db, $log, $t;
 
@@ -615,7 +587,7 @@
 		function ai_serv_post(string $endpoint, mixed $data = null) {
 			$ch = curl_init();
 
-			curl_setopt($ch, CURLOPT_URL, "http://localhost:3000/$endpoint");
+			curl_setopt($ch, CURLOPT_URL, "http://{$_ENV['AIRPG_HOST']}:{$_ENV['AIRPG_PORT']}/$endpoint");
 			curl_setopt($ch, CURLOPT_HTTPHEADER, [
 				'Content-Type: application/json',
 				'Accept: application/json'
@@ -632,7 +604,7 @@
 
 			$response = curl_exec($ch);
 
-			curl_close($ch);
+			unset($ch);
 
 			return $response;
 		}

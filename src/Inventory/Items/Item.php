@@ -1,8 +1,6 @@
 <?php
 namespace Game\Inventory\Items;
 use Game\Inventory\Enums\ObjectRarity;
-use Game\AI\Enums\HttpMethod;
-
 
 /**
  * Represents an inventory item with weight, gem sockets, and stat modifiers.
@@ -34,7 +32,6 @@ class Item {
 	/** @var string $subtype Item subtype to fetch the schema for that item */
 	private string $subtype = "";
 
-
 	/** @var int $maxSockets Number of gem sockets */
 	private int $maxSockets = 0;
 
@@ -47,7 +44,7 @@ class Item {
 	/** @var array $implicit Implicit stat modifiers */
 	private array $implicit = [];
 
-	/** @var array $affixPool Available affix pool for this item */
+	/** @var array $affixPool Randomly available stat boosts*/
 	private array $affixPool = [];
 
 	/** @var string $description Item description */
@@ -56,7 +53,7 @@ class Item {
     /** @var array<Socket> Array of Socket objects for gem insertion */
     private array $sockets = [];
     
-    /** @var array $modifiers Stat modifiers provided by this item */
+    /** @var array $modifiers Stat modifiers provided by this item which were chosen*/
 	private array $modifiers = [];
 
 	/** @var bool $stackable Whether or not the item is stackable */
@@ -104,7 +101,7 @@ class Item {
 	private function get_item_details() {
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, "http://localhost:3000/item/{$this->type}/{$this->itemId}");
+		curl_setopt($ch, CURLOPT_URL, "http://{$_ENV['AIRPG_HOST']}:{$_ENV['AIRPG_PORT']}/item/{$this->type}/{$this->itemId}");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, [
 			'Content-Type: application/json',
 			'Accept: application/json'

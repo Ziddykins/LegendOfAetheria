@@ -4,8 +4,7 @@ use Game\Character\Character;
     /**
      * Get a list of new members registered between two dates.
      *
-     * @param string $start_date The start date.
-     * @param string $end_date The end date.
+     * @param int $days The number of days to look back for new members.
      * @return array Returns an array of new member accounts.
      */
     function get_new_members($days) {
@@ -20,8 +19,7 @@ use Game\Character\Character;
     /**
      * Get the count of new members registered between two dates.
      *
-     * @param string $start_date The start date.
-     * @param string $end_date The end date.
+     * @param int $days The number of days to look back for new members.
      * @return int Returns the count of new member accounts.
      */
     function new_members_count($days = 30): int {
@@ -35,7 +33,8 @@ use Game\Character\Character;
     /**
      * Populate a list of new members in a HTML format.
      *
-     * @param array $accounts The array of new member accounts.
+     * @param int $days The number of days to look back for new members.
+     * @return void
      */
     function populate_new_members($days = 30) {
         global $db;

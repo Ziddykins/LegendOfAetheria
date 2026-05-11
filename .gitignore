@@ -118,3 +118,4 @@ node/src/**/*.js
 node/src/**/*.map
 loa.eng
 loa.eng.bk
+constants.php
