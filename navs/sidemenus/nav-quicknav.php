@@ -1,10 +1,13 @@
 <?php
     use Game\Account\Enums\Privileges;
-    use Game\Character\Enums\FriendStatus;
+    use Game\Account\Account;
+    use Game\Character\Character;
 
     $new_mail = check_mail('unread');
     $data = get_friend_counts(null, false);
     $new_friend_reqs = $data[1]['REQUEST_RECV'] ?? 0;
+    $account = new Account($_SESSION['email']);
+    $character = new Character($account->get_id(), $_SESSION['character-id']);
 
 ?>
 

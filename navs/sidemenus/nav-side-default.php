@@ -5,11 +5,13 @@ use Game\Mail\Folder\Enums\FolderType;
 use Game\Mail\MailBox\MailBox;
 use Game\Character\Enums\FriendStatus;
 use Game\Account\Enums\Privileges;
+use Game\Account\Settings;
 
 #require_once "system/constants.php";
 
 $account   = new Account($_SESSION['email']); 
-$character = new Character($account->get_id(), $_SESSION['character-id']); 
+$character = new Character($account->get_id(), $_SESSION['character-id']);
+$settings  = new Settings($account->get_id());
 $folders = [];
 
 foreach (["OUTBOX", "INBOX", "DELETED", "DRAFTS"] as $type) {
@@ -28,7 +30,7 @@ $currentPage = $_GET['page'] ?? '';
 $currentSub = $_GET['sub'] ?? '';
 ?>
 
-<aside id="sidebar" class="app-sidebar shadow overflow-hidden ps-3 uncial" data-bs-theme="<?php echo $color_mode; ?>" style="width: 240px; min-width: 240px; height: 100vh;">
+<aside id="sidebar" class="app-sidebar shadow overflow-hidden ps-3 uncial" data-bs-theme="<?php echo $settings->get_colorMode(); ?>" style="width: 240px; min-width: 240px; height: 100vh;">
     <div class="sidebar-brand d-flex align-items-center">
         <a href="/game" class="brand-link ms-2">
             <img src="/img/logos/logo-banner-no-bg.webp" alt="Legend of Aetheria Logo" class="brand-image img-fluid">
@@ -339,21 +341,21 @@ $currentSub = $_GET['sub'] ?? '';
 						</li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=accepted&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'accepted' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
+                            <a href="/game?page=accepted&sub=quests" class="nav-link text-secondary d-flex align-items-center ps-3 <?php echo ($currentPage === 'accepted' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">fact_check</i>
                                 <p class="ms-2">Accepted</p>
                             </a>
                         </li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=completed&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'completed' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
+                            <a href="/game?page=completed&sub=quests" class="nav-link text-secondary d-flex align-items-center ps-3 <?php echo ($currentPage === 'completed' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">done_all</i>
                                 <p class="ms-2">Completed</p>
                             </a>
                         </li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=abandoned&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'abandoned' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
+                            <a href="/game?page=abandoned&sub=quests" class="nav-link text-secondary d-flex align-items-center ps-3 <?php echo ($currentPage === 'abandoned' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">backspace</i>
                                 <p class="ms-2">Abandoned</p>
                             </a>
@@ -605,58 +607,59 @@ $currentSub = $_GET['sub'] ?? '';
         </nav>
     </div>
 </aside>
-<div id="sidebar-sliver" class="text-center" style="position: fixed; left: 0; top: 0; width: 10px; height: 100vh; z-index: 999; cursor: pointer; display: none;" onclick="document.body.classList.remove('sidebar-collapse'); document.body.classList.add('sidebar-open');">&gt;</div>
+<div id="sidebar-sliver" class="text-center" style="position: fixed; left: 0; top: 0; width: 10px; height: 100vh; z-index: 999; cursor: pointer; display: none;" onclick="document.querySelector('#terst').classList.remove('sidebar-collapse'); document.querySelector('#terst').classList.add('sidebar-open');">&gt;</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const activeLink = document.querySelector(".nav-link.active");
     const sidebar = document.getElementById("sidebar");
 	const sliver = document.getElementById("sidebar-sliver");
-    sidebar.classList.add('sidebar-open');
-    if (activeLink) {
-        let parent = activeLink.closest(".nav-item.menu-open");
-        while (parent) {
-            parent.classList.add("menu-open");
-            parent = parent.parentElement.closest(".nav-item.menu-open");
-        }
 
-        activeLink.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    
-    const observer = new MutationObserver(function(mutations) {
-		mutations.forEach(function(mutation) {
-			const sb = document.getElementById('terst');
-            if (mutation.target.classList.contains("sidebar-collapse")) {
-                sliver.style.display = "flex";
-                sliver.style.alignItems = "center";
-                sliver.style.justifyContent = "center";
-                sliver.style.backgroundColor = "rgba(5, 57, 28, 0.21)";
-                sliver.innerHTML = "<i class=\"bi bi-chevron-right\"></i>";
-				console.log("SIDEBAR CLOSED");
-                sb.classList.add('sidebar-collapse');
-                sb.classList.remove('sidebar-open');
-				sliver.style.visibility = 'true';
-                sliver.addEventListener('click', () => {
-                if (document.getElementById('sidebar-wrapper').classList.contains('sidebar-collapse')) {
-                    sliver.children[0].classList.remove('bi-chevron-right');
-                    sliver.children[0].classList.add('bi-chevron-left');
-                    sliver.appendChild(document.getElementById('sidebar'));
-                    sliver.style.position = 'relative';
-                } else {
-                    sliver.children[0].classList.add('bi-chevron-right');
-                    sliver.children[0].classList.remove('bi-chevron-left');
-                    sliver.appendChild(document.getElementById('main-section'));
-                    sliver.style.position = 'fixed';
+    if (sb && sliver) {
+        sidebar.classList.add('sidebar-open');
+        if (activeLink) {
+            let parent = activeLink.closest(".nav-item.menu-open");
+            while (parent) {
+                parent.classList.add("menu-open");
+                parent = parent.parentElement.closest(".nav-item.menu-open");
+            }
+
+            activeLink.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                const sb = document.getElementById('terst');
+                if (mutation.target.classList.contains("sidebar-collapse")) {
+                    sliver.style.display = "flex";
+                    sliver.style.alignItems = "center";
+                    sliver.style.justifyContent = "center";
+                    sliver.style.backgroundColor = "rgba(5, 57, 28, 0.21)";
+                    sliver.innerHTML = "<i class=\"bi bi-chevron-right\"></i>";
+                    console.log("SIDEBAR CLOSED");
+                    sb.classList.add('sidebar-collapse');
+                    sb.classList.remove('sidebar-open');
+                    sliver.style.visibility = 'true';
+                    sliver.addEventListener('click', () => {
+                        if (document.querySelector('.sidebar-wrapper').classList.contains('sidebar-collapse')) {
+                            sliver.children[0].classList.remove('bi-chevron-right');
+                            sliver.children[0].classList.add('bi-chevron-left');
+                            sliver.appendChild(document.getElementById('sidebar'));
+                            sliver.style.position = 'relative';
+                            sliver.style.display = 'flex';
+                        } else {
+                            sliver.style.display = 'none';
+                        }
+                    });
                 }
             });
-            }
         });
-    });
 
-    observer.observe(document.body, {
-        attributes: true,
-        attributeFilter: ["class"]
-    });
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ["class"]
+        });
+    }
 });
 </script>
 
