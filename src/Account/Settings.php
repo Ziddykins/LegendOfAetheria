@@ -1,7 +1,6 @@
 <?php
 namespace Game\Account;
 
-use Exception;
 use Game\Traits\PropSuite\PropSuite;
 use Game\Traits\PropSuite\Enums\PropType;
 use Game\Components\Sidebar\Enums\SidebarType;

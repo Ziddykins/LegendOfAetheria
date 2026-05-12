@@ -9,7 +9,7 @@
 
     require_once "functions.php";
     require_once "constants.php";
-
+    global $log;
     
     if (!isset($argv)) {
         echo 'Access to cron.php directly is not allowed!<br>';
@@ -74,7 +74,6 @@
 
         foreach ($characters as $t_character) {
             $character = new Character($t_character['account-id'], $t_character['id']);
-            $character->load();
             $max_hp = $character->stats->get_maxHP();
             if ($character->stats->get_hp() <= 0) {
                 $character->stats->set_hp($max_hp);

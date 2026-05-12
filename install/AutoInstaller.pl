@@ -55,6 +55,7 @@ use constant {
     COMPOSER  => 10,
     CLEANUP   => 11,
     HOSTS     => 12,
+	NODEJS    => 13,
 };
 
 use constant {
@@ -78,15 +79,14 @@ my %glb; # hash which holds all other required config variables
 my %ini; # full configuration ini, all domains
 my %sql; # object containing constant sql table names
 my %clr; # color constants
+my %hosts;
 
+my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
 my $question; # current question to ask the user
 my $fqdn;     # fully qualified domain name to set up
 
-# hosts list (/etc/hosts)
-my %hosts;
 my @list;
 
-my $cfg_file = 'config.ini';    # file which holds the scripts configuration ini
 
 if ($opt_config) {
     $cfg_file = $opt_config;
@@ -113,9 +113,11 @@ tie %ini, 'Config::IniFiles', (
 # ===================================[ cfg-end ]===================================== #
 
 # ==================================[ main-start ]=================================== #
-if ($ENV{'USER'} ne 'root') {
-    die $clr{red} . 'This script must be ran as root, not ',
-        $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
+if (!$ENV{TERMUX__ROOTFS_DIR}) {
+	if ($ENV{'USER'} ne 'root') {
+	    die $clr{red} . 'This script must be ran as root, not ',
+    	    $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
+	}
 }
 
 $fqdn = $opt_fqdn if $opt_fqdn;
@@ -128,7 +130,7 @@ if (!$fqdn) {
     $fqdn = lc $fqdn;
 }
 
-my $loc_check = getcwd;;
+my $loc_check = getcwd;
 $loc_check = abs_path($loc_check); # Ensure absolute path
 $loc_check =~ s/\/install$//;
 $cfg{web_root} = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
@@ -143,11 +145,10 @@ if (-d $cfg{web_root}) {
 
         make_path($cfg{web_root}, {
 	    mode => 0755,
-    	    user => "www-data",
-            group => "www-data"
+    	    user => "$cfg{apache_runas}",
+            group => "$cfg{apache_runas}"
 	}) or croak("Failed to create web root directory: $!");
-
-        open my $fh, '>', '/tmp/mover.pl';
+        open my $fh, '>', "/tmp/mover.pl";
         print $fh <<'EOF';
         #!/usr/bin/env perl
         use File::Copy::Recursive qw(rmove);
@@ -898,8 +899,9 @@ sub step_process_templates {
     my ($cp_cmd, $sql_cmd, $sqlrpw, $tmp);
     my $sql_import_result;
     my $crontab_output;
+	my $os = check_platform();
 
-    if (check_platform() eq 'linux') {
+    if ($os eq 'linux' or $os eq 'termux') {
         $cp_cmd = "cp";
     } else {
         $cp_cmd = "copy";
@@ -913,6 +915,7 @@ sub step_process_templates {
     ReadMode 'normal';
 
     $sqlrpw = '';
+
     if ($tmp) {
         $sqlrpw = "-p$tmp";
     }
@@ -943,8 +946,10 @@ sub step_process_templates {
 
     tell_user('INFO', "Installing our cronjobs under user $cfg{apache_runas}");
 
-    $crontab_output = `(sudo -u $cfg{apache_runas} crontab -l; cat $cfg{crontab_template}.ready; echo;) | sudo -u $cfg{apache_runas} crontab -`;
-    tell_user('SYSTEM', $crontab_output);
+	if ($os eq 'linux') {
+	    $crontab_output = `(sudo -u $cfg{apache_runas} crontab -l; cat $cfg{crontab_template}.ready; echo;) | sudo -u $cfg{apache_runas} crontab -`;
+	    tell_user('SYSTEM', $crontab_output);
+	}
 
     tell_user('SUCCESS', "All template files have been applied");
 }
@@ -1258,7 +1263,8 @@ sub check_platform {
     } elsif ($platform eq "linux") {
         return "linux";
     } elsif ($platform eq "android") {
-	return "linux";
+		return "termux";
+
     }
     die "Unsupported OS!\n";
 }
@@ -1430,8 +1436,11 @@ sub get_sysinfo {
 
 sub populate_hashdata {
     my $step = $_[0];
+	
+	if ($ENV{TERMUX__ROOTFS_DIR}) {
+		%def = %{$ini{termux_examples}};
 
-    if ($^O eq 'linux') {
+	} elsif ($^O eq 'linux') {
         %def = %{$ini{lin_examples}};
     } else {
         %def = %{$ini{win_examples}};

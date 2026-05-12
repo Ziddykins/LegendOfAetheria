@@ -465,7 +465,7 @@ Ensure the following ports are accessible:
 |------|----------|---------|----------|
 | 80 | TCP | HTTP (redirects to HTTPS) | Yes |
 | 443 | TCP | HTTPS (main application) | Yes |
-| 3306 | TCP | MariaDB (localhost only) | Internal |
+| 3306 | TCP | MariaDB ( only) | Internal |
 | 22 | TCP | SSH (server administration) | Recommended |
 
 **Note**: Port 3306 should **not** be exposed to the internet. MariaDB binds to `127.0.0.1` by default.
