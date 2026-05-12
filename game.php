@@ -1,7 +1,6 @@
 <?php
     declare(strict_types = 1);
-//    require_once "vendor/autoload.php";
-    require_once "system//bootstrap.php";
+    require_once "system/bootstrap.php";
 
 
     use Game\Account\Account;
@@ -10,9 +9,6 @@
     use Game\Components\Sidebar\Enums\SidebarType;
     use Game\System\System;
     use Game\AI\LoAllama;
-    use Game\Account\Settings;
-    use Game\AI\NPC\Tutorial\Frank;
-    //use Game\Familiar\Familiar;
 
     $system = new System(0);
     $system->load_sheet();
@@ -34,7 +30,6 @@
     $cur_floor        = $character->get_floor();
     $avatar           = $character->get_avatar();
     $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now"))); 
-    $log->debug("WE MADE IT TO GAME");   
 ?>
 
 <?php include 'html/opener.html'; ?>

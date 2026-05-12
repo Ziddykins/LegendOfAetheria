@@ -79,7 +79,7 @@ class Familiar {
      * 
      * @return void
      */
-    public function registerFamiliar() {
+    public function registerFamiliar(): void {
         global $db, $t;
         $sqlQuery = "INSERT INTO {$t['characters']} (`character_id`) VALUES (?)";
         
@@ -105,7 +105,7 @@ class Familiar {
      * 
      * @return void
      */
-    public function saveFamiliar() {
+    public function saveFamiliar(): void {
         global $db;
 
         $sqlQuery ='UPDATE  SET ';
@@ -143,7 +143,9 @@ class Familiar {
      * @param string $which Card type: 'empty' or 'current'
      * @return string|null HTML markup for familiar card
      */
-    public function getCard($which = 'current') {
+    public function getCard($which = 'current'): string|bool|null {
+        $html = null;
+
         if ($which === 'empty') {
             $html = file_get_contents(
                 WEBROOT . 'html/card-egg-none.html'
@@ -164,6 +166,8 @@ class Familiar {
 
             //return $html;
         }
+
+        return $html;
     }
 
     /**
@@ -174,7 +178,7 @@ class Familiar {
      * @param int $characterID Character whose familiar to load
      * @return void
      */
-    public function loadFamiliar($characterID) {
+    public function loadFamiliar($characterID): void {
         global $db, $log, $t;
 
         $sqlQuery = "SELECT * FROM {$t['familiars']} WHERE `character_id` = ?";
@@ -260,7 +264,7 @@ class Familiar {
      * @param int $rarity_roll Dice roll result to determine rarity
      * @return void
      */
-    public function generateEgg(Familiar $familiar, float $rarity_roll) {
+    public function generateEgg(Familiar $familiar, float $rarity_roll): void {
         global $log;
         
         $rarity       = ObjectRarity::getObjectRarity($rarity_roll);
@@ -280,8 +284,12 @@ class Familiar {
         
         $familiar->saveFamiliar();
     }
-
-    function __call($method, $params) {
+    /**
+     * @param mixed $method get|set|add|mul|sub|exp|new|load_[PropertyName]
+     * @param mixed $params Parameters for the method call (e.g., value to set)
+     * @return mixed Return value for get methods, or null for set methods
+     */
+    public function __call($method, $params): mixed {
         global $log, $db, $t;
         $caller = debug_backtrace()[1]['function'];
 
@@ -307,6 +315,8 @@ class Familiar {
             $db->query($sqlQuery);
             $this->$var = $params[0];
         }
+
+        return null;
     }
 }
 
