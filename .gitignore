@@ -48,7 +48,7 @@ qodana.yaml
 **/temp/**
 system/constants.php
 **/packages/**
-logs
+**/logs/*
 *.log
 npm-debug.log*
 yarn-debug.log*
