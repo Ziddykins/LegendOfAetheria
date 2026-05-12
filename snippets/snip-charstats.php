@@ -1,4 +1,10 @@
 <?php
+    use Game\Account\Account;
+    use Game\Character\Character;
+
+    $account = new Account($_SESSION['email']);
+    $character = new Character($account->get_id(), $_SESSION['character-id']);
+
     $char_name = $character->get_name();
     $char_race = $character->get_race();
     $char_avatar = $character->get_avatar();

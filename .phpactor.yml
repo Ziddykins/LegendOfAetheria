@@ -1,0 +1,15 @@
+# PHPactor Configuration
+language_server:
+  diagnostics:
+    enabled: true
+    exclude_diagnostics:
+      - PHP6615
+
+completion:
+  enabled: true
+
+code_transform:
+  enabled: true
+
+worse_reflection:
+  stub_dir: null

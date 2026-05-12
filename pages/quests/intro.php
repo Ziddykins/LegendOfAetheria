@@ -34,11 +34,9 @@ if (isset($_GET['choiceIndex']) && $_GET['choiceIndex'] != null) {
 $message = json_decode(ai_serv_post($endpoint, $data));
 $log->warning(print_r($message, 1));
 ?>
-<div class="quest-intro-page py-5">
-    <div class="container">
-        
-
-        <div class="quest-card shadow-lg">
+<div class="quest-intro-page py-5 d-flex align-items-center justify-content-center">
+    <div class="d-flex align-items-center justify-content-center px-3">
+        <div class="quest-card shadow-lg d-flex align-items-center justify-items-center">
             <div class="row g-0 align-items-stretch">
                 <div class="col-lg-4">
                     <div class="quest-avatar-wrapper d-flex align-items-center justify-content-center p-3">
@@ -49,12 +47,12 @@ $log->warning(print_r($message, 1));
                 <div class="col-lg-8">
                     <div class="card-body p-5 position-relative">
                         <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 mb-4">
-                            <div>
+                            <div class="text-center">
                                 <p class="text-uppercase text-secondary small mb-1 letter-spacing">Shadowed Inquiry</p>
                                 <h1 class="quest-title mb-2">Quest Giver</h1>
                                 <p class="text-muted small mb-0">A mysterious sage offers guidance from the forgotten archives.</p>
+								<span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle">New Encounter</span>
                             </div>
-                            <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle">New Encounter</span>
                         </div>
 
                         <div class="quest-dialogue p-4 rounded-4 mb-4">
@@ -67,12 +65,11 @@ $log->warning(print_r($message, 1));
                                 <div class="col-12">
                                     <a href="<?php echo $href; ?>" class="quest-choice d-flex align-items-center p-3 rounded-4 text-decoration-none">
                                         <div class="d-flex align-items-center gap-3">
-                                            <span class="quest-choice-icon text-<?php echo $choice->type->color; ?>">
-                                                <i class="bi bi-<?php echo $choice->type->icon; ?> fs-6 opacity-50"></i>
+                                            <span class="quest-choice-icon">
+                                                <i class="bi bi-circle-fill fs-6 opacity-50"></i>
                                             </span>
                                             <div>
                                                 <div class="fw-semibold text-white"><?php echo $choice->text; ?></div>
-                                                <div class="text-muted small">Choose this response</div>
                                             </div>
                                         </div>
                                     </a>
