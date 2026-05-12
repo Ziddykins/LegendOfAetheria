@@ -26,6 +26,9 @@
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
           mask-composite: exclude;
   filter: blur(8px);
@@ -66,4 +69,111 @@
 
 .ra {
     filter: drop-shadow(0 0 4px currentColor);
+}
+/* Quest intro modern styling */
+.quest-intro-page {
+    min-height: 100vh;
+    background: radial-gradient(circle at 20% 15%, rgba(170, 121, 72, 0.12), transparent 25%),
+        linear-gradient(180deg, #060609 0%, #08080d 100%);
+}
+
+.quest-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(8, 10, 14, 0.92);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(14px);
+}
+
+.quest-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at top right, rgba(228, 160, 74, 0.14), transparent 25%),
+        radial-gradient(circle at bottom left, rgba(88, 107, 152, 0.10), transparent 20%);
+}
+
+.quest-avatar-wrapper {
+    min-height: 360px;
+    border-radius: 2rem 0 0 2rem;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(16, 18, 24, 1), rgba(8, 10, 14, 0.95));
+}
+
+.quest-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.35));
+}
+
+.quest-title {
+    color: #e2d4b0;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+
+.quest-dialogue {
+    background: rgba(12, 14, 18, 0.90);
+    border: 1px solid rgba(189, 156, 101, 0.16);
+    color: #f2ecdf;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.quest-choice {
+    background: rgba(12, 14, 20, 0.80);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.quest-choice:hover {
+    transform: translateY(-2px);
+    border-color: rgba(228, 160, 74, 0.24);
+    background: rgba(24, 26, 32, 0.92);
+}
+
+.quest-choice-icon {
+    width: 3rem;
+    height: 3rem;
+    display: grid;
+    place-items: center;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.quest-choice-badge {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    color: #e7dab7;
+}
+
+.effect-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.4rem;
+}
+
+.letter-spacing {
+    letter-spacing: 0.24em;
+}
+
+@media (max-width: 991.98px) {
+    .quest-avatar-wrapper {
+        border-radius: 1.5rem 1.5rem 0 0;
+        min-height: 260px;
+    }
+
+    .quest-card {
+        border-radius: 1.5rem;
+    }
 }
