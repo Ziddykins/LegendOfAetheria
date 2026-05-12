@@ -121,7 +121,9 @@ trait PropDump {
                 ReflectionProperty::IS_PRIVATE
             );
             foreach ($classProperties as $prop) {
-                $prop->setAccessible(true);
+                if (PHP_VERSION_ID < 80100) {
+                    $prop->setAccessible(true);
+                }
                 $properties[$prop->getName()] = $prop;
             }
         } while ($reflection = $reflection->getParentClass());
@@ -208,8 +210,6 @@ trait PropDump {
                 }
 
                 $property = $reflection->getProperty($name);
-                $property->setAccessible(true);
-
                 $value = $propertyData['value'];
 
                 // Nested object or reference
