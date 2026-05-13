@@ -101,8 +101,6 @@ class Character {
     /** @var int Spindel currency count */
     private int $spindels = 0;
     
-    /** @var int Experience points */
-    private int $exp = 0;
     
     /** @var string Character creation timestamp */
     private string $dateCreated = '1970-01-01 00:00:00';
