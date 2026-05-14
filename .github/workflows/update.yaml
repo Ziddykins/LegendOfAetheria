@@ -14,4 +14,4 @@ jobs:
       - name: composer update action
         uses: kawax/composer-update-action@master
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
