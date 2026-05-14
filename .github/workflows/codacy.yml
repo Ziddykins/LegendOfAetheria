@@ -1,3 +1,4 @@
+name: "Codacy"
 on:
   push:
     branches: [ "master" ]
