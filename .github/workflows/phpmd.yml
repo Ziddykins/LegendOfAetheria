@@ -50,7 +50,7 @@ jobs:
           tools: phpmd
 
       - name: Update composer dependencies
-        run: composer update --no-scripts --no-interaction || true
+        run: sudo composer update --no-scripts --no-interaction || true
 
       - name: Run PHPMD
         run: phpmd . sarif codesize --reportfile phpmd-results.sarif

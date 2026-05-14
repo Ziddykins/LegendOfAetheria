@@ -30,7 +30,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get upgrade -y
 
       - name: Update npm dependencies
-        run: npm update -g
+        run: sudo npm update -g
 
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@d840f886c4bd4edc059706d09c6a1586111c540b
