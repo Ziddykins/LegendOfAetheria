@@ -1,6 +1,12 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const v1 = require('../services/v1');
 const router = new express.Router();
+
+const authRefreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 refresh attempts per window
+});
  
 router.get('/account/:accountID', async (req, res, next) => {
   let options = { 
@@ -20,7 +26,7 @@ router.get('/account/:accountID', async (req, res, next) => {
   }
 });
  
-router.post('/auth/refresh', async (req, res, next) => {
+router.post('/auth/refresh', authRefreshLimiter, async (req, res, next) => {
   let options = { 
   };
 

@@ -307,6 +307,7 @@ echo;) | sudo -u www-data crontab -
 
 [Tabulator](https://tabulator.info)
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Ziddykins/LegendOfAetheria)
 
 
 

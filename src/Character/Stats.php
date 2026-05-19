@@ -1,7 +1,7 @@
 <?php
 namespace Game\Character;
 use Game\Traits\PropSuite\Enums\PropType;
-use Game\Abstract\BaseStats As BaseStats;
+use Game\Abstract\BaseStats;
 
 /**
  * Stats class manages character combat and attribute statistics.
@@ -19,6 +19,8 @@ use Game\Abstract\BaseStats As BaseStats;
  * @method int get_ep() Gets current EP
  * @method int get_maxEP() Gets maximum EP
  * @method int get_ap() Gets ability points
+ * @method int get_experience() Gets current experience points
+ * @method int get_maxExperience() Gets experience points required for next level
  * @method int get_str() Gets strength
  * @method int get_int() Gets intelligence
  * @method int get_def() Gets defense
@@ -33,6 +35,8 @@ use Game\Abstract\BaseStats As BaseStats;
  * @method int get_accu() Gets accuracy
  * @method int get_rsst() Gets resistance
  * @method int get_rgen() Gets regeneration
+ * @method int get_absb() Gets damage absorption
+ * @method int get_evsn() Gets evasion chance
  * 
  * @method void set_hp(int $hp) Sets current HP
  * @method void set_maxHP(int $maxHP) Sets maximum HP
@@ -55,7 +59,9 @@ use Game\Abstract\BaseStats As BaseStats;
  * @method void set_accu(int $accu) Sets accuracy
  * @method void set_rsst(int $rsst) Sets resistance
  * @method void set_rgen(int $rgen) Sets regeneration
- * 
+ * @method void set_experience(int $experience) Sets current experience points
+ * @method void set_maxExperience(int $maxExperience) Sets experience points required for next level 
+
  * @method void add_hp(int $amount) Adds HP (capped at maxHP)
  * @method void sub_hp(int $amount) Subtracts HP
  * @method void add_mp(int $amount) Adds MP (capped at maxMP)
@@ -78,8 +84,17 @@ use Game\Abstract\BaseStats As BaseStats;
  * @method void add_accu(int $amount) Increases accuracy
  * @method void add_rsst(int $amount) Increases resistance
  * @method void add_rgen(int $amount) Increases regeneration
+ * @method void add_absb(int $amount) Increases damage absorption
+ * @method void add_evsn(int $amount) Increases evasion chance
+ 
  */
 class Stats extends BaseStats {
+    /** @var int Current experience points */
+    protected int $experience = 0;
+
+    /** @var int Experience points required for next level */
+    protected int $maxExperience = 1000;
+
     /** @var int Current energy points */
     protected int $ep     = 100;
     
@@ -112,5 +127,9 @@ class Stats extends BaseStats {
 
     protected function getType(): PropType {
         return PropType::CSTATS;
+    }
+
+    public function get_experience()
+    {
     }
 }

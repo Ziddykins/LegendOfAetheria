@@ -40,11 +40,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Update system packages
+        run: sudo apt-get update && sudo apt-get upgrade -y
+
       - name: Setup PHP
         uses: shivammathur/setup-php@aa1fe473f9c687b6fb896056d771232c0bc41161
         with:
           coverage: none
           tools: phpmd
+
+      - name: Update composer dependencies
+        run: sudo composer update --no-scripts --no-interaction || true
 
       - name: Run PHPMD
         run: phpmd . sarif codesize --reportfile phpmd-results.sarif

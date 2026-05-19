@@ -1,5 +1,21 @@
 <?php
-	include '../../snippets/snip-charstats.php';
+	include 'snippets/snip-charstats.php';
+	use Game\Inventory\Inventory;
+	use Game\Inventory\Items\Item;
+
+	global $character;
+
+	$inventory = new Inventory($character->get_id());
+	
+
+	$test_item = new Item('consumable', 1);
+
+	$inventory->addItem($test_item);
+	echo $slots_left = $inventory->spacesLeft();
+	echo '<pre>';
+	print_r($inventory->dumpProps());
+	echo '</pre>';
+	exit();
 ?>
 	<div class="inventory-page py-5">
 		<div class="container-lg">

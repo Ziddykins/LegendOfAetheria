@@ -34,6 +34,8 @@ jobs:
       actions: read
       contents: read
       security-events: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     strategy:
       fail-fast: false
@@ -47,6 +49,12 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+
+    - name: Update system packages
+      run: sudo apt-get update && sudo apt-get upgrade -y
+
+    - name: Update npm dependencies
+      run: sudo npm update -g
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL

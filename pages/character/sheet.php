@@ -1,5 +1,9 @@
 <?php
     include 'snippets/snip-charstats.php';
+	global $stats_map;
+	global $character;
+	
+
     $index = 1;
     $max_index = count($stats_map);
 

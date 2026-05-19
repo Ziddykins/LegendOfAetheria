@@ -2,12 +2,19 @@ import express from 'express';
 import { promises as fs } from 'fs';
 import type { Request, Response } from 'express';
 import type { Engine } from '@ai-rpg-engine/core';
+import rateLimit from 'express-rate-limit';
 import { saveEngine } from '../utils/save.js';
 
 export default function itemRoutes(engine: Engine) {
 	const router = express.Router();
+	const itemRouteLimiter = rateLimit({
+		windowMs: 15 * 60 * 1000,
+		max: 100,
+		standardHeaders: true,
+		legacyHeaders: false,
+	});
 
-	router.get('/item/:itemType/:itemId', async (req: Request, res: Response) => {
+	router.get('/item/:itemType/:itemId', itemRouteLimiter, async (req: Request, res: Response) => {
 		const itemType = req.params.itemType;
 		const itemId   = parseInt(req.params.itemId as string);
 
