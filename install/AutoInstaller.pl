@@ -514,10 +514,13 @@ sub step_sql_configure {
     $cfg{sql_host}     = '127.0.0.1';
     $cfg{sql_port}     = 3306;
 
-    $question = "Please enter the location of your MySQL configuration file (e.g. /etc/mysql/mariadb/mariadb.conf.d/50-server.conf)";
-    $cfg{sql_config_file} = ask_user($question, $cfg{sql_config_file}, 'input');
+	$question = "Enter the hostname or IP of the SQL server: ";
+	$cfg{sql_host} = ask_user($question, $cfg{sql_host}, 'input');
 
-    $question = "Please enter the SQL username to be used for the database";
+	$question = "Please enter the SQL port to be used for the database";
+    $cfg{sql_port} = ask_user($question, $cfg{sql_port}, 'input');
+
+	$question = "Please enter the SQL username to be used for the database";
     $cfg{sql_username} = ask_user($question, $cfg{sql_username}, 'input');
 
     $question = "Please enter the SQL password to be used for the database";
@@ -526,13 +529,10 @@ sub step_sql_configure {
     $question = "Please enter the SQL database to be used for the game";
     $cfg{sql_database} = ask_user($question, $cfg{sql_database}, 'input');
 
-    $question = "Please enter the SQL host to be used for the database";
-    $cfg{sql_host} = ask_user($question, $cfg{sql_host}, 'input');
+    $question = "Please enter the location of your MySQL configuration file (e.g. /etc/mysql/mariadb/mariadb.conf.d/50-server.conf)";
+    $cfg{sql_config_file} = ask_user($question, $cfg{sql_config_file}, 'input');
 
-    $question = "Please enter the SQL port to be used for the database";
-    $cfg{sql_port} = ask_user($question, $cfg{sql_port}, 'input');
-
-    }
+}
 
 sub step_vhost_ssl {
     my $redir_status = "$clr{green}ON$clr{reset}";
