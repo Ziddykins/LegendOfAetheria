@@ -28,16 +28,25 @@ app.use(express.text());
 
 // parse application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
-app.use(csrf({ cookie: true }));
-
+app.use(cookieParser());
 
 // parse multipart/form-data
 app.use(upload.array());
 app.use(express.static('public'));
 
-app.use(csrf({ cookie: true }));
+async function initializeRoutes() {
+  await routes(app);
+  app.listen(PORT, () => {
+      console.log(
+          `Express Server started on Port ${app.get('port')} | Environment : ${app.get('env')}`
+      );
+  });
+}
 
-require('./routes')(app);
+initializeRoutes().catch((err) => {
+  console.error('Failed to initialize API routes:', err);
+  process.exit(1);
+});
 
 // catch 404
 app.use((req, res, next) => {
@@ -57,8 +66,6 @@ module.exports = app;
 
 app.listen(PORT, () => {
     console.log(
-        `Express Server started on Port ${app.get(
-            'port'
-        )} | Environment : ${app.get('env')}`
+        `Express Server started on Port ${app.get('port')} | Environment : ${app.get('env')}`
     );
 });

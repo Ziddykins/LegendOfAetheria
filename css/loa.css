@@ -405,3 +405,22 @@
     }
 }
 
+/* Mobile responsive layout fixes for AdminLTE */
+@media (max-width: 991.98px) {
+    body.sidebar-collapse #main-section {
+        padding-left: 0.25rem !important;
+    }
+
+    body.sidebar-collapse .d-grid {
+        margin-left: 0 !important;
+    }
+
+    body.sidebar-collapse #chatbox-bottom {
+        width: 100%;
+    }
+
+    .app-wrapper.sidebar-collapse {
+        margin-left: 0 !important;
+    }
+}
+
