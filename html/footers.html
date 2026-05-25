@@ -27,7 +27,7 @@
 			const sb = document.getElementById('terst');
 			const sliver = document.getElementById('sliver');
 
-			if (sb && sliver) {
+			if (typeof sb == 'undefined' && sb && sliver) {
 				sb.classList.add('sidebar-open');
 				sb.classList.remove('sidebar-closed');
 				sb.style.position = 'relative';

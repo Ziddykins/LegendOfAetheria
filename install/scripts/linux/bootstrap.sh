@@ -5,7 +5,7 @@ DISTRO=$(cat /etc/os-release | grep '^ID' | sed 's/ID=//')
 echo "DISTRO: $DISTRO"
 echo $CWD
 
-if [[ "$CWD" != "scripts" ]]; then
+if [[ "$CWD" != "linux" ]]; then
 	echo "must be ran from loa's script dir (/install/scripts/linux)"
 	exit 1
 fi

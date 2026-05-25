@@ -8,7 +8,7 @@ const express = require('express'),
     app = express(),
     helmet = require('helmet'),
     mysql = require('mysql'),
-    csrf = require('cs`rf'),
+    csrf = require('csurf'),
     PORT = process.env.PORT || 3000,
     NODE_ENV = process.env.NODE_ENV || 'development';
 

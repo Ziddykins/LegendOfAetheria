@@ -73,8 +73,6 @@ $currentSub = $_GET['sub'] ?? '';
                                 <i class="nav-icon material-symbols-outlined">inventory_2</i>
                                 <p class="ms-2">Inventory</p>
                                 <i class="ms-auto bi bi-chevron-right"></i>
-                            </a>
-                        
                             <ul id="inventory-list" class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="/game?page=equipment&sub=inventory" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'equipment' && $currentSub === 'inventory') ? 'active' : ''; ?>">
@@ -615,7 +613,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const sidebar = document.getElementById("sidebar");
 	const sliver = document.getElementById("sidebar-sliver");
 
-    if (sb && sliver) {
+    if (typeof sb !== 'undefined' && sb && sliver) {
         sidebar.classList.add('sidebar-open');
         if (activeLink) {
             let parent = activeLink.closest(".nav-item.menu-open");
@@ -640,6 +638,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     sb.classList.add('sidebar-collapse');
                     sb.classList.remove('sidebar-open');
                     sliver.style.visibility = 'true';
+                    sb.classList.remove('sidebar-open');
+                    sliver.style.visibility = 'true';
+                    console.log('still good');
                     sliver.addEventListener('click', () => {
                         if (document.querySelector('.sidebar-wrapper').classList.contains('sidebar-collapse')) {
                             sliver.children[0].classList.remove('bi-chevron-right');
