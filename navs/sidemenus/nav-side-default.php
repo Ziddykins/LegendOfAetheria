@@ -615,7 +615,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const sidebar = document.getElementById("sidebar");
 	const sliver = document.getElementById("sidebar-sliver");
 
-    if (sb && sliver) {
+    if (sidebar && sliver) {
         sidebar.classList.add('sidebar-open');
         if (activeLink) {
             let parent = activeLink.closest(".nav-item.menu-open");
@@ -629,28 +629,15 @@ document.addEventListener("DOMContentLoaded", function() {
         
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
-                const sb = document.getElementById('terst');
-                if (mutation.target.classList.contains("sidebar-collapse")) {
+                const appWrapper = document.getElementById('terst');
+                if (appWrapper && appWrapper.classList.contains("sidebar-collapse")) {
                     sliver.style.display = "flex";
                     sliver.style.alignItems = "center";
                     sliver.style.justifyContent = "center";
                     sliver.style.backgroundColor = "rgba(5, 57, 28, 0.21)";
                     sliver.innerHTML = "<i class=\"bi bi-chevron-right\"></i>";
-                    console.log("SIDEBAR CLOSED");
-                    sb.classList.add('sidebar-collapse');
-                    sb.classList.remove('sidebar-open');
-                    sliver.style.visibility = 'true';
-                    sliver.addEventListener('click', () => {
-                        if (document.querySelector('.sidebar-wrapper').classList.contains('sidebar-collapse')) {
-                            sliver.children[0].classList.remove('bi-chevron-right');
-                            sliver.children[0].classList.add('bi-chevron-left');
-                            sliver.appendChild(document.getElementById('sidebar'));
-                            sliver.style.position = 'relative';
-                            sliver.style.display = 'flex';
-                        } else {
-                            sliver.style.display = 'none';
-                        }
-                    });
+                } else if (appWrapper && appWrapper.classList.contains("sidebar-open")) {
+                    sliver.style.display = "none";
                 }
             });
         });

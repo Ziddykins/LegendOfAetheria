@@ -12,7 +12,6 @@
         "bcrypt": "^5.1.1",
         "cookie-parser": "^1.4.7",
         "cors": "2.8.5",
-        "csurf": "^1.11.0",
         "dotenv": "^16.5.0",
         "express": "^4.22.1",
         "express-jwt": "^8.5.1",
@@ -21,6 +20,8 @@
         "morgan": "1.10.1",
         "multer": "2.1.1",
         "mysql": "^2.18.1",
-        "express-rate-limit": "^8.5.2"
+        "express-rate-limit": "^8.5.2",
+        "@ai-rpg-engine/core": "^2.1.2",
+        "@ai-rpg-engine/modules": "^2.3.2"
     }
 }
