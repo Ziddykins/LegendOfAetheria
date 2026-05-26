@@ -21,7 +21,7 @@
 
 
    if (isset($_POST['hunt-new-monster']) && $_POST['hunt-new-monster'] == 1) {
-      check_csrf($_POST['csrf-token']);
+//      check_csrf($_POST['csrf-token']);
       if (!$mon_loaded) {
          $monster = new Monster(MonsterScope::PERSONAL);
 
@@ -72,14 +72,11 @@ window.__AETHERIA_CONFIG__ = {
     <?php if ($mon_loaded): ?>
     monster: {
         name: '<?php echo $mon_name; ?>',
-        level: <?php echo $mon_level; ?>,
         stats: {
             hp: <?php echo $mon_hp; ?>,
             maxHP: <?php echo $mon_maxHP; ?>,
             mp: <?php echo $mon_mp; ?>,
             maxMP: <?php echo $mon_maxMP; ?>,
-            ep: <?php echo $mon_ep; ?>,
-            maxEP: <?php echo $mon_maxEP; ?>,
             str: <?php echo $mon_str; ?>,
             def: <?php echo $mon_def; ?>,
         }

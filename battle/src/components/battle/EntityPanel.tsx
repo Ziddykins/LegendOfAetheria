@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Shield, Swords, Skull, Activity, Droplets, Zap } from 'lucide-react';
+import { Shield, Swords, Activity, Droplets, Zap } from 'lucide-react';
 import type { EntityStats } from '@/types/battle';
 
 interface EntityPanelProps {
@@ -66,7 +66,7 @@ export function EntityPanel({
           {isPlayer ? (
             <Shield className="w-8 h-8" style={{ color: 'var(--mana-blue)' }} />
           ) : (
-            <Skull className="w-8 h-8" style={{ color: 'var(--crimson-glow)' }} />
+            <Shield className="w-8 h-8" style={{ color: 'var(--crimson-glow)' }} />
           )}
         </div>
         <div className="flex-1 min-w-0">
