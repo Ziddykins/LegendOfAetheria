@@ -76,11 +76,11 @@
                             
                         }
                     ?>
-                    </div>
+                     </div>
                 </main>
                 <?php include 'chat/chat.html'; ?>
-            </span>
-        </div>
+             </span>
+         </div>
 
         <div id="footer"> 
             <?php include 'html/footers.html'; ?>
