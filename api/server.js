@@ -34,6 +34,55 @@ app.use(cookieParser());
 app.use(upload.array());
 app.use(express.static('public'));
 
+// Game engine imports
+let engine;
+
+async function createGameEngine() {
+    const { Engine } = await import('@ai-rpg-engine/core');
+    return new Engine();
+}
+
+async function getDialogueMap() {
+    const { getDialogueDefinitions } = await import('@ai-rpg-engine/modules');
+    const definitions = getDialogueDefinitions();
+    return definitions.reduce((map, def) => {
+        map[def.id] = def;
+        return map;
+    }, {});
+}
+
+async function initGameEngine() {
+    try {
+        const dialogueMap = await getDialogueMap();
+        engine = await createGameEngine();
+
+        // Routes from node/index.js
+        const dialogueRoutes = require('./src/routes/dialogue');
+        const combatRoutes = require('./src/routes/combat');
+        const engineState = require('./src/routes/state');
+        const itemRoutes = require('./src/routes/item');
+        const saveEngine = require('./src/utils/save');
+
+        app.use('/', dialogueRoutes(engine, dialogueMap, saveEngine));
+        app.use('/', combatRoutes(engine));
+        app.use('/', engineState(engine, saveEngine));
+        app.use('/', itemRoutes(engine));
+
+        app.listen(PORT, () => {
+            console.log('🚀 Server running at http://localhost:' + PORT);
+        });
+
+    } catch (err) {
+        console.error('❌ Failed to start server:', err);
+        process.exit(1);
+    }
+}
+
+initGameEngine().catch((err) => {
+    console.error('Failed to initialize game engine:', err);
+    process.exit(1);
+});
+
 async function initializeRoutes() {
   await routes(app);
   app.listen(PORT, () => {
@@ -63,9 +112,3 @@ app.use((err, req, res, next) => {
 });
 
 module.exports = app;
-
-app.listen(PORT, () => {
-    console.log(
-        `Express Server started on Port ${app.get('port')} | Environment : ${app.get('env')}`
-    );
-});
