@@ -1,3 +1,5 @@
+import { getDialogueDefinitions } from './services/loa.js';
+
 const express = require('express'),
     cookieParser = require('cookie-parser'),
     log = require('morgan'),
@@ -43,7 +45,6 @@ async function createGameEngine() {
 }
 
 async function getDialogueMap() {
-    const { getDialogueDefinitions } = await import('@ai-rpg-engine/modules');
     const definitions = getDialogueDefinitions();
     return definitions.reduce((map, def) => {
         map[def.id] = def;
@@ -57,11 +58,11 @@ async function initGameEngine() {
         engine = await createGameEngine();
 
         // Routes from node/index.js
-        const dialogueRoutes = require('./src/routes/dialogue');
-        const combatRoutes = require('./src/routes/combat');
-        const engineState = require('./src/routes/state');
-        const itemRoutes = require('./src/routes/item');
-        const saveEngine = require('./src/utils/save');
+        const dialogueRoutes = require('./routes/dialogue');
+        const combatRoutes = require('./routes/combat');
+        const engineState = require('./routes/state');
+        const itemRoutes = require('./routes/item');
+        const saveEngine = require('./utils/save');
 
         app.use('/', dialogueRoutes(engine, dialogueMap, saveEngine));
         app.use('/', combatRoutes(engine));
@@ -84,7 +85,6 @@ initGameEngine().catch((err) => {
 });
 
 async function initializeRoutes() {
-  await routes(app);
   app.listen(PORT, () => {
       console.log(
           `Express Server started on Port ${app.get('port')} | Environment : ${app.get('env')}`
