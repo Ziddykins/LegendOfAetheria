@@ -8,12 +8,14 @@ import multer from 'multer';
 import helmet from 'helmet';
 import mysql from 'mysql';
 import csurf from 'csurf';
+import { createServer } from 'http';
 
 // Environment variables
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 const app = express();
+const server = createServer(app);
 
 app.set('port', PORT);
 app.set('env', NODE_ENV);
@@ -85,7 +87,7 @@ async function initGameEngine() {
     app.use('/', itemRoutes(engine));
 
     // Start listening
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`🚀 Server running at http://localhost:${PORT}`);
     });
   } catch (err) {
@@ -106,8 +108,8 @@ initGameEngine().catch((err) => {
  * so we guard against that by checking if the server is already listening.
  */
 async function initializeRoutes() {
-  if (!app.listening) {
-    app.listen(PORT, () => {
+  if (!server.listening) {
+    server.listen(PORT, () => {
       console.log(
         `Express Server started on Port ${app.get('port')} | Environment : ${app.get('env')}`
       );
