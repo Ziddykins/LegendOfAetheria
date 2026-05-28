@@ -1,4 +1,24 @@
 {
+  "name": "htdocs",
+  "version": "1.0.0",
+  "description": "![Legend of Aetheria logo](https://github.com/Ziddykins/LegendOfAetheria/blob/master/img/logos/logo-banner-no-bg.webp)",
+  "main": "index.js",
+  "type": "commonjs",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "webpack --config webpack.config.js --mode production",
+    "build:dev": "webpack --config webpack.config.js --mode development",
+    "build:node": "mkdir -p dist/node && cp -R node/index.js node/package.json node/package-lock.json node/src dist/node",
+    "vite:dev": "vite",
+    "vite:build": "vite build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
   "dependencies": {
     "@ai-rpg-engine/cli": "^2.0.9",
     "@babel/preset-env": "^7.29.2",
@@ -9,31 +29,16 @@
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "overlayscrollbars": "^2.14.0",
-    "rpg-awesome": "^0.2.0"
-  },
-  "name": "htdocs",
-  "version": "1.0.0",
-  "description": "![Legend of Aetheria logo](https://github.com/Ziddykins/LegendOfAetheria/blob/master/img/logos/logo-banner-no-bg.webp)",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
+    "rpg-awesome": "^0.2.0",
+    "vite": "^5.0.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
     "copy-webpack-plugin": "^14.0.0",
     "eruda": "^3.4.3",
     "eruda-timing": "^2.0.1",
     "html-webpack-plugin": "^5.6.7",
     "webpack": "^5.106.2",
     "webpack-cli": "^7.0.2"
-  },
-  "scripts": {
-    "build": "webpack --config webpack.config.js --mode production",
-    "build:dev": "webpack --config webpack.config.js --mode development",
-    "build:node": "mkdir -p dist/node && cp -R node/index.js node/package.json node/package-lock.json node/src dist/node",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  }
 }
