@@ -13,12 +13,10 @@
 **/**/node_modules/
 /sheets/
 /vendor/
-=
 composer.phar
 **/**/node_modules/
 /sheets/
 /vendor/
-=
 composer.phar
 esp.php
 esp32.html

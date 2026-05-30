@@ -51,8 +51,8 @@ export function useCombatEngine({ playerName, monsterName }: UseCombatEngineProp
       currentMonsterStats: EntityStats
     ): CombatResult => {
       const logEntries: CombatLogEntry[] = [];
-      let playerStats = { ...currentPlayerStats };
-      let monsterStats = { ...currentMonsterStats };
+      const playerStats = { ...currentPlayerStats };
+      const monsterStats = { ...currentMonsterStats };
       let damageDealt = 0;
       let damageTaken = 0;
       let isCritical = false;

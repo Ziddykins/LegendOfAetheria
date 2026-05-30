@@ -5,7 +5,9 @@
    require_once "functions.php";
 
    $character->stats->set_ep(10000);
-   [$mon_name, $mon_avatar, $mon_hp, $mon_maxHP, $mon_mp, $mon_maxMP, $mon_str, $mon_int, $mon_def] = [null, null, null, null, null, null, null, null, null];
+   $attribs = ['mon_name', 'mon_avatar', 'mon_hp', 'mon_maxHP', 'mon_mp', 'mon_maxMP', 'mon_str', 'mon_int', 'mon_def'];
+   $def_data = ['none', '/img/avatars/default.png', 0, 0, 0, 0, 0, 0, 0];
+   
    $monster = $character->get_monster();
    $mon_loaded = 0;
 
@@ -28,6 +30,14 @@
          $monster->new();
          $monster->load(MonsterScope::PERSONAL);
          $monster->random_monster($character->get_level());
+         
+         foreach ($attribs as $index => $attrib) {
+            if (!isset($monster->$attrib)) {
+               $monster->$attrib = $def_data[$index];
+            }
+         }
+
+
          $character->set_monster($monster);
          $mon_loaded = 1;
       }
@@ -53,11 +63,13 @@
    }
 ?>
 <script>
-window.__AETHERIA_CONFIG__ = {
-    player: {
-        name: '<?php echo $character->get_name(); ?>',
-        level: <?php echo $character->get_level(); ?>,
-        stats: {
+   const hasMonster = <?php echo $mon_loaded ? 'true' : 'false'; ?>;
+   window.__AETHERIA_CONFIG__ = {
+      state: hasMonster? 'ready' : 'need-hunt',
+      player: {
+         name: '<?php echo $character->get_name(); ?>',
+         level: <?php echo $character->get_level(); ?>,
+         stats: {
             hp: <?php echo $character->stats->get_hp(); ?>,
             maxHP: <?php echo $character->stats->get_maxHP(); ?>,
             mp: <?php echo $character->stats->get_mp(); ?>,
@@ -66,26 +78,23 @@ window.__AETHERIA_CONFIG__ = {
             maxEP: <?php echo $character->stats->get_maxEP(); ?>,
             str: <?php echo $character->stats->get_str(); ?>,
             def: <?php echo $character->stats->get_def(); ?>,
-        }
-    },
-
-    <?php if ($mon_loaded): ?>
-    monster: {
-        name: '<?php echo $mon_name; ?>',
-        stats: {
+         }
+      },
+      monster: {
+         name: '<?php echo $mon_name; ?>',
+         stats: {
             hp: <?php echo $mon_hp; ?>,
             maxHP: <?php echo $mon_maxHP; ?>,
             mp: <?php echo $mon_mp; ?>,
             maxMP: <?php echo $mon_maxMP; ?>,
             str: <?php echo $mon_str; ?>,
             def: <?php echo $mon_def; ?>,
-        }
-    },
-    <?php endif; ?>
+         }
+      },
 
-    csrfToken: loa.u_csrf,
-    apiEndpoint: '/battle'
-};
+      csrfToken: loa.u_csrf,
+      apiEndpoint: '/battle'
+   };
 </script>
 
 <div id="root"></div>

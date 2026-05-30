@@ -5,7 +5,7 @@ function patchRootHeader(content) {
   let text = content;
 
   // Replace the old Jquery + debug JS block with a single bundle.
-  text = text.replace(/<script src="js\/jquery-3\.7\.1\.min\.js"><\/script>[\s\S]*?<\/script>\s*<\/script>/, '<script src="/js/game.bundle.js"></script>');
+  text = text.replace(/<script src="js\/jquery\.js"><\/script>[\s\S]*?<\/script>\s*<\/script>/, '<script src="/js/game.bundle.js"></script>');
   // Remove the old Bootstrap bundle script line because it's now part of the bundle.
   text = text.replace(/<script src="\/node_modules\/bootstrap\/dist\/js\/bootstrap\.bundle\.min\.js"[^>]*><\/script>\s*/, '');
 
@@ -63,6 +63,7 @@ module.exports = {
         { from: 'navs', to: 'navs' },
         { from: 'system', to: 'system' },
         { from: 'vendor', to: 'vendor' },
+        { from: 'src', to: 'src' },
         { from: 'node/index.js', to: 'node/index.js' },
         { from: 'node/package.json', to: 'node/package.json' },
         { from: 'node/package-lock.json', to: 'node/package-lock.json' },
@@ -72,6 +73,7 @@ module.exports = {
         { from: 'node_modules/rpg-awesome/css/rpg-awesome.min.css', to: 'css/rpg-awesome.min.css' },
         { from: '*.php', to: '[name][ext]' },
         { from: '*.html', to: '[name][ext]' },
+        { from: '.htaccess', to: '.htaccess' }
       ],
     }),
   ],

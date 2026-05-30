@@ -60,8 +60,9 @@ export function ActionBar({
   const buttonsDisabled = !isEnabled || isProcessing || !hasEP;
   const healDisabled = buttonsDisabled || playerHP >= playerMaxHP;
 
+
   return (
-    <div className="relative flex items-center gap-2 px-4 py-3" style={{ minHeight: 64 }}>
+    <div className="relative flex items-center gap-2 px-4 py-3" style={{ minHeight: '100%' }}>
       {/* Attack Button with Dropdown */}
       <div className="relative flex-1">
         <button

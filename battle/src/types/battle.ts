@@ -62,6 +62,11 @@ export interface BattleConfig {
   monster: Entity;
   csrfToken: string;
   apiEndpoint: string;
+  state?: 'need-hunt' | 'combat';
+  location?: {
+    x: number;
+    y: number;
+  };
   onBattleEnd?: (result: BattleResult) => void;
   onNewBattle?: () => void;
 }
@@ -74,8 +79,10 @@ export interface DamageNumberData {
   isCritical?: boolean;
 }
 
+export type TargetType = 'player' | 'monster' | 'zone_monster' | 'global_monster' | 'other_player';
+
 export interface SpellEffectData {
   id: string;
   type: 'fire' | 'ice' | 'heal';
-  target: 'player' | 'monster' | 'zone_monster' | 'global_monster' | 'other_player';
+  target: TargetType;
 }

@@ -1,6 +1,9 @@
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const SAVE_FILE = path.join(__dirname, '..', '..', 'loa.eng');
 
 let Engine;
@@ -334,10 +337,4 @@ const loaRuleset = {
   progressionModels: [],
 };
 
-module.exports = {
-  createGameEngine,
-  getDialogueMap,
-  saveEngine,
-  getItemById,
-  loaRuleset,
-};
+export { createGameEngine, getDialogueDefinitions as getDialogueMap, saveEngine, getItemById, loaRuleset };

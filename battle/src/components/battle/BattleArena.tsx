@@ -1,4 +1,5 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Compass } from 'lucide-react';
 import { EntityPanel } from './EntityPanel';
 import { ActionBar } from './ActionBar';
 import { BattleLog } from './BattleLog';
@@ -35,7 +36,7 @@ export function BattleArena({ config }: BattleArenaProps) {
 
   const { executeCombat } = useCombatEngine({
     playerName: config.player.name,
-    monsterName: config.monster.name,
+    monsterName: config.monster.name
   });
 
   const { playCombatAnimation, playEntryAnimation, killTimeline } =
@@ -52,14 +53,36 @@ export function BattleArena({ config }: BattleArenaProps) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+  const isExplorationMode = config.state === 'need-hunt';
+  const [location, setLocation] = useState(() => config.location ?? { x: 0, y: 0 });
 
-  // Initialize battle on mount
+  const clamp = useCallback((value: number, min: number, max: number) => {
+    return Math.min(max, Math.max(min, value));
+  }, []);
+
+  const movePlayer = useCallback(
+    (dx: number, dy: number) => {
+      setLocation((prev) => ({
+        x: clamp(prev.x + dx, -100, 100),
+        y: clamp(prev.y + dy, -100, 100),
+      }));
+    },
+    [clamp]
+  );
+
   useEffect(() => {
-    if (!initialized.current) {
+    if (config.state === 'need-hunt' && config.location) {
+      setLocation(config.location);
+    }
+  }, [config.state, config.location]);
+
+  // Initialize battle on mount when not in exploration mode
+  useEffect(() => {
+    if (!initialized.current && !isExplorationMode) {
       initialized.current = true;
       initBattle(config.player.stats, config.monster.stats);
     }
-  }, [config, initBattle]);
+  }, [config.player.stats, config.monster.stats, initBattle, isExplorationMode]);
 
   // Entry animation
   useEffect(() => {
@@ -113,6 +136,105 @@ export function BattleArena({ config }: BattleArenaProps) {
   const hasEP = state.playerStats.ep > 0;
   const isActionEnabled = state.combatState === 'player_turn' && hasEP;
 
+  if (isExplorationMode) {
+    return (
+      <div
+        ref={containerRef}
+        className={`battle-arena-bg relative w-full max-w-3xl mx-auto rounded-lg overflow-hidden ${
+          state.isShaking ? 'screen-shake' : ''
+        }`}
+        style={{
+          minHeight: 500,
+          border: '1px solid rgba(42, 42, 58, 0.6)',
+          boxShadow: '0 8px 48px rgba(0,0,0,0.6)',
+        }}
+      >
+        <EmberParticles />
+
+        <div className="relative z-10 flex flex-col items-center justify-center gap-6 px-6 py-8" style={{ minHeight: 500 }}>
+          <div className="text-center max-w-xl">
+            <div
+              className="font-cinzel text-xs uppercase tracking-[0.32em]"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Exploration Mode
+            </div>
+            <h2
+              className="font-cinzel text-3xl font-bold mt-4"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Search the Open Plane
+            </h2>
+            <p
+              className="mt-3 text-sm leading-6"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              No monsters are nearby. Use the compass to move your position across the plain and hunt for danger.
+            </p>
+          </div>
+
+          <div
+            className="grid grid-cols-3 items-center gap-4 rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[rgba(12,12,20,0.92)] p-6 shadow-[0_0_60px_rgba(0,0,0,0.35)]"
+            style={{ width: '100%', maxWidth: 420 }}
+          >
+            <div />
+            <button
+              type="button"
+              onClick={() => movePlayer(0, -10)}
+              className="flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] transition hover:border-[rgba(139,26,26,0.35)] hover:bg-[rgba(255,255,255,0.08)]"
+            >
+              <ArrowUp className="w-6 h-6 text-[var(--text-primary)]" />
+            </button>
+            <div />
+
+            <button
+              type="button"
+              onClick={() => movePlayer(-10, 0)}
+              className="flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] transition hover:border-[rgba(139,26,26,0.35)] hover:bg-[rgba(255,255,255,0.08)]"
+            >
+              <ArrowLeft className="w-6 h-6 text-[var(--text-primary)]" />
+            </button>
+
+            <div className="flex flex-col items-center justify-center gap-2 rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[rgba(15,15,25,0.96)] p-4">
+              <Compass className="w-10 h-10 text-[var(--text-primary)]" />
+              <div className="text-center">
+                <div className="text-[0.72rem] uppercase tracking-[0.3em]" style={{ color: 'var(--text-muted)' }}>
+                  Coordinates
+                </div>
+                <div className="font-cinzel text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                  {location.x}, {location.y}
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => movePlayer(10, 0)}
+              className="flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] transition hover:border-[rgba(139,26,26,0.35)] hover:bg-[rgba(255,255,255,0.08)]"
+            >
+              <ArrowRight className="w-6 h-6 text-[var(--text-primary)]" />
+            </button>
+
+            <div />
+            <button
+              type="button"
+              onClick={() => movePlayer(0, 10)}
+              className="flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.04)] transition hover:border-[rgba(139,26,26,0.35)] hover:bg-[rgba(255,255,255,0.08)]"
+            >
+              <ArrowDown className="w-6 h-6 text-[var(--text-primary)]" />
+            </button>
+            <div />
+          </div>
+
+          <div className="flex flex-col items-center gap-1 text-sm" style={{ color: 'var(--text-muted)' }}>
+            <span>Plane bounds: x, y ∈ [-100, 100]</span>
+            <span>Step size: 10 units</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
@@ -127,6 +249,10 @@ export function BattleArena({ config }: BattleArenaProps) {
     >
       {/* Background particles */}
       <EmberParticles />
+
+      if (config.state === 'need-hunt') {
+
+      }
 
       {/* Content */}
       <div className="relative z-10 flex flex-col" style={{ minHeight: 500 }}>

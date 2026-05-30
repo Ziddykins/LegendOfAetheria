@@ -25,13 +25,14 @@ app.use(morgan('tiny'));
 app.use(helmet());
 
 // parse application/json
-app.use(express.json());
+app.use(json());
 
 // parse raw text
-app.use(express.text());
+app.use(text());
 
 // parse application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
+app.use(urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // parse multipart/form-data
 const upload = multer();

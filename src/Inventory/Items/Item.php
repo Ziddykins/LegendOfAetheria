@@ -72,8 +72,6 @@ class Item {
 		$this->type = $type;
 		$this->itemId = $itemId;
 
-		$log->warning("it $type iid $itemId");
-
 		if ($this->type !== "" && $this->itemId > 0) {
 			$item = $this->get_item_details();
 			if (is_object($item)) {

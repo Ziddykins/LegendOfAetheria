@@ -1,7 +1,7 @@
-const express = require('express');
-const { createGameEngine, getDialogueMap, saveEngine, getItemById } = require('../services/loa');
+import express from 'express';
+import { createGameEngine, getDialogueMap, saveEngine, getItemById } from '../services/loa.js';
 
-module.exports = async function createLoaRouter() {
+export default async function createLoaRouter() {
   const engine = await createGameEngine();
   const dialogueMap = getDialogueMap();
   const router = express.Router();
