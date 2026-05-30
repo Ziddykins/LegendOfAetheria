@@ -13,12 +13,10 @@
 **/**/node_modules/
 /sheets/
 /vendor/
-=
 composer.phar
 **/**/node_modules/
 /sheets/
 /vendor/
-=
 composer.phar
 esp.php
 esp32.html
@@ -120,3 +118,4 @@ loa.eng
 loa.eng.bk
 system/constants.php
 .aider*
+**/*.zip

@@ -1,8 +1,7 @@
-module.exports = async function (app) {
-  /*
-  * Routes
-  */
-  app.use('/auth', require('./routes/auth.route'));
-  app.use('/v1', require('./routes/v1.route'));
-  app.use('/loa', await require('./routes/loa.route')());
+import authRouter from './routes/auth.route.js';
+import v1Router from './routes/v1.route.js';
+
+export default function (app) {
+    app.use('/auth', authRouter);
+    app.use('/v1', v1Router);
 };

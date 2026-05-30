@@ -1,32 +1,53 @@
-const express = require('express');
-const auth = require('../services/auth');
-const router = new express.Router();
+import express from 'express';
+import auth from '../services/auth.js';
+const router = express.Router();
 
-router.post('/basic', async (req, res, next) => {
-    console.log(res);
-    let options = {
-        email: atob(req.headers.authorization.split(' ')[1]).split(":")[0],
-        password: atob(req.headers.authorization.split(' ')[1]).split(":")[1]
-    };
+function parseCredentials(req) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Basic ')) {
+        const payload = atob(authHeader.split(' ')[1]);
+        const [email, password] = payload.split(':');
+        return { email, password };
+    }
+
+    if (req.body && req.body.email && req.body.password) {
+        return { email: req.body.email, password: req.body.password };
+    }
+
+    return null;
+}
+
+async function handleLogin(req, res) {
+    const options = parseCredentials(req);
+    if (!options || !options.email || !options.password) {
+        return res.status(400).json({ error: 'Missing email or password' });
+    }
 
     try {
         const result = await auth.postBasic(options);
-        console.log(JSON.stringify(result));
-        res.status(result.data.status || 200).json(result.data);
+        
+        // Check if auth service returned an error
+        if (result.data.error) {
+            const status = result.data.status || 500;
+            return res.status(status).json({ error: result.data.error });
+        }
+        
+        return res.status(result.data.status || 200).json(result.data);
     } catch (err) {
-        console.log(err.message);
-        return res.status(500).send({
-            error: 'Something went wrong'
-        });
+        console.error('Auth route error:', err);
+        return res.status(500).json({ error: 'Internal server error' });
     }
-});
+}
 
-router.get('/basic', async(req, res, next) => {
-    console.log("nah get");
+router.post('/', handleLogin);
+router.post('/basic', handleLogin);
+
+router.get('/', async (req, res) => {
+    res.json({ message: 'Auth endpoint. POST credentials to /auth or /auth/basic.' });
 });
 
 router.post('/refresh', async (req, res, next) => {
-
+    res.status(501).json({ error: 'Refresh endpoint not implemented' });
 });
 
-module.exports = router;
+export default router;

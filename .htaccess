@@ -1,7 +1,7 @@
-AuthType Basic
-AuthName "Restricted Area"
-AuthUserFile /var/.htpasswd
-Require valid-user
+#AuthType Basic
+#AuthName "Restricted Area"
+#AuthUserFile /var/.htpasswd
+#Require valid-user
 
 ErrorDocument 404 /404.php
 <FilesMatch "\.env$|.*\.ready|.*\.template$|.*\.pl$|.*\.ini$|.*\.log$|.*\.sh$">
