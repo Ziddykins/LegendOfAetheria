@@ -33,7 +33,7 @@
     "vite": "^5.0.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react": "^6.0.2",
     "copy-webpack-plugin": "^14.0.0",
     "eruda": "^3.4.3",
     "eruda-timing": "^2.0.1",
