@@ -1,6 +1,8 @@
 <?php
     namespace Game\Traits\EnumExtender;
 
+    use BackedEnum;
+
     /**
      * Extends PHP enum functionality with utility methods for conversion and randomization.
      * Provides name-to-enum, value-to-enum, name-to-value conversions, and random enum selection.
@@ -16,28 +18,13 @@
          */
         public static function name_to_enum(string $name): self {
             foreach (self::cases() as $case) {
-                if ($name == $case->name) {
+                if ($name === $case->name) {
                     return $case;
                 }
             }
             throw new \TypeError("$name is not a valid backing type for enum " . self::class);
         }
 
-        /**
-         * Convert a value to the corresponding enum.
-         *
-         * @param int|string $value The value to convert.
-         * @return self The corresponding enum.
-         * @throws \ValueError If the value is not valid.
-         */
-        public static function value_to_enum(int|string $value): self {
-            foreach (self::cases() as $case) {
-                if ($value == $case->value) {
-                    return $case;
-                }
-            }
-            throw new \ValueError("$value is not a valid backing value for enum " . self::class);
-        }
 
         /**
          * Get a random enum from the defined cases.
@@ -59,7 +46,11 @@
         public static function name_to_value(string $name): string {
             foreach (self::cases() as $case) {
                 if ($name === $case->name){
-                    return $case->value;
+                    if ($case instanceof BackedEnum) {
+                        return $case->value;
+                    } else {
+                        throw new \TypeError(self::class . " is not a BackedEnum");
+                    }
                 }
             }
             throw new \ValueError("$name is not a valid backing value for enum " . self::class);

@@ -67,12 +67,12 @@
                                         </div>
 
                                         <div class="d-flex col text-center align-items-center" data-bs-toggle="tooltip" data-bs-title="Current gold on-hand">
-                                            <span class="material-symbols-outlined me-2" style="font-size: 18px; width: 24px; flex-shrink: 0;">monetization_on</span>
+                                            <span class="material-symbols-outlined me-2 text-warning" style="font-size: 18px; width: 24px; flex-shrink: 0;">monetization_on</span>
                                             <span class="fw-bold ms-2">Gold: <?php echo $character->get_gold(); ?></span>
                                         </div>
 
                                         <div class="d-flex align-items-center col text-center" data-bs-toggle="tooltip" data-bs-title="Current dungeon floor">
-                                            <span class="material-symbols-outlined me-2" style="font-size: 18px; width: 24px; flex-shrink: 0;">stairs</span>
+                                            <span class="material-symbols-outlined me-2 text-secondary" style="font-size: 18px; width: 24px; flex-shrink: 0;">stairs</span>
                                             <span class="fw-bold ms-2">Floor: <?php echo $character->get_floor(); ?></span>
                                         </div>
                                     </div>

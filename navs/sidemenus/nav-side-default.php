@@ -628,6 +628,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.log("SIDEBAR CLOSED");
             } else {
                 sliver.style.display = "none";
+                mutation.target.classList.add("sidebar-collapse");  
             }
         });
     });

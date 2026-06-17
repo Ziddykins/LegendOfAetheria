@@ -52,8 +52,9 @@
         $mon_avatar = '/img/enemies/' . str_replace(' ', '', $monster->get_name()) . '.png';
     }
 ?>
+<div>
     <link rel="stylesheet" href="/css/battle-animations.css">
-    <div class="d-flex pt-3">
+    <div class="d-flex w-100">
         <div class="container border border-1">
             <div class="row">
                 <div id="monster-stats" name="monster-stats" class="col pt-3 lh-1">
@@ -186,8 +187,8 @@
                 <div class="row mb-3">
                     <form id="new-mon" name="new-mon" action="/game?page=hunt&sub=location&action=hunt&scope=personal" method="post">
                         <div class="d-flex w-100">
-                            <button id="hunt-new-monster" name="hunt-new-monster" class="btn btn-sm me-2 border-black btn-success flex-fill" type="submit" value="1" data-loa-monld="0">Hunt</button>
-                            <button id="hunt-global-btn" name="hunt-global-btn" class="btn btn-sm border-black btn-secondary flex-fill" data-loa-monld="0">Global</button>
+                            <button id="hunt-new-monster" name="hunt-new-monster" class="btn btn-sm me-2 border-black btn-success flex-fill" style="width: calc(100% + 20px);" type="submit" value="1" data-loa-monld="0">Hunt</button>
+                            <button id="hunt-global-btn" name="hunt-global-btn" class="btn btn-sm border-black btn-secondary flex-fill" style="width: calc(100% + 20px);" data-loa-monld="0">Global</button>
                             <input id="csrf-token" name="csrf-token" type="hidden" value="<?php echo $_SESSION['csrf-token']; ?>" />
                         </div>
                     </form>
@@ -195,6 +196,7 @@
             </div>
         </div>
     </div>
+   
     <div class="container-fluid border border-1 mb-1 overflow-hidden" style="max-height: 65.0vh!important; height: 65.0vh;">
         <div class="d-flex" style="height: 65.0vh;">
             <div id="battle-log" name="battle-log" class="lh-1 flex-fill flex-row-reverse h-100">
