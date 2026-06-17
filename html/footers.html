@@ -13,7 +13,7 @@
         <script type="text/javascript" src="/js/popper.min.js"></script>
         <script type="text/javascript" src="/js/floating-ui-core.js"></script>
         <script type="text/javascript" src="/js/floating-ui-dom.js"></script>
-
+        <script type="text/javascript" src="/js/jquery.js" integrity="sha256-8DGpv13HIm+5iDNWw1XqxgFB4mj+yOKFNb+tHBZOowc="></script>
         <?php if ($_SERVER['SCRIPT_NAME'] == '/game.php'): ?>
         <script type="text/javascript" src="/chat/chat.js"></script>
         <?php endif; ?>
@@ -23,4 +23,16 @@
             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
         </script>
+		<script>
+			const sb = document.getElementById('terst');
+			const sliver = document.getElementById('sliver');
+
+			if (typeof sb == 'undefined' && sb && sliver) {
+				sb.classList.add('sidebar-open');
+				sb.classList.remove('sidebar-closed');
+				sb.style.position = 'relative';
+				sliver.style.visibility = 'false';
+			}
+		</script>
+
 

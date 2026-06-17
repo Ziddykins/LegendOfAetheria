@@ -1,398 +1,674 @@
-<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-    <div class="sidebar-brand">
-        <a href="../index.html" class="brand-link">
-            <img src="../../../dist/assets/img/AdminLTELogo.png" alt="AdminLTE Logo"
-                class="brand-image opacity-75 shadow">
-            <span class="brand-text fw-light">AdminLTE 4</span>
+<?php
+use Game\Account\Account;
+use Game\Character\Character;
+use Game\Mail\Folder\Enums\FolderType;
+use Game\Mail\MailBox\MailBox;
+use Game\Character\Enums\FriendStatus;
+use Game\Account\Enums\Privileges;
+use Game\Account\Settings;
+
+#require_once "system/constants.php";
+
+$account   = new Account($_SESSION['email']); 
+$character = new Character($account->get_id(), $_SESSION['character-id']);
+$settings  = new Settings($account->get_id());
+
+$folders = [];
+
+foreach (["OUTBOX", "INBOX", "DELETED", "DRAFTS"] as $type) {
+    $folder = FolderType::name_to_enum($type);
+
+    $folders[$type] = MailBox::getFolderCount(
+        FolderType::name_to_enum($type),
+        $character->get_id()
+    );
+}
+
+$char_menu_icon = $character->stats->get_hp() > 0 ? 'sentiment_satisfied' : 'skull';
+
+// Determine the current page and submenu
+$currentPage = $_GET['page'] ?? '';
+$currentSub = $_GET['sub'] ?? '';
+?>
+
+<aside id="sidebar" class="app-sidebar shadow overflow-hidden ps-3 uncial" data-bs-theme="<?php echo $settings->get_colorMode(); ?>" style="width: 240px; min-width: 240px; height: 100vh;">
+    <div class="sidebar-brand d-flex align-items-center">
+        <a href="/game" class="brand-link ms-2">
+            <img src="/img/logos/logo-banner-no-bg.webp" alt="Legend of Aetheria Logo" class="brand-image img-fluid">
         </a>
     </div>
-    <div class="sidebar-wrapper">
-        <nav class="mt-2">
-            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
-            <li class="nav-item menu-open">
-                    <li class="nav-item">
-                        <li class="nav-header">
-                            <a href="#" class="nav-link">
-                                <span class="nav-icon material-symbols-sharp"><?php echo $char_menu_icon; ?></span>
-                                <p class="align-self-center">Character</p>
-                            </a>
-                        </li>
-                    </li>
-                
-                    <li class="nav-item">
-                        <a href="/game?page=Sheet" class="nav-link align-items-center">
-                            <span class="nav-icon material-symbols-sharp">mist</span>
-                            <p class="align-self-center">Sheet</p>
-                        </a>
-                    </li>
-                
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp">inventory_2</span>
-                            <p class="align-self-center">Inventory</p>
-                            <i class="nav-arrow bi bi-chevron-right"></i>
-                        </a>
-                        
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="/game?page=Equipment" class="nav-link">
-                                    <span class="nav-icon material-symbols-sharp ms-2">colorize</span>
-                                    <p class="align-self-center">Equipment</p>
-                                </a>
-                            </li>
-                            
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <span class="nav-icon material-symbols-sharp ms-2">handyman</span>
-                                    <p class="align-self-center">Items</p>
-                                    <i class="nav-arrow bi bi-chevron-right"></i>
-                                </a>
 
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="/game?page=Questitems" class="nav-link justify-items-center">
-                                            <span class="nav-icon material-symbols-sharp ms-4">deployed_code_alert</span>
-                                            <p class="align-self-center">Quest Items</p>
-                                        </a>
-                                    </li>
+    <div class="d-flex justify-items-center text-center mb-3">
+        <?php include 'navs/sidemenus/nav-quicknav.php'; ?>
+    </div>
 
-                                    <li class="nav-item">
-                                        <a href="/game?page=Consumables" class="nav-link">
-                                            <span class="nav-icon material-symbols-sharp ms-4">grocery</span>
-                                            <p class="align-self-center">Consumables</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-
-                        <li class="nav-item">
-                            <a href="/game?page=Skills" class="nav-link">
-                                <span class="nav-icon material-symbols-sharp">hotel_class</span>
-                                <p class="align-self-center">Skills</p>
-                            </a>
-                        </li>
-                       
-                        <li class="nav-item">
-                            <a href="/game?page=Spells" class="nav-link">
-                                <span class="nav-icon material-symbols-sharp">book</span>
-                                <p class="align-self-center">Spells</p>
-                            </a>
-                        </li>
-                       
-                        <li class="nav-item">
-                            <a href="/game?page=Train" class="nav-link">
-                                <span class="nav-icon material-symbols-sharp">fitness_center</span>
-                                <p class="align-self-center">Train</p>
-                            </a>
-                        </li>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <li class="nav-header">Familiar</li>
-                    </li>
-                
-                    <li class="nav-item">
-                        <a href="/game?page=Manage" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">raven</span>
-                            <p class="align-self-center">Manage</p>
-                        </a>
-                    </li>
-                
-                    <li class="nav-item">
-                        <a href="/game?page=Hatchery" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">egg</span>
-                            <p class="align-self-center">Hatchery</p>
-                        </a>
-                    </li>
-                
-                    <li class="nav-item">
-                        <a href="/game?page=Equipment" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">pet_supplies</span>
-                            <p class="align-self-center">Equipment</p>
-                        </a>
-                    </li>
-                
-                    <li class="nav-item">
-                        <li class="nav-header">Location</li>
-                    </li>
-                
-                    <li class="nav-item">
-                        <a href="/game?page=hunt" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">cruelty_free</span>
-                            <p class="align-self-center">Hunt</p>
-                        </a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a href="/game?page=Map" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">map</span>
-                            <p class="align-self-center">Map</p>
-                        </a>
-                    </li>
-                
-                    <li class="nav-item">
-                        <a href="/game?page=Explore" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">forest</span>
-                            <p class="align-self-center">Explore</p>
-                        </a>
-                    </li>
-                
-                    <li class="nav-item">
-                        <a href="/game?page=Zone" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">rocket</span>
-                            <p class="align-self-center">Zone</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="/game?page=Rest" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">offline_bolt</span>
-                            <p class="align-self-center">Rest</p>
-                        </a>
-                    </li>
-                
-                    <li class="nav-item">
-                        <li class="nav-header">Economy</li>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="/game?page=Equipment" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">swords</span>
-                            <p class="align-self-center">Equipment</p>
-                        </a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a href="/game?page=Items" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">diamond</span>
-                            <p class="align-self-center">Items</p>
-                        </a>
-                    </li>
-                
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">loyalty</span>
-                            <p class="align-self-center">Blackmarket</p>
-                            <i class="nav-arrow bi bi-chevron-right"></i>
-                        </a>
-                    
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="/game?page=Buy" class="nav-link">
-                                    <span class="nav-icon material-symbols-sharp ms-4">paid</span>
-                                    <p class="align-self-center">Buy</p>
-                                </a>
-                            </li>
-                            
-                            <li class="nav-item">
-                                <a href="/game?page=Sell" class="nav-link">
-                                    <span class="nav-icon material-symbols-sharp ms-4">attach_money</span>
-                                    <p class="align-self-center">Sell</p>
-                                </a>
-                            </li>
-                            
-                            <li class="nav-item">
-                                <a href="/game?page=Market" class="nav-link">
-                                    <span class="nav-icon material-symbols-sharp ms-4">storefront</span>
-                                    <p class="align-self-center">Market</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                        
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">account_balance</span>
-                            <p class="align-self-center">Bank</p>
-                            <i class="nav-arrow bi bi-chevron-right"></i>
-                        </a>
-                        
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="/game?page=Loans" class="nav-link">
-                                    <span class="nav-icon material-symbols-sharp ms-4">savings</span>
-                                    <p class="align-self-center">Account</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="/game?page=Depost" class="nav-link">
-                                    <span class="nav-icon material-symbols-sharp ms-4">attach_money</span>
-                                    <p class="align-self-center">Depost</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="/game?page=Withdrawal" class="nav-link">
-                                    <span class="nav-icon material-symbols-sharp ms-4">paid</span>
-                                    <p class="align-self-center">Withdrawal</p>
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a href="/game?page=Loans" class="nav-link">
-                                    <span class="nav-icon material-symbols-sharp ms-4">payments</span>
-                                    <p class="align-self-center">Loans</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <li class="nav-header">Dungeon</li>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a href="/game?page=Floor1" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">stat_minus_3</span>
-                            <p class="align-self-center">Floor 1</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="/game?page=Settings" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2">settings</span>
-                            <p class="align-self-center">Settings</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a href="/game?page=Reset" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp ms-2 text-danger">restart_alt</span>
-                            <p class="align-self-center">Reset</p>
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <li class="nav-header">Quests</li>
-                    </li>
-        
-                    <li class="nav-item">
-                        <a href="/game?page=Active" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp">lists</span>
-                            <p class="align-self-center">Active</p>
-                        </a>
-                    </li>
-            
-                    <li class="nav-item">
-                        <a href="/game?page=Accepted" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp">fact_check</span>
-                            <p class="align-self-center">Accepted</p>
-                        </a>
-                    </li>
-            
-                    <li class="nav-item">
-                        <a href="/game?page=Completed" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp">done_all</span>
-                            <p class="align-self-center">Completed</p>
-                        </a>
-                    </li>
-            
-                    <li class="nav-item">
-                        <a href="/game?page=Abandoned" class="nav-link">
-                            <span class="nav-icon material-symbols-sharp">backspace</span>
-                            <p class="align-self-center">Abandoned</p>
-                        </a>
-                    </li>
-                </li>
-
-                <li class="nav-item">
-                    <li class="nav-header">Mail</li>
-                </li>
-            
-                <li class="nav-item">
-                    <a href="/game?page=Compose" class="nav-link">
-                        <span class="nav-icon material-symbols-sharp">forward_to_inbox</span>
-                        <p class="align-self-center">Compose</p>
+    <div class="sidebar-wrapper" style="height: calc(100vh - 180px); overflow-y: auto; padding-bottom: 80px;">
+        <nav class="nav-menu h-100 d-flex flex-column">
+            <ul class="nav sidebar-menu flex-column flex-grow-1" data-lte-toggle="treeview" role="menu">
+                <!-- Character Section -->
+                <li id="character-anchor" class="nav-item <?php echo ($currentSub === 'character' || $currentSub === 'inventory') ? 'menu-open' : ''; ?>">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
+                        <i class="nav-icon material-symbols-outlined"><?php echo $char_menu_icon; ?></i>
+                        <p class="ms-2">Character</p>
+                        <i class="ms-auto bi bi-chevron-right"></i>
                     </a>
+                    
+                    <ul id="character-list" class="nav nav-treeview">
+                        <!-- Character submenu items -->
+                        <li class="nav-item">
+                            <a href="/game?page=profile&sub=character" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'profile' && $currentSub === 'character') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">person</i>
+                                <p class="ms-2">Profile</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/game?page=sheet&sub=character" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'sheet' && $currentSub === 'character') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">mist</i>
+                                <p class="ms-2">Sheet</p>
+                            </a>
+                        </li>
+                        
+                        <li id="inventory-anchor" class="nav-item">
+                            <a href="#" class="nav-link d-flex align-items-center ps-3">
+                                <i class="nav-icon material-symbols-outlined">inventory_2</i>
+                                <p class="ms-2">Inventory</p>
+                                <i class="ms-auto bi bi-chevron-right"></i>
+                            </a>
+                        
+                            <ul id="inventory-list" class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="/game?page=equipment&sub=inventory" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'equipment' && $currentSub === 'inventory') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">colorize</i>
+                                        <p class="ms-2">Equipment</p>
+                                    </a>
+                                </li>
+                                
+                                <li id="items-anchor" class="nav-item">
+                                    <a href="#" class="nav-link d-flex align-items-center ps-4">
+                                        <i class="nav-icon material-symbols-outlined">handyman</i>
+                                        <p class="ms-2">Items</p>
+                                        <i class="ms-auto bi bi-chevron-right"></i>
+                                    </a>
+
+                                    <ul id="items-list" class="nav nav-treeview">
+                                        <li class="nav-item">
+                                            <a href="/game?page=quest&sub=items" class="nav-link d-flex align-items-center ps-5 <?php echo ($currentPage === 'quest' && $currentSub === 'items') ? 'active' : ''; ?>">
+                                                <i class="nav-icon material-symbols-outlined">deployed_code_alert</i>
+                                                <p class="ms-2">Quest Items</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="/game?page=consumables&sub=items" class="nav-link d-flex align-items-center ps-5 <?php echo ($currentPage === 'consumables' && $currentSub === 'items') ? 'active' : ''; ?>">
+                                                <i class="nav-icon material-symbols-outlined">grocery</i>
+                                                <p class="ms-2">Consumables</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+
+                            <li class="nav-item">
+                                <a href="/game?page=skills&sub=character" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'skills' && $currentSub === 'character') ? 'active' : ''; ?>">
+                                    <i class="nav-icon material-symbols-outlined">hotel_class</i>
+                                    <p class="ms-2">Skills</p>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a href="/game?page=spells&sub=character" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'spells' && $currentSub === 'character') ? 'active' : ''; ?>">
+                                    <i class="nav-icon material-symbols-outlined">book</i>
+                                    <p class="ms-2">Spells</p>
+                                </a>
+                            </li>
+                        
+                            <li class="nav-item">
+                                <a href="/game?page=train&sub=character" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'train' && $currentSub === 'character') ? 'active' : ''; ?>">
+                                    <i class="nav-icon material-symbols-outlined">fitness_center</i>
+                                    <p class="ms-2">Train</p>
+                                </a>
+                            </li>
+                        </li>
+                    </ul>
                 </li>
-            
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon material-symbols-sharp">folder_open</span>
-                        <p class="align-self-center">Folders</p>
-                        <i class="nav-arrow bi bi-chevron-right"></i>
+
+                <li id="familiar-anchor" class="nav-item <?php echo ($currentSub === 'familiar') ? 'menu-open' : ''; ?>">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
+                        <i class="nav-icon material-symbols-outlined">raven</i>
+                        <p class="ms-2">Familiar</p>
+                        <i class="ms-auto bi bi-chevron-right"></i>
                     </a>
 
-                    <ul class="nav nav-treeview">
-                        <li class="nav-items">
-                            <a href="/game?page=Inbox" class="nav-link">
-                                <span class="nav-icon material-symbols-sharp ms-2">inbox</span>
-                                <p class="align-self-center">Inbox</p>
+                    <ul id="familiar-list" class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/game?page=manage&sub=familiar" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'manage' && $currentSub === 'familiar') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">sound_detection_dog_barking</i>
+                                <p class="ms-2">Manage</p>
                             </a>
                         </li>
                     
                         <li class="nav-item">
-                            <a href="/game?page=Outbox" class="nav-link">
-                                <span class="nav-icon material-symbols-sharp ms-2">outbox</span>
-                                <p class="align-self-center">Outbox</p>
+                            <a href="/game?page=hatchery&sub=familiar" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'hatchery' && $currentSub === 'familiar') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">egg</i>
+                                <p class="ms-2">Hatchery</p>
                             </a>
                         </li>
                     
                         <li class="nav-item">
-                            <a href="/game?page=Deleted" class="nav-link">
-                                <span class="nav-icon material-symbols-sharp ms-2">cancel_presentation</span>
-                                <p class="align-self-center">Deleted</p>
+                            <a href="/game?page=equipment&sub=familiar" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'equipment' && $currentSub === 'familiar') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">pet_supplies</i>
+                                <p class="ms-2">Equipment</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            
+                <li id="location-anchor" class="nav-item <?php echo ($currentSub === 'location') ? 'menu-open' : ''; ?>">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
+                        <i class="nav-icon material-symbols-outlined">public</i>
+                        <p class="ms-2">Location</p>
+                        <i class="ms-auto bi bi-chevron-right"></i>
+                    </a>
+                
+                    <ul id="location-list" class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/game?page=hunt&sub=location" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'hunt' && $currentSub === 'location') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">cruelty_free</i>
+                                <p class="ms-2">Hunt</p>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="/game?page=map&sub=location" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'map' && $currentSub === 'location') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">map</i>
+                                <p class="ms-2">Map</p>
                             </a>
                         </li>
                     
                         <li class="nav-item">
-                            <a href="/game?page=Drafts" class="nav-link">
-                                <span class="nav-icon material-symbols-sharp ms-2">mark_as_unread</span>
-                                <p class="align-self-center">Drafts</p>
+                            <a href="/game?page=explore&sub=location" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'explore' && $currentSub === 'location') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">forest</i>
+                                <p class="ms-2">Explore</p>
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a href="/game?page=zone&sub=location" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'zone' && $currentSub === 'location') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">rocket</i>
+                                <p class="ms-2">Zone</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/game?page=rest&sub=location" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'rest' && $currentSub === 'location') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">offline_bolt</i>
+                                <p class="ms-2">Rest</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            
+                <li id="economy-anchor" class="nav-item <?php echo ($currentSub === 'economy' || $currentSub === 'blackmarket' || $currentSub === 'bank') ? 'menu-open' : ''; ?>">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
+                        <i class="nav-icon material-symbols-outlined">monitoring</i>
+                        <p class="ms-2">Economy</p>
+                        <i class="ms-auto bi bi-chevron-right"></i>
+                    </a>
+                
+                    <ul id="economy-list" class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/game?page=equipment&sub=economy" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'equipment' && $currentSub === 'economy') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">swords</i>
+                                <p class="ms-2">Equipment</p>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a href="/game?page=items&sub=economy" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'items' && $currentSub === 'economy') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">diamond</i>
+                                <p class="ms-2">Items</p>
+                            </a>
+                        </li>
+                    
+                        <li id="blackmarket-anchor" class="nav-item <?php echo ($currentSub === 'blackmarket') ? 'menu-open' : ''; ?>">
+                            <a href="#" class="nav-link d-flex align-items-center ps-3">
+                                <i class="nav-icon material-symbols-outlined">loyalty</i>
+                                <p class="ms-2">Blackmarket</p>
+                                <i class="ms-auto bi bi-chevron-right"></i>
+                            </a>
+                        
+                            <ul id="blackmarket-list" class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="/game?page=buy&sub=blackmarket" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'buy' && $currentSub === 'blackmarket') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">attach_money</i>
+                                        <p class="ms-2">Buy</p>
+                                    </a>
+                                </li>
+                                
+                                <li class="nav-item">
+                                    <a href="/game?page=sell&sub=blackmarket" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'sell' && $currentSub === 'blackmarket') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">paid</i>
+                                        <p class="ms-2">Sell</p>
+                                    </a>
+                                </li>
+                                
+                                <li class="nav-item">
+                                    <a href="/game?page=market&sub=blackmarket" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'market' && $currentSub === 'blackmarket') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">storefront</i>
+                                        <p class="ms-2">Market</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                            
+                        <li id="bank-anchor" class="nav-item <?php echo ($currentSub === 'bank') ? 'menu-open' : ''; ?>">
+                            <a href="#" class="nav-link d-flex align-items-center ps-3">
+                                <i class="nav-icon material-symbols-outlined">account_balance</i>
+                                <p class="ms-2">Bank</p>
+                                <i class="ms-auto bi bi-chevron-right"></i>
+                            </a>
+                            
+                            <ul id="bank-list" class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="/game?page=account&sub=bank" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'account' && $currentSub === 'bank') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">clinical_notes</i>
+                                        <p class="ms-2">Account</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/game?page=loans&sub=bank" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'loans' && $currentSub === 'bank') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">payments</i>
+                                        <p class="ms-2">Loans</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li id="dungeon-anchor" class="nav-item <?php echo ($currentSub === 'dungeon') ? 'menu-open' : ''; ?>">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
+                        <i class="nav-icon material-symbols-outlined">widgets</i>
+                        <p class="ms-2">Dungeon</p>
+                        <i class="ms-auto bi bi-chevron-right"></i>
+                    </a>
+                    
+                    <ul id="dungeon-list" class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/game?page=dungeon&sub=dungeon" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'dungeon' && $currentSub === 'dungeon') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">stat_minus_3</i>
+                                <p class="ms-2">Floor 1</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/game?page=settings&sub=dungeon" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'settings' && $currentSub === 'dungeon') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">settings</i>
+                                <p class="ms-2">Settings</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/game?page=reset&sub=dungeon" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'reset' && $currentSub === 'dungeon') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined text-danger">restart_alt</i>
+                                <p class="ms-2">Reset</p>
                             </a>
                         </li>
                     </ul>
                 </li>
 
-                <li class="nav-item">
-                    <a href="/game?page=Settings" class="nav-link">
-                        <span class="nav-icon material-symbols-sharp">inbox_customize</span>
-                        <p class="align-self-center">Settings</p>
+                <li id="quests-anchor" class="nav-item <?php echo ($currentSub === 'quests') ? 'menu-open' : ''; ?>">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
+                        <i class="nav-icon material-symbols-outlined">volcano</i>
+                        <p class="ms-2">Quests</p>
+                        <i class="ms-auto bi bi-chevron-right"></i>
                     </a>
+                    
+                    <ul id="quest-list" class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/game?page=intro&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'active' && $currentSub === 'quests') ? 'active' : ''; ?>" disabled>
+                                <i class="nav-icon material-symbols-outlined">step</i>
+                                <p class="ms-2">Introduction</p>
+                            </a>
+                        </li>
+ 
+                        <li class="nav-item">
+                            <a href="/game?page=active&sub=quests" class="nav-link text-secondary d-flex align-items-center ps-3 <?php echo ($currentPage === 'active' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
+                                <i class="nav-icon material-symbols-outlined">lists</i>
+                                <p class="ms-2">Active</p>
+                            </a>
+                        </li>
+                
+                        <li class="nav-item">
+                            <a href="/game?page=accepted&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'accepted' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
+                                <i class="nav-icon material-symbols-outlined">fact_check</i>
+                                <p class="ms-2">Accepted</p>
+                            </a>
+                        </li>
+                
+                        <li class="nav-item">
+                            <a href="/game?page=completed&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'completed' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
+                                <i class="nav-icon material-symbols-outlined">done_all</i>
+                                <p class="ms-2">Completed</p>
+                            </a>
+                        </li>
+                
+                        <li class="nav-item">
+                            <a href="/game?page=abandoned&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'abandoned' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
+                                <i class="nav-icon material-symbols-outlined">backspace</i>
+                                <p class="ms-2">Abandoned</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li id="mail-anchor" class="nav-item <?php echo ($currentSub === 'mail' || $currentSub === 'folders') ? 'menu-open' : ''; ?>">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
+                        <i class="nav-icon material-symbols-outlined">alternate_email</i>
+                        <p class="ms-2">Mail</p>
+                        <i class="ms-auto bi bi-exclamation-square-fill text-warning"></i>
+                        <i class="ms-auto bi bi-chevron-right"></i>
+                    </a>
+                    
+                    <ul id="mail-list" class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/game?page=compose&sub=mail" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'compose' && $currentSub === 'mail') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">forward_to_inbox</i>
+                                <p class="ms-2">Compose</p>
+                            </a>
+                        </li>
+                    
+                        <li id="folder-anchor" class="nav-item <?php echo ($currentSub === 'folders') ? 'menu-open' : ''; ?>">
+                            <a href="#" class="nav-link d-flex align-items-center ps-3">
+                                <i class="nav-icon material-symbols-outlined">folder_open</i>
+                                <p class="ms-2">Folders</p>
+                                <i class="ms-auto bi bi-chevron-right"></i>
+                            </a>
+
+                            <ul id="folder-list" class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="/game?page=inbox&sub=folders" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'inbox' && $currentSub === 'folders') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">inbox</i>
+                                        <p class="ms-2">Inbox</p>
+                                    <?php if ($folders['INBOX']): ?>
+                                        <span class="nav-badge badge text-bg-danger ms-auto me-3"><?php echo $folders['INBOX']; ?></span>
+                                    <?php else: ?>
+                                        <span class="nav-badge badge text-bg-secondary ms-auto me-3">0</span>
+                                    <?php endif; ?>
+                                    </a>
+                                </li>
+                            
+                                <li class="nav-item">
+                                    <a href="/game?page=outbox&sub=folders" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'outbox' && $currentSub === 'folders') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">outbox</i>
+                                        <p class="ms-2">Outbox</p>
+                                    <?php if ($folders['OUTBOX']): ?>
+                                        <span class="nav-badge badge text-bg-danger ms-auto me-3"><?php echo $folders['OUTBOX']; ?></span>
+                                    <?php else: ?>
+                                        <span class="nav-badge badge text-bg-secondary ms-auto me-3">0</span>
+                                    <?php endif; ?>
+                                    </a>
+                                </li>
+                            
+                                <li class="nav-item">
+                                    <a href="/game?page=deleted&sub=folders" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'deleted' && $currentSub === 'folders') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">cancel_presentation</i>
+                                        <p class="ms-2">Deleted</p>
+                                    <?php if ($folders['DELETED']): ?>
+                                        <span class="nav-badge badge text-bg-danger ms-auto me-3"><?php echo $folders['DELETED']; ?></span>
+                                    <?php else: ?>
+                                        <span class="nav-badge badge text-bg-secondary ms-auto me-3">0</span>
+                                    <?php endif; ?>
+                                    </a>
+                                </li>
+                            
+                                <li class="nav-item">
+                                    <a href="/game?page=drafts&sub=folders" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'drafts' && $currentSub === 'folders') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">mark_as_unread</i>
+                                        <p class="ms-2">Drafts</p>
+                                        <?php if ($folders['DRAFTS']): ?>
+                                        <span class="nav-badge badge text-bg-danger ms-auto me-3"><?php echo $folders['DRAFTS']; ?></span>
+                                        <?php else: ?>
+                                        <span class="nav-badge badge text-bg-secondary ms-auto me-3">0</span>
+                                        <?php endif; ?>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/game?page=settings&sub=mail" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'settings' && $currentSub === 'mail') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">inbox_customize</i>
+                                <p class="ms-2">Settings</p>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
             
-                <li class="nav-item">
-                    <li class="nav-header">Account</li>
-                </li>
+                <li id="account-anchor" class="nav-item <?php echo ($currentSub === 'account' || $currentSub === 'friends') ? 'menu-open' : ''; ?>">
+                    <a href="#" class="nav-link d-flex align-items-center ps-2">
+                        <i class="nav-icon material-symbols-outlined">person_pin</i>
+                        <p class="ms-2">Account</p>
+                        <i class="ms-auto bi bi-chevron-right"></i>
+                    </a>
+                    
+                    <ul id="account-list" class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/game?page=profile&sub=account" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'profile' && $currentSub === 'account') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">assignment_ind</i>
+                                <p class="ms-2">Profile</p>
+                            </a>
+                        </li>
+                
+                        <li class="nav-item">
+                            <a href="/game?page=awards&sub=account" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'awards' && $currentSub === 'account') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">workspace_premium</i>
+                                <p class="ms-2">Awards</p>
+                            </a>
+                        </li>
+                    
+                        <li class="nav-item">
+                            <a href="/game?page=achievements&sub=account" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'achievements' && $currentSub === 'account') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">military_tech</i>
+                                <p class="ms-2">Achievements</p>
+                            </a>
+                        </li>
             
-                <li class="nav-item">
-                    <a href="/game?page=Profile" class="nav-link">
-                        <span class="nav-icon material-symbols-sharp">assignment_ind</span>
-                        <p class="align-self-center">Profile</p>
-                    </a>
-                </li>
-           
-                <li class="nav-item">
-                    <a href="/game?page=Awards" class="nav-link">
-                        <span class="nav-icon material-symbols-sharp">workspace_premium</span>
-                        <p class="align-self-center">Awards</p>
-                    </a>
-                </li>
-            
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <span class="nav-icon material-symbols-sharp">military_tech</span>
-                        <p class="align-self-center">Achievements</p>
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                    </a>
-                </li>
-    
-                <li class="nav-item">
-                    <a href="/game?page=Friends" class="nav-link">
-                        <span class="nav-icon material-symbols-sharp">cheer</span>
-                        <p class="align-self-center">Friends</p>
-                    </a>
-                </li>                    
-                <li class="nav-item">
-                    <a href="/select" class="nav-link">
-                        <span class="nav-icon material-symbols-sharp">group</span>
-                        <p class="align-self-center">Character Select</p>
-                    </a>
+                        <li id="friends-anchor" class="nav-item <?php echo ($currentSub === 'friends') ? 'menu-open' : ''; ?>">
+                            <a href="#" class="nav-link d-flex align-items-center ps-3">
+                                <i class="nav-icon material-symbols-outlined">cheer</i>
+                                <p class="ms-2">Friends</p>
+                                <i class="ms-auto bi bi-chevron-right"></i>
+                            </a>
+                            
+                            <ul id="friends-list" class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="/game?page=mutual&sub=friends" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'mutual' && $currentSub === 'friends') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">handshake</i>
+                                        <p class="ms-2">Mutual</p>
+                                        <span class="nav-badge badge text-bg-success ms-auto me-3">0</span>
+                                        <span class="nav-badge badge text-bg-secondary ms-auto me-3">0</span>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/game?page=requested&sub=friends" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'requested' && $currentSub === 'friends') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">person_add</i>
+                                        <p class="ms-2">Send Request</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/game?page=requests&sub=friends" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'requests' && $currentSub === 'friends') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">emoji_people</i>
+                                        <p class="ms-2">Received</p>
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="/game?page=blocked&sub=friends" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'blocked' && $currentSub === 'friends') ? 'active' : ''; ?>">
+                                        <i class="nav-icon material-symbols-outlined">person_cancel</i>
+                                        <p class="ms-2">Blocked</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                            
+                        <li class="nav-item">
+                            <a href="/select" class="nav-link d-flex align-items-center ps-3">
+                                <i class="nav-icon material-symbols-outlined">group</i>
+                                <p class="ms-2">Character Select</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item mb-3">
+                            <a href="/game?page=settings&sub=account" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'settings' && $currentSub === 'account') ? 'active' : ''; ?>">
+                                <i class="nav-icon material-symbols-outlined">settings_account_box</i>
+                                <p class="ms-2">Settings</p>
+                            </a>
+                        </li>                        
+                    </ul>
+
+                    <div id="bottom-menu" name="bottom-menu" class="d-flex align-items-center ms-3 pb-3 position-absolute bottom-0 ms-3 ps-3 start-0 w-100 bg-dark mb-3" style="z-index: 1030; min-height: 70px;">
+                            <a href="#offcanvas-summary" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="offcanvas" aria-expanded="false" role="button" aria-controls="offcanvas-summary">    
+                                <span><img src="img/avatars/<?php echo $character->get_avatar(); ?>" alt="avatar" width="50" height="50" class="rounded-circle" /></span>
+                            </a>
+                            
+                            <a href="#" class="text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="d-none d-md-inline mx-1 ms-3 fs-6">Account</span>
+                            </a>
+                        
+                            <ul class="dropdown-menu dropdown-menu text-small shadow">
+                                <li>
+                                    <a class="dropdown-item" href="?page=profile">Profile</a>
+                                    <ul class="dropdown-menu dropdown-menu text-small shadow">
+                                        <li>
+                                            <a class="dropdown-item" href="?page=profile">Profile</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=friends">Friends
+                                    <?php
+                                        $posts = 0;
+                                        $posts = get_friend_counts(FriendStatus::REQUEST_RECV);
+                                        $pill_bg  = 'bg-danger';
+
+                                        if (!$posts) {
+                                            $pill_bg = 'bg-primary';
+                                        }
+                                    ?>
+    <span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo "woo"; ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=mail">Mail
+                                        <?php
+                                            $unread_mail = check_mail('unread');
+                                            $pill_bg = 'bg-danger';
+        
+                                            if ($unread_mail == 0) {
+                                                    $pill_bg = 'bg-primary';
+                                            }
+                                        ?>
+<span class="badge <?php echo $pill_bg; ?> rounded-pill"> <?php echo $unread_mail; ?></span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="?page=settings">Settings</a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <?php
+                                    $privileges = $account->get_privileges()->name;
+                                            
+                                    if ($privileges > Privileges::ADMINISTRATOR->value) {
+                                        $href = "/admini/strator/";
+                                        echo "<li>\n\t\t\t\t\t\t\t\t\t\t";
+                                    
+                                        echo "<a class=\"dropdown-item\" href=\"$href\">Administrator</a>";
+                                        echo "\n\t\t\t\t\t\t\t\t\t</li>\n";
+                                    }
+                                ?>
+                                
+                                <li>
+                                    <a class="dropdown-item" href="/select">Characters</a>
+                                </li>
+                                        
+                                <li>
+                                    <a class="dropdown-item" href="/logout">Sign out</a>
+                                </li>
+                            </ul>
+                        </div>
                 </li>
             </ul>
-            <div class="text-danger border p-3 m-3 text-center mb-5">Sign out</div>
         </nav>
     </div>
 </aside>
+<div id="sidebar-sliver" class="text-center" style="position: fixed; left: 0; top: 0; width: 10px; height: 100vh; z-index: 999; cursor: pointer; display: none;" onclick="document.querySelector('#terst').classList.remove('sidebar-collapse'); document.querySelector('#terst').classList.add('sidebar-open');">&gt;</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const activeLink = document.querySelector(".nav-link.active");
+    const sidebar = document.getElementById("sidebar");
+const sliver = document.getElementById("sidebar-sliver");
+    sidebar.classList.add('sidebar-open');
+    if (activeLink) {
+        let parent = activeLink.closest(".nav-item.menu-open");
+        while (parent) {
+            parent.classList.add("menu-open");
+            parent = parent.parentElement.closest(".nav-item.menu-open");
+        }
+
+        activeLink.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+    
+    const observer = new MutationObserver(function(mutations) {
+mutations.forEach(function(mutation) {
+const sb = document.getElementById('terst');
+            if (mutation.target.classList.contains("sidebar-collapse")) {
+                sliver.style.display = "flex";
+                sliver.style.alignItems = "center";
+                sliver.style.justifyContent = "center";
+                sliver.style.backgroundColor = "rgba(5, 57, 28, 0.21)";
+                sliver.innerHTML = "<i class=\"bi bi-chevron-right\"></i>";
+console.log("SIDEBAR CLOSED");
+                sb.classList.add('sidebar-collapse');
+                sb.classList.remove('sidebar-open');
+sliver.style.visibility = "true";
+                sliver.addEventListener('click', () => {
+                if (document.getElementById('sidebar-wrapper').classList.contains('sidebar-collapse')) {
+                    sliver.children[0].classList.remove('bi-chevron-right');
+                    sliver.children[0].classList.add('bi-chevron-left');
+                    sliver.appendChild(document.getElementById('sidebar'));
+                    sliver.style.position = 'relative';
+                } else {
+                    sliver.children[0].classList.add('bi-chevron-right');
+                    sliver.children[0].classList.remove('bi-chevron-left');
+                    sliver.appendChild(document.getElementById('main-section'));
+                    sliver.style.position = 'fixed';
+                }
+            });
+            }
+        });
+    });
+
+    observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ["class"]
+    });
+});
+</script>
+
+<style>
+    .nav-link.active {
+        font-weight: bold;
+        color: rgba(200, 255, 200, .7) !important;
+    }
+    .menu-open > .nav-treeview {
+        display: block !important;
+    }
+</style>

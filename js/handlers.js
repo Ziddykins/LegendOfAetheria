@@ -1,16 +1,35 @@
-$("a[id^='menu-anchor']").on("click", 
-    function (ev) {
-        menu.querySelectorAll("a[id^='menu-anchor']").forEach(
-            function(el) {
-                el.classList.remove('bg-primary');
-                el.classList.remove('text-white');
-            }
-        );
+function fadeIn(element, duration = 1000) {
+    element.style.display = '';
+    element.style.opacity = '0';
+    let start = null;
+    const step = (timestamp) => {
+        if (!start) start = timestamp;
+        const progress = timestamp - start;
+        const opacity = Math.min(progress / duration, 1);
+        element.style.opacity = opacity;
+        if (progress < duration) {
+            requestAnimationFrame(step);
+        }
+    };
+    requestAnimationFrame(step);
+}
 
-        ev.currentTarget.classList.add('bg-primary');
-        ev.currentTarget.classList.add('text-white');
-    }
-);
+function fadeOut(element, duration = 5000) {
+    let start = null;
+    const startOpacity = parseFloat(getComputedStyle(element).opacity) || 1;
+    const step = (timestamp) => {
+        if (!start) start = timestamp;
+        const progress = timestamp - start;
+        const opacity = Math.max(startOpacity - (progress / duration), 0);
+        element.style.opacity = opacity;
+        if (progress < duration) {
+            requestAnimationFrame(step);
+        } else {
+            element.style.display = 'none';
+        }
+    };
+    requestAnimationFrame(step);
+}
 
 if (document.getElementById("ip-lock-switch")) {
     document.getElementById("ip-lock-switch").addEventListener("click", function(e) {
@@ -40,18 +59,20 @@ function save_settings(which) {
                 }
             })
             .then((data) => {
-                $("#status-msg").removeClass('text-danger');
-                $("#status-msg").addClass('text-success');
-                $("#status-msg").fadeIn(1000);
-                $("#status-msg").text(data);
-                $("#status-msg").fadeOut(5000);
+                let status_msg = document.getElementById("status-msg");
+                status_msg.classList.remove('text-danger');
+                status_msg.classList.add('text-success');
+                status_msg.innerText = data;
+                fadeIn(status_msg, 1000);
+                setTimeout(() => fadeOut(status_msg, 5000), 1000);
             })
             .catch((error) => {
-                $("#status-msg").removeClass('text-success');
-                $("#status-msg").addClass('text-danger');
-                $("#status-msg").fadeIn(1000);
-                $("#status-msg").text(error);
-                $("#status-msg").fadeOut(5000);
+                let status_msg = document.getElementById("status-msg");
+                status_msg.classList.remove('text-success');
+                status_msg.classList.add('text-danger');
+                status_msg.innerText = error.message;
+                fadeIn(status_msg, 1000);
+                setTimeout(() => fadeOut(status_msg, 5000), 1000);
             });
         }
     }

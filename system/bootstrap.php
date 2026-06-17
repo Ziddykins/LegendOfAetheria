@@ -2,12 +2,12 @@
 declare(strict_types=1);
 
 /* Core requirements */
+require_once $_SERVER['DOCUMENT_ROOT'] . '/system/constants.php';
 require_once WEBROOT . '/vendor/autoload.php';
 
 use Game\System\System;
 
 $system = new System(0);
-require_once SYSTEM_DIRECTORY . '/constants.php';
 
 /* Funcs etc */
 
@@ -20,6 +20,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(WEBROOT);
 $dotenv->safeLoad();
 
 /* tables */
+$t = [];
 $t['accounts']   = $_ENV['SQL_ACCT_TBL'];
 $t['characters'] = $_ENV['SQL_CHAR_TBL'];
 $t['familiars']  = $_ENV['SQL_FMLR_TBL'];

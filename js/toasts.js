@@ -28,7 +28,7 @@ function gen_toast(id, type, icon, header_txt, message) {
     toast_bubble.show();
 };
 
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', () => {
     let query =  new URLSearchParams(location.search);
 
     if (query.has('failed_login')) {

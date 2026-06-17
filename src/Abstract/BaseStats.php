@@ -42,6 +42,12 @@ abstract class BaseStats implements \JsonSerializable {
     /** @var int Dodge chance */
     protected int $dodg = 0;
     
+    /** @var int Ability to convert damage to HP/MP/EP */
+    protected int $absb = 0;
+     
+    /** @var int Ability to flee/avoid detection chance */
+    protected int $evsn = 0;
+    
     /** @var int Block chance */
     protected int $blck = 0;
     

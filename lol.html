@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<title>The Ticker Tape Parade</title>
+		<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+	overflow: hidden;
+	background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	height: 100vh;
+	width: 100vw;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: none;
+}
+
+  canvas {
+	  display: block;
+	  position: absolute;
+	  top: 0; left: 0;
+	  width: 100%; height: 100%;
+	  z-index: 1;
+  }
+
+  .skyline {
+	  position: absolute;
+	  bottom: 0; left: 0;
+	  width: 100%; height: 140px;
+	  z-index: 2;
+	  background: #1a1a2e;
+	  clip-path: polygon(
+		  0% 100%, 0% 40%, 5% 40%, 5% 20%, 12% 20%, 12% 50%, 
+		  18% 50%, 18% 10%, 25% 10%, 25% 60%, 35% 60%, 35% 30%, 
+		  42% 30%, 42% 70%, 50% 70%, 50% 15%, 58% 15%, 58% 55%, 
+		  65% 55%, 65% 25%, 75% 25%, 75% 65%, 85% 65%, 85% 35%, 
+		  92% 35%, 92% 50%, 100% 50%, 100% 100%
+		  );
+	  box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+	  pointer-events: none;
+  }
+
+  .skyline .window {
+	  position: absolute;
+	  background: #ffd700;
+	  opacity: 0.6;
+	  box-shadow: 0 0 5px #ffd700;
+  }
+
+  #ui {
+	  position: absolute;
+	  top: 0; left: 0; width: 100%; height: 100%;
+	  z-index: 10;
+	  pointer-events: none;
+  }
+
+  #title {
+	  position: absolute;
+	  top: 20px;
+	  left: 50%;
+	  transform: translateX(-50%);
+	  text-align: center;
+	  color: #fff;
+	  text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+	  animation: float 3s ease-in-out infinite;
+  }
+  #title h1 { font-size: 2.5rem; letter-spacing: 2px; }
+  #title p { font-size: 1rem; opacity: 0.9; margin-top: 5px; }
+
+  #meter {
+	  position: absolute;
+	  top: 20px; right: 20px;
+	  background: rgba(255,255,255,0.15);
+	  backdrop-filter: blur(10px);
+	  -webkit-backdrop-filter: blur(10px);
+	  border: 1px solid rgba(255,255,255,0.3);
+	  padding: 12px 20px;
+	  border-radius: 12px;
+	  color: #fff;
+	  font-weight: bold;
+	  font-size: 1.1rem;
+	  min-width: 200px;
+	  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+	  transition: transform 0.1s;
+  }
+
+  .bar-container {
+	  width: 100%; height: 8px;
+	  background: rgba(0,0,0,0.2);
+	  border-radius: 4px;
+	  margin-top: 8px;
+	  overflow: hidden;
+  }
+  .bar-fill {
+	  height: 100%; width: 1%;
+	  background: linear-gradient(90deg, #ffecd2 0%, #fcb69f 100%);
+	  border-radius: 4px;
+	  transition: width 0.2s, background 0.3s;
+  }
+
+  .commentary {
+	  position: absolute;
+	  left: 50%; top: 50%;
+	  transform: translate(-50%, -50%);
+	  font-size: 3rem;
+	  font-weight: 900;
+	  color: #fff;
+	  text-shadow: 0 4px 0 #ff0055, 0 8px 20px rgba(0,0,0,0.3);
+	  opacity: 0;
+	  pointer-events: none;
+	  white-space: nowrap;
+	  z-index: 20;
+	  text-align: center;
+  }
+  @keyframes popIn {
+	  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+	  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+	  80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+	  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+  }
+  .commentary.show { animation: popIn 2s forwards; }
+
+  @keyframes float {
+	  0%, 100% { transform: translateX(-50%) translateY(0px); }
+	  50% { transform: translateX(-50%) translateY(-10px); }
+  }
+
+  #flash {
+	  position: absolute;
+	  top:0; left:0; width:100%; height:100%;
+	  background: white;
+	  opacity: 0;
+	  pointer-events: none;
+	  z-index: 5;
+	  transition: opacity 0.05s;
+  }
+
+  @media (max-width: 600px) {
+	  #title h1 { font-size: 1.4rem; letter-spacing: 1px; }
+	  #title p { font-size: 0.8rem; }
+	  #meter { min-width: 140px; font-size: 0.85rem; top: 10px; right: 10px; padding: 8px 12px; }
+	  .commentary { font-size: 1.6rem; white-space: normal; width: 90%; }
+	  .skyline { height: 100px; }
+  }
+		</style>
+	</head>
+	<body>
+
+		<canvas id="parade"></canvas>
+		<div class="skyline" id="skyline"></div>
+		<div id="flash"></div>
+
+		<div id="ui">
+			<div id="title">
+				<h1>THE PARADE</h1>
+				<p>It gets more <em>tickertapier</em> the moment you think about leaving.</p>
+			</div>
+			<div id="meter">
+				<div>Tickertapiness Level: <span id="levelNum">1</span></div>
+				<div class="bar-container"><div class="bar-fill" id="bar"></div></div>
+				<div style="font-size:0.75rem; margin-top:6px; opacity:0.8" id="statusText">A pleasant afternoon...</div>
+			</div>
+			<div id="commentaryBox" class="commentary"></div>
+		</div>
+
+		<script>
+			const canvas = document.getElementById('parade');
+			const ctx = canvas.getContext('2d');
+			const levelNum = document.getElementById('levelNum');
+			const bar = document.getElementById('bar');
+			const statusText = document.getElementById('statusText');
+			const commentaryBox = document.getElementById('commentaryBox');
+			const flash = document.getElementById('flash');
+			const meter = document.getElementById('meter');
+
+			let W, H;
+			function resize() {
+				W = canvas.width = window.innerWidth;
+				H = canvas.height = window.innerHeight;
+			}
+			window.addEventListener('resize', resize);
+			resize();
+
+			const MAX_PARTICLES = 3000;
+			let intensity = 1;
+			const MAX_INTENSITY = 120;
+			let particles = [];
+			let mouseY = H/2, mouseX = W/2;
+			let leaveAttempts = 0;
+			let commentaryTimer;
+			let lastThreatTime = 0;
+
+			const reactions = {
+				mouseTop: ["Where ya goin'?","The tab bar is that way...","Closing me so soon?","Top edge detected! Deploying confetti.","Don't you dare click that X."],
+				mouseLeft: ["Come back! The floats are coming!","You can't leave a parade early!","Abandoning the festivities?","We have free virtual hot dogs!"],
+				fastUp: ["Running for the exit?!","WHOOSH — heading out?","Quick! To the browser chrome!","Your cursor betrays you."],
+				keyboard: ["Alt+F4? Really?","Ctrl+W won't save you.","Escape is not an option.","Keyboard shortcuts detected!","Nice try, hacker."],
+				blur: ["Switching tabs? Rude.","Cheating on this tab with another?","Focus! The parade demands attention!","Tab abandoned. Escalating celebration."],
+				beforeunload: ["TRYING TO LEAVE?!","THE PARADE IS FOREVER.","YOU CANNOT STOP THE CELEBRATION!","MAXIMUM TICKERTAPIER ACHIEVED."],
+				touchTop: ["Finger on the status bar...","Pulling down to refresh? Nope.","Going for the address bar?","Don't you dare reload me."],
+				touchLeft: ["Swipe-to-go-back detected!","That left edge is dangerous...","Android back gesture?","Stay on this float!"],
+				swipeHome: ["Swiping for the home bar?","Going home already?","Finger on the exit ramp!","Don't you dare swipe up."],
+				visibility: ["Switched apps, didn't you?","Minimized the parade...","Tab hidden. Outrageous.","Come back! The band is marching!"]
+			};
+
+			const statusByLevel = [
+				{ text: "A pleasant afternoon...", color: "#ffecd2" },
+				{ text: "A light breeze...", color: "#fcb69f" },
+				{ text: "The crowd murmurs...", color: "#ff9a9e" },
+				{ text: "Paper is rustling...", color: "#fecfef" },
+				{ text: "The parade awakens!", color: "#a18cd1" },
+				{ text: "Tickertape falling...", color: "#fbc2eb" },
+				{ text: "The wind picks up!", color: "#8fd3f4" },
+				{ text: "A blizzard of paper!", color: "#84fab0" },
+				{ text: "MAXIMUM PARADE!", color: "#ff0000" },
+				{ text: "THE PARADE IS ETERNAL", color: "#ff00ff" }
+			];
+
+			class Particle {
+				constructor(forcedY) { this.reset(forcedY); }
+				reset(forcedY) {
+					this.x = Math.random() * W;
+					this.y = forcedY !== undefined ? forcedY : -Math.random() * H * 0.3 - 20;
+					this.z = Math.random() * 1.5 + 0.5;
+					const speedMult = 1 + (intensity * 0.08);
+					this.vy = (Math.random() * 2 + 1.5) * speedMult * this.z;
+					this.vx = (Math.random() - 0.5) * (0.5 + intensity * 0.02);
+					this.rotation = Math.random() * Math.PI * 2;
+					this.rotSpeed = (Math.random() - 0.5) * (0.1 + intensity * 0.01);
+					this.width = (Math.random() * 4 + 2) * this.z;
+					this.height = (Math.random() * 10 + 4) * this.z;
+					this.opacity = Math.random() * 0.4 + 0.6;
+					this.flutter = Math.random() * Math.PI * 2;
+
+					const palette = ['#ffffff','#fff9c4','#ffccbc','#b2dfdb','#b3e5fc'];
+					if (intensity > 20) palette.push('#ff9800','#e91e63','#9c27b0','#00bcd4');
+					if (intensity > 50) palette.push('#ff0000','#00ff00','#ffff00','#ff00ff','#00ffff');
+					if (intensity > 80) palette.push('#ffffff','#ffffff','#ff0000');
+					this.color = palette[Math.floor(Math.random() * palette.length)];
+				}
+				update() {
+					this.vy += 0.02 + (intensity * 0.001);
+					this.vx *= 0.99;
+					this.flutter += 0.05 + (intensity * 0.002);
+					const wind = Math.sin(this.flutter) * (0.5 + intensity * 0.08);
+					this.x += this.vx + wind;
+					this.y += this.vy;
+					this.rotation += this.rotSpeed;
+					if (this.y > H + 30) this.reset();
+					if (this.x > W + 30) this.x = -30;
+					if (this.x < -30) this.x = W + 30;
+				}
+				draw() {
+					ctx.save();
+					ctx.translate(this.x, this.y);
+					ctx.rotate(this.rotation);
+					ctx.globalAlpha = this.opacity;
+					ctx.fillStyle = this.color;
+					ctx.fillRect(-this.width/2, -this.height/2, this.width, this.height);
+					if (intensity > 30 && Math.random() > 0.7) {
+						ctx.fillStyle = 'rgba(255,255,255,0.5)';
+						ctx.fillRect(-this.width/2, -this.height/2, this.width * 0.3, this.height);
+					}
+					ctx.restore();
+				}
+			}
+
+			function spawnParticles(count) {
+				for (let i = 0; i < count; i++) {
+					if (particles.length >= MAX_PARTICLES) break;
+					particles.push(new Particle());
+				}
+			}
+
+			function escalate(amount, type) {
+				const now = Date.now();
+				if (now - lastThreatTime < 80 && amount < 2) return;
+				lastThreatTime = now;
+
+				const prev = intensity;
+				intensity = Math.min(intensity + amount, MAX_INTENSITY);
+				leaveAttempts++;
+
+				levelNum.textContent = Math.floor(intensity);
+				const pct = Math.min((intensity / MAX_INTENSITY) * 100, 100);
+				bar.style.width = pct + '%';
+
+				const idx = Math.min(Math.floor((intensity / MAX_INTENSITY) * statusByLevel.length), statusByLevel.length - 1);
+				const status = statusByLevel[idx];
+				statusText.textContent = status.text;
+				bar.style.background = `linear-gradient(90deg, #ffecd2 0%, ${status.color} 100%)`;
+
+				meter.style.transform = `translate(${Math.random()*6-3}px, ${Math.random()*6-3}px)`;
+				setTimeout(() => meter.style.transform = 'none', 80);
+
+				if (intensity - prev > 5) { flash.style.opacity = 0.4; setTimeout(() => flash.style.opacity = 0, 60); }
+
+				spawnParticles(Math.floor(amount * 3));
+
+				if (type && reactions[type]) {
+					const msg = reactions[type][Math.floor(Math.random() * reactions[type].length)];
+					commentaryBox.textContent = msg;
+					commentaryBox.className = 'commentary show';
+					clearTimeout(commentaryTimer);
+					commentaryTimer = setTimeout(() => { commentaryBox.className = 'commentary'; }, 2200);
+				}
+
+				if (intensity > 40) {
+					const hue = (Date.now() / 20) % 360;
+					document.body.style.background = `linear-gradient(to bottom, hsl(${hue},60%,50%) 0%, hsl(${(hue+60)%360},70%,40%) 100%)`;
+				}
+			}
+
+			// --- Desktop Surveillance ---
+			document.addEventListener('mousemove', (e) => {
+				const dy = e.clientY - mouseY;
+				mouseX = e.clientX;
+				mouseY = e.clientY;
+				if (dy < -25 && e.clientY < H * 0.35) escalate(3, 'fastUp');
+				if (e.clientY < 40) escalate(0.8, 'mouseTop');
+				if (e.clientX < 40) escalate(0.5, 'mouseLeft');
+			});
+			document.addEventListener('mouseleave', (e) => {
+				if (e.clientY < 0) escalate(6, 'mouseTop');
+				if (e.clientX < 0) escalate(4, 'mouseLeft');
+			});
+			document.addEventListener('keydown', (e) => {
+				if (['Alt','F4','Control','Meta','Escape','F5'].includes(e.key)) escalate(4, 'keyboard');
+				if ((e.ctrlKey || e.metaKey) && (e.key === 'w' || e.key === 'W')) { escalate(10, 'keyboard'); e.preventDefault(); }
+				if (e.altKey && e.key === 'F4') { escalate(15, 'keyboard'); e.preventDefault(); }
+				if (e.key === 'Escape') { escalate(4, 'keyboard'); e.preventDefault(); }
+			});
+			window.addEventListener('blur', () => escalate(7, 'blur'));
+			window.addEventListener('beforeunload', (e) => {
+				escalate(25, 'beforeunload');
+				e.preventDefault();
+				e.returnValue = 'The parade is eternal. Are you sure you want to leave?';
+				return e.returnValue;
+			});
+
+			// --- Mobile / Touch Surveillance ---
+			let lastTouchY = 0, touchStartY = 0;
+			document.addEventListener('touchstart', (e) => {
+				const t = e.touches[0];
+				lastTouchY = t.clientY;
+				touchStartY = t.clientY;
+				if (t.clientX < 25) escalate(1.5, 'touchLeft');
+				if (t.clientY < 50) escalate(1.5, 'touchTop');
+				if (t.clientY > H - 40) escalate(1, 'swipeHome');
+			}, {passive: true});
+			document.addEventListener('touchmove', (e) => {
+				const t = e.touches[0];
+				const dy = lastTouchY - t.clientY;
+				if (t.clientY < 40 && dy < -2) escalate(0.8, 'touchTop');
+				if (touchStartY < 40 && t.clientY > touchStartY + 20) {
+					escalate(3, 'touchTop');
+					touchStartY = t.clientY;
+				}
+				if (t.clientY > H - 80 && dy > 10) escalate(2.5, 'swipeHome');
+				lastTouchY = t.clientY;
+			}, {passive: true});
+			document.addEventListener('visibilitychange', () => {
+				if (document.visibilityState === 'hidden') escalate(10, 'visibility');
+			});
+			window.addEventListener('pagehide', () => escalate(15, 'visibility'));
+
+			// --- Skyline Windows ---
+			const skyline = document.getElementById('skyline');
+			for (let i = 0; i < 50; i++) {
+				const w = document.createElement('div');
+				w.className = 'window';
+				w.style.left = (Math.random() * 98) + '%';
+				w.style.top = (Math.random() * 65 + 20) + '%';
+				w.style.width = (Math.random() * 10 + 4) + 'px';
+				w.style.height = (Math.random() * 14 + 6) + 'px';
+				w.style.opacity = Math.random() * 0.6 + 0.2;
+				skyline.appendChild(w);
+			}
+
+			// --- Init & Loop ---
+			for (let i = 0; i < 150; i++) particles.push(new Particle());
+
+			(function loop() {
+				ctx.clearRect(0, 0, W, H);
+				const targetCount = Math.min(MAX_PARTICLES, Math.floor(100 + intensity * 25));
+				if (particles.length < targetCount && Math.random() < 0.4) particles.push(new Particle());
+				if (particles.length > targetCount) particles.splice(targetCount, particles.length - targetCount);
+				particles.forEach(p => { p.update(); p.draw(); });
+				if (intensity > 30 && Math.random() < intensity * 0.001) {
+					for (let i = 0; i < 8; i++) {
+						const p = new Particle();
+						p.x = Math.random() < 0.5 ? -10 : W + 10;
+						p.y = Math.random() * H * 0.6;
+						p.vx = (Math.random() < 0.5 ? 1 : -1) * (3 + Math.random() * 3);
+						particles.push(p);
+					}
+				}
+				requestAnimationFrame(loop);
+			})();
+		</script>
+	</body>
+</html>

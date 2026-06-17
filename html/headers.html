@@ -1,40 +1,49 @@
 <title>Legend of Aetheria</title>
 
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Legend of Aetheria - A Fantasy-RPG, browser-based game full of exciting adventures">
-        <meta name="google-signin-client_id" content="905625455039-22nlqmke7jn849t3h7125i5tjtea89fb.apps.googleusercontent.com">
-        <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
-        <meta http-equiv="Content-Security-Policy"
-                 content="script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client https://apis.google.com/js/platform.js;
-                         style-src 'self' 'unsafe-inline' https://accounts.google.com https://cdn.jsdelivr.net/npm/*;
-                         object-src 'none';
-                         base-uri 'self';
-                         connect-src *;
-                         font-src 'self' https://fonts.gstatic.com https://fonts.gstatic.com/*;
-                         frame-src 'self' https://accounts.google.com;
-                         manifest-src 'self';
-                         media-src 'self';
-                         worker-src 'none';">
-                         
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Legend of Aetheria - A Fantasy-RPG, browser-based game full of exciting adventures">
+	<meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+	<meta http-equiv="Content-Security-Policy"
+			 content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com/gsi/client https://apis.google.com/js/platform.js;
+					 style-src 'self' 'unsafe-inline' https://accounts.google.com https://cdn.jsdelivr.net/npm/* https://fonts.googleapis.com/;
+					 object-src 'none';
+					 base-uri 'self';
+					 connect-src *;
+					 font-src 'self' https://fonts.gstatic.com https://fonts.gstatic.com/* https://fonts.googleapis.com/*;
+					 frame-src 'self' https://accounts.google.com;
+					 manifest-src 'self';
+					 media-src 'self';
+					 worker-src 'none';">
+	
+        <script src="node_modules/eruda/eruda.js"></script>
+	    <script src="node_modules/eruda-timing/eruda-timing.js"></script>
+	    <script>
+		    eruda.init();
+            eruda.add(erudaTiming); 
+            
+            window.addEventListener('error', function (event) {
+                eruda.show();
+            });
+            
+            window.addEventListener('unhandledrejection', function (event) {
+                eruda.show();
+            });
+        </script>
+        
+		</script>
         <!-- local 'self' https://accounts.google.com;-->
-        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/css/bootstrap-icons.min.css">
+        <link rel="stylesheet" type="text/css" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
         <link rel="stylesheet" type="text/css" href="/css/gfonts.css" />
         <link rel="stylesheet" type="text/css" href="/css/loa.css" />
         <link rel="stylesheet" href="/css/adminlte.min.css">
         <link type="text/css" href="/css/overlayscrollbars.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="./node_modules/rpg-awesome/css/rpg-awesome.min.css" />
+		<link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-        <!-- RPGUI: https://github.com/RonenNess/RPGUI -->
-        <script src="/js/rpgui.min.js"></script>
-        <link href="/css/rpgui.min.css" rel="stylesheet">
-  
-        <script src="/js/bootstrap.bundle.min.js" type="text/javascript"></script>
-        <script src="/js/jquery-3.7.1.min.js" type="text/javascript"></script>
-
-        <!-- Progress bar library from https://loading.io -->
-        <link rel="stylesheet" type="text/css" href="/css/loading-bar.css"/>
-
+        <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+        
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 

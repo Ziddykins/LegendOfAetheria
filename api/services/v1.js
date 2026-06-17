@@ -1,100 +1,66 @@
-module.exports = {
+export default {
   /**
   * Retrieve an account by its ID.
   * @param options.accountID The ID of the account to retrieve. 
 
   */
-  getAccountAccountID: async (options) => {
-    let sql = "SELECT * FROM tbl_accounts WHERE `email` = ?";
-        // Create connection
-    con = mysql.createConnection({
-        host: process.env.SQLHOST,
-        user: process.env.SQLUSER,
-        password: process.env.SQLPASS,
-        database: process.env.SQLDB
-    });
-
-    // Promisify connection
-    await new Promise((resolve, reject) => {
-        con.connect(err => {
-            if (err) reject(err);
-            resolve();
+    getAccountAccountID: async (options) => {
+        let sql = "SELECT * FROM tbl_accounts WHERE `email` = ?";
+        const con = mysql.createConnection({
+            host: process.env.SQLHOST,
+            user: process.env.SQLUSER,
+            password: process.env.SQLPASS,
+            database: process.env.SQLDB
         });
-    });
-    con.query(sql, [email], (err, results, fields) => {
 
-    });
+                await new Promise((resolve, reject) => {
+            con.connect(err => {
+                if (err) reject(err);
+                resolve();
+            });
+        });
+        con.query(sql, [email], (err, results, fields) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
+        });
 
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
+        var data = {
+            "banned": "<boolean>",
+            "charSlot1": "<string>",
+            "charSlot2": "<string>",
+            "charSlot3": "<string>",
+            "credits": "<integer>",
+            "dateRegistered": "<date-time>",
+            "eggsOwned": "<integer>",
+            "eggsSeen": "<integer>",
+            "email": "<string>",
+            "failedLogins": "<integer>",
+            "focusedSlot": "<string>",
+            "id": "<integer>",
+            "ipAddress": "<string>",
+            "ipLock": "<boolean>",
+            "ipLockAddr": "<string>",
+            "lastLogin": "<date-time>",
+            "loggedIn": "<boolean>",
+            "loggedOn": "<boolean>",
+            "muted": "<boolean>",
+            "password": "<string>",
+            "privileges": "<string>",
+            "sessionID": "<string>",
+            "settings": "<object>",
+            "verificationCode": "<string>",
+            "verified": "<boolean>",
+        },
+        status = '200';
 
-    var data = {
-        "banned": "<boolean>",
-        "charSlot1": "<string>",
-        "charSlot2": "<string>",
-        "charSlot3": "<string>",
-        "credits": "<integer>",
-        "dateRegistered": "<date-time>",
-        "eggsOwned": "<integer>",
-        "eggsSeen": "<integer>",
-        "email": "<string>",
-        "failedLogins": "<integer>",
-        "focusedSlot": "<string>",
-        "id": "<integer>",
-        "ipAddress": "<string>",
-        "ipLock": "<boolean>",
-        "ipLockAddr": "<string>",
-        "lastLogin": "<date-time>",
-        "loggedIn": "<boolean>",
-        "loggedOn": "<boolean>",
-        "muted": "<boolean>",
-        "password": "<string>",
-        "privileges": "<string>",
-        "sessionID": "<string>",
-        "settings": "<object>",
-        "verificationCode": "<string>",
-        "verified": "<boolean>",
-      },
-      status = '200';
-
-    return {
-      status: status,
-      data: data
-    };  
-  },
+        return {
+            status: status,
+            data: data
+        };  
+    },
 
   /**
-  * Get a new JWT token using an existing valid token
-
-
-  */
+  * Get a new JWT token using an existing valid token  */
   postAuthRefresh: async (options) => {
-
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
     var data = {
         "expires": "<date-time>",
         "token": "<string>",
@@ -108,26 +74,8 @@ module.exports = {
   },
 
   /**
-  * Get all characters for the authenticated account
-
-
-  */
+  * Get all characters for the authenticated account  */
   getCharacters: async (options) => {
-
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
     var data = [{
         "accountID": "<integer>",
         "alignment": "<integer>",
@@ -168,21 +116,6 @@ module.exports = {
 
   */
   postCharacters: async (options) => {
-
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
     var data = {
         "accountID": "<integer>",
         "alignment": "<integer>",
@@ -218,21 +151,6 @@ module.exports = {
 
   */
   getCharactersCharacterId: async (options) => {
-
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
     var data = {
         "accountID": "<integer>",
         "alignment": "<integer>",
@@ -269,20 +187,8 @@ module.exports = {
   */
   getCharactersCharacterIdBank: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "balance": "<integer>",
         "characterId": "<integer>",
@@ -305,20 +211,8 @@ module.exports = {
   */
   postCharactersCharacterIdBank: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "balance": "<integer>",
         "characterId": "<integer>",
@@ -345,20 +239,8 @@ module.exports = {
   */
   postCharactersCharacterIdBattle: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "enemy": "<Monster>",
         "player": "<Character>",
@@ -379,20 +261,8 @@ module.exports = {
   */
   getCharactersCharacterIdFamiliar: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "avatar": "<string>",
         "characterID": "<integer>",
@@ -418,20 +288,8 @@ module.exports = {
   */
   getCharactersCharacterIdFriends: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "friendId": "<integer>",
         "name": "<string>",
@@ -454,20 +312,8 @@ module.exports = {
   */
   postCharactersCharacterIdFriends: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {},
       status = '201';
 
@@ -484,20 +330,8 @@ module.exports = {
   */
   getCharactersCharacterIdInventory: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "currentWeight": "<integer>",
         "id": "<integer>",
@@ -521,20 +355,8 @@ module.exports = {
   */
   getCharactersCharacterIdQuests: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = [{
         "description": "<string>",
         "id": "<integer>",
@@ -559,20 +381,8 @@ module.exports = {
   */
   getLocations: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = [{
         "connectedLocations": "<array>",
         "coordinates": "<object>",
@@ -601,20 +411,8 @@ module.exports = {
   */
   postLocationsLocationIdTravel: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "connectedLocations": "<array>",
         "coordinates": "<object>",
@@ -642,20 +440,8 @@ module.exports = {
   */
   getMail: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = [{
         "date": "<date-time>",
         "folder": "<FolderType>",
@@ -685,20 +471,8 @@ module.exports = {
   */
   postMail: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "date": "<date-time>",
         "folder": "<FolderType>",
@@ -724,20 +498,8 @@ module.exports = {
   */
   getMailMailId: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "date": "<date-time>",
         "folder": "<FolderType>",
@@ -763,20 +525,8 @@ module.exports = {
   */
   deleteMailMailId: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {},
       status = '204';
 
@@ -793,20 +543,8 @@ module.exports = {
   */
   getMarketListings: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "listings": "<array>",
         "total": "<integer>",
@@ -829,20 +567,8 @@ module.exports = {
   */
   postMarketListings: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "expires": "<date-time>",
         "id": "<integer>",
@@ -866,20 +592,8 @@ module.exports = {
   */
   postMarketListingsListingIdPurchase: async (options) => {
 
-    // Implement your business logic here...
-    //
-    // Return all 2xx and 4xx as follows:
-    //
-    // return {
-    //   status: 'statusCode',
-    //   data: 'response'
-    // }
-
-    // If an error happens during your business logic implementation,
-    // you can throw it as follows:
-    //
-    // throw new Error('<Error message>'); // this will result in a 500
-
+                                
+                
     var data = {
         "buyer": "<string>",
         "item": "<Item>",

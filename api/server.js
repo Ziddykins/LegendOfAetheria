@@ -1,17 +1,16 @@
-const express = require('express'),
-    cookieParser = require('cookie-parser'),
-    log = require('morgan'),
-    path = require('path'),
-    cors = require('cors'),
-    multer = require('multer'),
-    upload = multer(),
-    app = express(),
-    helmet = require('helmet'),
-    mysql = require('mysql'),
-    csrf = require('cs`rf'),
-    PORT = process.env.PORT || 3000,
-    NODE_ENV = process.env.NODE_ENV || 'development';
+import express, { json, text, urlencoded } from 'express';
+import cookieParser from 'cookie-parser';
+import log from 'morgan';
+import cors from 'cors';
+import multer from 'multer';
+import helmet from 'helmet';
+import authRouter from './routes/auth.route.js';
+import v1Router from './routes/v1.route.js';
 
+const upload = multer();
+const app = express();
+const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 app.set('port', PORT);
 app.set('env', NODE_ENV);
@@ -21,23 +20,36 @@ app.use(log('tiny'));
 app.use(helmet());
 
 // parse application/json
-app.use(express.json());
+app.use(json());
 
 // parse raw text
-app.use(express.text());
+app.use(text());
 
 // parse application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
-app.use(csrf({ cookie: true }));
-
+app.use(urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // parse multipart/form-data
 app.use(upload.array());
-app.use(express.static('public'));
 
-app.use(csrf({ cookie: true }));
+async function initGameEngine() {
+    try {
+        app.use('/auth', authRouter);
+        app.use('/v1', v1Router);
 
-require('./routes')(app);
+        app.listen(PORT, () => {
+            console.log('🚀 Server running at http://localhost:' + PORT);
+        });
+    } catch (err) {
+        console.error('❌ Failed to start server:', err);
+        process.exit(1);
+    }
+}
+
+initGameEngine().catch((err) => {
+    console.error('Failed to initialize game engine:', err);
+    process.exit(1);
+});
 
 // catch 404
 app.use((req, res, next) => {
@@ -53,12 +65,4 @@ app.use((err, req, res, next) => {
     res.status(status).json({ status, error: msg });
 });
 
-module.exports = app;
-
-app.listen(PORT, () => {
-    console.log(
-        `Express Server started on Port ${app.get(
-            'port'
-        )} | Environment : ${app.get('env')}`
-    );
-});
+export default app;

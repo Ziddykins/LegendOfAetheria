@@ -47,6 +47,21 @@ ssl_fullcer=/etc/ssl/certs/ssl-cert-snakeoil.pem
 ssl_privkey=/etc/ssl/private/ssl-cert-snakeoil.key
 step=1
 
+[termux_examples]
+webroot=/data/data/com.termux/files/usr/share/apache2/default-site/htdocs
+php_binary=/data/data/com.termux/files/usr/bin/php
+php_ini=/data/data/com.termux/files/usr/etc/php/php.ini
+fpm_binary=/data/data/com.termux/files/usr/bin/php-fpm
+sql_config_filei=/data/data/com.termux/files/usr/etc/my.cnf.d
+apache_directory=/data/data/com.termux/files/usr/etc/apache2
+apache_runas=www-data
+composer_runas=www-data
+hosts_file=/data/data/com.termux/files/usr/etc/hosts
+crontab_dir=/data/data/com.termux/files/usr/var/spool/cron/crontabs
+virthost_conf_file=/data/data/com.termux/files/usr/etc/apache2/conf.d/loa.conf
+virthost_conf_file_ssl=/data/data/com.termux/files/usr/etc/apache2/conf.d/ssl-loa.conf
+tmp_dir=/data/data/com.termux/files/usr/tmp
+
 [xampp_examples]
 web_root=C:\xampp\htdocs
 php_binary=C:\xampp\php\php.exe

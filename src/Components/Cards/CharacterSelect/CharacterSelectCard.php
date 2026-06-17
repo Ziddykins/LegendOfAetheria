@@ -1,7 +1,7 @@
 <?php
 namespace Game\Components\Cards\CharacterSelect;
 use Game\Character\Stats;
-
+use Game\Account\Account;
 /**
  * Renders a Bootstrap card component for character selection screen.
  * Displays character information (avatar, name, level, race, stats) for existing characters,
@@ -13,8 +13,8 @@ class CharacterSelectCard {
     
     /** @var int Slot number (1-3) for this character selection card */
     private $slot;
-
-    /**
+    private int $characterCount = 0;
+    /*
      * Creates a character selection card.
      * 
      * @param int|null $characterID Character ID or null for empty slot
@@ -23,6 +23,7 @@ class CharacterSelectCard {
     public function __construct($characterID, $slot) {
         $this->characterID = $characterID;
         $this->slot = $slot;
+        $this->characterCount = Account::getCharacterCount($_SESSION['account-id']);
     }
 
     /**
@@ -42,7 +43,7 @@ class CharacterSelectCard {
             $stats = new Stats($this->characterID);
             $stats->propRestore($character['stats']);
 
-            $cardHtml = '<div class="card text-center me-3" data-loa-slot="' . $this->slot . '" style="width: 15rem;">
+            $cardHtml = '<div class="d-flex card text-center me-3" data-loa-slot="' . $this->slot . '" style="min-width:300px;">
                     <span class="small text-bg-dark bg-gradient float-right">Slot ' . $this->slot . '</span>
                     <div class="card-header">
                     <img src="img/avatars/' . $character['avatar'] . '" class="rounded-circle" width="100" height="100" />
@@ -83,59 +84,27 @@ class CharacterSelectCard {
                 </div>
             </div>';
         } else {
-            $cardHtml =  "\n\n\t\t\t\t" . '<div class="card text-center me-3 ms-1" data-loa-slot="' . $this->slot . '">
+            $cardHtml =  "\n\n\t\t\t\t" . '<div class="card text-center me-3 ms-1 flex-shrink-1" data-loa-slot="' . $this->slot . '">
                     <span class="small text-bg-dark bg-gradient float-right">Slot ' . $this->slot . '</span>
-                    <div class="card-header">
-                    <img src="img/avatars/avatar-unknown.webp" class="rounded-circle" width="100" height="100" />
-                </div>
 
                 <div class="card-body">
                     <p class="card-text">Lv. 0 - Empty</p>
                     <div class="small" style="font-size: 10px;">
-                        <div class="row">
-                            <div class="col">
-                                <span>HP</span>: 0 / 0
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col">
-                                <span>MP</span>: 0 / 0
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col">
-                                <span>EP</span>: 0 / 0
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col">
-                                <span>AP</span>: 0
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col">                        
-                                <div>XP: 0</div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col">
-                                <div>NL: 100</div>
-                            </div>
-                        </div>
+                        - Empty Slot -
                     </div>
                 </div>
 
                 <div class="card-footer d-grid gap-2">
-                    <button id="select-new-' . $this->slot . '" name="new-char-' . $this->slot . '" type="submit" id="select-new-s' . $this->slot . '" class="flex-grow-1 btn btn-sm btn-success pe-3" data-bs-toggle="modal" data-bs-target="#create-character-modal" value="' . $this->slot . '">New Character</a>
+                    <button id="select-new-' . $this->slot . '" name="new-char-' . $this->slot . '" type="submit" id="select-new-s' . $this->slot . '" class="flex-grow-1 btn btn-sm btn-success pe-3 als" data-bs-toggle="modal" data-bs-target="#create-character-modal" value="' . $this->slot . '"><span class="material-symbols-outlined">add_reaction</span> New Character</span></button>
                 </div>
             </div>';
         }
 
         return $cardHtml;
     }
+
+    public function getCharCount() {
+        return $this->characterCount;
+    }
+        
 }

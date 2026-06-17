@@ -14,9 +14,9 @@
         relating to their progress through the tutorial */
         private array $players = [];
 
-        public function __construct($accountID, $characterID) {
-            $this->accountID = $accountID;
-            $this->characterID = $characterID;
+        private int $tutorialStep = 0;
+        
+        public function __construct() {
             $this->tutorialStep = 0;
         }
     }

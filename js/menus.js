@@ -17,16 +17,18 @@ function tgl_active_signup (e) {
  * Removes 'bg-primary' and 'text-white' classes from all menu anchors,
  * then adds them to the clicked anchor.
  */
-$('a[id^="menu-anchor"]').on('click', function (e) {
-    document.querySelectorAll('a[id^="menu-anchor"]').forEach(function(ce) {
-        if (ce.classList.contains('bg-primary')) {
-            ce.classList.remove('bg-primary');
-            ce.classList.remove('text-white');
-        }
-    });
+document.querySelectorAll('a[id^="menu-anchor"]').forEach(function(el) {
+    el.addEventListener('click', function (e) {
+        document.querySelectorAll('a[id^="menu-anchor"]').forEach(function(ce) {
+            if (ce.classList.contains('bg-primary')) {
+                ce.classList.remove('bg-primary');
+                ce.classList.remove('text-white');
+            }
+        });
 
-    e.target.classList.add('bg-primary');
-    e.target.classList.add('text-white');
+        e.target.classList.add('bg-primary');
+        e.target.classList.add('text-white');
+    });
 });
 
 var { 
@@ -41,5 +43,3 @@ const Default = {
     scrollbarAutoHide: "leave",
     scrollbarClickScroll: true,
 };
-
-

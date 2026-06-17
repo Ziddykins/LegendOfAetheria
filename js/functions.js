@@ -45,7 +45,9 @@ function stat_adjust(which, slider) {
 function append_to_header($data, $comment) {
     document.head.append(`<!-- ${comment} -->`);
     document.head.append(`${data}`);
-}function toggle_stretch() {
+}
+
+function toggle_stretch() {
     document.getElementById('direct-chat-container').classList.toggle('align-self-stretch');
 };
 

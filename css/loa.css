@@ -7,3 +7,420 @@
     background: rgba(2, 2, 2, 1);
 }
 
+.rpg-title {
+  font-family: 'Uncial Antiqua', serif;
+}
+
+/* glow */
+.rpg-glow {
+  position: relative;
+}
+
+.rpg-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: var(--glow);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  filter: blur(8px);
+  animation: pulse 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%,100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* rarities */
+.rarity-common { --glow: rgba(200,200,200,.5); }
+.rarity-rare { --glow: rgba(77,166,255,.7); }
+.rarity-epic { --glow: rgba(184,77,255,.8); }
+.rarity-legendary { --glow: rgba(255,184,77,.9); }
+.rarity-cursed { --glow: rgba(255,60,60,.9); }
+
+/* glitch (cursed only) */
+@keyframes glitch {
+  0% { transform: translate(0); }
+  25% { transform: translate(-1px,1px); }
+  50% { transform: translate(1px,-1px); }
+  75% { transform: translate(-1px,-1px); }
+  100% { transform: translate(0); }
+}
+
+.rarity-cursed img {
+  animation: glitch 0.15s infinite;
+  filter: contrast(1.2) saturate(1.3);
+}
+
+/* badge style tweak */
+.rarity-badge {
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+}
+
+.ra {
+    filter: drop-shadow(0 0 4px currentColor);
+}
+/* Quest intro modern styling */
+.quest-intro-page {
+    min-height: 97.00vh;
+}
+
+.quest-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 2rem;
+    border: 1px solid rgb(78, 60, 0);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(14px);
+}
+
+.quest-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at top right, rgba(228, 160, 74, 0.14), transparent 25%),
+        radial-gradient(circle at bottom left, rgba(88, 107, 152, 0.10), transparent 20%);
+}
+
+.quest-avatar-wrapper {
+    min-height: 200px;
+    border-radius: 2rem 0 0 2rem;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(16, 18, 24, 1), rgba(8, 10, 14, 0.95));
+}
+
+.quest-avatar {
+    width: 40%;
+    height: auto;
+    object-fit: cover;
+    filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.35));
+}
+
+.quest-title {
+    color: #e2d4b0;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+    font-size: 12px;
+}
+
+.quest-dialogue {
+    background: rgba(12, 14, 18, 0.90);
+    border: 1px solid rgba(189, 156, 101, 0.16);
+    color: #f2ecdf;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.quest-choice {
+    background: rgba(12, 14, 20, 0.80);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.quest-choice:hover {
+    transform: translateY(-2px);
+    border-color: rgba(228, 160, 74, 0.24);
+    background: rgba(24, 26, 32, 0.92);
+}
+
+.quest-choice-icon {
+    width: 3rem;
+    height: 3rem;
+    display: grid;
+    place-items: center;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.quest-choice-badge {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    color: #e7dab7;
+}
+
+.effect-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 1.4rem;
+}
+
+.letter-spacing {
+    letter-spacing: 0.24em;
+}
+
+@media (max-width: 991.98px) {
+    .quest-avatar-wrapper {
+        border-radius: 1.5rem 1.5rem 0 0;
+        min-height: 260px;
+    }
+
+    .quest-card {
+        border-radius: 1.5rem;
+    }
+}
+
+/* Diablo 2-inspired Inventory */
+.inventory-page {
+    min-height: 100vh;
+    background: radial-gradient(circle at 20% 50%, rgba(139, 69, 19, 0.08), transparent 30%),
+        linear-gradient(135deg, #0a0a0a 0%, #050505 100%);
+}
+
+.inventory-panel {
+    background: rgba(12, 10, 8, 0.95);
+    border: 2px solid rgba(184, 134, 11, 0.25);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(184, 134, 11, 0.1);
+}
+
+.inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+}
+
+.inventory-title {
+    font-size: 1.5rem;
+    color: #d4af37;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    margin: 0;
+}
+
+.inventory-weight {
+    font-size: 0.85rem;
+    color: #a0826d;
+    letter-spacing: 0.08em;
+}
+
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 1rem;
+    border-radius: 0.25rem;
+}
+
+.inventory-slot {
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, rgba(60, 50, 40, 0.8), rgba(40, 35, 30, 0.95));
+    border: 1px solid rgba(184, 134, 11, 0.3);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.inventory-slot:hover {
+    border-color: rgba(184, 134, 11, 0.6);
+    box-shadow: inset 0 0 8px rgba(184, 134, 11, 0.15),
+                0 0 12px rgba(184, 134, 11, 0.1);
+}
+
+.inventory-item {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.inventory-item-icon {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.inventory-item-quantity {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #d4af37;
+    font-size: 0.65rem;
+    padding: 1px 3px;
+    border-radius: 2px;
+    font-weight: bold;
+}
+
+.inventory-item[data-rarity="rare"] .inventory-item-icon {
+    filter: drop-shadow(0 0 4px rgba(100, 149, 237, 0.6));
+}
+
+.character-panel {
+    background: rgba(12, 10, 8, 0.95);
+    border: 2px solid rgba(184, 134, 11, 0.25);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+.character-portrait {
+    overflow: hidden;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(184, 134, 11, 0.3);
+}
+
+.character-info {
+    text-align: center;
+}
+
+.character-panel h3 {
+    color: #d4af37;
+    letter-spacing: 0.08em;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.stat-item {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(184, 134, 11, 0.2);
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #a0826d;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #f0f0f0;
+}
+
+.equipment-panel {
+    background: rgba(12, 10, 8, 0.95);
+    border: 2px solid rgba(184, 134, 11, 0.25);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+.equipment-title {
+    color: #d4af37;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.equipment-slots {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.equipment-slot {
+    background: linear-gradient(135deg, rgba(60, 50, 40, 0.8), rgba(40, 35, 30, 0.95));
+    border: 1px solid rgba(184, 134, 11, 0.3);
+    border-radius: 0.35rem;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.equipment-slot:hover {
+    border-color: rgba(184, 134, 11, 0.6);
+    box-shadow: inset 0 0 8px rgba(184, 134, 11, 0.15);
+}
+
+.slot-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #a0826d;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.slot-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+}
+
+.item-details-panel {
+    background: rgba(12, 10, 8, 0.95);
+    border: 2px solid rgba(184, 134, 11, 0.25);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 1199.98px) {
+    .inventory-grid {
+        grid-template-columns: repeat(8, 1fr);
+    }
+}
+
+@media (max-width: 991.98px) {
+    .inventory-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .equipment-slots {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Mobile responsive layout fixes for AdminLTE */
+@media (max-width: 991.98px) {
+    body.sidebar-collapse #main-section {
+        padding-left: 0.25rem !important;
+    }
+
+    body.sidebar-collapse .d-grid {
+        margin-left: 0 !important;
+    }
+
+    body.sidebar-collapse #chatbox-bottom {
+        width: 100%;
+    }
+
+    .app-wrapper.sidebar-collapse {
+        margin-left: 0 !important;
+    }
+}
+

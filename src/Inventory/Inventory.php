@@ -4,6 +4,7 @@ namespace Game\Inventory;
 use Game\Inventory\Items\Item;
 use Game\Traits\PropSuite\Enums\PropType;
 use Game\Traits\PropSuite\PropSuite;
+use function count;
 
 /**
  * Manages a character's item inventory with slot-based storage and weight limits.
@@ -29,6 +30,7 @@ use Game\Traits\PropSuite\PropSuite;
  */
 class Inventory {
     use PropSuite;
+
     /** @var int Inventory identifier (matches character ID) */
     private int $id;
     
@@ -101,21 +103,19 @@ class Inventory {
      * 
      * @return int Number of available slots
      */
-    private function spacesLeft() {
+    private function spacesLeft(): int {
         return count($this->slots) - $this->nextAvailableSlot;
     }
 
     /**
      * Adds a new item to the next available inventory slot.
      * 
-     * @param string $name Item name
-     * @param int $weight Item weight
-     * @param int $numSockets Number of gem sockets
+     * @param Item $item The items to add to the next available slot
      * @return void
      */
-    private function addItem(Item $item) {
+    private function addItem(Item $item): void {
         $targetSlot = $this->nextAvailableSlot++;
-        $this->slots[$targetSlot]->item = $item;
+        $this->slots[$targetSlot] = $item;
     }
 
     /**
@@ -125,7 +125,7 @@ class Inventory {
      * @param int $slot Slot index to clear
      * @return void
      */
-    private function removeItem($slot) {
+    private function removeItem($slot): void {
         $this->slots[$slot] = new Item();
         $this->nextAvailableSlot--;
     }

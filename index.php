@@ -1,7 +1,7 @@
 <?php
     require_once "vendor/autoload.php";
-    require_once "system/constants.php";
-    require_once "system/bootstrap.php";
+	require_once "system/constants.php";
+	require_once "system/bootstrap.php";
 
     use Game\Account\Account;
     use Game\Account\Enums\Privileges;
@@ -159,7 +159,8 @@
                     $character->stats->set_mp(100);
                     $character->stats->set_maxMP(100);
 
-                    $race->set_stat_adjust($character->stats);
+                    $tmp = $race->set_stat_adjust($character->stats);
+                    $character->stats = $tmp;
 
                     $character->stats->set_status(Status::HEALTHY);
 
@@ -182,7 +183,7 @@
 
     </head>
 
-    <body data-bs-theme="dark" class="main-font">
+    <body data-bs-theme="dark" class="uncial">
         <div class="d-flex align-items-center min-vh-100" style="min-width: 60%;">
             <div id="login-container" class="container shadow border border-round border-1 border-tertiary" style="max-width:550px; width: 100%;">
                 <div class="row">

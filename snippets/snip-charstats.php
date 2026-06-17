@@ -1,4 +1,10 @@
 <?php
+    use Game\Account\Account;
+    use Game\Character\Character;
+
+    $account = new Account($_SESSION['email']);
+    $character = new Character($account->get_id(), $_SESSION['character-id']);
+
     $char_name = $character->get_name();
     $char_race = $character->get_race();
     $char_avatar = $character->get_avatar();
@@ -36,9 +42,9 @@
     $ep_icon  = 'bi-battery-full';
     $ep_color = 'success'; 
     
-    $ep_percent_full = $cur_ep / $max_ep;
     $mp_percent_full = $cur_mp / $max_mp;
     $hp_percent_full = $cur_hp / $max_hp;
+    $ep_percent_full = $cur_ep / $max_ep;
 
     if ($ep_percent_full > 25 && $ep_percent_full < 75) {
         $ep_icon  = 'bi-battery-half';
@@ -50,8 +56,8 @@
 
     $ap = $character->stats->get_ap();
 
-    $cur_xp   = $character->stats->get_exp();
-    $next_lvl = $character->stats->get_maxExp();
+    $cur_xp   = $character->stats->get_experience();
+    $next_lvl = $character->stats->get_maxExperience();
 
     $location = $character->get_location();
     $cur_x    = $character->get_x();

@@ -1,10 +1,11 @@
 <?php
-    include 'html/opener.html';
-    include 'system/constants.php';
+    $root = $_SERVER['DOCUMENT_ROOT'];
+    require_once "$root/system/constants.php";
+    include "$root/html/opener.html";
  ?>
 
 <head>
-    <?php include '/html/headers.html'; ?>
+    <?php include "$root/html/headers.html"; ?>
     <link rel="stylesheet" href="/css/spooky.css">
     <script src="/js/tweenmax.min.js"></script>
     <script src="/js/timelinemax.min.js"></script>
@@ -57,7 +58,7 @@
         </div>
     </div>
 
-    <?php include '/html/footers.html'; ?>
+    <?php include 'html/footers.html'; ?>
     <script src="/js/404.js"></script>
 </body>
 </html>

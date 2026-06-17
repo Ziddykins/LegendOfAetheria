@@ -11,9 +11,9 @@ class Zone {
     private array $locations;
     private array $connections;
 
-    public function __construct(string $name, array $zcoords, array $limits) {
+    public function __construct(string $name, array $zcoords, array $bounds) {
         $this->name = $name;
         $this->zcoords = $zcoords;
-        $this->limits = $limits;
+        $this->bounds = $bounds;
     }
 }

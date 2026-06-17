@@ -1,8 +1,18 @@
-const express = require('express');
-const v1 = require('../services/v1');
-const router = new express.Router();
+import express from 'express';
+import rateLimit from 'express-rate-limit';
+import v1 from '../services/v1.js';
+import createLoaRouter from './loa.route.js';
+const router = express.Router();
+
+const loaRouter = await createLoaRouter();
+router.use('/', loaRouter);
+
+const authRefreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 refresh attempts per window
+});
  
-router.get('/account/:accountID', async (req, res, next) => {
+router.get('/accounts/:accountID', async (req, res, next) => {
   let options = { 
     "accountID": req.params.accountID,
     
@@ -20,7 +30,7 @@ router.get('/account/:accountID', async (req, res, next) => {
   }
 });
  
-router.post('/auth/refresh', async (req, res, next) => {
+router.post('/auth/refresh', authRefreshLimiter, async (req, res, next) => {
   let options = { 
   };
 
@@ -386,4 +396,4 @@ router.post('/market/listings/:listingId/purchase', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;

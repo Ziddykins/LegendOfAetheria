@@ -1,11 +1,12 @@
-const mysql = require('mysql');
-const bcrypt = require('bcrypt');
-const { randomBytes } = require('node:crypto');
-const jwt = require('jsonwebtoken');
-const e = require('dotenv');
-e.config();
+import mysql from 'mysql';
+import bcrypt from 'bcrypt';
+import { randomBytes } from 'node:crypto';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-module.exports = {
+dotenv.config({path: '.env'});
+
+export default {
     postBasic: async (options) => {
         let con = null;
         try {
@@ -77,10 +78,12 @@ module.exports = {
             };
 
         } catch (err) {
-            console.error('Auth error:', err.message);
+            console.error('Auth error caught:', err);
+            console.error('Error message:', err.message);
+            console.error('Error:', err);
             return {
                 data: {
-                    error: err.message,
+                    error: err.message || 'Authentication failed',
                     status: err.message === 'User not found' || err.message === 'Invalid password' ? 401 : 500
                 }
             };
@@ -91,4 +94,3 @@ module.exports = {
         }
     }
 };
-console.log("Woooooooo pass");

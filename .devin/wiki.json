@@ -1,0 +1,301 @@
+{
+  "repo_notes": [
+    {
+      "content": ""
+    }
+  ],
+  "pages": [
+    {
+      "title": "Overview",
+      "purpose": "Introduce Legend of Aetheria, a browser-based fantasy RPG, describing its purpose, architecture, and main components at a high level",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "System Architecture",
+      "purpose": "Explain the overall system architecture, including the web server layer, application core, domain logic, and data persistence layers",
+      "parent": "Overview",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Technology Stack",
+      "purpose": "Document the technologies used: PHP 8.4, MariaDB, Bootstrap 5.3, jQuery, Apache, and external services like OpenAI",
+      "parent": "Overview",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Installation & Setup",
+      "purpose": "Comprehensive guide to installing and configuring Legend of Aetheria on various platforms",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Prerequisites",
+      "purpose": "List system requirements, required software packages, and preparation steps before installation",
+      "parent": "Installation & Setup",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "AutoInstaller",
+      "purpose": "Detailed documentation of the AutoInstaller.pl script, its steps, and automated installation process",
+      "parent": "Installation & Setup",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Configuration",
+      "purpose": "Explain config.ini structure, template system, and how to configure database, Apache, SSL, and OpenAI settings",
+      "parent": "Installation & Setup",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Web Server Setup",
+      "purpose": "Document Apache virtual host configuration, SSL setup, .htaccess rules, and PHP configuration",
+      "parent": "Installation & Setup",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Core Application",
+      "purpose": "Document the main application entry points and request handling flow",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Entry Points",
+      "purpose": "Explain index.php (login/registration), game.php (main game), select.php (character selection), and battle.php (combat)",
+      "parent": "Core Application",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Session Management",
+      "purpose": "Document PHP session handling, check_session() validation, CSRF tokens, and session security",
+      "parent": "Core Application",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "URL Routing",
+      "purpose": "Explain .htaccess URL rewriting, page parameter system, and how requests are routed to PHP controllers",
+      "parent": "Core Application",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Authentication & Authorization",
+      "purpose": "Comprehensive security documentation covering user authentication and access control",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "User Registration",
+      "purpose": "Document registration flow, character creation, attribute point allocation, avatar/race selection, and abuse detection",
+      "parent": "Authentication & Authorization",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Login System",
+      "purpose": "Explain login form, password verification (bcrypt), rate limiting, failed login tracking, and Google OAuth integration",
+      "parent": "Authentication & Authorization",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Privilege System",
+      "purpose": "Document privilege levels (UNVERIFIED, USER, MODERATOR, ADMINISTRATOR) and access control mechanisms",
+      "parent": "Authentication & Authorization",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Security Measures",
+      "purpose": "Detail CSRF protection, IP locking, ban system, email verification, and security best practices",
+      "parent": "Authentication & Authorization",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Game Systems",
+      "purpose": "Overview of all game mechanics and features available to players",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Character Management",
+      "purpose": "Document Character class, character slots, stats, inventory, bank, and character progression system",
+      "parent": "Game Systems",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Combat System",
+      "purpose": "Explain turn-based battle mechanics, monster encounters, attack/defense calculations, critical hits, and rewards",
+      "parent": "Game Systems",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Monster System",
+      "purpose": "Document Monster class, monster scaling, spawn scopes (GLOBAL/ZONE/PERSONAL), and loot drops",
+      "parent": "Game Systems",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Friends System",
+      "purpose": "Document friend relationships, request system, friend statuses (MUTUAL, BLOCKED, REQUEST_SENT/RECV), and blocking",
+      "parent": "Game Systems",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Mail System",
+      "purpose": "Explain in-game mail, folder organization (INBOX, OUTBOX, DELETED, DRAFTS), and message composition",
+      "parent": "Game Systems",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Inventory & Economy",
+      "purpose": "Document inventory system, gold/spindels currencies, bank accounts, and marketplace",
+      "parent": "Game Systems",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Database & Data Layer",
+      "purpose": "Comprehensive documentation of data persistence, ORM layer, and database architecture",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Database Schema",
+      "purpose": "Document all database tables (accounts, characters, monsters, familiars, mail, friends, etc.) and relationships",
+      "parent": "Database & Data Layer",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "PropSuite ORM",
+      "purpose": "Explain the PropSuite trait, PropType enum, dynamic property access (__call), and database synchronization",
+      "parent": "Database & Data Layer",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Entity Classes",
+      "purpose": "Document Account, Character, Stats, Monster, Familiar classes and their properties/methods",
+      "parent": "Database & Data Layer",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Frontend & User Interface",
+      "purpose": "Documentation of client-side UI components, frameworks, and JavaScript functionality",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    },
+    {
+      "title": "Manual Setup",
+      "purpose": "Use the existing data on the repo and the autoinstaller.pl script to generate comorehensive step by step documentation explaining how to set this all up without the autoinstaller.",
+      "page_notes": [
+        {
+          "content": ""
+        }
+      ]
+    }
+  ]
+}

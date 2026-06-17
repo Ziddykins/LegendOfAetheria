@@ -7,12 +7,19 @@ use Game\Account\Account;
 use Game\Character\Character;
 use Game\System\Enums\AbuseType;
 use Game\Components\Cards\CharacterSelect\CharacterSelectCard;
-$log->debug("WE MADE IT TO SELECT");
 
+$select_style = 'd-grid gap-2';
 
 if (check_session()) {
     $account   = new Account($_SESSION['email']);
-    $character = new Character($account->get_id());
+	$character = new Character($account->get_id());
+	//ai_serv_post('logged_in', $account);
+
+    $char_count = Account::getCharacterCount($account->get_id());
+
+    if ($char_count > 1) {
+        $select_style = 'd-flex';
+    }
 
     if (isset($_POST['create-submit']) && $_POST['create-submit'] == 1) {
         if (isset($_POST['slot']) && $_POST['slot'] > 0 && $_POST['slot'] <= 3) {
@@ -48,7 +55,7 @@ if (check_session()) {
                 $_SESSION['focused-slot'] = (int)$slot;
                 $_SESSION['character-id'] = (int)$char_id;
                 $_SESSION['name'] = $character->get_name();
-                header('Location: /game?page=sheet&sub=character');
+                header('Location: /game?page=profile&sub=character');
                 exit();
             case 'new':
                 $char_name   = $_POST['create-character-name'];
@@ -128,12 +135,11 @@ if (check_session()) {
     <link rel="stylesheet" href="css/select.css">
 </head>
 
-<body class="main-font" data-bs-theme="dark">
+<body class="uncial" data-bs-theme="dark">
     <div class="d-flex align-items-center min-vh-100" style="min-width: 325px;">
-        <div class="container">
-            <div class="d-flex justify-content-center">
+        <div class="container mt-4 pt-2">
+            <div class="d-grid gap-4 d-lg-flex justify-content-center align-content-center">
                 <?php
-
                 for ($i = 1; $i < 4; $i++) {
                     $char_slot = "get_charSlot$i";
                     $char_id   = $account->$char_slot();
@@ -171,7 +177,8 @@ if (check_session()) {
             });
         });
         const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+		
+		const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
     </script>
 
     <?php include "html/footers.html"; ?>    

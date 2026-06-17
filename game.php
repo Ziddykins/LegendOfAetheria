@@ -1,8 +1,6 @@
 <?php
     declare(strict_types = 1);
-    require_once "vendor/autoload.php";
-    require_once "system/constants.php";
-    require_once SYSTEM_DIRECTORY . "/bootstrap.php";
+    require_once "system/bootstrap.php";
 
 
     use Game\Account\Account;
@@ -11,9 +9,6 @@
     use Game\Components\Sidebar\Enums\SidebarType;
     use Game\System\System;
     use Game\AI\LoAllama;
-    use Game\Account\Settings;
-    use Game\AI\NPC\Tutorial\Frank;
-    //use Game\Familiar\Familiar;
 
     $system = new System(0);
     $system->load_sheet();
@@ -35,7 +30,6 @@
     $cur_floor        = $character->get_floor();
     $avatar           = $character->get_avatar();
     $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now"))); 
-    $log->debug("WE MADE IT TO GAME");   
 ?>
 
 <?php include 'html/opener.html'; ?>
@@ -44,7 +38,7 @@
     </head>
     <script>loa.u_name = '<?php echo $_SESSION['name']; ?>';</script>
 
-    <body class="main-font" data-bs-theme="<?php echo $color_mode; ?>" data-overlayscrollbars-initialize>
+    <body class="uncial" data-bs-theme="<?php echo $color_mode; ?>" data-overlayscrollbars-initialize>
         <div class="d-flex-fill overflow-hidden" style="height: 100vh;">
             <span id="terst" class="row g-0 h-100 app-wrapper layout-fixed sidebar-expand-lg ms-n3">
             <?php include $sidebar_rel_link; ?>
@@ -70,7 +64,7 @@
                                 $requested_sub = preg_replace('/[^a-z-]+/', '', $_GET['sub']);
                                 $page_string .= "$requested_sub/$requested_page.php";
                             } else {
-                                $page_string .= "pages/character/sheet.php";
+                                $page_string .= "pages/character/profile.php";
                             }
 
                             
@@ -82,11 +76,11 @@
                             
                         }
                     ?>
-                    </div>
+                     </div>
                 </main>
                 <?php include 'chat/chat.html'; ?>
-            </span>
-        </div>
+             </span>
+         </div>
 
         <div id="footer"> 
             <?php include 'html/footers.html'; ?>

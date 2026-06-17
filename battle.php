@@ -1,7 +1,5 @@
 <?php
     declare(strict_types = 1);
-    require_once "vendor/autoload.php";
-    require_once "system/constants.php";
     require_once "system/bootstrap.php";
     
     use Game\Account\Account;
@@ -16,6 +14,15 @@
     $monster = $character->get_monster();
     $ch_name = $character->get_name();
     $mn_name = $monster ? $monster->get_name() : '';
+
+    $data = file_get_contents("php://input");
+    $logger->debug('Received battle action', [
+        'character' => $ch_name,
+        'monster' => $mn_name,
+        'payload' => $data
+    ]);
+
+
     
 
     $colors = [ 'text-danger', 'text-primary' ];

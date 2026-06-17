@@ -1,16 +1,17 @@
 <?php
-;
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\Mail\Folder\Enums\FolderType;
 use Game\Mail\MailBox\MailBox;
 use Game\Character\Enums\FriendStatus;
 use Game\Account\Enums\Privileges;
+use Game\Account\Settings;
 
-require_once "system/constants.php";
+#require_once "system/constants.php";
 
 $account   = new Account($_SESSION['email']); 
-$character = new Character($account->get_id(), $_SESSION['character-id']); 
+$character = new Character($account->get_id(), $_SESSION['character-id']);
+$settings  = new Settings($account->get_id());
 $folders = [];
 
 foreach (["OUTBOX", "INBOX", "DELETED", "DRAFTS"] as $type) {
@@ -29,7 +30,7 @@ $currentPage = $_GET['page'] ?? '';
 $currentSub = $_GET['sub'] ?? '';
 ?>
 
-<aside id="sidebar" class="app-sidebar shadow overflow-hidden ps-3" data-bs-theme="<?php echo $color_mode; ?>" style="width: 240px; min-width: 240px; height: 100vh;">
+<aside id="sidebar" class="app-sidebar shadow overflow-hidden ps-3 uncial" data-bs-theme="<?php echo $settings->get_colorMode(); ?>" style="width: 240px; min-width: 240px; height: 100vh;">
     <div class="sidebar-brand d-flex align-items-center">
         <a href="/game" class="brand-link ms-2">
             <img src="/img/logos/logo-banner-no-bg.webp" alt="Legend of Aetheria Logo" class="brand-image img-fluid">
@@ -72,8 +73,6 @@ $currentSub = $_GET['sub'] ?? '';
                                 <i class="nav-icon material-symbols-outlined">inventory_2</i>
                                 <p class="ms-2">Inventory</p>
                                 <i class="ms-auto bi bi-chevron-right"></i>
-                            </a>
-                        
                             <ul id="inventory-list" class="nav nav-treeview">
                                 <li class="nav-item">
                                     <a href="/game?page=equipment&sub=inventory" class="nav-link d-flex align-items-center ps-4 <?php echo ($currentPage === 'equipment' && $currentSub === 'inventory') ? 'active' : ''; ?>">
@@ -324,30 +323,37 @@ $currentSub = $_GET['sub'] ?? '';
                         <i class="ms-auto bi bi-chevron-right"></i>
                     </a>
                     
-                    <ul id="quest-list" class="nav nav-treeview">
+					<ul id="quest-list" class="nav nav-treeview">
+						<li class="nav-item">
+                            <a href="/game?page=intro&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'active' && $currentSub === 'quests') ? 'active' : ''; ?>" disabled>
+                                <i class="nav-icon material-symbols-outlined">step</i>
+                                <p class="ms-2">Introduction</p>
+                            </a>
+                        </li>
+ 
                         <li class="nav-item">
-                            <a href="/game?page=active&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'active' && $currentSub === 'quests') ? 'active' : ''; ?>">
+                            <a href="/game?page=active&sub=quests" class="nav-link text-secondary d-flex align-items-center ps-3 <?php echo ($currentPage === 'active' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">lists</i>
                                 <p class="ms-2">Active</p>
                             </a>
-                        </li>
+						</li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=accepted&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'accepted' && $currentSub === 'quests') ? 'active' : ''; ?>">
+                            <a href="/game?page=accepted&sub=quests" class="nav-link text-secondary d-flex align-items-center ps-3 <?php echo ($currentPage === 'accepted' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">fact_check</i>
                                 <p class="ms-2">Accepted</p>
                             </a>
                         </li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=completed&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'completed' && $currentSub === 'quests') ? 'active' : ''; ?>">
+                            <a href="/game?page=completed&sub=quests" class="nav-link text-secondary d-flex align-items-center ps-3 <?php echo ($currentPage === 'completed' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">done_all</i>
                                 <p class="ms-2">Completed</p>
                             </a>
                         </li>
                 
                         <li class="nav-item">
-                            <a href="/game?page=abandoned&sub=quests" class="nav-link d-flex align-items-center ps-3 <?php echo ($currentPage === 'abandoned' && $currentSub === 'quests') ? 'active' : ''; ?>">
+                            <a href="/game?page=abandoned&sub=quests" class="nav-link text-secondary d-flex align-items-center ps-3 <?php echo ($currentPage === 'abandoned' && $currentSub === 'quests') ? 'active' : ''; ?> disabled" disabled>
                                 <i class="nav-icon material-symbols-outlined">backspace</i>
                                 <p class="ms-2">Abandoned</p>
                             </a>
@@ -599,44 +605,46 @@ $currentSub = $_GET['sub'] ?? '';
         </nav>
     </div>
 </aside>
-<div id="sidebar-sliver" class="text-center" style="position: fixed; left: 0; top: 0; width: 10px; height: 100vh; z-index: 999; cursor: pointer; display: none;" onclick="document.body.classList.remove('sidebar-collapse'); document.body.classList.add('sidebar-open');">&gt;</div>
+<div id="sidebar-sliver" class="text-center" style="position: fixed; left: 0; top: 0; width: 10px; height: 100vh; z-index: 999; cursor: pointer; display: none;" onclick="document.querySelector('#terst').classList.remove('sidebar-collapse'); document.querySelector('#terst').classList.add('sidebar-open');">&gt;</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const activeLink = document.querySelector(".nav-link.active");
     const sidebar = document.getElementById("sidebar");
-    const sliver = document.getElementById("sidebar-sliver");
-    
-    if (activeLink) {
-        let parent = activeLink.closest(".nav-item.menu-open");
-        while (parent) {
-            parent.classList.add("menu-open");
-            parent = parent.parentElement.closest(".nav-item.menu-open");
-        }
+	const sliver = document.getElementById("sidebar-sliver");
 
-        activeLink.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-    
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.target.classList.contains("sidebar-collapse")) {
-                sliver.style.display = "flex";
-                sliver.style.alignItems = "center";
-                sliver.style.justifyContent = "center";
-                sliver.style.backgroundColor = "rgba(5, 57, 28, 0.21)";
-                sliver.innerHTML = "<i class=\"bi bi-chevron-right\"></i>";
-                console.log("SIDEBAR CLOSED");
-            } else {
-                sliver.style.display = "none";
-                mutation.target.classList.add("sidebar-collapse");  
+    if (typeof sb !== 'undefined' && sb && sliver) {
+        sidebar.classList.add('sidebar-open');
+        if (activeLink) {
+            let parent = activeLink.closest(".nav-item.menu-open");
+            while (parent) {
+                parent.classList.add("menu-open");
+                parent = parent.parentElement.closest(".nav-item.menu-open");
             }
-        });
-    });
 
-    observer.observe(document.body, {
-        attributes: true,
-        attributeFilter: ["class"]
-    });
+            activeLink.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                const appWrapper = document.getElementById('terst');
+                if (appWrapper && appWrapper.classList.contains("sidebar-collapse")) {
+                    sliver.style.display = "flex";
+                    sliver.style.alignItems = "center";
+                    sliver.style.justifyContent = "center";
+                    sliver.style.backgroundColor = "rgba(5, 57, 28, 0.21)";
+                    sliver.innerHTML = "<i class=\"bi bi-chevron-right\"></i>";
+                } else if (appWrapper && appWrapper.classList.contains("sidebar-open")) {
+                    sliver.style.display = "none";
+                }
+            });
+        });
+
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ["class"]
+        });
+    }
 });
 </script>
 

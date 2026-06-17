@@ -217,4 +217,12 @@ class Account {
 
         return -1;
     }
+
+    public static function getCharacterCount(int $accountID): int {
+        global $db, $t;
+        $sql_query  = "SELECT (IF(`char_slot1` IS NOT NULL, 1, 0) + IF(`char_slot2` IS NOT NULL, 1, 0) + IF(`char_slot3` IS NOT NULL, 1, 0)) AS `c_count` FROM {$t['accounts']} WHERE `id` = ?";
+        $char_count = $db->execute_query($sql_query, [ $accountID ])->fetch_assoc()['c_count'];
+        
+        return (int) $char_count;
+    }
 }

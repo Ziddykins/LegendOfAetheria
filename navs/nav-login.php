@@ -182,8 +182,11 @@
                 </div>
 
                 <script>
-                    $("#avatar-select").change(function(event) {
-                        document.getElementById("avatar-img").classList.remove("invisible");
+                    document.addEventListener("DOMContentLoaded", function() {
+                        document.getElementById("avatar-select").selectedIndex = 0;
+                        $("#avatar-select").change(function(event) {
+                            document.getElementById("avatar-img").classList.remove("invisible");
+                        });
                     });
                 </script>
             </div>
@@ -240,37 +243,39 @@
             </div>
 
             <script>
-                $("#register-submit").on("click", function(e) {
-                    document.querySelector("#str-ap").value = document.querySelector("#stats-str-cur").innerHTML;
-                    document.querySelector("#def-ap").value = document.querySelector("#stats-def-cur").innerHTML;
-                    document.querySelector("#int-ap").value = document.querySelector("#stats-int-cur").innerHTML;
-                    let password_field = document.getElementById('register-password').value;
-                    let password_confirm = document.getElementById('register-password-confirm').value;
+                document.addEventListener("DOMContentLoaded", function() {
+                    $("#register-submit").on("click", function(e) {
+                        document.querySelector("#str-ap").value = document.querySelector("#stats-str-cur").innerHTML;
+                        document.querySelector("#def-ap").value = document.querySelector("#stats-def-cur").innerHTML;
+                        document.querySelector("#int-ap").value = document.querySelector("#stats-int-cur").innerHTML;
+                        let password_field = document.getElementById('register-password').value;
+                        let password_confirm = document.getElementById('register-password-confirm').value;
 
-                    if (password_field !== password_confirm) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        gen_toast('error-pw-mismatch', 'warning', 'bi-key', 'Password Mis-match', 'Ensure passwords match');
-                    };
+                        if (password_field !== password_confirm) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            gen_toast('error-pw-mismatch', 'warning', 'bi-key', 'Password Mis-match', 'Ensure passwords match');
+                        };
 
-                    if (parseInt(document.querySelector("#stats-remaining-ap").innerHTML) > 0) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        gen_toast('error-ap-toast', 'warning', 'bi-dice-5-fill', 'Unassigned Attribute Points', 'Ensure all remaining attribute points are applied');
-                    };
+                        if (parseInt(document.querySelector("#stats-remaining-ap").innerHTML) > 0) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            gen_toast('error-ap-toast', 'warning', 'bi-dice-5-fill', 'Unassigned Attribute Points', 'Ensure all remaining attribute points are applied');
+                        };
 
-                    if (document.querySelector("#race-select").selectedIndex == 0) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        gen_toast('error-race-toast', 'warning', 'bi-droplet', 'Select Race', 'You must choose a race first');
-                    };
+                        if (document.querySelector("#race-select").selectedIndex == 0) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            gen_toast('error-race-toast', 'warning', 'bi-droplet', 'Select Race', 'You must choose a race first');
+                        };
 
-                    if (document.querySelector("#avatar-select").selectedIndex == 0) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        gen_toast('error-avatar-toast', 'warning', 'bi-person-bounding-box', 'Select Avatar', 'You must choose an avatar first');
-                    };
-                });
+                        if (document.querySelector("#avatar-select").selectedIndex == 0) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            gen_toast('error-avatar-toast', 'warning', 'bi-person-bounding-box', 'Select Avatar', 'You must choose an avatar first');
+                        };
+                    });
+            });
             </script>
         </form>
     </div>
@@ -370,13 +375,15 @@
 </div>
 
 <script type="text/javascript">
-    $("#avatar-select").on("change", function(e) {
-        let chosen_pic = document.querySelector('#avatar-select').value;
-        let target_div = document.querySelector('#avatar-image-cont');
-        let pic_path = "img/avatars/avatar-" + chosen_pic;
-        let html_string = "<img src=\"" + pic_path + ".webp\" style=\"width: 256px; height: auto;\" alt=\"" + chosen_pic + "\">";
+    document.addEventListener("DOMContentLoaded", function() {
+        $("#avatar-select").on("change", function(e) {
+            let chosen_pic = document.querySelector('#avatar-select').value;
+            let target_div = document.querySelector('#avatar-image-cont');
+            let pic_path = "img/avatars/avatar-" + chosen_pic;
+            let html_string = "<img src=\"" + pic_path + ".webp\" style=\"width: 256px; height: auto;\" alt=\"" + chosen_pic + "\">";
 
-        target_div.innerHTML = html_string;
+            target_div.innerHTML = html_string;
+        });
     });
 
     function genString(length) {

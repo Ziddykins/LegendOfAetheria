@@ -1,3 +1,8 @@
+#AuthType Basic
+#AuthName "Restricted Area"
+#AuthUserFile /var/.htpasswd
+#Require valid-user
+
 ErrorDocument 404 /404.php
 <FilesMatch "\.env$|.*\.ready|.*\.template$|.*\.pl$|.*\.ini$|.*\.log$|.*\.sh$">
     Require all denied
@@ -17,6 +22,6 @@ ErrorDocument 404 /404.php
     RewriteCond %{THE_REQUEST} "^[^ ]* .*?\.txt[? ].*$"
     RewriteRule .* - [L,R=404]
 
-    RewriteCond %{HTTPS} !=on [NC]
-    RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R,L]
+#    RewriteCond %{HTTPS} !=on [NC]
+#    RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [R,L]
 </IfModule>
