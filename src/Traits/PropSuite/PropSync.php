@@ -81,6 +81,7 @@ trait PropSync {
                 $table = $_ENV['SQL_ACCT_TBL'];
                 break;
             case PropType::FAMILIAR:
+            case PropType::FSTATS:
                 $table = $_ENV['SQL_FMLR_TBL'];
                 break;
             case PropType::MONSTER:
