@@ -1,0 +1,17 @@
+{
+  "name": "loa-web-setup",
+  "version": "1.0.0",
+  "description": "helps setup loa",
+  "license": "ISC",
+  "author": "ziddy",
+  "type": "nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "vite": "^8.0.16"
+  }
+}

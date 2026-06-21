@@ -1,7 +1,0 @@
-2024-01-15 - package.json
-- Added vite ^5.0.0 to dependencies
-- Added @vitejs/plugin-react ^4.0.0 to devDependencies
-- Added vite:build and vite:dev scripts
-
-2024-01-15 - node/package.json
-- Added vite ^5.0.0 to dependencies
