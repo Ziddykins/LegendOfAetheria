@@ -49,6 +49,7 @@ CREATE TABLE `###REPL_SQL_TBL_ACCOUNTS###` (
   `char_slot2` int(9) unsigned DEFAULT NULL,
   `char_slot3` int(9) unsigned DEFAULT NULL,
   `settings` mediumtext DEFAULT NULL,
+  `jwt_secret` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `slots` (`char_slot1`,`char_slot2`,`char_slot3`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -286,17 +286,23 @@ if ($cfg{step} == COMPOSER) {
     next_step();
 }
 
+if ($cfg{step} == HOSTS) {
+    if (ask_user("Update hosts file?", 'y', 'yesno')) {
+        step_update_hosts();
+    }
+}
+
+if ($cfg{step} == SMTP) {
+    if (ask_user("Go through SMTP configuration?", 'y', 'yesno')) {
+        step_get_smtp_info();
+    }
+}
+
 if ($cfg{step} == CLEANUP) {
     if (ask_user("Clean up temp files?", 'y', 'yesno')) {
         clean_up();
     }
     next_step();
-}
-
-if ($cfg{step} == HOSTS) {
-    if (ask_user("Update hosts file?", 'y', 'yesno')) {
-        step_update_hosts();
-    }
 }
 
 print "$clr{green}All steps completed$clr{reset}\n";
@@ -857,6 +863,8 @@ sub step_composer_pull {
         my $cmd_output = `$cmd`;
         tell_user('SYSTEM', $cmd_output);
     }
+
+    tell_user('INFO', 'We need to run a NodeJS server to handle API calls, and certain tasks like battles. Please provide the required information below.'
 }
 
 sub step_generate_templates {
@@ -895,7 +903,6 @@ sub step_generate_templates {
 }
 
 sub step_process_templates {
-    use Term::ReadKey;
     my ($cp_cmd, $sql_cmd, $sqlrpw, $tmp);
     my $sql_import_result;
     my $crontab_output;
@@ -981,6 +988,24 @@ sub step_update_hosts {
     read_hosts();
     choose_host();
     write_hosts();
+}
+
+sub step_get_smtp_info() {
+    my ($smtp_user, $smtp_host, $smtp_port, $smtp_pass);
+
+    tell_user('INFO', 'The system sends out verification emails to the user and optionally');
+    tell_user('INFO', 'other various emails which can be enabled/disabled within the admin portal');
+
+    $smtp_host = ask_user('SMTP Host', $cfg{smtp_host}, 'input');
+    $smtp_port = ask_user('SMTP Port', $cfg{smtp_port}, 'input');
+    $smtp_user = ask_user('SMTP User', $cfg{smtp_user}, 'input');
+
+    if (ask_user('Does the server require authentication', 'y', 'yesno')) {
+        ReadMode 'noecho';
+        $smtp_pass = ask_user('SMTP Pass', $cfg{smtp_pass}, 'input');
+        ReadMode 'normal';
+    }
+    
 }
 
 # ====================================[ steps-end ]====================================== #
@@ -1309,18 +1334,19 @@ sub name_to_const {
     my $name = shift;
 
     my %names = (
-    'FIRSTRUN'  => 1,
-    'SOFTWARE'  => 2,
-    'PHP'       => 3,
-    'SERVICES'  => 4,
-    'SQL'       => 5,
-    'OPENAI'    => 6,
-    'TEMPLATES' => 7,
-    'APACHE'    => 8,
-    'PERMS'     => 9,
-    'COMPOSER'  => 10,
-    'CLEANUP'   => 11,
-    'HOSTS'     => 12,
+        'FIRSTRUN'  => 1,
+        'SOFTWARE'  => 2,
+        'PHP'       => 3,
+        'SERVICES'  => 4,
+        'SQL'       => 5,
+        'OPENAI'    => 6,
+        'TEMPLATES' => 7,
+        'APACHE'    => 8,
+        'PERMS'     => 9,
+        'COMPOSER'  => 10,
+        'HOSTS'     => 11,
+        'SMTP'      => 12,
+        'CLEANUP'   => 13,
     );
 
     return $names{$name};
@@ -1525,22 +1551,6 @@ sub write_hosts {
 	close $fh;
 }
 
-sub help {
-    print "Usage: $0 [options]\n\n";
-    print "Options:\n";
-    print "  -h, --help\t\tShow this help message and exit\n";
-    print "  -v, --version\t\tShow version information and exit\n";
-    print "  -c, --config\t\tSpecify a configuration file to use\n";
-    print "  -f, --fqdn\t\tSpecify a domain to use\n";
-    print "  -s, --step\t\tSpecify a step to start at\n";
-    print "  -l, --list-steps\tList the available steps to supply to -s/--step\n";
-    print "  -o, --only\t\tSpecify the step to run, and exit once complete\n";
-    print "  -g, --generate\t\tGenerates and processes templates - this also\n";
-    print "\t\t\t\timports the generated db schema. This should really only be used\n";
-    print "\t\t\t\tif you're manually setting up the server\n\n";
-    exit 0;
-}
-
 sub parse_replacements {
     my $replacements = shift;
 
@@ -1557,4 +1567,20 @@ sub parse_replacements {
 
         push @$replacements, "$target%%%$replace" if $target and $replace;
     }
+}
+
+sub help {
+    print "Usage: $0 [options]\n\n";
+    print "Options:\n";
+    print "  -h, --help\t\tShow this help message and exit\n";
+    print "  -v, --version\t\tShow version information and exit\n";
+    print "  -c, --config\t\tSpecify a configuration file to use\n";
+    print "  -f, --fqdn\t\tSpecify a domain to use\n";
+    print "  -s, --step\t\tSpecify a step to start at\n";
+    print "  -l, --list-steps\tList the available steps to supply to -s/--step\n";
+    print "  -o, --only\t\tSpecify the step to run, and exit once complete\n";
+    print "  -g, --generate\t\tGenerates and processes templates - this also\n";
+    print "\t\t\t\timports the generated db schema. This should really only be used\n";
+    print "\t\t\t\tif you're manually setting up the server\n\n";
+    exit 0;
 }
