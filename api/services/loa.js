@@ -13,7 +13,7 @@ let createDialogueCore;
 let traversalCore;
 let statusCore;
 
-async function loadAiRpgPackages() {
+async function loadLOAPIPackages() {
   if (Engine) return;
   const core = await import('@ai-rpg-engine/core');
   const modules = await import('@ai-rpg-engine/modules');
@@ -144,7 +144,7 @@ async function saveEngine(engine) {
 }
 
 async function loadEngine() {
-  await loadAiRpgPackages();
+  await loadLOAPIPackages();
   const contents = fs.readFileSync(SAVE_FILE, 'utf8').trim();
   const dialogueModule = createDialogueCore([]);
   const combatStack = buildCombatStack({
@@ -184,7 +184,7 @@ async function loadEngine() {
 }
 
 async function createGameEngine() {
-  await loadAiRpgPackages();
+  await loadLOAPIPackages();
 
   const combatStack = buildCombatStack({
     statMapping: { attack: 'strength', precision: 'intelligence', resolve: 'defense' },

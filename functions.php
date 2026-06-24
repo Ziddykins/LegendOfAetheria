@@ -587,7 +587,7 @@
 		function ai_serv_post(string $endpoint, mixed $data = null) {
 			$ch = curl_init();
 
-			curl_setopt($ch, CURLOPT_URL, "http://{$_ENV['AIRPG_HOST']}:{$_ENV['AIRPG_PORT']}/$endpoint");
+			curl_setopt($ch, CURLOPT_URL, "http://{$_ENV['LOAPI_HOST']}:{$_ENV['LOAPI_PORT']}/$endpoint");
 			curl_setopt($ch, CURLOPT_HTTPHEADER, [
 				'Content-Type: application/json',
 				'Accept: application/json'

@@ -47,3 +47,11 @@
 
 ###REPL_APACHE_HTTP_PORT###%%%cfg(apache_http_port)
 ###REPL_APACHE_HTTPS_PORT###%%%cfg(apache_https_port)
+
+###REPL_LOAPI_HOST###%%%cfg(loapi_host)
+###REPL_LOAPI_PORT###%%%cfg(loapi_port)
+
+###REPL_SMTP_HOSTNAME####%%%cfg(smtp_host)
+###REPL_SMTP_USERNAME####%%%cfg(smtp_user)
+###REPL_SMTP_PASSWORD####%%%cfg(smtp_pass)
+###REPL_SMTP_PORT####%%%cfg(smtp_port)

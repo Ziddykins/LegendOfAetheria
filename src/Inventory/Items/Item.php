@@ -99,7 +99,7 @@ class Item {
 	private function get_item_details() {
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, "http://{$_ENV['AIRPG_HOST']}:{$_ENV['AIRPG_PORT']}/item/{$this->type}/{$this->itemId}");
+		curl_setopt($ch, CURLOPT_URL, "http://{$_ENV['LOAPI_HOST']}:{$_ENV['LOAPI_PORT']}/item/{$this->type}/{$this->itemId}");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, [
 			'Content-Type: application/json',
 			'Accept: application/json'

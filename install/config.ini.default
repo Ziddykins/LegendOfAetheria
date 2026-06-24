@@ -11,9 +11,9 @@ game_template_dir=
 htaccess_template=
 constants_template=
 hosts_file=
+loapi_host=
+loapi_port=
 log_to_file=
-nodejs_server=
-nodejs_port=
 openai_apikey=
 openai_enable=
 php_binary=
@@ -55,6 +55,8 @@ step=1
 smtp_user=loa@localhost
 smtp_port=465
 smtp_host=localhost
+loapi_host=localhost
+loapi_port=3000
 
 [termux_examples]
 webroot=/data/data/com.termux/files/usr/share/apache2/default-site/htdocs
@@ -82,6 +84,8 @@ ssl_privkey=C:\xampp\apache\conf\ssl.key\server.key
 hosts_file=C:\windows\system32\drivers\etc\hosts
 php_ini=C:\xampp\php\php.ini
 step=1
+loapi_host=localhost
+loapi_port=3000
 
 [win_examples]
 web_root=C:\Program Files\Apache Software Foundation\Apache2.4\htdocs
@@ -93,6 +97,8 @@ ssl_fullcer=C:\xampp\apache\conf\ssl.crt\server.crt
 ssl_privkey=C:\xampp\apache\conf\ssl.key\server.key
 hosts_file=C:\windows\system32\drivers\etc\hosts
 step=1
+loapi_host=localhost
+loapi_port=3000
 
 [sql_tables]
 tbl_characters=tbl_characters

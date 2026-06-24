@@ -458,6 +458,8 @@ sub step_install_software {
 		"deb:libapache2-mod-php$cfg{php_version}",
 		"deb:composer",
 		"deb:openssl",
+        "deb:nodejs",
+        "deb:npm",
 		"alp:lsb_release",
 		"alp:php$cfg{php_version}",
 		"alp:php$cfg{php_version}-{cli,common,curl,dev,xml,intl,mbstring,apache2}",
@@ -991,7 +993,7 @@ sub step_update_hosts {
 }
 
 sub step_get_smtp_info() {
-    my ($smtp_user, $smtp_host, $smtp_port, $smtp_pass);
+    my ($smtp_user, $smtp_host, $smtp_port, $smtp_pass, $smtp_pwlen);
 
     tell_user('INFO', 'The system sends out verification emails to the user and optionally');
     tell_user('INFO', 'other various emails which can be enabled/disabled within the admin portal');
@@ -1002,10 +1004,47 @@ sub step_get_smtp_info() {
 
     if (ask_user('Does the server require authentication', 'y', 'yesno')) {
         ReadMode 'noecho';
-        $smtp_pass = ask_user('SMTP Pass', $cfg{smtp_pass}, 'input');
+        $smtp_pass  = ask_user('SMTP Pass', $cfg{smtp_pass}, 'input');
+        $smtp_pwlen = length $smtp_pass;
         ReadMode 'normal';
+    } else {
+        $smtp_pass = '<none>';
     }
-    
+
+    tell_user('WARNING', "SMTP Host: $smtp_host");
+    tell_user('WARNING', "SMTP Port: $smtp_port");
+    tell_user('WARNING', "SMTP User: $smtp_user");
+    tell_user('WARNING', 'SMTP Pass: ' . $smtp_pwlen ? ('*' x $smtp_pwlen) : $smtp_pass);
+
+    if (ask_user('Is this correct?', 'y', 'yesno')) {
+        $cfg{'smtp_host'} = $smtp_host;
+        $cfg{'smtp_port'} = $smtp_port;
+        $cfg{'smtp_user'} = $smtp_user;
+
+        if ($smtp_pwlen){
+            $cfg{'smtp_pass'} = $smtp_pass;
+        }
+    }    
+}
+
+sub step_nodejs_setup {
+    tell_user('INFO', 'A NodeJS server is required to run, for future-websocket support for chat,');
+    tell_user('INFO', 'as well as for the LoAPI to work. Provide the information below.');
+
+    my $nodejs_host = ask_user('Enter host (usually localhost)', 'localhost', 'input');
+    my $nodejs_port = ask_user('Enter host port', 3000, 'input');
+
+    if ($nodejs_port <= 1000) {
+        tell_user('WARNING', 'Ports under 1000 are privileged ports and require root access to spawn a');
+        tell_user('WARNING', 'process listening on them; it isn\'t recommended to use ports < 1000 because of this.');
+        
+        if (ask_user('Would you like to change the port?', 'y', 'yesno')) {
+            $nodejs_port = ask_user('Enter host port', 3000, 'input');
+        }
+    }
+
+    $cfg{'loapi_host'} = $nodejs_host;
+    $cfg{'loapi_port'} = $nodejs_port;
 }
 
 # ====================================[ steps-end ]====================================== #
@@ -1584,3 +1623,4 @@ sub help {
     print "\t\t\t\tif you're manually setting up the server\n\n";
     exit 0;
 }
+
