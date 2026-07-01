@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use autodie;
 
-our $VERSION = "2.6.4.28";
+our $VERSION = "2.6.4.29";
 
 use Config::IniFiles;
 use Term::ReadKey;
