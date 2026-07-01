@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-
 use warnings;
 use strict;
 use autodie;
@@ -53,9 +51,10 @@ use constant {
     APACHE    => 8,
     PERMS     => 9,
     COMPOSER  => 10,
-    CLEANUP   => 11,
-    HOSTS     => 12,
+    HOSTS     => 11,
+    SMTP      => 12,
 	NODEJS    => 13,
+    CLEANUP   => 14,
 };
 
 use constant {
@@ -87,7 +86,6 @@ my $fqdn;     # fully qualified domain name to set up
 
 my @list;
 
-
 if ($opt_config) {
     $cfg_file = $opt_config;
 }
@@ -113,7 +111,7 @@ tie %ini, 'Config::IniFiles', (
 # ===================================[ cfg-end ]===================================== #
 
 # ==================================[ main-start ]=================================== #
-if (!$ENV{TERMUX__ROOTFS_DIR}) {
+if (check_platform() eq 'linux') {
 	if ($ENV{'USER'} ne 'root') {
 	    die $clr{red} . 'This script must be ran as root, not ',
     	    $clr{yellow}, $ENV{'USER'}, $clr{red}, '!', $clr{reset}, "\n";
@@ -128,12 +126,16 @@ if (!$fqdn) {
     print "fqdn> ";
     chomp($fqdn = <STDIN>);
     $fqdn = lc $fqdn;
+    $cfg{fqdn} = $fqdn;
 }
 
 my $loc_check = getcwd;
 $loc_check = abs_path($loc_check); # Ensure absolute path
 $loc_check =~ s/\/install$//;
-$cfg{web_root} = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
+
+my $web_root = ask_user("Please enter the location where the game will be served from", $def{web_root}, 'input');
+$web_root =~ s/\\/\//g;
+$cfg{web_root} = $web_root;
 
 if (-d $cfg{web_root}) {
     $cfg{web_root} =~ s/\/$//; # remove trailing slash
@@ -144,24 +146,24 @@ if (-d $cfg{web_root}) {
                . "Would you like to do that now?", 'y', 'yesno')) {
 
         make_path($cfg{web_root}, {
-	    mode => 0755,
+	        mode => 0755,
     	    user => "$cfg{apache_runas}",
             group => "$cfg{apache_runas}"
-	}) or croak("Failed to create web root directory: $!");
-        open my $fh, '>', "/tmp/mover.pl";
-        print $fh <<'EOF';
-        #!/usr/bin/env perl
-        use File::Copy::Recursive qw(rmove);
-        rmove($ARGV[0], $ARGV[1]) or die "Failed to move $ARGV[0] to $ARGV[1]: $!";
+	    }) or croak("Failed to create web root directory: $!");
+            open my $fh, '>', "/tmp/mover.pl";
+            print $fh <<'EOF';
+            #!/usr/bin/env perl
+            use File::Copy::Recursive qw(rmove);
+            rmove($ARGV[0], $ARGV[1]) or die "Failed to move $ARGV[0] to $ARGV[1]: $!";
 
-        if (my $pid = fork) {
-            print "Move has finished. Re-launching the AutoInstaller script from the new directory!";
-            exit;
-        } elsif (defined $pid) {
-            exec($^X, $ARGV[1] . '/install/AutoInstaller.pl');
-        } else {
-            croak "Failed to fork: $!";
-        }
+            if (my $pid = fork) {
+                print "Move has finished. Re-launching the AutoInstaller script from the new directory!";
+                exit;
+            } elsif (defined $pid) {
+                exec($^X, $ARGV[1] . '/install/AutoInstaller.pl');
+            } else {
+                croak "Failed to fork: $!";
+            }
 EOF
         close $fh;
 
@@ -174,7 +176,6 @@ EOF
             croak "Failed to fork: $!";
         }
 
-        
         tell_user('SUCCESS', "Moved installation files to web root directory '$cfg{web_root}'");
     } else {
         tell_user('ERROR', "You will have to move the installation files to the web root directory manually (mv $loc_check $cfg{web_root})\n"
@@ -295,6 +296,12 @@ if ($cfg{step} == HOSTS) {
 if ($cfg{step} == SMTP) {
     if (ask_user("Go through SMTP configuration?", 'y', 'yesno')) {
         step_get_smtp_info();
+    }
+}
+
+if ($cfg{step} == NODEJS) {
+    if (ask_user("Go through Node.js configuration?", 'y', 'yesno')) {
+        step_get_nodejs_info();
     }
 }
 
@@ -469,6 +476,9 @@ sub step_install_software {
 		"alp:composer",
 		"alp:openssl",
 		"alp:certbot-apache",
+        "win:composer",
+        "win:nodejs",
+        "win:npm",
     );
 
     if (ask_user("Do you want to use PHP-FPM? This will use mpm_worker instead of the default mpm_prefork.", 'y', 'yesno')) {
@@ -497,8 +507,11 @@ sub step_install_software {
 
 sub step_webserver_configure {
     my $question = "Enter the location of your webserver's config directory (e.g. /etc/apache2)";
-    $cfg{apache_directory} = ask_user($question, '/etc/apache2', 'input');
+    my $apache_dir = ask_user($question, $cfg{apache_directory}, 'input');
 
+    $apache_dir =~ s/\\/\//g;
+
+    $cfg{apache_directory}       = $apache_dir;
     $cfg{virthost_conf_file}     = "$cfg{apache_directory}/sites-available/$cfg{fqdn}.conf";
     $cfg{virthost_conf_file_ssl} = "$cfg{apache_directory}/sites-available/ssl-$cfg{fqdn}.conf";
 
@@ -865,8 +878,6 @@ sub step_composer_pull {
         my $cmd_output = `$cmd`;
         tell_user('SYSTEM', $cmd_output);
     }
-
-    tell_user('INFO', 'We need to run a NodeJS server to handle API calls, and certain tasks like battles. Please provide the required information below.'
 }
 
 sub step_generate_templates {
@@ -992,7 +1003,7 @@ sub step_update_hosts {
     write_hosts();
 }
 
-sub step_get_smtp_info() {
+sub step_get_smtp_info {
     my ($smtp_user, $smtp_host, $smtp_port, $smtp_pass, $smtp_pwlen);
 
     tell_user('INFO', 'The system sends out verification emails to the user and optionally');
@@ -1322,7 +1333,7 @@ sub write_log {
 sub check_platform {
     my $platform = $^O;
 
-    if ($platform eq "MSwin32") {
+    if ($platform eq "MSWin32") {
         return "windows";
     } elsif ($platform eq "linux") {
         return "linux";
@@ -1365,7 +1376,7 @@ sub merge_hashes {
 }
 
 sub const_to_name {
-    my @names = qw/FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER CLEANUP HOSTS/;
+    my @names = qw/FIRSTRUN SOFTWARE PHP SERVICES SQL OPENAI TEMPLATES APACHE PERMS COMPOSER HOSTS SMTP NODEJS CLEANUP/;
     return $names[shift];
 }
 
@@ -1385,7 +1396,8 @@ sub name_to_const {
         'COMPOSER'  => 10,
         'HOSTS'     => 11,
         'SMTP'      => 12,
-        'CLEANUP'   => 13,
+        'NODEJS'    => 13,
+        'CLEANUP'   => 14,
     );
 
     return $names{$name};
@@ -1494,8 +1506,9 @@ sub get_sysinfo {
             $cfg{software} = 'alp';
         }
     } else {
-        $cfg{svc_cmd} = 'sc';
-        $cfg{pm_cmd} = 'choco install';
+        $cfg{pm_cmd}   = 'choco install';
+        $cfg{software} = 'win';
+        $cfg{svc_cmd}  = 'sc';
     }
 }
 
@@ -1623,4 +1636,3 @@ sub help {
     print "\t\t\t\tif you're manually setting up the server\n\n";
     exit 0;
 }
-

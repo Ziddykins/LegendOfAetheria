@@ -74,28 +74,28 @@ virthost_conf_file_ssl=/data/data/com.termux/files/usr/etc/apache2/conf.d/ssl-lo
 tmp_dir=/data/data/com.termux/files/usr/tmp
 
 [xampp_examples]
-web_root=C:\xampp\htdocs
-php_binary=C:\xampp\php\php.exe
-sql_config_file=C:\xampp\mysql\bin\my.ini
-apache_directory=C:\xampp\apache
-virthost_conf_file=C:\xampp\apache\conf\httpd.conf
-ssl_fullcer=C:\xampp\apache\conf\ssl.crt\server.crt
-ssl_privkey=C:\xampp\apache\conf\ssl.key\server.key
-hosts_file=C:\windows\system32\drivers\etc\hosts
-php_ini=C:\xampp\php\php.ini
+web_root=C:/xampp/htdocs
+php_binary=C:/xampp/php/php.exe
+sql_config_file=C:/xampp/mysql/bin/my.ini
+apache_directory=C:/xampp/apache
+virthost_conf_file=C:/xampp/apache/conf/httpd.conf
+ssl_fullcer=C:/xampp/apache/conf/ssl.crt/server.crt
+ssl_privkey=C:/xampp/apache/conf/ssl.key/server.key
+hosts_file=C:/windows/system32/drivers/etc/hosts
+php_ini=C:/xampp/php/php.ini
 step=1
 loapi_host=localhost
 loapi_port=3000
 
 [win_examples]
-web_root=C:\Program Files\Apache Software Foundation\Apache2.4\htdocs
-php_binary=C:\xampp\php\php.exe
-sql_config_file=C:\xampp\mysql\bin\my.ini
-apache_directory=C:\Program Files\Apache Software Foundation\Apache2.4\
-virthost_conf_file=C:\Program Files\Apache Software Foundation\Apache2.4\conf\httpd.conf
-ssl_fullcer=C:\xampp\apache\conf\ssl.crt\server.crt
-ssl_privkey=C:\xampp\apache\conf\ssl.key\server.key
-hosts_file=C:\windows\system32\drivers\etc\hosts
+web_root=C:/Program Files/Apache Software Foundation/Apache2.4/htdocs
+php_binary=C:/xampp/php/php.exe
+sql_config_file=C:/xampp/mysql/bin/my.ini
+apache_directory=C:/Program Files/Apache Software Foundation/Apache2.4/
+virthost_conf_file=C:/Program Files/Apache Software Foundation/Apache2.4/conf/httpd.conf
+ssl_fullcer=C:/xampp/apache/conf/ssl.crt/server.crt
+ssl_privkey=C:/xampp/apache/conf/ssl.key/server.key
+hosts_file=C:/windows/system32/drivers/etc/hosts
 step=1
 loapi_host=localhost
 loapi_port=3000
@@ -123,3 +123,6 @@ blue=[34m
 cyan=[36m
 grey=[37m
 reset=[0m
+
+[loa.localhost]
+step=2
