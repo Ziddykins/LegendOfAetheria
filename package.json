@@ -31,10 +31,10 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "rpg-awesome": "^0.2.0",
-    "vite": "^5.0.0"
+    "vite": "^8.1.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react": "^6.0.3",
     "copy-webpack-plugin": "^14.0.0",
     "eruda": "^3.4.3",
     "eruda-timing": "^2.0.1",
