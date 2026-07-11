@@ -20,7 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@ai-rpg-engine/cli": "^2.0.9",
-    "@babel/preset-env": "^7.29.2",
+    "@babel/preset-env": "^8.0.2",
     "@devmade/express-hot-reload": "^1.0.5",
     "@floating-ui/core": "^1.7.5",
     "babel-loader": "^10.1.1",
