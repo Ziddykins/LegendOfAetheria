@@ -1,0 +1,306 @@
+@import '@fontsource/cinzel/400.css';
+@import '@fontsource/cinzel/600.css';
+@import '@fontsource/cinzel/700.css';
+@import '@fontsource/cinzel/900.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/700.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --void-black: #0a0a0f;
+    --obsidian: #12121a;
+    --surface-raised: #1a1a25;
+    --surface-hover: #222230;
+    --border-subtle: #2a2a3a;
+    --border-focus: #3d3d55;
+    --crimson-blood: #8b1a1a;
+    --crimson-glow: #cc2222;
+    --health-red: #dc3545;
+    --health-red-dim: #8b1a1a;
+    --mana-blue: #2266cc;
+    --mana-blue-dim: #1a3a66;
+    --energy-amber: #cc8800;
+    --energy-amber-dim: #664400;
+    --spell-fire: #ff4400;
+    --spell-ice: #44aaff;
+    --spell-heal: #44cc66;
+    --text-primary: #e0d5c8;
+    --text-secondary: #8a8090;
+    --text-muted: #5a5060;
+    --text-gold: #d4a830;
+    --success-green: #28a745;
+    --warning-orange: #ff8800;
+    --damage-flash: rgba(220, 53, 69, 0.3);
+    --heal-flash: rgba(40, 167, 69, 0.2);
+
+    --background: 240 20% 4%;
+    --foreground: 30 15% 85%;
+    --card: 240 18% 8%;
+    --card-foreground: 30 15% 85%;
+    --popover: 240 18% 8%;
+    --popover-foreground: 30 15% 85%;
+    --primary: 0 70% 45%;
+    --primary-foreground: 30 15% 85%;
+    --secondary: 240 15% 15%;
+    --secondary-foreground: 30 15% 85%;
+    --muted: 240 15% 15%;
+    --muted-foreground: 270 8% 35%;
+    --accent: 240 15% 15%;
+    --accent-foreground: 30 15% 85%;
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 30 15% 85%;
+    --border: 240 15% 18%;
+    --input: 240 15% 18%;
+    --ring: 0 70% 45%;
+    --radius: 0.5rem;
+  }
+
+  body {
+    background: var(--void-black);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  #root {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@layer components {
+  .font-cinzel {
+    font-family: 'Cinzel', serif;
+  }
+
+  .font-mono-stats {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .text-shadow-gold {
+    text-shadow: 0 0 20px rgba(212, 168, 48, 0.5);
+  }
+
+  .text-shadow-crimson {
+    text-shadow: 0 0 8px rgba(139, 26, 26, 0.3);
+  }
+
+  .battle-arena-bg {
+    background: linear-gradient(180deg, #0a0a0f 0%, #12121a 40%, #0d0d14 100%);
+    position: relative;
+  }
+
+  .battle-arena-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+  }
+
+  .entity-card {
+    background: rgba(18, 18, 26, 0.85);
+    border: 1px solid rgba(42, 42, 58, 0.6);
+    border-radius: 8px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 4px 24px rgba(0,0,0,0.4);
+    transition: border-color 0.3s ease;
+  }
+
+  .entity-card.player-active {
+    border-left: 3px solid var(--crimson-glow);
+  }
+
+  .entity-card.enemy-active {
+    border-left: 3px solid var(--mana-blue);
+  }
+
+  @keyframes pulse-glow-red {
+    0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 4px 24px rgba(0,0,0,0.4), 0 0 8px rgba(204, 34, 34, 0.3); }
+    50% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 4px 24px rgba(0,0,0,0.4), 0 0 16px rgba(204, 34, 34, 0.6); }
+  }
+
+  @keyframes pulse-glow-blue {
+    0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 4px 24px rgba(0,0,0,0.4), 0 0 8px rgba(34, 102, 204, 0.3); }
+    50% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 4px 24px rgba(0,0,0,0.4), 0 0 16px rgba(34, 102, 204, 0.6); }
+  }
+
+  .entity-card.player-active-pulse {
+    animation: pulse-glow-red 1.5s ease-in-out infinite;
+  }
+
+  .entity-card.enemy-active-pulse {
+    animation: pulse-glow-blue 1.5s ease-in-out infinite;
+  }
+
+  @keyframes damage-flash {
+    0% { background-color: transparent; }
+    50% { background-color: var(--damage-flash); }
+    100% { background-color: transparent; }
+  }
+
+  @keyframes heal-flash {
+    0% { background-color: transparent; }
+    50% { background-color: var(--heal-flash); }
+    100% { background-color: transparent; }
+  }
+
+  .flash-damage {
+    animation: damage-flash 200ms ease-out;
+  }
+
+  .flash-heal {
+    animation: heal-flash 200ms ease-out;
+  }
+
+  @keyframes slash-draw {
+    0% { width: 0; opacity: 1; }
+    50% { width: 100%; opacity: 1; }
+    100% { width: 100%; opacity: 0; }
+  }
+
+  .slash-effect {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #fff, var(--crimson-glow), transparent);
+    box-shadow: 0 0 8px var(--crimson-glow);
+    transform: rotate(-45deg);
+    transform-origin: left center;
+    animation: slash-draw 200ms ease-out forwards;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  @keyframes fire-flash {
+    0% { opacity: 0; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes ice-flash {
+    0% { opacity: 0; }
+    50% { opacity: 0.25; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes heal-flash-overlay {
+    0% { opacity: 0; }
+    50% { opacity: 0.25; }
+    100% { opacity: 0; }
+  }
+
+  .spell-fire-flash {
+    animation: fire-flash 400ms ease-out;
+    background: radial-gradient(circle, rgba(255, 68, 0, 0.4), transparent 70%);
+  }
+
+  .spell-ice-flash {
+    animation: ice-flash 400ms ease-out;
+    background: radial-gradient(circle, rgba(68, 170, 255, 0.4), transparent 70%);
+  }
+
+  .spell-heal-flash {
+    animation: heal-flash-overlay 400ms ease-out;
+    background: radial-gradient(circle, rgba(68, 204, 102, 0.4), transparent 70%);
+  }
+
+  @keyframes low-hp-pulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3) drop-shadow(0 0 4px var(--health-red)); }
+  }
+
+  .low-hp-pulse {
+    animation: low-hp-pulse 1s ease-in-out infinite;
+  }
+
+  @keyframes spin-loader {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .spinner {
+    animation: spin-loader 1s linear infinite;
+  }
+
+  .stat-bar-track {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+  }
+
+  .stat-bar-fill-hp {
+    background: linear-gradient(90deg, var(--health-red-dim), var(--health-red));
+    border-radius: 4px;
+    height: 100%;
+    transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .stat-bar-fill-mp {
+    background: linear-gradient(90deg, var(--mana-blue-dim), var(--mana-blue));
+    border-radius: 4px;
+    height: 100%;
+    transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .stat-bar-fill-ep {
+    background: linear-gradient(90deg, var(--energy-amber-dim), var(--energy-amber));
+    border-radius: 4px;
+    height: 100%;
+    transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes ripple-effect {
+    0% { transform: scale(0); opacity: 0.5; }
+    100% { transform: scale(4); opacity: 0; }
+  }
+
+  .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(204, 34, 34, 0.3), transparent);
+    animation: ripple-effect 300ms ease-out forwards;
+    pointer-events: none;
+  }
+
+  .battle-log-container::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .battle-log-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .battle-log-container::-webkit-scrollbar-thumb {
+    background: rgba(90, 80, 96, 0.5);
+    border-radius: 2px;
+  }
+
+  @keyframes shake-screen {
+    0%, 100% { transform: translateX(0); }
+    10% { transform: translateX(-3px); }
+    20% { transform: translateX(3px); }
+    30% { transform: translateX(-3px); }
+    40% { transform: translateX(3px); }
+    50% { transform: translateX(-2px); }
+    60% { transform: translateX(2px); }
+    70% { transform: translateX(-1px); }
+    80% { transform: translateX(1px); }
+    90% { transform: translateX(0); }
+  }
+
+  .screen-shake {
+    animation: shake-screen 300ms ease-out;
+  }
+}
