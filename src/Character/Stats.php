@@ -86,9 +86,10 @@ use Game\Abstract\BaseStats;
  * @method void add_rgen(int $amount) Increases regeneration
  * @method void add_absb(int $amount) Increases damage absorption
  * @method void add_evsn(int $amount) Increases evasion chance
- 
+
  */
-class Stats extends BaseStats {
+class Stats extends BaseStats
+{
     /** @var int Current experience points */
     protected int $experience = 0;
 
@@ -96,40 +97,41 @@ class Stats extends BaseStats {
     protected int $maxExperience = 1000;
 
     /** @var int Current energy points */
-    protected int $ep     = 100;
-    
+    protected int $ep = 100;
+
     /** @var int Maximum energy points */
-    protected int $maxEP  = 100;
-    
+    protected int $maxEP = 100;
+
     /** @var int Ability points available for spending */
     protected int $ap = 0;
 
     /** @var int Luck - affects drops and random events */
     protected int $luck = 3;
-    
+
     /** @var int Charisma - affects NPC interactions */
     protected int $chsm = 3;
-    
+
     /** @var int Dexterity - affects crafting and precision */
     protected int $dext = 3;
-    
+
     /** @var int HP/MP regeneration rate */
     protected int $rgen = 0;
-    
+
+    protected bool $questsEnabled = false;
+
+
     /**
      * Constructs a new Stats instance.
      * 
      * @param int $characterID Character ID these stats belong to
      */
-    public function __construct($characterID = 0) {
+    public function __construct($characterID = 0)
+    {
         parent::__construct($characterID);
     }
 
-    protected function getType(): PropType {
-        return PropType::CSTATS;
-    }
-
-    public function get_experience()
+    protected function getType(): PropType
     {
+        return PropType::CSTATS;
     }
 }

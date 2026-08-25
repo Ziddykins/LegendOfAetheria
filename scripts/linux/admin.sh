@@ -16,8 +16,10 @@ function do_dumpin() {
           GRANT SELECT, INSERT, UPDATE, DELETE ON ###REPL_SQL_DB###.* TO ###REPL_SQL_USER### IDENTIFIED BY '###REPL_SQL_PASS###';
           FLUSH PRIVILEGES;" >> /tmp/db.sql;
 
+    TBLS=$(mysql -e 'SELECT `TABLE_NAME` FROM information_schema.TABLES WHERE `TABLE_SCHEMA` = "db_loa";' | grep tbl | perl -e 'while(<>){chomp;$x=uc $_; $x=~s/TBL_//; print "$x ";}';);
+
     echo -e "\e[0;32m - Making schema replacements for templates\e[0m";
-    for i in ACCOUNTS CHARACTERS FAMILIARS FRIENDS MAIL MONSTERS LOGS GLOBALS BANNED GLOBALCHAT STATISTICS BANK;
+    for i in $(echo $TBLS);
     do
         LCTBL=`echo $i | perl -e 'while(<>){chomp;print lc$_;}'`;
         SEDREPLTBL="'s/tbl_$LCTBL/###REPL_SQL_TBL_$i###/g'";

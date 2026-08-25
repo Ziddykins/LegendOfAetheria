@@ -8,68 +8,104 @@
 }
 
 .rpg-title {
-  font-family: 'Uncial Antiqua', serif;
+    font-family: 'Uncial Antiqua', serif;
 }
 
 /* glow */
 .rpg-glow {
-  position: relative;
+    position: relative;
 }
 
 .rpg-glow::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 2px;
-  background: var(--glow);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  filter: blur(8px);
-  animation: pulse 2.5s infinite ease-in-out;
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: var(--glow);
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    filter: blur(8px);
+    animation: pulse 2.5s infinite ease-in-out;
 }
 
 @keyframes pulse {
-  0%,100% { opacity: 0.6; }
-  50% { opacity: 1; }
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
 }
 
 /* rarities */
-.rarity-common { --glow: rgba(200,200,200,.5); }
-.rarity-rare { --glow: rgba(77,166,255,.7); }
-.rarity-epic { --glow: rgba(184,77,255,.8); }
-.rarity-legendary { --glow: rgba(255,184,77,.9); }
-.rarity-cursed { --glow: rgba(255,60,60,.9); }
+.rarity-common {
+    --glow: rgba(200, 200, 200, .5);
+}
+
+.rarity-rare {
+    --glow: rgba(77, 166, 255, .7);
+}
+
+.rarity-epic {
+    --glow: rgba(184, 77, 255, .8);
+}
+
+.rarity-legendary {
+    --glow: rgba(255, 184, 77, .9);
+}
+
+.rarity-cursed {
+    --glow: rgba(255, 60, 60, .9);
+}
 
 /* glitch (cursed only) */
 @keyframes glitch {
-  0% { transform: translate(0); }
-  25% { transform: translate(-1px,1px); }
-  50% { transform: translate(1px,-1px); }
-  75% { transform: translate(-1px,-1px); }
-  100% { transform: translate(0); }
+    0% {
+        transform: translate(0);
+    }
+
+    25% {
+        transform: translate(-1px, 1px);
+    }
+
+    50% {
+        transform: translate(1px, -1px);
+    }
+
+    75% {
+        transform: translate(-1px, -1px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
 }
 
 .rarity-cursed img {
-  animation: glitch 0.15s infinite;
-  filter: contrast(1.2) saturate(1.3);
+    animation: glitch 0.15s infinite;
+    filter: contrast(1.2) saturate(1.3);
 }
 
 /* badge style tweak */
 .rarity-badge {
-  font-size: 0.65rem;
-  letter-spacing: 0.05em;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
 }
 
 .ra {
     filter: drop-shadow(0 0 4px currentColor);
 }
+
 /* Quest intro modern styling */
 .quest-intro-page {
     min-height: 97.00vh;
@@ -189,7 +225,7 @@
     border-radius: 0.5rem;
     padding: 1.5rem;
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6),
-                0 0 30px rgba(184, 134, 11, 0.1);
+        0 0 30px rgba(184, 134, 11, 0.1);
 }
 
 .inventory-header {
@@ -210,7 +246,7 @@
     margin: 0;
 }
 
-.inventory-weight {
+.inventory-weight .inventory-slotcout {
     font-size: 0.85rem;
     color: #a0826d;
     letter-spacing: 0.08em;
@@ -239,7 +275,7 @@
 .inventory-slot:hover {
     border-color: rgba(184, 134, 11, 0.6);
     box-shadow: inset 0 0 8px rgba(184, 134, 11, 0.15),
-                0 0 12px rgba(184, 134, 11, 0.1);
+        0 0 12px rgba(184, 134, 11, 0.1);
 }
 
 .inventory-item {
@@ -254,7 +290,7 @@
 .inventory-item-icon {
     width: 90%;
     height: 90%;
-    object-fit: contain;
+    object-fit: cover;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
@@ -286,6 +322,11 @@
     overflow: hidden;
     border-radius: 0.5rem;
     border: 1px solid rgba(184, 134, 11, 0.3);
+    width: 50%;
+    height: auto;
+    display: flex;
+    justify-self: center;
+
 }
 
 .character-info {
@@ -423,4 +464,3 @@
         margin-left: 0 !important;
     }
 }
-

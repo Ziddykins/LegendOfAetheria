@@ -2,7 +2,8 @@
 
 namespace Game\Map\Zones;
 
-class Zone {
+class Zone
+{
     private string $name;
     private array $zcoords;
     private array $bounds = [-100, 100, -100, 100];
@@ -11,9 +12,12 @@ class Zone {
     private array $locations;
     private array $connections;
 
-    public function __construct(string $name, array $zcoords, array $bounds) {
+    public function __construct(string $name, array $zcoords, array $bounds)
+    {
         $this->name = $name;
         $this->zcoords = $zcoords;
         $this->bounds = $bounds;
     }
+
+
 }

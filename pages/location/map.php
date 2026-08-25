@@ -1,12 +1,18 @@
-	<div class="container">
-    	<div class="card shadow-sm">
-        	<div class="card-body bg-dark bg-opacity-25 p-4">
-            		<div class="d-flex justify-content-between align-items-center mb-4">
-				<?php
-					echo "Nothing here in ./location/map.php yet\!";
-				?>
-				</div>
-			</div>
+<?php
+
+?>
+
+<div class="container border border-1">
+	<div class="d-flex pt-3">
+		<div class="d-flex flex-grow-1 border border-1">
+			woo
+		</div>
+		<div class="d-flex border border-1">
+			<button>a</button>
+			<button>a</button>
+			<button>a</button>
+			<button>a</button>
+			<button>a</button>
 		</div>
 	</div>
 </div>

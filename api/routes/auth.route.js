@@ -5,19 +5,26 @@ const router = express.Router();
 function parseCredentials(req) {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Basic ')) {
+        console.log("Basic auth header found");
         const payload = atob(authHeader.split(' ')[1]);
         const [email, password] = payload.split(':');
+        console.log("email: " + email + " pw: " + password);
         return { email, password };
     }
 
     if (req.body && req.body.email && req.body.password) {
-        return { email: req.body.email, password: req.body.password };
+        console.log("got auth in body - email: " + req.body.email + " pw: " + req.body.password);
+        return {
+            email: req.body.email,
+            password: req.body.password
+        };
     }
 
     return null;
 }
 
 async function handleLogin(req, res) {
+    console.log(req.body);
     const options = parseCredentials(req);
     if (!options || !options.email || !options.password) {
         return res.status(400).json({ error: 'Missing email or password' });
@@ -25,13 +32,13 @@ async function handleLogin(req, res) {
 
     try {
         const result = await auth.postBasic(options);
-        
+
         // Check if auth service returned an error
         if (result.data.error) {
             const status = result.data.status || 500;
             return res.status(status).json({ error: result.data.error });
         }
-        
+
         return res.status(result.data.status || 200).json(result.data);
     } catch (err) {
         console.error('Auth route error:', err);

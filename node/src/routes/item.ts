@@ -5,6 +5,10 @@ import type { Engine } from '@ai-rpg-engine/core';
 import rateLimit from 'express-rate-limit';
 import { saveEngine } from '../utils/save.js';
 
+import { register } from "node:module";
+import { pathToFileURL } from "node:url";
+register("ts-node/esm", pathToFileURL("./"));
+
 export default function itemRoutes(engine: Engine) {
 	const router = express.Router();
 	const itemRouteLimiter = rateLimit({
@@ -23,6 +27,8 @@ export default function itemRoutes(engine: Engine) {
 		const itemsSchema = await fs.readFile(schemaFile, 'utf8');
 		const cat_items = JSON.parse(itemsSchema).Items[itemType as string];
 		let item;
+
+		console.log(JSON.stringify(cat_items));
 
 		for (let i of cat_items) {
 			if (i.itemId == itemId) {

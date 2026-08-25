@@ -1,10 +1,10 @@
-import mysql from 'mysql';
+import mysql from 'mysql2';
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-dotenv.config({path: '.env'});
+dotenv.config({ path: '.env' });
 
 export default {
     postBasic: async (options) => {
@@ -15,10 +15,10 @@ export default {
 
             // Create connection
             con = mysql.createConnection({
-                host: process.env.SQLHOST,
-                user: process.env.SQLUSER,
-                password: process.env.SQLPASS,
-                database: process.env.SQLDB
+                host: process.env.SQL_HOST,
+                user: process.env.SQL_USER,
+                password: process.env.SQL_PASS,
+                database: process.env.SQL_DB
             });
 
             // Promisify connection

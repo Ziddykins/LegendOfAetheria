@@ -119,3 +119,5 @@ loa.eng.bk
 system/constants.php
 .aider*
 .memory
+postman/
+.postman/

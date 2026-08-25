@@ -1,19 +1,18 @@
 <?php
-
-require_once "system/constants.php";
 require_once "system/bootstrap.php";
 
 use Game\Account\Account;
 use Game\Character\Character;
 use Game\System\Enums\AbuseType;
 use Game\Components\Cards\CharacterSelect\CharacterSelectCard;
+use Game\System\Enums\LOAError;
 
 $select_style = 'd-grid gap-2';
 
 if (check_session()) {
-    $account   = new Account($_SESSION['email']);
-	$character = new Character($account->get_id());
-	//ai_serv_post('logged_in', $account);
+    $account = new Account($_SESSION['email']);
+    $character = new Character($account->get_id());
+    //ai_serv_post('logged_in', $account);
 
     $char_count = Account::getCharacterCount($account->get_id());
 
@@ -27,10 +26,10 @@ if (check_session()) {
             $_POST["select-new-$slot"] = 1;
         }
     }
-    
+
     if (isset($_POST)) {
-        $action    = null;
-        $slot      = null;
+        $action = null;
+        $slot = null;
         $char_slot = null;
 
         foreach ($_POST as $key => $value) {
@@ -38,7 +37,7 @@ if (check_session()) {
 
             if (preg_match('/^select-(load|delete|new)-(\d+)/', $key, $matches)) {
                 $action = $matches[1];
-                $slot   = $matches[2];
+                $slot = $matches[2];
             }
         }
 
@@ -48,23 +47,23 @@ if (check_session()) {
             case 'load':
                 /* Get character ID in that slot */
                 $sql_query = "SELECT `$char_slot` FROM {$t['accounts']} WHERE `id` = ?";
-                $char_id = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc()["$char_slot"];
+                $char_id = $db->execute_query($sql_query, [$_SESSION['account-id']])->fetch_assoc()["$char_slot"];
 
                 $character = new Character($account->get_id(), $char_id);
 
-                $_SESSION['focused-slot'] = (int)$slot;
-                $_SESSION['character-id'] = (int)$char_id;
+                $_SESSION['focused-slot'] = (int) $slot;
+                $_SESSION['character-id'] = (int) $char_id;
                 $_SESSION['name'] = $character->get_name();
                 header('Location: /game?page=profile&sub=character');
                 exit();
             case 'new':
-                $char_name   = $_POST['create-character-name'];
-                $char_race   = validate_race($_POST['race-select']);
+                $char_name = preg_replace('/[^a-zA-Z0-9_-]+/', '', $_POST['create-character-name']);
+                $char_race = validate_race($_POST['race-select']);
                 $char_avatar = validate_avatar('avatar-' . $_POST['avatar-select'] . '.webp');
 
-                $str     = $_POST['str-ap'];
-                $int     = $_POST['int-ap'];
-                $def     = $_POST['def-ap'];
+                $str = $_POST['str-ap'];
+                $int = $_POST['int-ap'];
+                $def = $_POST['def-ap'];
                 $next_char_id = getNextTableID($t['characters']);
 
                 if ($str + $def + $int === STARTING_ASSIGNABLE_AP) {
@@ -80,7 +79,7 @@ if (check_session()) {
                 }
 
                 $sql_query = "UPDATE {$t['accounts']} SET `$char_slot` = ? WHERE `id` = ?";
-                $db->execute_query($sql_query, [ $next_char_id, $account->get_id() ]);
+                $db->execute_query($sql_query, [$next_char_id, $account->get_id()]);
 
                 $character = new Character($account->get_id());
                 $character->new($slot);
@@ -98,22 +97,22 @@ if (check_session()) {
             case 'delete':
                 /* Get character ID in that slot */
                 $sql_query = "SELECT `$char_slot` FROM {$t['accounts']} WHERE `id` = ?";
-                $char_id = $db->execute_query($sql_query, [ $_SESSION['account-id'] ])->fetch_assoc()["$char_slot"];
+                $char_id = $db->execute_query($sql_query, [$_SESSION['account-id']])->fetch_assoc()["$char_slot"];
 
                 /* Clear that slot */
                 $sql_query = "UPDATE {$t['accounts']} SET `$char_slot` = NULL WHERE `id` = ?";
-                $db->execute_query($sql_query, [ $_SESSION['account-id'] ]);
+                $db->execute_query($sql_query, [$_SESSION['account-id']]);
 
                 /* Delete that character */
                 $sql_query = "DELETE FROM {$t['characters']} WHERE `id` = ?";
-                $db->execute_query($sql_query, [ $char_id ]);
+                $db->execute_query($sql_query, [$char_id]);
 
                 $log->info(
                     "Character Deleted",
                     [
-                        'AccountID'   => $_SESSION['account-id'],
+                        'AccountID' => $_SESSION['account-id'],
                         'CharacterID' => $char_id,
-                        'Slot'        => $slot
+                        'Slot' => $slot
                     ]
                 );
 
@@ -142,7 +141,7 @@ if (check_session()) {
                 <?php
                 for ($i = 1; $i < 4; $i++) {
                     $char_slot = "get_charSlot$i";
-                    $char_id   = $account->$char_slot();
+                    $char_id = $account->$char_slot();
                     $card = new CharacterSelectCard($char_id, $i);
                     echo $card->render();
                 }
@@ -152,10 +151,11 @@ if (check_session()) {
     </div>
 
     <span class="d-grid sticky-bottom w-100">
-        <a href="/logout"><button id="signout-button" name="signout-button" type="button" role="button" class="btn btn-sm btn-dark bg-gradient">Sign Out</button></a>
+        <a href="/logout"><button id="signout-button" name="signout-button" type="button" role="button"
+                class="btn btn-sm btn-dark bg-gradient">Sign Out</button></a>
     </span>
 
-<script>
+    <script>
         document.querySelectorAll("button[id^='select-new-']").forEach((button) => {
             button.addEventListener("click", (e) => {
                 let slot = button.id.split("-")[2];
@@ -163,7 +163,7 @@ if (check_session()) {
             });
         });
     </script>
-    
+
     <?php include "snippets/snip-new-char.php"; ?>
 
     <script>
@@ -177,11 +177,11 @@ if (check_session()) {
             });
         });
         const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
-		
-		const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+
+        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
     </script>
 
-    <?php include "html/footers.html"; ?>    
+    <?php include "html/footers.html"; ?>
 
 </body>
 

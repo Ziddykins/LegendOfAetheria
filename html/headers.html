@@ -16,7 +16,7 @@
 					 media-src 'self';
 					 worker-src 'none';">
 	
-        <script src="node_modules/eruda/eruda.js"></script>
+<!--    <script src="node_modules/eruda/eruda.js"></script>
 	    <script src="node_modules/eruda-timing/eruda-timing.js"></script>
 	    <script>
 		    eruda.init();
@@ -30,8 +30,9 @@
                 eruda.show();
             });
         </script>
-        
-		</script>
+        -->
+    		</script>
+            
         <!-- local 'self' https://accounts.google.com;-->
         <link rel="stylesheet" type="text/css" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="/node_modules/bootstrap-icons/font/bootstrap-icons.min.css">
@@ -49,9 +50,11 @@
 
         <?php if (isset($_SESSION['logged-in']) && $_SESSION['logged-in'] == 1): ?>
         <?php if (!isset($_SESSION['csrf-token'])): ?>
-            $_SESSION['csrf-token'] = gen_csrf_token();
+            $sup = gen_csrf_token();
+            
+            $_SESSION['csrf-token'] = $sup;
         <?php endif; ?>
-
+        
         <meta content="<?php echo $_SESSION['csrf-token']; ?>" name="csrf-token" />
 
         <script>                

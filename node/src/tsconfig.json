@@ -3,29 +3,27 @@
   "compilerOptions": {
     // File Layout
     "rootDir": "./",
-
-
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "esnext",
     "target": "ES2022",
     // For nodejs:
-    "lib": ["esnext"],
-    "types": ["node"],
-	"moduleResolution": "bundler",
-	"esModuleInterop": true,
-
+    "lib": [
+      "esnext"
+    ],
+    "types": [
+      "node"
+    ],
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
     // and npm install -D @types/node
-
     // Other Outputs
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-
     // Style Options
     // "noImplicitReturns": true,
     // "noImplicitOverride": true,
@@ -43,9 +41,9 @@
     "skipLibCheck": true
   },
   "exclude": [
-  	"node_modules",
-	"packages",
-	"dist"
+    "node_modules",
+    "packages",
+    "dist"
   ],
   "watchDirectory": "useFsEvents"
 }

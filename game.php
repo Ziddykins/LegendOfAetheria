@@ -1,96 +1,98 @@
 <?php
-    declare(strict_types = 1);
-    require_once "system/bootstrap.php";
+declare(strict_types=1);
+require_once "system/bootstrap.php";
 
 
-    use Game\Account\Account;
-    use Game\Account\Enums\Privileges;
-    use Game\Character\Character;
-    use Game\Components\Sidebar\Enums\SidebarType;
-    use Game\System\System;
-    use Game\AI\LoAllama;
+use Game\Account\Account;
+use Game\Account\Enums\Privileges;
+use Game\Character\Character;
+use Game\Components\Sidebar\Enums\SidebarType;
+use Game\System\System;
+use Game\AI\LoAllama;
+use Game\Map\Map;
 
-    $system = new System(0);
-    $system->load_sheet();
-    $llama = new LoAllama(1, 'Frank', 'smollm2:360m');
+$system = new System(0);
+$system->load_sheet();
+$llama = new LoAllama(1, 'Frank', 'smollm2:360m');
 
-    $account   = new Account($_SESSION['email']);
-    $character = new Character($account->get_id(), $_SESSION['character-id']);
-    
-    $color_mode = $account->get_settings()->get_colorMode();
-    
-    $account->get_settings()->set_sideBar(SidebarType::LOA_CLASSIC);
-    $sidebar_rel_link = $account->get_settings()->get_sideBar()->value;
+$map = new Map();
+
+$account = new Account($_SESSION['email']);
+$character = new Character($account->get_id(), $_SESSION['character-id']);
+
+$color_mode = $account->get_settings()->get_colorMode();
+
+$account->get_settings()->set_sideBar(SidebarType::LOA_CLASSIC);
+$sidebar_rel_link = $account->get_settings()->get_sideBar()->value;
 
 
-    //$familiar = new Familiar($character->get_id(), $t['familiars']);
-    //$familiar->loadFamiliar($character->get_id());
+//$familiar = new Familiar($character->get_id(), $t['familiars']);
+//$familiar->loadFamiliar($character->get_id());
 
-    $_SESSION['name'] = $character->get_name();
-    $cur_floor        = $character->get_floor();
-    $avatar           = $character->get_avatar();
-    $character->set_lastAction(date("Y-m-d H:i:s", strtotime("now"))); 
+$_SESSION['name'] = $character->get_name();
+$cur_floor = $character->get_floor();
+$avatar = $character->get_avatar();
+$character->set_lastAction(date("Y-m-d H:i:s", strtotime("now")));
 ?>
 
 <?php include 'html/opener.html'; ?>
-    <head>
-        <?php include 'html/headers.html'; ?>
-    </head>
-    <script>loa.u_name = '<?php echo $_SESSION['name']; ?>';</script>
 
-    <body class="uncial" data-bs-theme="<?php echo $color_mode; ?>" data-overlayscrollbars-initialize>
-        <div class="d-flex-fill overflow-hidden" style="height: 100vh;">
-            <span id="terst" class="row g-0 h-100 app-wrapper layout-fixed sidebar-expand-lg ms-n3">
+<head>
+    <?php include 'html/headers.html'; ?>
+</head>
+<script>loa.u_name = '<?php echo $_SESSION['name']; ?>';</script>
+
+<body class="uncial" data-bs-theme="<?php echo $color_mode; ?>" data-overlayscrollbars-initialize>
+    <div class="d-flex-fill overflow-hidden" style="height: 100vh;">
+        <span id="terst" class="row g-0 h-100 app-wrapper layout-fixed sidebar-expand-lg ms-n3">
             <?php include $sidebar_rel_link; ?>
-                <main id="main-section" class="col ps-1 border border-success overflow-hidden" style="height: 100vh; max-height: 100vh; background: rgba(15,15,15,0.6);" data-overlayscrollbars-initialize>
-                    <div class="d-grid ms-3 mt-3">
+            <main id="main-section" class="col ps-1 border border-success overflow-hidden"
+                style="height: 100vh; max-height: 100vh; background: rgba(15,15,15,0.6);"
+                data-overlayscrollbars-initialize>
+                <div class="d-grid ms-3 mt-3">
                     <?php
-                        $privileges = $account->get_privileges()->value;
+                    $privileges = $account->get_privileges()->value;
 
-                        if ($privileges == Privileges::UNVERIFIED->value) {
-                            include 'html/verify.html';
-                            exit();
+                    if ($privileges == Privileges::UNVERIFIED->value) {
+                        include 'html/verify.html';
+                        exit();
+                    }
+
+                    if (isset($_GET['page'])) {
+                        $requested_page = null;
+                        $requestion_sub = null;
+                        $page_string = null;
+
+                        $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
+                        $page_string = "pages/";
+
+                        if (isset($_GET['sub'])) {
+                            $requested_sub = preg_replace('/[^a-z-]+/', '', $_GET['sub']);
+                            $page_string .= "$requested_sub/$requested_page.php";
+                        } else {
+                            $page_string .= "pages/character/profile.php";
                         }
 
-                        if (isset($_GET['page'])) {
-                            $requested_page = null;
-                            $requestion_sub = null;
-                            $page_string    = null;
-                            
-                            $requested_page = preg_replace('/[^a-z-]+/', '', $_GET['page']);
-                            $page_string = "pages/";
 
-                            if (isset($_GET['sub'])) {
-                                $requested_sub = preg_replace('/[^a-z-]+/', '', $_GET['sub']);
-                                $page_string .= "$requested_sub/$requested_page.php";
-                            } else {
-                                $page_string .= "pages/character/profile.php";
-                            }
-
-                            
-                            if (file_exists($page_string)) {
-                                include "$page_string";
-                            } else {
-                                include 'pages/character/sheet.php';
-                            }
-                            
+                        if (file_exists($page_string)) {
+                            include "$page_string";
+                        } else {
+                            include 'pages/character/sheet.php';
                         }
+
+                    }
                     ?>
-                     </div>
-                </main>
-                <?php include 'chat/chat.html'; ?>
-             </span>
-         </div>
+                </div>
+            </main>
+            <?php include 'chat/chat.html'; ?>
+        </span>
+    </div>
 
-        <div id="footer"> 
-            <?php include 'html/footers.html'; ?>
-        </div>
+    <div id="footer">
+        <?php include 'html/footers.html'; ?>
+    </div>
 
-        <div aria-live="polite" aria-atomic="true" class="position-relative">
-            <div class="toast-container position-fixed bottom-0 end-0 p-3" id='toast-container' name='toast-container'>
-                <!-- Toast placeholder -->
-            </div>
-        </div>
-        <script>OverlayScrollbars(document.querySelector('#main-section'), {  overflow: { x: 'hidden' }, scrollbars: { theme: 'os-theme-light'}});</script>
-    </body>
+    <script>OverlayScrollbars(document.querySelector('#main-section'), { overflow: { x: 'hidden' }, scrollbars: { theme: 'os-theme-light' } });</script>
+</body>
+
 </html>

@@ -180,6 +180,7 @@ EOF
     } else {
         tell_user('ERROR', "You will have to move the installation files to the web root directory manually (mv $loc_check $cfg{web_root})\n"
                          . "Exiting script now...");
+
     }
 }
 

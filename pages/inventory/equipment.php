@@ -1,121 +1,135 @@
 <?php
-	include 'snippets/snip-charstats.php';
-	use Game\Inventory\Inventory;
-	use Game\Inventory\Items\Item;
+include 'snippets/snip-charstats.php';
+use Game\Inventory\Inventory;
+use Game\Inventory\Items\Item;
 
-	global $character;
+global $character;
 
-	$inventory = new Inventory($character->get_id());
-	
+$inventory = new Inventory($character->get_id());
+$inventory->load();
 
-	$test_item = new Item('consumable', 1);
+$test_item = new Item('consumables', 1);
+$inventory->addItem($test_item);
+$test_item = new Item('consumables', 4);
+$inventory->addItem($test_item);
 
-	$inventory->addItem($test_item);
-	echo $slots_left = $inventory->spacesLeft();
-	echo '<pre>';
-	print_r($inventory->dumpProps());
-	echo '</pre>';
-	exit();
+$max_slots = $inventory->get_slotCount();
+$free_slots = $max_slots - $inventory->get_nextAvailableSlot();
+
 ?>
-	<div class="inventory-page py-5">
-		<div class="container-lg">
-			<div class="row g-4">
-				<!-- Left Panel: Character Inventory Grid -->
-				<div class="col-lg-8">
-					<div class="inventory-panel">
-						<div class="inventory-header">
-							<h2 class="inventory-title">Backpack</h2>
-							<span class="inventory-weight">23/50 slots</span>
-						</div>
-						<div class="inventory-grid">
-							<?php for ($i = 0; $i < 50; $i++): ?>
-								<div class="inventory-slot" data-slot="<?php echo $i; ?>">
-									<?php if ($i === 0): ?>
-										<div class="inventory-item" data-rarity="rare">
-											<img src="/img/items/sword-icon.png" alt="Item" class="inventory-item-icon" />
-											<div class="inventory-item-quantity">1</div>
-										</div>
-									<?php endif; ?>
-								</div>
-							<?php endfor; ?>
+
+<div class="inventory-page py-5">
+	<div class="container-lg">
+		<div class="row g-4">
+			<!-- Top Row: Character Stats and Equipment (50/50) -->
+			<div class="col-12 col-lg-6">
+				<div class="character-panel mb-4">
+					<div class="character-portrait text-center">
+						<img src="/img/avatars/<?php echo $character->get_avatar(); ?>" alt="Character"
+							class="img-fluid rounded" />
+					</div>
+					<div class="character-info mt-3">
+						<h3 class="text-white mb-2"><?php echo $character->get_Race()->name; ?></h3>
+						<div class="stats-grid">
+							<div class="stat-item">
+								<span class="stat-label">Level</span>
+								<span class="stat-value">
+									<?php echo $character->get_level(); ?>
+								</span>
+							</div>
+							<div class="stat-item">
+								<span class="stat-label">Exp</span>
+								<span class="stat-value">
+									<?php echo $character->get_experience() . " / " . $character->get_maxExp(); ?>
+								</span>
+							</div>
+							<div class="stat-item">
+								<span class="stat-label">Gold</span>
+								<span class="stat-value text-warning">
+									<?php echo $character->get_gold(); ?>
+								</span>
+							</div>
 						</div>
 					</div>
 				</div>
+			</div>
 
-				<!-- Right Panel: Character Stats & Equipment -->
-				<div class="col-lg-4">
-					<div class="character-panel mb-4">
-						<div class="character-portrait text-center">
-							<img src="/img/avatars/avatar-unknown.webp" alt="Character" class="img-fluid rounded" />
+			<div class="col-12 col-lg-6">
+				<div class="equipment-panel">
+					<h4 class="equipment-title">Equipment</h4>
+					<div class="equipment-slots">
+						<div class="equipment-slot head">
+							<span class="slot-label">Head</span>
+							<div class="slot-display">
+								<i class="bi bi-shield-check text-warning opacity-25"></i>
+							</div>
 						</div>
-						<div class="character-info mt-3">
-							<h3 class="text-white mb-2">Warrior</h3>
-							<div class="stats-grid">
-								<div class="stat-item">
-									<span class="stat-label">Level</span>
-									<span class="stat-value">12</span>
-								</div>
-								<div class="stat-item">
-									<span class="stat-label">Exp</span>
-									<span class="stat-value">2,450</span>
-								</div>
-								<div class="stat-item">
-									<span class="stat-label">Gold</span>
-									<span class="stat-value text-warning">15.2K</span>
-								</div>
+						<div class="equipment-slot chest">
+							<span class="slot-label">Chest</span>
+							<div class="slot-display">
+								<i class="bi bi-shield-check text-warning opacity-25"></i>
+							</div>
+						</div>
+						<div class="equipment-slot hands">
+							<span class="slot-label">Hands</span>
+							<div class="slot-display">
+								<i class="bi bi-shield-check text-warning opacity-25"></i>
+							</div>
+						</div>
+						<div class="equipment-slot feet">
+							<span class="slot-label">Feet</span>
+							<div class="slot-display">
+								<i class="bi bi-shield-check text-warning opacity-25"></i>
+							</div>
+						</div>
+						<div class="equipment-slot main-hand">
+							<span class="slot-label">Main Hand</span>
+							<div class="slot-display">
+								<i class="bi bi-shield-check text-warning opacity-25"></i>
+							</div>
+						</div>
+						<div class="equipment-slot off-hand">
+							<span class="slot-label">Off Hand</span>
+							<div class="slot-display">
+								<i class="bi bi-shield-check text-warning opacity-25"></i>
 							</div>
 						</div>
 					</div>
+				</div>
+			</div>
 
-					<!-- Equipment Slots -->
-					<div class="equipment-panel">
-						<h4 class="equipment-title">Equipment</h4>
-						<div class="equipment-slots">
-							<div class="equipment-slot head">
-								<span class="slot-label">Head</span>
-								<div class="slot-display">
-									<i class="bi bi-shield-check text-warning opacity-25"></i>
-								</div>
-							</div>
-							<div class="equipment-slot chest">
-								<span class="slot-label">Chest</span>
-								<div class="slot-display">
-									<i class="bi bi-shield-check text-warning opacity-25"></i>
-								</div>
-							</div>
-							<div class="equipment-slot hands">
-								<span class="slot-label">Hands</span>
-								<div class="slot-display">
-									<i class="bi bi-shield-check text-warning opacity-25"></i>
-								</div>
-							</div>
-							<div class="equipment-slot feet">
-								<span class="slot-label">Feet</span>
-								<div class="slot-display">
-									<i class="bi bi-shield-check text-warning opacity-25"></i>
-								</div>
-							</div>
-							<div class="equipment-slot main-hand">
-								<span class="slot-label">Main Hand</span>
-								<div class="slot-display">
-									<i class="bi bi-shield-check text-warning opacity-25"></i>
-								</div>
-							</div>
-							<div class="equipment-slot off-hand">
-								<span class="slot-label">Off Hand</span>
-								<div class="slot-display">
-									<i class="bi bi-shield-check text-warning opacity-25"></i>
-								</div>
-							</div>
-						</div>
+			<!-- Bottom Row: Backpack (80%) and Item Details (20%) -->
+			<div class="col-12 col-lg-10">
+				<div class="inventory-panel">
+					<div class="inventory-header">
+						<h2 class="inventory-title">Backpack</h2>
+						<span class="inventory-slotcount">
+							<?php echo $inventory->spacesLeft() . ' / ' . $inventory->get_slotCount() . ' slots'; ?>
+						</span>
+						<span class="inventory-weight">
+							<?php echo '(' . $inventory->get_currentWeight() . ' / ' . $inventory->get_maxWeight() . ')'; ?>
+						</span>
 					</div>
+					<div class="inventory-grid">
+						<?php for ($i = 0; $i < $inventory->get_nextAvailableSlot(); $i++): ?>
+							<?php $item = $inventory->getItem($i); ?>
+							<div class="inventory-slot" data-slot="<?php echo $i; ?>">
+								<div class="inventory-item"
+									data-rarity="<?php echo strtolower($item->get_rarity()->name); ?>">
+									<img src="/<?php echo $item->get_image(); ?>" alt=" Item" class="inventory-item-icon" />
+									<div class="inventory-item-quantity">1</div>
+								</div>
+							</div>
+						<?php endfor; ?>
+					</div>
+				</div>
+			</div>
 
-					<!-- Item Details -->
-					<div class="item-details-panel mt-4">
-						<h4 class="text-white mb-3">Item Details</h4>
-						<div class="alert alert-info-subtle border-subtle">
-							<p class="text-muted small mb-0">Select an item to view details</p>
-						</div>
+			<div class="col-12 col-lg-2">
+				<div class="item-details-panel h-100">
+					<h4 class="text-white mb-3">Item Details</h4>
+					<div class="alert alert-info-subtle border-subtle">
+						<p class="text-muted small mb-0">Select an item to view details</p>
 					</div>
 				</div>
 			</div>

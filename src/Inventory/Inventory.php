@@ -28,26 +28,27 @@ use function count;
  * @method void add_currentWeight(int $amount) Increases carried weight
  * @method void sub_currentWeight(int $amount) Decreases carried weight
  */
-class Inventory {
+class Inventory
+{
     use PropSuite;
 
     /** @var int Inventory identifier (matches character ID) */
     private int $id;
-    
+
     /** @var int Total number of inventory slots available */
     private int $slotCount;
-    
+
     /** @var int Current total weight of all carried items */
     private int $currentWeight;
-    
+
     /** @var int Maximum weight capacity before encumbrance */
     private int $maxWeight;
-    
+
     /** @var int Index of next available empty slot */
     private int $nextAvailableSlot;
 
     /** @var array<Item> Array of Item objects indexed by slot number */
-    private array $slots;
+    public array $slots;
 
     /**
      * Creates a new inventory instance with default capacity.
@@ -57,15 +58,16 @@ class Inventory {
      * @param int $slotCount Total inventory slots (default 20)
      * @param int $maxWeight Weight limit (default 1000)
      */
-    public function __construct($characterID, $slotCount = 20, $maxWeight = 1000) {
+    public function __construct($characterID, $slotCount = 20, $maxWeight = 1000)
+    {
         $this->id = $characterID;
-        $this->slotCount     = $slotCount;
-        $this->maxWeight     = $maxWeight;
+        $this->slotCount = $slotCount;
+        $this->maxWeight = $maxWeight;
         $this->currentWeight = 0;
 
         $this->nextAvailableSlot = 0;
 
-        for ($i=0; $i<$slotCount; $i++) {
+        for ($i = 0; $i < $slotCount; $i++) {
             $this->slots[$i] = new Item();
         }
     }
@@ -79,10 +81,10 @@ class Inventory {
      * @param array $params Method parameters
      * @return mixed Result from PropSuite method
      */
-    public function __call($method, $params) {
+    public function __call($method, $params)
+    {
         global $db, $log;
 
-        
         if (!count($params)) {
             $params = null;
         }
@@ -103,7 +105,8 @@ class Inventory {
      * 
      * @return int Number of available slots
      */
-    private function spacesLeft(): int {
+    public function spacesLeft(): int
+    {
         return count($this->slots) - $this->nextAvailableSlot;
     }
 
@@ -113,9 +116,11 @@ class Inventory {
      * @param Item $item The items to add to the next available slot
      * @return void
      */
-    private function addItem(Item $item): void {
+    public function addItem(Item $item): void
+    {
         $targetSlot = $this->nextAvailableSlot++;
         $this->slots[$targetSlot] = $item;
+        $this->currentWeight += $item->get_weight();
     }
 
     /**
@@ -125,8 +130,20 @@ class Inventory {
      * @param int $slot Slot index to clear
      * @return void
      */
-    private function removeItem($slot): void {
+    public function removeItem($slot): void
+    {
         $this->slots[$slot] = new Item();
         $this->nextAvailableSlot--;
+    }
+
+    public function getItem($slot): ?Item
+    {
+        return $this->slots[$slot] ?? null;
+    }
+
+    public function noop(): void
+    {
+
+        return;
     }
 }

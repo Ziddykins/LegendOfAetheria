@@ -7,7 +7,8 @@ use Game\Inventory\Enums\ObjectRarity;
  * Items can have multiple sockets for gems and provide various stat modifications.
  * The class fetches item details from a remote service based on item type and ID.
  */
-class Item {
+class Item
+{
 	/** @var int The ID of the item, relating to the SQL entry */
 	private int $id;
 
@@ -19,16 +20,16 @@ class Item {
 
 	/** @var string $img_thumb The items image thumbnail path, defaults to an unknown placeholder */
 	private string $imgThumb = "img/items/potions/thumbs/unknown.png";
-    
-    /** @var int $weight Weight value (contributes to encumbrance) */
+
+	/** @var int $weight Weight value (contributes to encumbrance) */
 	private int $weight = 0;
 
 	/** @var int $itemId Item ID to fetch the schema for that item */
 	private int $itemId = 0;
-    	
+
 	/** @var string $type Item type to fetch the schema for that item */
 	private string $type = "";
-	
+
 	/** @var string $subtype Item subtype to fetch the schema for that item */
 	private string $subtype = "";
 
@@ -50,30 +51,32 @@ class Item {
 	/** @var string $description Item description */
 	private string $description = "";
 
-    /** @var array<Socket> Array of Socket objects for gem insertion */
-    private array $sockets = [];
-    
-    /** @var array $modifiers Stat modifiers provided by this item which were chosen*/
+	/** @var array<Socket> Array of Socket objects for gem insertion */
+	private array $sockets = [];
+
+	/** @var array $modifiers Stat modifiers provided by this item which were chosen*/
 	private array $modifiers = [];
 
 	/** @var bool $stackable Whether or not the item is stackable */
 	private bool $stackable = false;
 
 
-    /**
-     * Creates a new item instance and hydrates it from the remote item schema.
-     * If no type/itemId are supplied, an empty placeholder item is created.
-     * 
-     * @param string $type Item type to fetch from item service
-     * @param int $itemId Item ID to fetch from item service
-     */
-	public function __construct(string $type = "", int $itemId = 0) {
+	/**
+	 * Creates a new item instance and hydrates it from the remote item schema.
+	 * If no type/itemId are supplied, an empty placeholder item is created.
+	 * 
+	 * @param string $type Item type to fetch from item service
+	 * @param int $itemId Item ID to fetch from item service
+	 */
+	public function __construct(string $type = "", int $itemId = 0)
+	{
 		global $log;
 		$this->type = $type;
 		$this->itemId = $itemId;
 
 		if ($this->type !== "" && $this->itemId > 0) {
 			$item = $this->get_item_details();
+
 			if (is_object($item)) {
 				$this->name = $item->name ?? $this->name;
 				$this->image = $item->image ?? $this->image;
@@ -91,15 +94,17 @@ class Item {
 			}
 		}
 
-/*		for ($i=0; $i<$socketCount; $i++) {
-            $this->sockets[$i] = new Socket($i);
-		}*/
+		/*		for ($i=0; $i<$socketCount; $i++) {
+					$this->sockets[$i] = new Socket($i);
+				}*/
 	}
 
-	private function get_item_details() {
+	private function get_item_details()
+	{
+		global $log;
 		$ch = curl_init();
 
-		curl_setopt($ch, CURLOPT_URL, "http://{$_ENV['LOAPI_HOST']}:{$_ENV['LOAPI_PORT']}/item/{$this->type}/{$this->itemId}");
+		curl_setopt($ch, CURLOPT_URL, "http://{$_ENV['LOAPI_HOST']}:{$_ENV['LOAPI_PORT']}/v1/item/{$this->type}/{$this->itemId}");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, [
 			'Content-Type: application/json',
 			'Accept: application/json'
@@ -116,35 +121,37 @@ class Item {
 		return json_decode($response);
 	}
 
-	private function mod_pool($rarity) {
+	private function mod_pool($rarity)
+	{
 		$RARITY_CONFIG = [
 			"WORTHLESS" => ["weight" => 50.0, "mult" => 0.3, "affixes" => [0, 1]],
 			"TARNISHED" => ["weight" => 30.0, "mult" => 0.5, "affixes" => [0, 2]],
-			"COMMON"    => ["weight" => 20.0, "mult" => 1.0, "affixes" => [1, 2]],
+			"COMMON" => ["weight" => 20.0, "mult" => 1.0, "affixes" => [1, 2]],
 			"ENCHANTED" => ["weight" => 12.0, "mult" => 1.3, "affixes" => [2, 3]],
-			"MAGICAL"   => ["weight" => 8.0,  "mult" => 1.6, "affixes" => [2, 4]],
-			"LEGENDARY" => ["weight" => 5.0,  "mult" => 2.2, "affixes" => [3, 5]],
-			"EPIC"      => ["weight" => 2.5,  "mult" => 2.8, "affixes" => [4, 6]],
-			"MYSTIC"    => ["weight" => 1.5,  "mult" => 3.5, "affixes" => [5, 7]],
-			"HEROIC"    => ["weight" => 0.75, "mult" => 4.5, "affixes" => [6, 8]],
-			"INFAMOUS"  => ["weight" => 0.24, "mult" => 6.0, "affixes" => [7, 9]],
-			"GODLY"     => ["weight" => 0.01, "mult" => 10.0,"affixes" => [8, 10]]
+			"MAGICAL" => ["weight" => 8.0, "mult" => 1.6, "affixes" => [2, 4]],
+			"LEGENDARY" => ["weight" => 5.0, "mult" => 2.2, "affixes" => [3, 5]],
+			"EPIC" => ["weight" => 2.5, "mult" => 2.8, "affixes" => [4, 6]],
+			"MYSTIC" => ["weight" => 1.5, "mult" => 3.5, "affixes" => [5, 7]],
+			"HEROIC" => ["weight" => 0.75, "mult" => 4.5, "affixes" => [6, 8]],
+			"INFAMOUS" => ["weight" => 0.24, "mult" => 6.0, "affixes" => [7, 9]],
+			"GODLY" => ["weight" => 0.01, "mult" => 10.0, "affixes" => [8, 10]]
 		];
-		
+
 		$STAT_POOLS = [
 			"weapon" => ["str", "crit", "accu", "sped"],
-			"armor"  => ["def", "maxHP", "rsst", "mdef"],
-			"boots"  => ["sped", "dodg", "dext"],
+			"armor" => ["def", "maxHP", "rsst", "mdef"],
+			"boots" => ["sped", "dodg", "dext"],
 			"helmet" => ["def", "int", "maxMP"],
 			"gloves" => ["str", "dext", "accu"],
 			"shield" => ["def", "blck", "rsst"],
 			"potion" => ["hp", "mp", "ep"],
-			"misc"   => ["luck", "chsm", "rgen"]
-		];	
+			"misc" => ["luck", "chsm", "rgen"]
+		];
 	}
 
 
-	public function __call($method, $params) {
+	public function __call($method, $params)
+	{
 		$var = lcfirst(substr($method, 4));
 
 		if (strncasecmp($method, "get_", 4) === 0) {
