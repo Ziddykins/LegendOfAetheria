@@ -53,20 +53,23 @@ if [ ! -f "php-$PHP_VERSION.tar.gz" ]; then
 	echo " Downloading PHP source"
 	echo "========================================"
 	curl -LO "https://www.php.net/distributions/php-$PHP_VERSION.tar.gz"
+fi
+
+if [ ! -d "php-$PHP_VERSION" ]; then
+	tar xzf php-$PHP_VERSION.tar.gz
 else
-	echo "PHP found already, re-download?"
+	echo "PHP found already, overwrite?"
 	echo -n "y/n> "
 	read CHOICE
 
 	if [ "$CHOICE" == "y" ]; then
-		rm -f "php-$PHP_VERSION.tar.gz"
-		curl -LO "https://www.php.net/distributions/php-$PHP_VERSION.tar.gz"
+		rm -f php-$PHP_VERSION
+		tar xzf php-$PHP_VERSION.tar.gz
 	fi
 fi
 
-tar xzf php-$PHP_VERSION.tar.gz
 
-PHP_DIR="${1:-$HOME/src/php-8.4.7}"
+PHP_DIR="${1:-$HOME/src/php-$PHP_VERSION}"
 
 echo "Using source dir: $PHP_DIR"
 
@@ -402,8 +405,6 @@ open(path_c, 'w').write(src_c)
 print("  → dns.c patched OK")
 PYEOF
 
-sed -i 's/#ifndef PHP_DNS_H/#ifndef PHP_DNS_H\n#define PHO_DNS_H\n#endif\n/' /data/data/com.termux/files/home/src/php-8.4.7/ext/standard/php_dns.h
-
 # ── Quick compile check ───────────────────────────────────────────────────────
 echo ""
 echo "Checking that HEADER + C_IN + res_search are visible..."
@@ -441,6 +442,7 @@ echo "  (dns_get_record/checkdnsrr gracefully use res_search on Android;"
 echo "   apache, fpm, mysqli, curl, openssl are all unaffected)"
 
 echo "Done."
+
 DNS_C="ext/standard/dns.c"
 PHP_DNS_H="ext/standard/php_dns.h"
 
@@ -488,7 +490,7 @@ typedef HEADER ns_msg_dummy_t; /* force arpa/nameser.h inclusion */
 /* END TERMUX_BIONIC_PATCH */'
 
     # Use Python for safe multi-line insertion (always available in Termux)
-    python - "$PHP_DNS_H" "$GUARD_LINE" <<PYEOF
+    python3 - "$PHP_DNS_H" "$GUARD_LINE" <<PYEOF
 import sys
 path, line_no = sys.argv[1], int(sys.argv[2])
 lines = open(path).readlines()
@@ -603,6 +605,12 @@ PYEOF
     echo "  → done."
 fi
 
+echo "Verifying guard closures"
+sed -i '/^#ifndef PHP_DNS_H$/c\#ifndef PHP_DNS_H\n#define PHP_DNS_H\n#endif' ext/standard/php_dns.h
+
+echo "Converting getdtablesize to bionic-friendly sysconf"
+sed -i 's/dtablesize = getdtablesize();/dtablesize = (int)sysconf(_SC_OPEN_MAX); if (dtablesize < 0) dtablesize = INT_MAX;/' ext/standard/php_fopen_wrapper.c
+
 echo ""
 echo "If you still get HEADER errors, run:"
 echo "  grep -n 'arpa/nameser' \$(pkg-config --variable=includedir libc)/resolv.h 2>/dev/null || echo 'check: ls \$PREFIX/include/arpa/'"
@@ -612,9 +620,9 @@ echo " Running ./configure script"
 echo "========================================"
 
 ./configure \
-  --prefix=\$PREFIX \
-  --with-config-file-path=\$PREFIX/etc \
-  --with-apxs=\$PREFIX/bin/apxs \
+  --prefix=$PREFIX \
+  --with-config-file-path=$PREFIX/etc \
+  --with-apxs=$PREFIX/bin/apxs \
   --disable-phpdbg \
   --disable-opcache \
   --without-iconv \
@@ -641,16 +649,13 @@ echo "========================================"
 echo " Cleaning old files and compiling"
 echo "========================================"
 
-make clean
+bash main.sh
 make -j $(nproc)
+make install
 
 echo
 echo "========================================"
 echo " DONE"
 echo "========================================"
 
-echo
-echo "========================================"
-echo " DONE"
-echo "========================================"
-
+bash end.sh
