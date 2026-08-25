@@ -1,4 +1,43 @@
 #!/data/data/com.termux/files/usr/bin/bash
+echo "======================"
+echo "  Patch: Step 2 / 2"
+echo "======================"
+
+PHP_DIR="$HOME/src/php-8.4.7"
+BF="$PHP_DIR/ext/standard/basic_functions.c"
+[[ -f "$BF" ]] || { echo "ERROR: $BF not found. Run from php source root."; exit 1; }
+
+[[ -f "${BF}.orig" ]] && cp "${BF}.orig" "$BF" && echo "Restored $BF from orig"
+cp "$BF" "${BF}.orig"
+
+python3 << PYEOF
+import re
+
+path = "$PHP_DIR/ext/standard/basic_functions.c"
+src  = open(path).read()
+
+# Insert a getloadavg stub before the first #include so it's always available.
+# Bionic doesn't have getloadavg; our stub always returns -1 which causes
+# PHP's sys_getloadavg() to return false — safe and correct behaviour.
+STUB = """\
+/* ---- Termux/Bionic compat: patch_basic_functions.sh ---- */
+#if defined(__ANDROID__) && !defined(HAVE_GETLOADAVG)
+static inline int getloadavg(double loadavg[], int nelem) {
+    (void)loadavg; (void)nelem;
+    return -1; /* not available on Android; sys_getloadavg() returns false */
+}
+#endif
+/* ---- end Termux/Bionic compat ---- */
+"""
+
+first_inc = src.find('#include')
+if first_inc == -1:
+    print("ERROR: no #include found"); raise SystemExit(1)
+
+src = src[:first_inc] + STUB + '\n' + src[first_inc:]
+open(path, 'w').write(src)
+print("  → basic_functions.c patched OK")
+PYEOF
 
 
 
@@ -6,8 +45,8 @@ echo
 echo "=========================≈==="
 echo "      Patch: Step 3 / 3"
 echo "=========================≈==="
-DNS_C="ext/standard/dns.c"
-PHP_DNS_H="ext/standard/php_dns.h"
+DNS_C="$PHP_DIR/ext/standard/dns.c"
+PHP_DNS_H="$PHP_DIR/ext/standard/php_dns.h"
 
 for f in "$DNS_C" "$PHP_DNS_H"; do
     [[ -f "$f" ]] || { echo "ERROR: $f not found. Run from php source root."; exit 1; }
@@ -40,7 +79,7 @@ import re, sys
 # ══════════════════════════════════════════════════════════════════════════════
 # php_dns.h — replace the macro backend block in-place
 # ══════════════════════════════════════════════════════════════════════════════
-path_h = "ext/standard/php_dns.h"
+path_h = "/data/data/com.termux/files/home/src/php-8.4.7/ext/standard/php_dns.h"
 src_h  = open(path_h).read()
 
 # The block we need to replace begins right after the #include guards and
@@ -138,7 +177,7 @@ print("  → php_dns.h rewritten OK")
 # ══════════════════════════════════════════════════════════════════════════════
 # dns.c — four targeted fixes
 # ══════════════════════════════════════════════════════════════════════════════
-path_c = "ext/standard/dns.c"
+path_c = "/data/data/com.termux/files/home/src/php-8.4.7/ext/standard/dns.c"
 src_c  = open(path_c).read()
 
 # ── Fix 1: add includes at top so HEADER / C_IN / dn_expand are visible ─────
@@ -250,43 +289,5 @@ rm -f $TMPDIR/dns_check.c $TMPDIR/dns_check.o $TMPDIR/dns_check_err.txt
 
 echo "  (dns_get_record/checkdnsrr gracefully use res_search on Android;"
 echo "   apache, fpm, mysqli, curl, openssl are all unaffected)"
-echo "======================"
-echo "  Patch: Step 2 / 2"
-echo "======================"
-
-BF="ext/standard/basic_functions.c"
-[[ -f "$BF" ]] || { echo "ERROR: $BF not found. Run from php source root."; exit 1; }
-
-[[ -f "${BF}.orig" ]] && cp "${BF}.orig" "$BF" && echo "Restored $BF from orig"
-cp "$BF" "${BF}.orig"
-
-python3 << PYEOF
-import re
-
-path = "ext/standard/basic_functions.c"
-src  = open(path).read()
-
-# Insert a getloadavg stub before the first #include so it's always available.
-# Bionic doesn't have getloadavg; our stub always returns -1 which causes
-# PHP's sys_getloadavg() to return false — safe and correct behaviour.
-STUB = """\
-/* ---- Termux/Bionic compat: patch_basic_functions.sh ---- */
-#if defined(__ANDROID__) && !defined(HAVE_GETLOADAVG)
-static inline int getloadavg(double loadavg[], int nelem) {
-    (void)loadavg; (void)nelem;
-    return -1; /* not available on Android; sys_getloadavg() returns false */
-}
-#endif
-/* ---- end Termux/Bionic compat ---- */
-"""
-
-first_inc = src.find('#include')
-if first_inc == -1:
-    print("ERROR: no #include found"); raise SystemExit(1)
-
-src = src[:first_inc] + STUB + '\n' + src[first_inc:]
-open(path, 'w').write(src)
-print("  → basic_functions.c patched OK")
-PYEOF
 
 echo "Done."
