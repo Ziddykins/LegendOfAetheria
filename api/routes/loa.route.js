@@ -23,7 +23,7 @@ export default async function createLoaRouter() {
     if (typeof nodeId !== 'undefined' && nodeId !== 'reset') {
       dialogue.startNodeId = nodeId;
     }
-x
+
     engine.store.state.dialogueCore = {
       activeDialogueId: dialogue.id,
       activeNodeId: dialogue.startNodeId,

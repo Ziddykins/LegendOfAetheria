@@ -7,13 +7,9 @@ const router = express.Router();
 function parseCredentials(req) {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Basic ')) {
-        const payload = atob(authHeader.split(' ')[1]);
+        const payload = Buffer.from(authHeader.split(' ')[1], 'base64').toString('utf8');
         const [email, password] = payload.split(':');
         return { email, password };
-    } else 
-
-        if (jwt.verify(token, ))
-        return { token: token };
     }
 
     if (req.body && req.body.email && req.body.password) {
@@ -30,10 +26,14 @@ async function handleBearer(req, res) {
     const authHeader = req.headers.authorization;
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = await auth.checkToken(authHeader.split(' ')[1]);
-
-        
-        
+        try {
+            const token = authHeader.split(' ')[1];
+            return res.json({ token, valid: true });
+        } catch (err) {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+    }
+    return res.status(401).json({ error: 'Missing bearer token' });
 }
 
 async function handleLogin(req, res) {
