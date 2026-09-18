@@ -57,6 +57,13 @@ if (isset($_POST['login-submit']) && $_POST['login-submit'] == 1) {
             $account->set_sessionID(session_id());
             $account->set_lastLogin(date('Y-m-d H:i:s'));
 
+            $api_data = [
+                'email' => $account->get_email(),
+                'password' => $password
+            ];
+
+            $_SESSION['bearer'] = ai_serv_post('auth', $api_data)->token;
+
             header('Location: /select');
             exit();
         }

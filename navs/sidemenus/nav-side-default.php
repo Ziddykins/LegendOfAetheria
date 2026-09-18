@@ -7,8 +7,6 @@ use Game\Character\Enums\FriendStatus;
 use Game\Account\Enums\Privileges;
 use Game\Account\Settings;
 
-#require_once "system/constants.php";
-
 $account = new Account($_SESSION['email']);
 $character = new Character($account->get_id(), $_SESSION['character-id']);
 $settings = new Settings($account->get_id());
@@ -30,7 +28,7 @@ $currentPage = $_GET['page'] ?? '';
 $currentSub = $_GET['sub'] ?? '';
 ?>
 
-<aside id="sidebar" class="app-sidebar shadow overflow-hidden ps-3 uncial"
+<aside id="sidebar" class="app-sidebar shadow overflow-hidden ps-3"
     data-bs-theme="<?php echo $settings->get_colorMode(); ?>" style="width: 240px; min-width: 240px; height: 100vh;">
     <div class="sidebar-brand d-flex align-items-center">
         <a href="/game" class="brand-link ms-2">

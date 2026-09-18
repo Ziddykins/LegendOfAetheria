@@ -3,6 +3,8 @@
     if (strlen($_ENV['OPENAI_APIKEY']) < 128) {
         $ai_button_class = 'disabled';
     }
+
+
 ?>
 
                         <div class="container">
@@ -38,9 +40,6 @@
                                             <i id="clear-icon" name="clear-icon" class="bi bi-x-lg"></i> Clear
                                         </button>
                                     </div>
-                                </div>
-                                <div class="col">
-
                                 </div>
                             </div>
                         </div>

@@ -584,28 +584,37 @@
             }
         }
 
-		function ai_serv_post(string $endpoint, mixed $data = null) {
+		function ai_serv_post(string $endpoint, mixed $data = null, string $token = "") {
 			$ch = curl_init();
-
-			curl_setopt($ch, CURLOPT_URL, "http://{$_ENV['LOAPI_HOST']}:{$_ENV['LOAPI_PORT']}/$endpoint");
-			curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            
+            $headers = [
 				'Content-Type: application/json',
 				'Accept: application/json'
-			]);
+			];
 
+            if ($token) {
+                array_push($headers, "Authorization: Bearer $token");
+            }
+
+			curl_setopt($ch, CURLOPT_URL, "http://{$_ENV['LOAPI_HOST']}:{$_ENV['LOAPI_PORT']}/$endpoint");
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 			curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 			curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 			if ($data !== null) {
 				curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 			}
-
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
+			
 			$response = curl_exec($ch);
+            $status_code = curl_getinfo($ch)['http_code'];
+
+            if ($status_code != 200) {
+                echo "API Error: ";
+                print_r(curl_getinfo($ch));
+            }
 
 			unset($ch);
-
-			return $response;
+			return json_decode($response);
 		}
 ?>

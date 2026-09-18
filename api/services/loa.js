@@ -45,7 +45,7 @@ function getDialogueDefinitions() {
         text: 'Oh, nothing. Here, drink this quest-enabling potion.',
         choices: [
           { text: 'You got it, sport-o!', nextNodeId: 'end_power', type: { color: 'bg-success', icon: 'emoji-sunglasses-fill' } },
-          { text: "I ain't quaffin' a thing, later creep-o", nextNodeId: 'rude', type: { color: 'bg-warning', icon: 'emoji-neutral-fill' } },
+          { text: "I ain't quaffin' a thing, later creep-o!", nextNodeId: 'rude', type: { color: 'bg-warning', icon: 'emoji-neutral-fill' } },
         ],
       },
       rude: {

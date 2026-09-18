@@ -213,7 +213,7 @@ graph LR
     subgraph "Authentication Flow"
         BasicAuth["POST /auth/basic"]
         Refresh["POST /auth/refresh"]
-        AuthService["auth.postBasic()"]
+        AuthService["auth.postAuthorization()"]
         Response["JWT Token Response"]
     end
     
@@ -228,7 +228,7 @@ The `/auth/basic` endpoint:
 - Accepts Basic authentication header
 - Decodes base64 credentials: `atob(req.headers.authorization.split(' ')[1])`
 - Splits email and password by colon separator
-- Delegates to `auth.postBasic()` service
+- Delegates to `auth.postAuthorization()` service
 
 **Sources:** [api/routes/auth.route.js:5-22]()
 

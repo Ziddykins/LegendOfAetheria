@@ -179,7 +179,7 @@ graph TB
     subgraph "Authentication Flow"
         BasicPost --> DecodeHeader["Decode Authorization header<br/>atob(base64)"]
         DecodeHeader --> ExtractCreds["Extract email:password<br/>split(':')"]
-        ExtractCreds --> AuthService["auth.postBasic(options)"]
+        ExtractCreds --> AuthService["auth.postAuthorization(options)"]
         AuthService --> Response["Return JWT token<br/>or error"]
     end
 ```
@@ -197,7 +197,7 @@ Authorization: Basic <base64(email:password)>
 **Implementation Details:**
 - Decodes base64 credentials: [api/routes/auth.route.js:8-9]()
 - Splits on `:` to extract email and password
-- Delegates to `auth.postBasic()` service
+- Delegates to `auth.postAuthorization()` service
 - Returns JSON response with JWT token or error
 - Error handling returns HTTP 500 on exceptions
 
@@ -395,7 +395,7 @@ sequenceDiagram
     alt Authentication Request
         Router->>Router: Decode Authorization header
         Router->>Router: Extract credentials
-        Router->>Service: auth.postBasic(options)
+        Router->>Service: auth.postAuthorization(options)
     else API v1 Request
         Router->>Router: Extract path/query params
         Router->>Router: Extract request body
