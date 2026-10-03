@@ -34,7 +34,7 @@ export const AuthView = () => {
   const [race, setRace] = useState('Human');
   const [showPassword, setShowPassword] = useState(false);
 
-  const { login, register, isLoading, error } = useAuthStore();
+  const { login, register, demoLogin, isLoading, error } = useAuthStore();
   const { notify } = useUIStore();
   const navigate = useNavigate();
 
