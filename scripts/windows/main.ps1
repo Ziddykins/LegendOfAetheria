@@ -96,6 +96,7 @@ if (file_exists "$tempDir\mover.success") {
         if (Get-Item -Path "HKLM:Software\Microsoft\Windows\CurrentVersion\Uninstall\xampp" -ErrorAction SilentlyContinue) {
             Write-Host "XAMPP Installed already"
         } else {
+            Write-Host "Installing XAMPP silently, please be patient as this may take a few minutes..."
             Start-Process -FilePath $xamppInstaller -ArgumentList "--unattendedmodeui none --mode unattended --disable-components xampp_mercury,xampp_tomcat,xampp_webalizer" -Wait
             Write-Host "Downloads and installations complete."
         }
@@ -130,4 +131,35 @@ if (-Not (file_exists "$tempDir\mover.success")) {
 } else {
     Write-Host "Mover script has completed and now we will continue the bootstrap process"
     continue_script
+}
+
+
+$OldPath = [regex]::Escape("C:/xampp")
+$NewPath = ((((Get-Item (Get-Location)).Parent).Parent).Parent).Parent.FullName
+$Files = @(
+    "$NewPath/apache/conf/extra/httpd-autoindex.conf",
+    "$NewPath/apache/conf/extra/httpd-dav.conf",
+    "$NewPath/apache/conf/extra/httpd-manual.conf",
+    "$NewPath/apache/conf/extra/httpd-multilang-errordoc.conf",
+    "$NewPath/apache/conf/extra/httpd-ssl.conf",
+    "$NewPath/apache/conf/extra/httpd-vhosts.conf",
+    "$NewPath/apache/conf/extra/httpd-xampp.conf",
+    "$NewPath/apache/conf/httpd.conf",
+    "$NewPath/apache/logs/error.log",
+    "$NewPath/htdocs/install/config.ini.default",
+    "$NewPath/mysql/backup/my.ini",
+    "$NewPath/mysql/bin/my.ini",
+    "$NewPath/mysql/data/my.ini",
+    "$NewPath/perl/lib/CPAN/Config.pm"
+)
+
+$NewPath = ((((Get-Item (Get-Location)).Parent).Parent).Parent).Parent.FullName.Replace('\', '/')
+
+foreach ($File in $Files) {
+    if (Test-Path $File) {
+        (Get-Content -Path $File) -replace $OldPath, $NewPath | Set-Content -Path $File
+        Write-Host "Updated: $File" -ForegroundColor Green
+    } else {
+        Write-Warning "File not found: $File"
+    }
 }
